@@ -685,7 +685,7 @@ import requests # (อย่าลืมเพิ่มบรรทัดนี�
 
 # --- (ใหม่!) 12. ระบบตรวจสอบลิงค์ (Link Checker) ---
 # เราจะใช้ Secret Key เพื่อป้องกันคนอื่นมากดเล่น
-CHECKER_SECRET = os.environ.get('CHECKER_SECRET', 'my-super-secret-checker-key')
+CHECKER_SECRET = os.environ.get('CHECKER_SECRET', 'my_super_secret_checker_key')
 
 @app.route('/run_link_checker')
 def run_link_checker():
