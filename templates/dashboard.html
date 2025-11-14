@@ -613,71 +613,63 @@
                             <th>⚙️ จัดการ</th>
                         </tr>
                     </thead>
-                    <tbody id="linkTableBody">
-                        <!-- Sample Data 1 -->
-                        <tr>
-                            <td><a href="#" target="_blank">ระบบจัดการเอกสาร</a></td>
-                            <td>ระบบสำหรับจัดเก็บและค้นหาเอกสารภายในองค์กร</td>
-                            <td><span class="status-badge status-ok">🟢 ปกติ</span></td>
-                            <td><span class="status-badge status-active">● ใช้งาน</span></td>
-                            <td>ระบบภายใน</td>
-                            <td>กองยุทธศาสตร์</td>
-                            <td>02-221-1234</td>
-                            <td>strategy@bma.go.th</td>
-                            <td>2024-11-14</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <form class="delete-form" style="display: inline;">
-                                        <button type="submit" class="btn-delete">🅾️ ลบ</button>
-                                    </form>
-                                    <a href="#" class="btn-edit">✏️ แก้ไข</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Sample Data 2 -->
-                        <tr>
-                            <td><a href="#" target="_blank">แบบฟอร์มคำขอ</a></td>
-                            <td>ระบบยื่นคำขอและติดตามสถานะออนไลน์</td>
-                            <td><span class="status-badge status-blocked">🔵 ถูกบล็อก</span></td>
-                            <td><span class="status-badge status-updating">● ปรับปรุง</span></td>
-                            <td>บริการประชาชน</td>
-                            <td>สำนักงานเขต</td>
-                            <td>02-221-5678</td>
-                            <td>district@bma.go.th</td>
-                            <td>2024-11-13</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <form class="delete-form" style="display: inline;">
-                                        <button type="submit" class="btn-delete">🅾️ ลบ</button>
-                                    </form>
-                                    <a href="#" class="btn-edit">✏️ แก้ไข</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Sample Data 3 - No Permission -->
-                        <tr>
-                            <td>ฐานข้อมูลบุคลากร</td>
-                            <td>ระบบจัดการข้อมูลพนักงานและทรัพยากรบุคคล</td>
-                            <td><span class="status-badge status-error">🔴 404 Error</span></td>
-                            <td><span class="status-badge status-inactive">● เลิกใช้งาน</span></td>
-                            <td>ระบบภายใน</td>
-                            <td>กองการเจ้าหน้าที่</td>
-                            <td>02-221-9012</td>
-                            <td>hr@bma.go.th</td>
-                            <td>2024-11-10</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <span class="no-permission">(ไม่มีสิทธิ์)</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr id="noDataRow" style="display: none;">
-                            <td colspan="10" style="text-align: center; padding: 40px;">
-                                <div style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
-                                <div style="font-size: 1.1rem; color: var(--button-gray);">ไม่พบข้อมูลลิงค์</div>
-                            </td>
-                        </tr>
-                    </tbody>
+            <tbody id="linkTableBody">
+                {% for link in links %}
+                <tr>
+                    <td>
+                        {% if link.สถานะ == 'ใช้งาน' %}
+                            <a href="{{ link.URL }}" target="_blank">{{ link.ชื่อลิงก์ }}</a>
+                        {% else %}
+                            {{ link.ชื่อลิงก์ }}
+                        {% endif %}
+                    </td>
+                    <td>{{ link.หมายเหตุ }}</td>
+                    <td>
+                        {% if link.LinkStatus == 'OK' %}
+                            <span style="color: green; font-weight: 500;">🟢 ปกติ</span>
+                        {% elif link.LinkStatus == '403 Blocked' %}
+                            <span style="color: #007bff; font-weight: 500;">🔵 ถูกบล็อก</span>
+                        {% elif link.LinkStatus %}
+                            <span style="color: red; font-weight: 500;">🔴 {{ link.LinkStatus }}</span>
+                        {% else %}
+                            <span style="color: gray;">⚪ (ยังไม่ตรวจสอบ)</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if link.สถานะ == 'ใช้งาน' %}
+                            <span style="color: green;">● ใช้งาน</span>
+                        {% elif link.สถานะ == 'ปรับปรุง' %}
+                            <span style="color: #FFC107;">● ปรับปรุง</span>
+                        {% elif link.สถานะ == 'เลิกใช้งาน' %}
+                            <span style="color: red;">● เลิกใช้งาน</span>
+                        {% else %}
+                            {{ link.สถานะ }}
+                        {% endif %}
+                    </td>
+                    <td>{{ link.ประเภท }}</td>
+                    <td>{{ link.หน่วยงาน }}</td>
+                    <td>{{ link.เบอร์โทรติดต่อ }}</td>
+                    <td>{{ link.อีเมลผู้รับผิดชอบ }}</td>
+                    <td>{{ link.วันที่อัปเดต.split(' ')[0] }}</td>
+                    <td>
+                        <div class="action-buttons">
+                        {% if session.level == 'Admin' or (session.level == 'Users' and link.CreatorUsername == session.username) %}
+                            <form action="{{ url_for('delete_link_action', link_id=link.ID) }}" method="POST" class="delete-form">
+                                <button type="submit" class="btn-delete">🅾️ ลบ</button>
+                            </form>
+                            <a href="{{ url_for('edit_link_page', link_id=link.ID) }}" class="btn-edit">✏️ แก้ไข</a>
+                        {% else %}
+                            <i style="font-size: 0.9em; color: #6c757d;">(ไม่มีสิทธิ์)</i>
+                        {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr id="noDataRow">
+                    <td colspan="10" style="text-align: center;">ไม่พบข้อมูลลิงค์</td>
+                </tr>
+                {% endfor %}
+            </tbody>
                 </table>
             </div>
 
