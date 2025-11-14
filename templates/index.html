@@ -526,22 +526,37 @@
 <body>
     
     <header class="main-header">
-        <div class="header-container">
-            <div class="logo-container">
-                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-            </div>
-
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-
-            <div class="navigation" id="mainNavigation">
-                <span class="user-greeting">สวัสดี, ผู้ใช้งาน!</span>
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/BMA Logo.png') }}" alt="BMA Logo">
+        </div>
+        
+        <div class="navigation">
+            <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
+            <a href="{{ url_for('home') }}">
+                <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
+            </a>
+            
+            {% if session.get('level') == 'Admin' %}
+            <a href="{{ url_for('admin_panel') }}">
                 <button type="button" class="btn-admin">👑 Admin Panel</button>
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('analytics_page') }}">
                 <button type="button" class="btn-analytics">📊 Analytics</button>
+            </a>
+
+            <a href="{{ url_for('dashboard') }}">
                 <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+            </a>
+            
+            <a href="{{ url_for('feedback_page') }}">
                 <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+            </a>
+
+            <a href="{{ url_for('logout') }}">
                 <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-            </div>
+            </a>
         </div>
     </header>
     
