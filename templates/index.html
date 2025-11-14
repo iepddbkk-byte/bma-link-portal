@@ -534,7 +534,7 @@
 			
 	<button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
         
-        <div class="navigation">
+        <div class="navigation" id="mainNavigation">
             {% if session.get('logged_in') %}
                 <span>สวัสดี, {{ session.name }}!</span>
                 
@@ -765,5 +765,22 @@
             {% endif %}
         {% endwith %}
     </script>
+	<script>
+    function toggleMobileMenu() {
+        const nav = document.getElementById('mainNavigation'); // มันจะหา id นี้
+        if (nav) {
+            nav.classList.toggle('active');
+        }
+    }
+    
+    // (เสริม) ปิดเมนูเมื่อคลิกข้างนอก
+    document.addEventListener('click', (e) => {
+        const nav = document.getElementById('mainNavigation');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+            nav.classList.remove('active');
+        }
+    });
+</script>
 </body>
 </html>

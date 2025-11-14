@@ -568,7 +568,7 @@
 			
 	<button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
         
-        <div class="navigation">
+        <div class="navigation" id="mainNavigation">
             <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
             <a href="{{ url_for('home') }}">
                 <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
@@ -722,7 +722,8 @@
         <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2024 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
 
-    <script>
+<script>
+        // 1. ส่วนจัดการตารางและการค้นหา
         let allTableRows = []; 
         let currentPage = 1;
         let totalPages = 1;
@@ -768,12 +769,14 @@
             tbody.innerHTML = ''; 
 
             if (filteredRows.length === 0) {
-                noDataRow.style.display = '';
-                tbody.appendChild(noDataRow); 
+                if(noDataRow) {
+                    noDataRow.style.display = '';
+                    tbody.appendChild(noDataRow);
+                }
                 totalPages = 1;
                 currentPage = 1;
             } else {
-                noDataRow.style.display = 'none';
+                if(noDataRow) noDataRow.style.display = 'none';
                 totalPages = Math.ceil(filteredRows.length / itemsPerPage);
                 if (page > totalPages) currentPage = totalPages;
                 if (page < 1) currentPage = 1;
@@ -807,13 +810,13 @@
             document.addEventListener('click', (e) => {
                 const nav = document.getElementById('mainNavigation');
                 const toggle = document.querySelector('.mobile-menu-toggle');
-                if (nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
                     nav.classList.remove('active');
                 }
             });
         });
 
-        // Delete Confirmation
+        // 2. ส่วนจัดการการลบข้อมูล (แก้ไขให้ Submit Form จริง)
         document.querySelectorAll('.delete-form').forEach(form => {
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
@@ -832,36 +835,54 @@
                     cancelButtonText: 'ยกเลิก'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'ลบสำเร็จ!',
-                            text: 'ลิงค์ถูกลบเรียบร้อยแล้ว',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        // In real implementation: currentForm.submit();
+                        // สั่ง Submit Form เพื่อให้ Backend ลบข้อมูลจริง
+                        currentForm.submit(); 
                     }
                 });
             });
         });
+    </script>
 
-        // Success/Error Toast Messages (Demo)
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer);
-                toast.addEventListener('mouseleave', Swal.resumeTimer);
-            }
-        });
-
-        // Example: Show welcome message on load
-        setTimeout(() => {
-            Toast.fire({
-                icon: 'success',
-                title: 'ยินดีต้อนรับสู่ Dashboard!'
-            });
-        }, 500);
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                const messages = {{ messages | tojson }};
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top', /* แสดงด้านบนตรงกลาง หรือเปลี่ยนเป็น top-end */
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+                messages.forEach(([category, message]) => {
+                    Toast.fire({
+                        icon: category, // success, error, warning, info
+                        title: message
+                    });
+                });
+            {% endif %}
+        {% endwith %}
+    </script>
+	<script>
+    function toggleMobileMenu() {
+        const nav = document.getElementById('mainNavigation'); // มันจะหา id นี้
+        if (nav) {
+            nav.classList.toggle('active');
+        }
+    }
+    
+    // (เสริม) ปิดเมนูเมื่อคลิกข้างนอก
+    document.addEventListener('click', (e) => {
+        const nav = document.getElementById('mainNavigation');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+            nav.classList.remove('active');
+        }
+    });
+	</script>
+</body>
+</html>
