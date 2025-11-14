@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Feedback - BMA Link Registry</title>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --bma-green: #00963C;
+            --bma-green-hover: #007a30;
+            --button-red: #dc3545;
+            --button-red-hover: #c82333;
+            --button-blue: #007bff;
+            --button-blue-hover: #0056b3;
+            --button-yellow: #ffc107;
+            --button-yellow-hover: #e0a800;
+            --button-gray: #6c757d;
+            --light-gray: #f4f4f4;
+            --text-color: #333;
+        }
+        body { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            margin: 0; padding: 0;
+            background-color: var(--light-gray); 
+            color: var(--text-color);
+        }
+        .main-header {
+            background-color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--bma-green);
+            min-height: 80px; 
+        }
+        .main-header .logo-container img { height: 70px; margin-right: 15px; }
+        .main-header .navigation {
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .main-header .navigation span {
+            font-size: 1.1em;
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+        .container {
+            max-width: 800px; /* (ขนาดที่เหมาะกับฟอร์ม) */
+            margin: 20px auto; 
+            padding: 20px 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        h1, h2 { 
+            color: var(--text-color);
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        button, .btn {
+            font-family: 'Kanit', Arial, sans-serif;
+            color: white; border: none; 
+            padding: 8px 12px;
+            border-radius: 4px; cursor: pointer; 
+            font-size: 1em;
+            transition: background-color 0.3s; 
+            text-decoration: none !important;
+            white-space: nowrap;
+        }
+        .main-header .btn-home { background-color: var(--button-blue); } 
+        .main-header .btn-home:hover { background-color: var(--button-blue-hover); }
+        .main-header .btn-dashboard { background-color: var(--bma-green); }
+        .main-header .btn-dashboard:hover { background-color: var(--bma-green-hover); }
+        .main-header .btn-analytics { background-color: var(--button-blue); }
+        .main-header .btn-analytics:hover { background-color: var(--button-blue-hover); }
+        .main-header .btn-admin { background-color: var(--button-yellow); color: #212529 !important; }
+        .main-header .btn-admin:hover { background-color: var(--button-yellow-hover); }
+        .main-header .btn-logout { background-color: var(--button-red); } 
+        .main-header .btn-logout:hover { background-color: var(--button-red-hover); }
+        .main-header .btn-feedback { background-color: var(--button-gray); } /* (ปุ่ม Feedback) */
+        .main-header .btn-feedback:hover { background-color: #5a6268; }
+
+        .main-footer {
+            background-color: var(--bma-green);
+            color: white; text-align: center;
+            padding: 20px; margin-top: 30px;
+            font-size: 0.9em;
+        }
+        .main-footer p { margin: 5px 0; }
+        
+        /* (ใหม่!) CSS สำหรับฟอร์ม Feedback */
+        form div {
+            margin-bottom: 20px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+        form textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Kanit', Arial, sans-serif;
+            font-size: 1em;
+            height: 100px;
+        }
+        .btn-submit-feedback {
+            background-color: var(--bma-green);
+            font-size: 1.1em;
+            padding: 12px 20px;
+            width: 100%;
+        }
+        .btn-submit-feedback:hover {
+            background-color: var(--bma-green-hover);
+        }
+
+        /* (ใหม่!) CSS สำหรับ Star Rating */
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse; /* (สำคัญ!) ทำให้ดาวดวงที่ 5 มาก่อน */
+            justify-content: center;
+            font-size: 2.5em; /* ขนาดของดาว */
+            gap: 5px;
+        }
+        .star-rating input[type="radio"] {
+            display: none; /* ซ่อน Radio Button จริง */
+        }
+        .star-rating label {
+            color: #ccc; /* สีดาว (ว่าง) */
+            cursor: pointer;
+            transition: color 0.2s;
+            margin: 0;
+            padding: 0 5px;
+        }
+        /* (เวทมนตร์!) เมื่อ Hover หรือ Check ให้ดาว (และดาวก่อนหน้า) เปลี่ยนสี */
+        .star-rating input[type="radio"]:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: var(--button-yellow);
+        }
+    </style>
+</head>
+<body>
+    
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/BMA Logo.png') }}" alt="BMA Logo">
+        </div>
+        <div class="navigation">
+            <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
+            <a href="{{ url_for('home') }}">
+                <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
+            </a>
+            {% if session.get('level') == 'Admin' %}
+            <a href="{{ url_for('admin_panel') }}">
+                <button type="button" class="btn-admin">👑 Admin Panel</button>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('analytics_page') }}">
+                <button type="button" class="btn-analytics">📊 Analytics</button>
+            </a>
+            <a href="{{ url_for('dashboard') }}">
+                <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+            </a>
+            <a href="{{ url_for('feedback_page') }}">
+                <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+            </a>
+            <a href="{{ url_for('logout') }}">
+                <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+            </a>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h2>📝 แบบสำรวจความพึงพอใจ</h2>
+        <p style="text-align: center; margin-top: -15px; color: var(--button-gray);">
+            ทีมงานต้องการข้อเสนอแนะจากท่าน (ผู้ใช้: {{ session.username }}) เพื่อนำไปปรับปรุงระบบให้ดียิ่งขึ้น
+        </p>
+
+        <form action="{{ url_for('feedback_action') }}" method="POST">
+            
+            <div>
+                <label for="satisfaction">1. โดยรวม ท่านพึงพอใจกับระบบนี้เพียงใด?</label>
+                <div class="star-rating">
+                    <input type="radio" id="sat-5" name="satisfaction" value="5" required><label for="sat-5"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="sat-4" name="satisfaction" value="4"><label for="sat-4"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="sat-3" name="satisfaction" value="3"><label for="sat-3"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="sat-2" name="satisfaction" value="2"><label for="sat-2"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="sat-1" name="satisfaction" value="1"><label for="sat-1"><i class="fas fa-star"></i></label>
+                </div>
+            </div>
+
+            <div>
+                <label for="ease_of_use">2. ท่านคิดว่าระบบนี้ใช้งานง่ายเพียงใด?</label>
+                <div class="star-rating">
+                    <input type="radio" id="ease-5" name="ease_of_use" value="5" required><label for="ease-5"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="ease-4" name="ease_of_use" value="4"><label for="ease-4"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="ease-3" name="ease_of_use" value="3"><label for="ease-3"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="ease-2" name="ease_of_use" value="2"><label for="ease-2"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="ease-1" name="ease_of_use" value="1"><label for="ease-1"><i class="fas fa-star"></i></label>
+                </div>
+            </div>
+
+            <div>
+                <label for="comments">3. ข้อเสนอแนะ หรือ ปัญหาที่พบ (ถ้ามี)</label>
+                <textarea id="comments" name="comments" placeholder="เช่น หน้า Dashboard โหลดช้า, ปุ่มลบเล็กเกินไป, ฯลฯ"></textarea>
+            </div>
+
+            <div>
+                <label for="features">4. ฟีเจอร์ (Feature) ที่ท่านอยากให้มีในอนาคต</label>
+                <textarea id="features" name="features" placeholder="เช่น อยากให้ระบบแจ้งเตือนทาง LINE เมื่อลิงค์เสีย, อยากให้มีระบบ Upload ไฟล์, ฯลฯ"></textarea>
+            </div>
+
+            <div>
+                <button type="submit" class="btn-submit-feedback">ส่งแบบสำรวจ</button>
+            </div>
+        </form>
+
+    </div> 
+    
+    <footer class="main-footer">
+        <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>โทร 0-2221-2141-69 ต่อ 1513</p>
+    </footer>
+
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                const messages = {{ messages | tojson }};
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+                messages.forEach(([category, message]) => {
+                    Toast.fire({
+                        icon: category,
+                        title: message
+                    });
+                });
+            {% endif %}
+        {% endwith %}
+    </script>
+
+</body>
+</html>

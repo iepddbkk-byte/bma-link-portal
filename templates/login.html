@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - BMA Link Registry</title>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --bma-green: #00963C;
+            --bma-green-hover: #007a30;
+            --light-gray: #f4f4f4;
+            --text-color: #333;
+            --button-gray: #6c757d;
+        }
+        
+        body { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            margin: 0; /* (ปรับปรุง!) */
+            padding: 20px; /* (ปรับปรุง!) */
+            background-color: var(--light-gray); 
+            display: flex; /* (ใหม่!) */
+            justify-content: center; /* (ใหม่!) */
+            align-items: center; /* (ใหม่!) */
+            min-height: 100vh; /* (ใหม่!) */
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%; /* (ใหม่!) */
+            margin: 20px auto; /* (ปรับปรุง!) */
+            padding: 30px 40px; /* (ปรับปรุง!) */
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* (ปรับปรุง!) */
+            text-align: center;
+        }
+
+        /* --- (ใหม่!) ส่วนโลโก้และหัวข้อ --- */
+        .logo-container {
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            height: 80px; /* ขนาดโลโก้ */
+            margin-bottom: 10px;
+        }
+        .container h1 {
+            font-size: 1.8em;
+            color: var(--text-color);
+            margin: 10px 0 5px 0;
+        }
+        .container h2 {
+            font-size: 1.2em;
+            color: var(--button-gray);
+            margin: 0 0 25px 0;
+            font-weight: 400;
+        }
+        /* --------------------------------- */
+
+        form div { 
+            margin-bottom: 15px; 
+            text-align: left;
+        }
+        form label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: 500; 
+        }
+        form input[type="email"],
+        form input[type="password"],
+        form input[type="text"] {
+            width: 100%;
+            padding: 10px; 
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px; 
+            font-family: 'Kanit', Arial, sans-serif; 
+            font-size: 1.1em;
+        }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        .password-wrapper i {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+        }
+        form input#password {
+            padding-right: 40px; 
+        }
+
+        button {
+            font-family: 'Kanit', Arial, sans-serif;
+            background-color: var(--bma-green);
+            color: white; 
+            border: none; 
+            padding: 12px 15px; /* (ปรับปรุง!) */
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 1.1em;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: var(--bma-green-hover);
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1em; /* (ปรับปรุง!) */
+        }
+        .register-link a {
+            color: var(--bma-green);
+            text-decoration: none;
+            font-weight: 500; /* (ปรับปรุง!) */
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* (ใหม่!) ปุ่มกลับหน้าหลัก */
+        .home-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .home-link a {
+            color: var(--button-gray);
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .home-link a:hover {
+            text-decoration: underline;
+        }
+		.forgot-link {
+        text-align: right;
+        margin-top: -10px; /* ดึงขึ้นไปใกล้ๆ ช่องรหัสผ่าน */
+        margin-bottom: 15px;
+		}
+		.forgot-link a {
+        color: var(--button-gray);
+        font-size: 0.9em;
+        text-decoration: none;
+		}
+		.forgot-link a:hover {
+        text-decoration: underline;
+		}
+	</style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/BMA Logo.png') }}" alt="BMA Logo">
+            <h1>ทะเบียนลิงค์ BMA</h1>
+            <h2>สำหรับเจ้าหน้าที่</h2>
+        </div>
+
+        <form action="{{ url_for('login_action') }}" method="POST">
+            
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div>
+                <label for="password">รหัสผ่าน:</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" required>
+                    <i class="fas fa-eye" id="togglePassword"></i>
+                </div>
+            </div>
+            
+            <div class="forgot-link">
+                <a href="{{ url_for('forgot_password') }}">ลืมรหัสผ่าน?</a>
+            </div>
+            
+            <button type="submit">เข้าสู่ระบบ</button>
+        </form>
+
+        <div class="register-link">
+            <p>ยังไม่มีบัญชี? <a href="{{ url_for('register_page') }}">สมัครสมาชิกที่นี่</a></p>
+        </div>
+        
+        <div class="home-link">
+            <a href="{{ url_for('home') }}">⬅️ กลับหน้าหลัก</a>
+        </div>
+        
+    </div> <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function (e) {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
+
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                const messages = {{ messages | tojson }};
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+                messages.forEach(([category, message]) => {
+                    Toast.fire({
+                        icon: category,
+                        title: message
+                    });
+                });
+            {% endif %}
+        {% endwith %}
+    </script>
+
+</body>
+</html>

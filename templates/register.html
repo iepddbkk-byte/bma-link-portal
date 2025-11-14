@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สมัครสมาชิก - BMA</title>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        :root {
+            --bma-green: #00963C;
+            --bma-green-hover: #007a30;
+            --light-gray: #f4f4f4;
+            --text-color: #333;
+            --button-gray: #6c757d;
+            --color-error: #dc3545; 
+            --color-success: #28a745; 
+        }
+        body {
+            font-family: 'Kanit', Arial, sans-serif;
+            margin: 0; padding: 20px;
+            background-color: var(--light-gray);
+            display: flex; justify-content: center;
+            align-items: center; min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 600px; width: 100%;
+            margin: 20px auto; padding: 30px 40px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .logo-container { margin-bottom: 20px; }
+        .logo-container img { height: 80px; margin-bottom: 10px; }
+        .container h1 { font-size: 1.8em; color: var(--text-color); margin: 10px 0 5px 0; }
+        .container h2 { font-size: 1.2em; color: var(--button-gray); margin: 0 0 25px 0; font-weight: 400; }
+        form div {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        form input[type="text"],
+        form input[type="password"],
+        form input[type="email"],
+        form input[type="tel"],
+        form select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Kanit', Arial, sans-serif;
+            font-size: 1em;
+        }
+        .message {
+            display: block;
+            font-size: 0.9em;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        .message.error { color: var(--color-error); }
+        .message.success { color: var(--color-success); }
+        input.invalid { border-color: var(--color-error); background-color: #fdd; }
+        input.valid { border-color: var(--color-success); background-color: #dfd; }
+        button {
+            font-family: 'Kanit', Arial, sans-serif;
+            background-color: var(--bma-green); 
+            color: white; border: none;
+            padding: 12px 20px;
+            border-radius: 4px; cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        button:hover { background-color: var(--bma-green-hover); }
+        button:disabled { background-color: #aaa; cursor: not-allowed; }
+        .login-link { text-align: center; margin-top: 20px; font-size: 1em; }
+        .login-link a { color: var(--bma-green); text-decoration: none; font-weight: 500; }
+        .login-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/BMA Logo.png') }}" alt="BMA Logo">
+            <h1>ทะเบียนลิงค์ BMA</h1>
+            <h2>สมัครสมาชิก (สำหรับเจ้าหน้าที่)</h2>
+        </div>
+
+        <form id="registerForm" action="{{ url_for('register_action') }}" method="POST">
+            <div>
+                <label for="invite_code">รหัสเชิญ (Invitation Code) (จำเป็น)</label>
+                <input type="text" id="invite_code" name="invite_code" required>
+                <span id="invite-code-message" class="message"></span>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+            <div>
+                <label for="fullname">ชื่อ-นามสกุล (จำเป็น)</label>
+                <input type="text" id="fullname" name="fullname" required>
+            </div>
+            <div>
+                <label for="username">Username (สำหรับ Login) (จำเป็น)</label>
+                <input type="text" id="username" name="username" required>
+                <span id="username-message" class="message"></span> 
+            </div>
+            <div>
+                <label for="password">Password (สำหรับ Login) (จำเป็น)</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <label for="confirm_password">ยืนยันรหัสผ่าน (จำเป็น)</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+                <span id="password-message" class="message"></span>
+            </div>
+             <div>
+                <label for="position">ตำแหน่ง (จำเป็น)</label>
+                <input type="text" id="position" name="position" required>
+            </div>
+            <div>
+                <label for="department">หน่วยงาน (จำเป็น)</label>
+                <input type="text" id="department" name="department" required>
+            </div>
+            <div>
+                <label for="email">อีเมล (จำเป็น)</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="phone">เบอร์โทร (จำเป็น)</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div>
+                <button type="submit" id="submit-button" disabled>ยืนยันการสมัครสมาชิก</button>
+            </div>
+        </form>
+        
+        <div class="login-link">
+            <p>มีบัญชีอยู่แล้ว? <a href="{{ url_for('login_page') }}">เข้าสู่ระบบที่นี่</a></p>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. เลือก Elements ---
+        const inviteCodeInput = document.getElementById('invite_code'); // (ใหม่!)
+        const inviteCodeMessage = document.getElementById('invite-code-message'); // (ใหม่!)
+        const usernameInput = document.getElementById('username');
+        const usernameMessage = document.getElementById('username-message');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const passwordMessage = document.getElementById('password-message');
+        const submitButton = document.getElementById('submit-button');
+        const registerForm = document.getElementById('registerForm');
+
+        // สถานะการตรวจสอบ
+        let isInviteCodeValid = false; // (ใหม่!)
+        let isUsernameAvailable = false;
+        let isPasswordConfirmed = false;
+
+        // --- 2. ฟังก์ชันตรวจสอบสถานะปุ่ม Submit ---
+        function checkFormValidity() {
+            // (ปรับปรุง!) ต้องเช็ก 3 อย่าง
+            if (isInviteCodeValid && isUsernameAvailable && isPasswordConfirmed) {
+                submitButton.disabled = false;
+            } else {
+                submitButton.disabled = true;
+            }
+        }
+        
+        // --- (ใหม่!) 3. ฟังก์ชันตรวจสอบรหัสเชิญ (เรียก API) ---
+        async function checkInviteCode() {
+            const inviteCode = inviteCodeInput.value;
+            
+            if (inviteCode.length < 3) { // (สั้นไป)
+                inviteCodeMessage.textContent = 'กรุณากรอกรหัสเชิญ';
+                inviteCodeMessage.className = 'message error';
+                inviteCodeInput.classList.add('invalid');
+                inviteCodeInput.classList.remove('valid');
+                isInviteCodeValid = false;
+                checkFormValidity();
+                return;
+            }
+
+            try {
+                const response = await fetch("{{ url_for('check_invite_code') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 'invite_code': inviteCode })
+                });
+                const data = await response.json();
+
+                if (data.available) {
+                    inviteCodeMessage.textContent = data.message; // 'รหัสเชิญถูกต้อง'
+                    inviteCodeMessage.className = 'message success';
+                    inviteCodeInput.classList.add('valid');
+                    inviteCodeInput.classList.remove('invalid');
+                    isInviteCodeValid = true;
+                } else {
+                    inviteCodeMessage.textContent = data.message; // 'ไม่ถูกต้อง' หรือ 'ใช้ไปแล้ว'
+                    inviteCodeMessage.className = 'message error';
+                    inviteCodeInput.classList.add('invalid');
+                    inviteCodeInput.classList.remove('valid');
+                    isInviteCodeValid = false;
+                }
+            } catch (error) {
+                console.error('Error checking invite code:', error);
+                inviteCodeMessage.textContent = 'ไม่สามารถตรวจสอบรหัสได้';
+                inviteCodeMessage.className = 'message error';
+                isInviteCodeValid = false;
+            }
+            checkFormValidity();
+        }
+
+        // --- 4. ฟังก์ชันตรวจสอบ Username ซ้ำ (เหมือนเดิม) ---
+        async function checkUsername() {
+            const username = usernameInput.value;
+            if (username.length < 3) {
+                usernameMessage.textContent = 'Username ต้องมีอย่างน้อย 3 ตัวอักษร';
+                usernameMessage.className = 'message error';
+                usernameInput.classList.add('invalid');
+                usernameInput.classList.remove('valid');
+                isUsernameAvailable = false;
+                checkFormValidity();
+                return;
+            }
+            try {
+                const response = await fetch("{{ url_for('check_username') }}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 'username': username })
+                });
+                const data = await response.json();
+                if (data.available) {
+                    usernameMessage.textContent = 'Username นี้สามารถใช้งานได้';
+                    usernameMessage.className = 'message success';
+                    usernameInput.classList.add('valid');
+                    usernameInput.classList.remove('invalid');
+                    isUsernameAvailable = true;
+                } else {
+                    usernameMessage.textContent = 'บัญชีนี้มีผู้ใช้แล้ว';
+                    usernameMessage.className = 'message error';
+                    usernameInput.classList.add('invalid');
+                    usernameInput.classList.remove('valid');
+                    isUsernameAvailable = false;
+                }
+            } catch (error) {
+                usernameMessage.textContent = 'ไม่สามารถตรวจสอบได้';
+                usernameMessage.className = 'message error';
+                isUsernameAvailable = false;
+            }
+            checkFormValidity();
+        }
+
+        // --- 5. ฟังก์ชันตรวจสอบรหัสผ่านตรงกัน (เหมือนเดิม) ---
+        function validatePassword() {
+            const pass = passwordInput.value;
+            const confirmPass = confirmPasswordInput.value;
+
+            if (pass.length === 0 && confirmPass.length === 0) {
+                 passwordMessage.textContent = '';
+                 isPasswordConfirmed = false;
+                 confirmPasswordInput.classList.remove('valid', 'invalid');
+            } else if (pass.length > 0 && pass === confirmPass) { // (ปรับปรุง!)
+                passwordMessage.textContent = 'รหัสผ่านตรงกัน';
+                passwordMessage.className = 'message success';
+                confirmPasswordInput.classList.add('valid');
+                confirmPasswordInput.classList.remove('invalid');
+                isPasswordConfirmed = true;
+            } else {
+                passwordMessage.textContent = 'รหัสผ่านไม่ตรงกัน';
+                passwordMessage.className = 'message error';
+                confirmPasswordInput.classList.add('invalid');
+                confirmPasswordInput.classList.remove('valid');
+                isPasswordConfirmed = false;
+            }
+            checkFormValidity();
+        }
+        
+        // --- 6. ฟังก์ชัน Debounce (เหมือนเดิม) ---
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+        
+        const debouncedCheckUsername = debounce(checkUsername, 500);
+        const debouncedCheckInviteCode = debounce(checkInviteCode, 500); // (ใหม่!)
+
+        // --- 7. ผูก Event Listeners ---
+        inviteCodeInput.addEventListener('keyup', debouncedCheckInviteCode); // (ใหม่!)
+        usernameInput.addEventListener('keyup', debouncedCheckUsername);
+        passwordInput.addEventListener('keyup', validatePassword);
+        confirmPasswordInput.addEventListener('keyup', validatePassword);
+        
+        registerForm.addEventListener('submit', function(event) {
+            // (ปรับปรุง!) เช็ก 3 อย่าง
+            if (!isInviteCodeValid || !isUsernameAvailable || !isPasswordConfirmed) {
+                event.preventDefault(); // หยุดการส่งฟอร์ม
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อมูลไม่ถูกต้อง',
+                    text: 'กรุณาตรวจสอบรหัสเชิญ, Username, และ รหัสผ่านอีกครั้ง'
+                });
+            }
+        });
+
+    </script>
+
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    Swal.fire({
+                        icon: '{{ category }}',
+                        title: '{{ message }}',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </script>
+</body>
+</html>

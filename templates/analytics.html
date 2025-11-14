@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics Dashboard - BMA</title>
+    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --bma-green: #00963C;
+            --bma-green-hover: #007a30;
+            --button-red: #dc3545;
+            --button-red-hover: #c82333;
+            --button-blue: #007bff;
+            --button-blue-hover: #0056b3;
+            --button-yellow: #ffc107;
+            --button-gray: #6c757d;
+            --light-gray: #f4f4f4;
+            --text-color: #333;
+        }
+        body { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            margin: 0; padding: 0;
+            background-color: var(--light-gray); 
+            color: var(--text-color);
+        }
+        .main-header {
+            background-color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--bma-green);
+            min-height: 80px; 
+        }
+        .main-header .logo-container img { height: 70px; margin-right: 15px; }
+        .main-header .navigation {
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .main-header .navigation span {
+            font-size: 1.1em;
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 20px auto; 
+            padding: 20px;
+            background-color: transparent; 
+            border-radius: 8px;
+            box-shadow: none; 
+        }
+        h1, h2 { 
+            color: var(--text-color);
+            border-bottom: 2px solid #ddd; 
+            padding-bottom: 10px;
+        }
+        button {
+            font-family: 'Kanit', Arial, sans-serif;
+            color: white; border: none; 
+            padding: 8px 12px;
+            border-radius: 4px; cursor: pointer; 
+            font-size: 1em;
+            transition: background-color 0.3s; 
+            text-decoration: none !important;
+            white-space: nowrap;
+        }
+        .main-header .btn-home { background-color: var(--button-blue); } 
+        .main-header .btn-home:hover { background-color: var(--button-blue-hover); }
+        .main-header .btn-dashboard { background-color: var(--bma-green); }
+        .main-header .btn-dashboard:hover { background-color: var(--bma-green-hover); }
+        .main-header .btn-analytics { background-color: var(--button-blue); }
+        .main-header .btn-analytics:hover { background-color: var(--button-blue-hover); }
+        .main-header .btn-admin { background-color: var(--button-yellow); color: #212529 !important; }
+        .main-header .btn-admin:hover { background-color: var(--button-yellow-hover); }
+        .main-header .btn-feedback { background-color: var(--button-gray); }
+        .main-header .btn-feedback:hover { background-color: #5a6268; }
+        .main-header .btn-logout { background-color: var(--button-red); } 
+        .main-header .btn-logout:hover { background-color: var(--button-red-hover); }
+        
+        .main-footer {
+            background-color: var(--bma-green);
+            color: white; text-align: center;
+            padding: 20px; margin-top: 30px;
+            font-size: 0.9em;
+        }
+        .main-footer p { margin: 5px 0; }
+
+        /* (CSS สำหรับการ์ดสรุป) */
+        .stat-card-row {
+            display: grid; /* (ปรับปรุง!) ใช้ Grid */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* (ปรับปรุง!) */
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #ddd;
+        }
+        .stat-card-icon {
+            font-size: 2.5em;
+            padding: 20px;
+            border-radius: 50%;
+            color: #fff;
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .icon-links { background-color: var(--button-blue); }
+        .icon-active { background-color: var(--bma-green); }
+        .icon-users { background-color: var(--button-yellow); color: var(--text-color); }
+        .icon-feedback { background-color: var(--button-gray); } /* (ใหม่!) */
+        .icon-star { background-color: var(--button-yellow); color: var(--text-color); } /* (ใหม่!) */
+
+
+        .stat-card-info h3 {
+            margin: 0;
+            font-size: 1.1em;
+            color: var(--button-gray);
+            font-weight: 500;
+        }
+        .stat-card-info .stat-number {
+            font-size: 2.2em;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        .stat-card-info .stat-number .unit { /* (ใหม่!) */
+            font-size: 0.6em;
+            color: var(--button-gray);
+        }
+
+        /* (CSS สำหรับพื้นที่กราฟ) */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 25px;
+        }
+        .chart-container {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .chart-container-full {
+             grid-column: 1 / -1; 
+        }
+        .chart-container h3 {
+            text-align: center;
+            margin-top: 0;
+            font-weight: 500;
+        }
+        
+        /* (ใหม่!) CSS สำหรับกล่อง Feedback */
+        .feedback-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 300px; /* (จำกัดความสูง) */
+            overflow-y: auto; /* (เพิ่ม Scrollbar) */
+        }
+        .feedback-list li {
+            border-bottom: 1px solid #eee;
+            padding: 10px 5px;
+        }
+        .feedback-list li:last-child {
+            border-bottom: none;
+        }
+        .feedback-list p {
+            margin: 0 0 5px 0;
+            font-size: 1em;
+        }
+        .feedback-list .user {
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--button-gray);
+        }
+        
+        @media (max-width: 900px) {
+            .chart-grid { grid-template-columns: 1fr; }
+            .stat-card-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/BMA Logo.png') }}" alt="BMA Logo">
+        </div>
+        <div class="navigation">
+            <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
+            <a href="{{ url_for('home') }}">
+                <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
+            </a>
+            {% if session.get('level') == 'Admin' %}
+            <a href="{{ url_for('admin_panel') }}">
+                <button type="button" class="btn-admin">👑 Admin Panel</button>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('analytics_page') }}">
+                <button type="button" class="btn-analytics">📊 Analytics</button>
+            </a>
+            <a href="{{ url_for('dashboard') }}">
+                <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+            </a>
+            <a href="{{ url_for('feedback_page') }}">
+                <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+            </a>
+            <a href="{{ url_for('logout') }}">
+                <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+            </a>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h2>📊 Analytics Dashboard (สรุปผลผู้บริหาร)</h2>
+
+        <div class="stat-card-row">
+            <div class="stat-card">
+                <div class="stat-card-icon icon-links"><i class="fas fa-link"></i></div>
+                <div class="stat-card-info">
+                    <h3>ลิงค์ทั้งหมด</h3>
+                    <div class="stat-number">{{ chart_data.total_links | default(0) }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon icon-active"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-card-info">
+                    <h3>ลิงค์ที่ใช้งาน</h3>
+                    <div class="stat-number">{{ chart_data.active_links | default(0) }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon icon-users"><i class="fas fa-users"></i></div>
+                <div class="stat-card-info">
+                    <h3>ผู้ใช้งานทั้งหมด</h3>
+                    <div class="stat-number">{{ chart_data.total_users | default(0) }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon icon-feedback"><i class="fas fa-comment-dots"></i></div>
+                <div class="stat-card-info">
+                    <h3>ผู้ตอบแบบสำรวจ</h3>
+                    <div class="stat-number">{{ chart_data.total_responses | default(0) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-row">
+            <div class="stat-card">
+                <div class="stat-card-icon icon-star"><i class="fas fa-star"></i></div>
+                <div class="stat-card-info">
+                    <h3>คะแนนความพึงพอใจ (เฉลี่ย)</h3>
+                    <div class="stat-number">{{ chart_data.avg_sat | default(0) }} <span class="unit">/ 5</span></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon icon-star"><i class="fas fa-star"></i></div>
+                <div class="stat-card-info">
+                    <h3>คะแนนความง่าย (เฉลี่ย)</h3>
+                    <div class="stat-number">{{ chart_data.avg_ease | default(0) }} <span class="unit">/ 5</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h3>สัดส่วนลิงค์ตามประเภทงาน</h3>
+                <canvas id="categoryPieChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>5 หน่วยงานที่เพิ่มลิงค์สูงสุด</h3>
+                <canvas id="departmentBarChart"></canvas>
+            </div>
+            <div class="chart-container chart-container-full">
+                <h3>จำนวนลิงค์ที่เพิ่มขึ้น (รายเดือน)</h3>
+                <canvas id="monthlyLineChart"></canvas>
+            </div>
+        </div>
+        
+        <h2 style="margin-top: 40px;">🗣️ เสียงสะท้อนจากผู้ใช้งาน (5 รายการล่าสุด)</h2>
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h3><i class="fas fa-comment-alt"></i> ข้อเสนอแนะ/ปัญหาที่พบ</h3>
+                <ul class="feedback-list">
+                    {% for item in chart_data.recent_comments %}
+                        <li>
+                            <p>"{{ item.text }}"</p>
+                            <span class="user">- (โดย: {{ item.user }})</span>
+                        </li>
+                    {% else %}
+                        <li><p style="text-align: center; color: #888;">ยังไม่มีข้อเสนอแนะ</p></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="chart-container">
+                <h3><i class="fas fa-lightbulb"></i> ฟีเจอร์ที่อยากให้มี</h3>
+                <ul class="feedback-list">
+                    {% for item in chart_data.recent_features %}
+                        <li>
+                            <p>"{{ item.text }}"</p>
+                            <span class="user">- (โดย: {{ item.user }})</span>
+                        </li>
+                    {% else %}
+                        <li><p style="text-align: center; color: #888;">ยังไม่มีคำขอฟีเจอร์</p></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div> 
+    
+    <footer class="main-footer">
+        <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>โทร 0-2221-2141-69 ต่อ 1513</p>
+    </footer>
+
+    <script>
+        const chartData = {{ chart_data | tojson }};
+        const bmaGreen = 'rgba(0, 150, 60, 0.7)';
+        const bmaBlue = 'rgba(0, 123, 255, 0.7)';
+        const bmaYellow = 'rgba(255, 193, 7, 0.7)';
+        const bmaRed = 'rgba(220, 53, 69, 0.7)';
+        const bmaGray = 'rgba(108, 117, 125, 0.7)';
+        const bmaOrange = 'rgba(253, 126, 20, 0.7)';
+        const bmaTeal = 'rgba(32, 201, 151, 0.7)';
+        const colorPalette = [bmaGreen, bmaBlue, bmaYellow, bmaRed, bmaGray, bmaOrange, bmaTeal];
+        function getBmaColors(count) {
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                colors.push(colorPalette[i % colorPalette.length]);
+            }
+            return colors;
+        }
+        Chart.defaults.font.family = "'Kanit', sans-serif";
+        Chart.defaults.font.size = 14;
+
+        if (chartData.category_labels && chartData.category_data) {
+            const ctx1 = document.getElementById('categoryPieChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'pie',
+                data: {
+                    labels: chartData.category_labels,
+                    datasets: [{
+                        label: 'จำนวนลิงค์',
+                        data: chartData.category_data,
+                        backgroundColor: getBmaColors(chartData.category_data.length),
+                        borderWidth: 1
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'top' } } }
+            });
+        }
+        if (chartData.dept_labels && chartData.dept_data) {
+            const ctx2 = document.getElementById('departmentBarChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: chartData.dept_labels,
+                    datasets: [{
+                        label: 'จำนวนลิงค์',
+                        data: chartData.dept_data,
+                        backgroundColor: getBmaColors(chartData.dept_data.length),
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+        }
+        if (chartData.month_labels && chartData.month_data) {
+            const ctx3 = document.getElementById('monthlyLineChart').getContext('2d');
+            new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: chartData.month_labels,
+                    datasets: [{
+                        label: 'จำนวนลิงค์ที่เพิ่ม',
+                        data: chartData.month_data,
+                        backgroundColor: 'rgba(0, 150, 60, 0.2)',
+                        borderColor: 'rgba(0, 150, 60, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+        }
+    </script>
+    
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                const messages = {{ messages | tojson }};
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+                messages.forEach(([category, message]) => {
+                    Toast.fire({
+                        icon: category,
+                        title: message
+                    });
+                });
+            {% endif %}
+        {% endwith %}
+    </script>
+
+</body>
+</html>

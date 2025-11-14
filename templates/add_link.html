@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มลิงค์ใหม่ - BMA</title>
+    <style>
+        @import url('https://fonts.f0nt.com/css/saowchingcha.css');
+        body {
+            font-family: 'Sao Ching Cha', Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 { color: #333; }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        form div {
+            margin-bottom: 15px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        form input[type="text"],
+        form input[type="url"],
+        form input[type="email"],
+        form input[type="tel"],
+        form textarea,
+        form select { /* (ปรับปรุง!) เพิ่ม select เข้ามา */
+            width: 100%; /* (ปรับปรุง!) */
+            box-sizing: border-box; 
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Sao Ching Cha', Arial, sans-serif;
+            font-size: 1.1em;
+            background-color: #fff; /* (ใหม่!) */
+        }
+        
+        button {
+            font-family: 'Sao Ching Cha', Arial, sans-serif;
+            background-color: #00963C; 
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+        button:hover { background-color: #007a30; }
+        .btn-back { background-color: #6c757d; }
+        .btn-back:hover { background-color: #5a6268; }
+        
+        .flashes { list-style: none; padding: 0; margin: 15px 0; }
+        .flashes li { padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .flashes .success { background-color: #d4edda; color: #155724; }
+        .flashes .error { background-color: #f8d7da; color: #721c24; }
+        .flashes .info { background-color: #cce5ff; color: #004085; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="{{ url_for('dashboard') }}"><button type="button" class="btn-back">⬅️ กลับหน้า Dashboard</button></a>
+
+        <h2>เพิ่มลิงค์ใหม่</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('add_link_action') }}" method="POST">
+            <div>
+                <label for="ชื่อลิงก์">ชื่อลิงก์ (จำเป็น)</label>
+                <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" required>
+            </div>
+            <div>
+                <label for="URL">URL (จำเป็น)</label>
+                <input type="url" id="URL" name="URL" placeholder="https://..." required>
+            </div>
+            
+            <div>
+                <label for="ประเภท">ประเภท (จำเป็น)</label>
+                <select id="ประเภท" name="ประเภท" required>
+                    <option value="" disabled selected>--- เลือกประเภทงาน ---</option>
+                    
+                    <optgroup label="ด้านโครงสร้างพื้นฐาน">
+                        <option value="การจราจรและขนส่ง">การจราจรและขนส่ง</option>
+                        <option value="การโยธาและก่อสร้าง">การโยธาและก่อสร้าง</option>
+                        <option value="การระบายน้ำและป้องกันน้ำท่วม">การระบายน้ำและป้องกันน้ำท่วม</option>
+                        <option value="ผังเมือง">ผังเมือง</option>
+                    </optgroup>
+                    
+                    <optgroup label="ด้านคุณภาพชีวิต">
+                        <option value="สิ่งแวดล้อมและความสะอาด">สิ่งแวดล้อมและความสะอาด</option>
+                        <option value="อนามัยและสาธารณสุข">อนามัยและสาธารณสุข</option>
+                        <option value="การแพทย์ (โรงพยาบาล)">การแพทย์ (โรงพยาบาล)</option>
+                    </optgroup>
+                    
+                    <optgroup label="ด้านการศึกษาและสังคม">
+                        <option value="การศึกษา (โรงเรียน)">การศึกษา (โรงเรียน)</option>
+                        <option value="วัฒนธรรม กีฬา และการท่องเที่ยว">วัฒนธรรม กีฬา และการท่องเที่ยว</option>
+                        <option value="พัฒนาสังคม">พัฒนาสังคม</option>
+                    </optgroup>
+                    
+                    <optgroup label="ด้านความปลอดภัย">
+                        <option value="ป้องกันและบรรเทาสาธารณภัย">ป้องกันและบรรเทาสาธารณภัย</option>
+                        <option value="เทศกิจ">เทศกิจ</option>
+                    </optgroup>
+                    
+                    <optgroup label="ด้านการบริหารและทะเบียน">
+                        <option value="การคลังและงบประมาณ">การคลังและงบประมาณ</option>
+                        <option value="การทะเบียน (สำนักงานเขต)">การทะเบียน (สำนักงานเขต)</option>
+                        <option value="บริหารทั่วไป/สำนักงาน">บริหารทั่วไป/สำนักงาน</option>
+                    </optgroup>
+
+                    <option value="อื่นๆ">--- อื่นๆ ---</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="หน่วยงาน">หน่วยงาน (จำเป็น)</label>
+                <input type="text" id="หน่วยงาน" name="หน่วยงาน" required>
+            </div>
+            <div>
+                <label for="สถานะ">สถานะ (จำเป็น)</label>
+                <select id="สถานะ" name="สถานะ" required>
+                    <option value="ใช้งาน" selected>ใช้งาน</option>
+                    <option value="ปรับปรุง">ปรับปรุง</option>
+                    <option value="เลิกใช้งาน">เลิกใช้งาน</option>
+                </select>
+            </div>
+            <div>
+                <label for="อีเมลผู้รับผิดชอบ">อีเมลผู้รับผิดชอบ (จำเป็น)</label>
+                <input type="email" id="อีเมลผู้รับผิดชอบ" name="อีเมลผู้รับผิดชอบ" required>
+            </div>
+            <div>
+                <label for="เบอร์โทรติดต่อ">เบอร์โทรติดต่อ (จำเป็น)</label>
+                <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ" required>
+            </div>
+            <div>
+                <label for="หมายเหตุ">หมายเหตุ (ถ้ามี)</label>
+                <textarea id="หมายเหตุ" name="หมายเหตุ" rows="3"></textarea>
+            </div>
+            <div>
+                <button type="submit">ยืนยันเพิ่มลิงค์</button>
+            </div>
+        </form>
+
+    </div>
+
+</body>
+</html>

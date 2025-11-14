@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - BMA</title>
+    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --bma-green: #00963C;
+            --bma-green-hover: #007a30;
+            --button-red: #dc3545;
+            --button-red-hover: #c82333;
+            --button-yellow: #ffc107;
+            --button-yellow-hover: #e0a800;
+            --button-blue: #007bff;
+            --button-blue-hover: #0056b3;
+            --button-gray: #6c757d;
+            --light-gray: #f4f4f4;
+            --text-color: #333;
+        }
+        body { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            margin: 0; 
+            padding: 0;
+            background-color: var(--light-gray); 
+            color: var(--text-color);
+        }
+        .main-header {
+            background-color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--bma-green);
+            min-height: 80px; 
+        }
+        .main-header .logo-container img { height: 70px; margin-right: 15px; }
+        .main-header .navigation {
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .main-header .navigation span {
+            font-size: 1.1em;
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 20px auto; 
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        h1, h2 { 
+            color: var(--text-color);
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 10px;
+        }
+        table { 
+            width: 100%; border-collapse: collapse; 
+            margin-top: 20px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            font-size: 0.9em;
+        }
+        th, td { 
+            padding: 10px 12px;
+            border: 1px solid #ddd; 
+            text-align: left; 
+            word-break: break-word; 
+        }
+        th { 
+            background-color: var(--bma-green); 
+            color: white; 
+            white-space: nowrap;
+            text-align: center; 
+            vertical-align: middle; 
+        }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        
+        table tbody td:nth-child(3),
+        table tbody td:nth-child(4) {
+            text-align: center;
+        }
+
+        a { color: var(--bma-green); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        button, .btn, a.btn-edit {
+            font-family: 'Kanit', Arial, sans-serif;
+            color: white; border: none; 
+            padding: 8px 12px;
+            border-radius: 4px; cursor: pointer; 
+            font-size: 1em;
+            transition: background-color 0.3s; 
+            text-decoration: none !important;
+            white-space: nowrap;
+        }
+        .btn-add { background-color: var(--bma-green); }
+        .btn-add:hover { background-color: var(--bma-green-hover); }
+        .action-buttons {
+            display: flex; gap: 5px;
+            justify-content: center;
+        }
+        .btn-edit { background-color: var(--button-yellow); color: #212529 !important; }
+        .btn-edit:hover { background-color: var(--button-yellow-hover); }
+        .btn-delete { background-color: var(--button-red); } 
+        .btn-delete:hover { background-color: var(--button-red-hover); }
+        .main-header .btn-home { background-color: var(--button-blue); } 
+        .main-header .btn-home:hover { background-color: var(--button-blue-hover); }
+        .main-header .btn-analytics { background-color: var(--button-blue); }
+        .main-header .btn-analytics:hover { background-color: var(--button-blue-hover); }
+        .main-header .btn-admin { background-color: var(--button-yellow); color: #212529 !important; }
+        .main-header .btn-admin:hover { background-color: var(--button-yellow-hover); }
+        .main-header .btn-feedback { background-color: var(--button-gray); }
+        .main-header .btn-feedback:hover { background-color: #5a6268; }
+        .main-header .btn-logout { background-color: var(--button-red); } 
+        .main-header .btn-logout:hover { background-color: var(--button-red-hover); }
+        .sort-buttons { margin-top: 5px; }
+        .sort-buttons button {
+            font-size: 0.8em; padding: 4px 6px;
+            background-color: #fff; 
+            color: var(--bma-green);
+            border: 1px solid var(--bma-green);
+        }
+        .sort-buttons button:hover { background-color: var(--light-gray); }
+        .search-container { margin: 20px 0 10px 0; }
+        #searchInput {
+            width: 100%; padding: 10px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1em; border: 1px solid #ccc;
+            border-radius: 4px; box-sizing: border-box; 
+        }
+        .pagination-controls {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 15px 0;
+            margin-top: 20px; border-top: 1px solid #eee;
+        }
+        .pagination-items select {
+            font-family: 'Kanit', sans-serif;
+            padding: 5px; border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .pagination-nav button {
+            background-color: #6c757d; margin: 0 2px;
+            font-size: 1em; padding: 8px 12px;
+        }
+        .pagination-nav button:hover { background-color: #5a6268; }
+        .pagination-nav button:disabled { background-color: #ccc; cursor: not-allowed; opacity: 0.7; }
+        .pagination-nav span { margin: 0 10px; font-weight: 500; }
+        .main-footer {
+            background-color: var(--bma-green);
+            color: white; text-align: center;
+            padding: 20px; margin-top: 30px;
+            font-size: 0.9em;
+        }
+        .main-footer p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/BMA Logo.png') }}" alt="BMA Logo">
+        </div>
+        
+        <div class="navigation">
+            <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
+            <a href="{{ url_for('home') }}">
+                <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
+            </a>
+            
+            {% if session.get('level') == 'Admin' %}
+            <a href="{{ url_for('admin_panel') }}">
+                <button type="button" class="btn-admin">👑 Admin Panel</button>
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('analytics_page') }}">
+                <button type="button" class="btn-analytics">📊 Analytics</button>
+            </a>
+
+            <a href="{{ url_for('dashboard') }}">
+                <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+            </a>
+            
+            <a href="{{ url_for('feedback_page') }}">
+                <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+            </a>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h2>Dashboard จัดการลิงค์</h2>
+        <a href="{{ url_for('add_link_page') }}"><button class="btn-add">❇️ เพิ่มลิงค์ใหม่</button></a>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="🔍 ค้นหาทุกลิงค์ (ชื่อ, สถานะ, ประเภท, หน่วยงาน, อีเมล)...">
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        🔗 ชื่อลิงค์
+                        <div class="sort-buttons">
+                            <button onclick="sortTable(0, 'asc')">A-Z (ก-ฮ)</button>
+                            <button onclick="sortTable(0, 'desc')">Z-A (ฮ-ก)</button>
+                        </div>
+                    </th>
+                    <th>📝 รายละเอียด</th>
+                    <th>🚦 สถานะลิงค์</th> 
+                    <th>📊 สถานะการใช้งาน</th>
+                    <th>📂 ประเภท</th>
+                    <th>🏢 หน่วยงาน</th>
+                    <th>📞 เบอร์ติดต่อ</th>
+                    <th>📧 อีเมล</th>
+                    <th>🗓️ วันที่อัปเดต</th>
+                    <th>⚙️ จัดการ (Actions)</th>
+                </tr>
+            </thead>
+            <tbody id="linkTableBody">
+                {% for link in links %}
+                <tr>
+                    <td>
+                        {% if link.สถานะ == 'ใช้งาน' %}
+                            <a href="{{ link.URL }}" target="_blank">{{ link.ชื่อลิงก์ }}</a>
+                        {% else %}
+                            {{ link.ชื่อลิงก์ }}
+                        {% endif %}
+                    </td>
+                    <td>{{ link.หมายเหตุ }}</td>
+                    <td>
+                        {% if link.LinkStatus == 'OK' %}
+                            <span style="color: green; font-weight: 500;">🟢 ปกติ</span>
+                        {% elif link.LinkStatus == '403 Blocked' %}
+                            <span style="color: #007bff; font-weight: 500;">🔵 ถูกบล็อก</span>
+                        {% elif link.LinkStatus %}
+                            <span style="color: red; font-weight: 500;">🔴 {{ link.LinkStatus }}</span>
+                        {% else %}
+                            <span style="color: gray;">⚪ (ยังไม่ตรวจสอบ)</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if link.สถานะ == 'ใช้งาน' %}
+                            <span style="color: green;">● ใช้งาน</span>
+                        {% elif link.สถานะ == 'ปรับปรุง' %}
+                            <span style="color: #FFC107;">● ปรับปรุง</span>
+                        {% elif link.สถานะ == 'เลิกใช้งาน' %}
+                            <span style="color: red;">● เลิกใช้งาน</span>
+                        {% else %}
+                            {{ link.สถานะ }}
+                        {% endif %}
+                    </td>
+                    <td>{{ link.ประเภท }}</td>
+                    <td>{{ link.หน่วยงาน }}</td>
+                    <td>{{ link.เบอร์โทรติดต่อ }}</td>
+                    <td>{{ link.อีเมลผู้รับผิดชอบ }}</td>
+                    <td>{{ link.วันที่อัปเดต.split(' ')[0] }}</td>
+                    <td>
+                        <div class="action-buttons">
+                        {% if session.level == 'Admin' or (session.level == 'Users' and link.CreatorUsername == session.username) %}
+                            <form action="{{ url_for('delete_link_action', link_id=link.ID) }}" method="POST" class="delete-form">
+                                <button type="submit" class="btn-delete">🅾️ ลบ</button>
+                            </form>
+                            <a href="{{ url_for('edit_link_page', link_id=link.ID) }}" class="btn-edit">✏️ แก้ไข</a>
+                        {% else %}
+                            <i style="font-size: 0.9em; color: #6c757d;">(ไม่มีสิทธิ์)</i>
+                        {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr id="noDataRow">
+                    <td colspan="10" style="text-align: center;">ไม่พบข้อมูลลิงค์</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pagination-controls">
+             <div class="pagination-items">
+                <span>แสดง: </span>
+                <select id="itemsPerPage">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="99999">ทั้งหมด</option>
+                </select>
+                <span> รายการ</span>
+            </div>
+            <div class="pagination-nav">
+                <button id="btnFirst"> << </button>
+                <button id="btnPrev"> < </button>
+                <span> หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span> </span>
+                <button id="btnNext"> > </button>
+                <button id="btnLast"> >> </button>
+            </div>
+        </div>
+    </div> 
+    
+    <footer class="main-footer">
+        <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>โทร 0-2221-2141-69 ต่อ 1513</p>
+    </footer>
+
+    <script>
+        let allTableRows = []; 
+        let currentPage = 1;
+        let totalPages = 1;
+        const tbody = document.getElementById("linkTableBody");
+        const noDataRow = document.getElementById("noDataRow");
+        const searchInput = document.getElementById("searchInput");
+        function sortTable(columnIndex, direction) {
+            const collator = new Intl.Collator('th', { sensitivity: 'base' });
+            allTableRows.sort((rowA, rowB) => {
+                const cellA = rowA.getElementsByTagName("td")[columnIndex].querySelector('a') ? rowA.getElementsByTagName("td")[columnIndex].querySelector('a').textContent.trim() : rowA.getElementsByTagName("td")[columnIndex].textContent.trim();
+                const cellB = rowB.getElementsByTagName("td")[columnIndex].querySelector('a') ? rowB.getElementsByTagName("td")[columnIndex].querySelector('a').textContent.trim() : rowB.getElementsByTagName("td")[columnIndex].textContent.trim();
+                if (direction === 'asc') { return collator.compare(cellA, cellB); } else { return collator.compare(cellB, cellA); }
+            });
+            displayPage(currentPage);
+        }
+        function displayPage(page) {
+            currentPage = page;
+            const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
+            const filter = searchInput.value.toLowerCase();
+            const filteredRows = allTableRows.filter(row => {
+                const cells = row.getElementsByTagName("td");
+                const name = (cells[0].textContent || cells[0].innerText).toLowerCase();
+                const status = (cells[3].textContent || cells[3].innerText).toLowerCase();
+                const type = (cells[4].textContent || cells[4].innerText).toLowerCase();
+                const department = (cells[5].textContent || cells[5].innerText).toLowerCase();
+                const email = (cells[7].textContent || cells[7].innerText).toLowerCase();
+                const combinedText = name + " " + status + " " + type + " " + department + " " + email;
+                return combinedText.includes(filter);
+            });
+            tbody.innerHTML = ''; 
+            if (filteredRows.length === 0) {
+                if(noDataRow) tbody.appendChild(noDataRow); 
+                totalPages = 1;
+                currentPage = 1;
+            } else {
+                totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+                if (page > totalPages) currentPage = totalPages;
+                if (page < 1) currentPage = 1;
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const slicedRows = filteredRows.slice(startIndex, endIndex);
+                slicedRows.forEach(row => { tbody.appendChild(row); });
+            }
+            document.getElementById("currentPage").textContent = currentPage;
+            document.getElementById("totalPages").textContent = totalPages;
+            document.getElementById("btnFirst").disabled = (currentPage === 1);
+            document.getElementById("btnPrev").disabled = (currentPage === 1);
+            document.getElementById("btnNext").disabled = (currentPage === totalPages);
+            document.getElementById("btnLast").disabled = (currentPage === totalPages);
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            allTableRows = Array.from(tbody.children).filter(row => row.id !== 'noDataRow');
+            document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
+            document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
+            document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
+            document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
+            document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
+            searchInput.addEventListener('keyup', () => displayPage(1)); 
+            displayPage(1);
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.delete-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const currentForm = this;
+                const row = currentForm.closest('tr');
+                const linkName = row.querySelector('td:first-child').textContent.trim();
+                Swal.fire({
+                    title: 'ยืนยันการลบ',
+                    text: `คุณแน่ใจหรือไม่ว่าต้องการลบลิงค์ "${linkName}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'ใช่, ลบเลย!',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) { currentForm.submit(); }
+                });
+            });
+        });
+    </script>
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                const messages = {{ messages | tojson }};
+                const Toast = Swal.mixin({
+                    toast: true, position: 'top',
+                    showConfirmButton: false, timer: 3000, timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+                messages.forEach(([category, message]) => {
+                    Toast.fire({ icon: category, title: message });
+                });
+            {% endif %}
+        {% endwith %}
+    </script>
+
+</body>
+</html>
