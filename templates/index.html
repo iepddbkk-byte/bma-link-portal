@@ -2,9 +2,11 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ทะเบียนลิงค์ BMA</title>
     
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -12,6 +14,7 @@
         :root {
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
+            --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
             --button-red-hover: #c82333;
             --button-blue: #007bff;
@@ -19,335 +22,634 @@
             --button-yellow: #ffc107;
             --button-yellow-hover: #e0a800;
             --button-gray: #6c757d;
-            --light-gray: #f4f4f4;
-            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
-            margin: 0; 
-            padding: 0;
-            background-color: var(--light-gray); 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
         }
 
+        /* Header Styles */
         .main-header {
-            background-color: #fff;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-bottom: 3px solid var(--bma-green);
-            min-height: 80px; 
+            background: white;
+            padding: 15px 20px;
+            box-shadow: var(--shadow-md);
+            border-bottom: 4px solid var(--bma-green);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
         }
-        .main-header .logo-container { 
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-container { 
             display: flex;
             align-items: center;
-        }
-        .main-header img {
-            height: 70px; 
-            margin-right: 15px;
+            gap: 15px;
         }
 
-        .container {
-            max-width: 1300px;
-            margin: 20px auto; 
-            padding: 20px;
-            background-color: #fff;
+        .logo-container img {
+            height: 60px;
+            transition: transform 0.3s;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bma-green);
+            display: none;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .user-greeting {
+            font-size: 1rem;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 12px;
+            background: var(--bma-green-light);
+            border-radius: 20px;
+            display: none;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--bma-green);
+            color: white;
+            border: none;
+            padding: 10px 15px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Button Styles */
+        button { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            background-color: var(--bma-green); 
+            color: white; 
+            border: none; 
+            padding: 10px 16px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 0.95rem; 
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
+        .btn-analytics { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+        .btn-admin { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
+        .btn-feedback { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
+        .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h1 { 
             color: var(--text-color);
-            border-bottom: 2px solid var(--light-gray);
-            padding-bottom: 10px;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--bma-green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
+        /* Search Container */
         .search-container {
-            margin: 20px 0;
+            margin: 25px 0;
+            position: relative;
         }
+
         #searchInput {
             width: 100%;
-            padding: 10px;
+            padding: 15px 20px 15px 50px;
             font-family: 'Kanit', sans-serif;
-            font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--bma-green);
+            box-shadow: 0 0 0 4px var(--bma-green-light);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--button-gray);
+            font-size: 1.2rem;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-top: 20px;
         }
 
         table { 
             width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            font-size: 0.95em; 
-        }
-        th, td { 
-            padding: 12px; 
-            border: 1px solid #ddd; 
-            text-align: left; 
-            word-break: break-word; 
-        }
-        th { 
-            background-color: var(--bma-green); 
-            color: white; 
-            text-align: center; 
-            vertical-align: middle; 
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.95rem;
+            background: white;
         }
 
-        /* จัดกลางคอลัมน์สถานะลิงค์ (3) และ สถานะใช้งาน (4) */
+        th, td { 
+            padding: 16px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th { 
+            background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        tbody tr {
+            transition: all 0.3s;
+        }
+
+        tbody tr:hover {
+            background: var(--bma-green-light);
+            transform: scale(1.01);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
         table tbody td:nth-child(3),
         table tbody td:nth-child(4) {
             text-align: center;
         }
 
         a { 
-            color: var(--bma-green); 
-            text-decoration: none;
-        }
-        a:hover { 
-            text-decoration: underline; 
-        }
-        
-        button { 
-            font-family: 'Kanit', Arial, sans-serif; 
-            background-color: var(--bma-green); 
-            color: white; 
-            border: none; 
-            padding: 8px 12px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 1em; 
-            transition: background-color 0.3s;
-            white-space: nowrap; 
-        }
-        button:hover {
-            background-color: var(--bma-green-hover);
-        }
-
-        .sort-buttons {
-            margin-top: 5px;
-        }
-        .sort-buttons button {
-            font-size: 0.8em; 
-            padding: 4px 6px;
-            background-color: #fff; 
             color: var(--bma-green);
-            border: 1px solid var(--bma-green);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
         }
+
+        a:hover { 
+            color: var(--bma-green-hover);
+            text-decoration: underline;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-ok { background: #d4edda; color: #155724; }
+        .status-blocked { background: #cce5ff; color: #004085; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .status-unknown { background: #e2e3e5; color: #383d41; }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-updating { background: #fff3cd; color: #856404; }
+        .status-inactive { background: #f8d7da; color: #721c24; }
+
+        /* Sort Buttons */
+        .sort-buttons {
+            margin-top: 8px;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .sort-buttons button {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
         .sort-buttons button:hover {
-            background-color: var(--light-gray);
+            background: rgba(255, 255, 255, 0.3);
+            transform: none;
         }
 
-        .main-header .navigation {
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-        .main-header .navigation span {
-            margin-right: 0; 
-            font-size: 1.1em;
-            color: var(--text-color); 
-        }
-        .main-header .btn-dashboard { background-color: var(--bma-green); }
-        .main-header .btn-dashboard:hover { background-color: var(--bma-green-hover); }
-        .main-header .btn-analytics { background-color: var(--button-blue); }
-        .main-header .btn-analytics:hover { background-color: var(--button-blue-hover); }
-        .main-header .btn-admin { background-color: var(--button-yellow); color: #212529 !important; }
-        .main-header .btn-admin:hover { background-color: var(--button-yellow-hover); }
-        .main-header .btn-feedback { background-color: var(--button-gray); }
-        .main-header .btn-feedback:hover { background-color: #5a6268; }
-        .main-header .btn-logout { background-color: var(--button-red); }
-        .main-header .btn-logout:hover { background-color: var(--button-red-hover); }
-
+        /* Pagination */
         .pagination-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        .pagination-items select {
-            font-family: 'Kanit', sans-serif;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .pagination-nav button {
-            background-color: #6c757d;
-            margin: 0 2px;
-        }
-        .pagination-nav button:hover {
-            background-color: #5a6268;
-        }
-        .pagination-nav button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        .pagination-nav span {
-            margin: 0 10px;
-            font-weight: 500;
+            padding: 20px 0;
+            margin-top: 25px;
+            border-top: 2px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
+        .pagination-items {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-items select {
+            font-family: 'Kanit', sans-serif;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination-items select:focus {
+            outline: none;
+            border-color: var(--bma-green);
+        }
+
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-nav button {
+            background: var(--button-gray);
+            min-width: 40px;
+            padding: 8px 12px;
+        }
+
+        .pagination-nav button:hover {
+            background: #5a6268;
+        }
+
+        .pagination-nav button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .pagination-nav span {
+            font-weight: 500;
+            padding: 0 10px;
+            white-space: nowrap;
+        }
+
+        /* Footer */
         .main-footer {
-            background-color: var(--bma-green);
+            background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
             color: white;
             text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-            font-size: 0.9em;
+            padding: 30px 20px;
+            margin-top: 50px;
+            box-shadow: var(--shadow-lg);
         }
+
         .main-footer p {
-            margin: 5px 0;
+            margin: 8px 0;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .navigation {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                background: white;
+                padding: 15px;
+                border-radius: 12px;
+                margin-top: 10px;
+                box-shadow: var(--shadow-md);
+            }
+
+            .navigation.active {
+                display: flex;
+            }
+
+            .navigation button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .user-greeting {
+                display: none !important;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .content-card {
+                padding: 20px 15px;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 10px 8px;
+            }
+
+            .pagination-controls {
+                justify-content: center;
+            }
+
+            .pagination-items,
+            .pagination-nav {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Hide some columns on mobile */
+            th:nth-child(2),
+            td:nth-child(2),
+            th:nth-child(7),
+            td:nth-child(7),
+            th:nth-child(9),
+            td:nth-child(9) {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .logo-text {
+                display: block;
+            }
+
+            .user-greeting {
+                display: block;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .logo-text {
+                display: block;
+            }
+
+            .user-greeting {
+                display: block;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 150, 60, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--bma-green);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
 <body>
     
     <header class="main-header">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="https://via.placeholder.com/60x60/00963C/FFFFFF?text=BMA" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
             </div>
 
-        <div class="navigation">
-            {% if session.get('logged_in') %}
-                <span>สวัสดี, {{ session.name }}!</span>
-                
-                {% if session.get('level') == 'Admin' %}
-                <a href="{{ url_for('admin_panel') }}">
-                    <button type="button" class="btn-admin">👑 Admin Panel</button>
-                </a>
-                {% endif %}
-                <a href="{{ url_for('analytics_page') }}">
-                    <button type="button" class="btn-analytics">📊 Analytics</button>
-                </a>
-                <a href="{{ url_for('dashboard') }}">
-                    <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-                </a>
-                <a href="{{ url_for('feedback_page') }}">
-                    <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
-                </a>
-                <a href="{{ url_for('logout') }}">
-                    <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-                </a>
-            {% else %}
-                <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
-            {% endif %}
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+
+            <div class="navigation" id="mainNavigation">
+                <span class="user-greeting">สวัสดี, ผู้ใช้งาน!</span>
+                <button type="button" class="btn-admin">👑 Admin Panel</button>
+                <button type="button" class="btn-analytics">📊 Analytics</button>
+                <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+                <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+                <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+            </div>
         </div>
     </header>
     
     <div class="container">
+        <div class="content-card">
+            <h1>
+                📋 ทะเบียนลิงค์ BMA
+            </h1>
 
-        <h1>📋 ทะเบียนลิงค์ BMA</h1>
-        
-        {% if error %}
-            <p style="color: red; font-weight: bold;">เกิดข้อผิดพลาดในการโหลดข้อมูล: {{ error }}</p>
-        {% endif %}
-
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="🔍 ค้นหา (ชื่อ, สถานะ, ประเภท, หน่วยงาน, อีเมล)...">
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>
-                        🔗 ชื่อลิงค์
-                        <div class="sort-buttons">
-                            <button onclick="sortTable(0, 'asc')">A-Z (ก-ฮ)</button>
-                            <button onclick="sortTable(0, 'desc')">Z-A (ฮ-ก)</button>
-                        </div>
-                    </th>
-                    <th>📝 รายละเอียด</th>
-                    <th>🚦 สถานะลิงค์</th>
-                    <th>📊 สถานะการใช้งาน</th>
-                    <th>📂 ประเภท</th>
-                    <th>🏢 หน่วยงาน</th>
-                    <th>📞 เบอร์ติดต่อ</th>
-                    <th>📧 อีเมล</th>
-                    <th>🗓️ วันที่อัปเดต</th>
-                </tr>
-            </thead>
-            <tbody id="linkTableBody">
-                
-                {% for link in links %}
-                <tr>
-                    <td>
-                        <a href="{{ link.URL }}" target="_blank">{{ link.ชื่อลิงก์ }}</a>
-                    </td>
-                    <td>{{ link.หมายเหตุ }}</td>
-                    
-                    <td>
-                        {% if link.LinkStatus == 'OK' %}
-                            <span style="color: green; font-weight: 500;">🟢 ปกติ</span>
-                        {% elif link.LinkStatus == '403 Blocked' %}
-                            <span style="color: #007bff; font-weight: 500;">🔵 ถูกบล็อก</span>
-                        {% elif link.LinkStatus %}
-                            <span style="color: red; font-weight: 500;">🔴 {{ link.LinkStatus }}</span>
-                        {% else %}
-                            <span style="color: gray;">⚪ (ยังไม่ตรวจสอบ)</span>
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        {% if link.สถานะ == 'ใช้งาน' %}
-                            <span style="color: green;">● ใช้งาน</span>
-                        {% elif link.สถานะ == 'ปรับปรุง' %}
-                            <span style="color: #FFC107;">● ปรับปรุง</span>
-                        {% elif link.สถานะ == 'เลิกใช้งาน' %}
-                            <span style="color: red;">● เลิกใช้งาน</span>
-                        {% else %}
-                            {{ link.สถานะ }}
-                        {% endif %}
-                    </td>
-                    <td>{{ link.ประเภท }}</td>
-                    <td>{{ link.หน่วยงาน }}</td>
-                    <td>{{ link.เบอร์โทรติดต่อ }}</td>
-                    <td>{{ link.อีเมลผู้รับผิดชอบ }}</td>
-                    <td>{{ link.วันที่อัปเดต.split(' ')[0] }}</td>
-                </tr>
-                {% else %}
-                <tr id="noDataRow">
-                    <td colspan="9" style="text-align: center;">ไม่พบข้อมูลลิงค์</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="pagination-controls">
-            <div class="pagination-items">
-                <span>แสดง: </span>
-                <select id="itemsPerPage">
-                    <option value="10">10</option>
-                    <option value="20" selected>20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="99999">ทั้งหมด</option>
-                </select>
-                <span> รายการ</span>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="ค้นหา (ชื่อ, สถานะ, ประเภท, หน่วยงาน, อีเมล)...">
             </div>
-            <div class="pagination-nav">
-                <button id="btnFirst"> << </button>
-                <button id="btnPrev"> < </button>
-                <span> หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span> </span>
-                <button id="btnNext"> > </button>
-                <button id="btnLast"> >> </button>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                🔗 ชื่อลิงค์
+                                <div class="sort-buttons">
+                                    <button onclick="sortTable(0, 'asc')">A-Z (ก-ฮ)</button>
+                                    <button onclick="sortTable(0, 'desc')">Z-A (ฮ-ก)</button>
+                                </div>
+                            </th>
+                            <th>📝 รายละเอียด</th>
+                            <th>🚦 สถานะลิงค์</th>
+                            <th>📊 สถานะการใช้งาน</th>
+                            <th>📂 ประเภท</th>
+                            <th>🏢 หน่วยงาน</th>
+                            <th>📞 เบอร์ติดต่อ</th>
+                            <th>📧 อีเมล</th>
+                            <th>🗓️ วันที่อัปเดต</th>
+                        </tr>
+                    </thead>
+                    <tbody id="linkTableBody">
+                        <!-- Sample Data -->
+                        <tr>
+                            <td><a href="#" target="_blank">ระบบจัดการเอกสาร</a></td>
+                            <td>ระบบสำหรับจัดเก็บและค้นหาเอกสารภายในองค์กร</td>
+                            <td><span class="status-badge status-ok">🟢 ปกติ</span></td>
+                            <td><span class="status-badge status-active">● ใช้งาน</span></td>
+                            <td>ระบบภายใน</td>
+                            <td>กองยุทธศาสตร์</td>
+                            <td>02-221-1234</td>
+                            <td>strategy@bma.go.th</td>
+                            <td>2024-11-14</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#" target="_blank">แบบฟอร์มคำขอ</a></td>
+                            <td>ระบบยื่นคำขอและติดตามสถานะออนไลน์</td>
+                            <td><span class="status-badge status-blocked">🔵 ถูกบล็อก</span></td>
+                            <td><span class="status-badge status-updating">● ปรับปรุง</span></td>
+                            <td>บริการประชาชน</td>
+                            <td>สำนักงานเขต</td>
+                            <td>02-221-5678</td>
+                            <td>district@bma.go.th</td>
+                            <td>2024-11-13</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#" target="_blank">ฐานข้อมูลบุคลากร</a></td>
+                            <td>ระบบจัดการข้อมูลพนักงานและทรัพยากรบุคคล</td>
+                            <td><span class="status-badge status-error">🔴 404 Error</span></td>
+                            <td><span class="status-badge status-inactive">● เลิกใช้งาน</span></td>
+                            <td>ระบบภายใน</td>
+                            <td>กองการเจ้าหน้าที่</td>
+                            <td>02-221-9012</td>
+                            <td>hr@bma.go.th</td>
+                            <td>2024-11-10</td>
+                        </tr>
+                        <tr id="noDataRow" style="display: none;">
+                            <td colspan="9" style="text-align: center; padding: 40px;">
+                                <div style="font-size: 3rem; margin-bottom: 10px;">🔍</div>
+                                <div style="font-size: 1.1rem; color: var(--button-gray);">ไม่พบข้อมูลลิงค์</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-controls">
+                <div class="pagination-items">
+                    <span>แสดง: </span>
+                    <select id="itemsPerPage">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="99999">ทั้งหมด</option>
+                    </select>
+                    <span>รายการ</span>
+                </div>
+                <div class="pagination-nav">
+                    <button id="btnFirst" title="หน้าแรก">«</button>
+                    <button id="btnPrev" title="หน้าก่อนหน้า">‹</button>
+                    <span>หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span></span>
+                    <button id="btnNext" title="หน้าถัดไป">›</button>
+                    <button id="btnLast" title="หน้าสุดท้าย">»</button>
+                </div>
             </div>
         </div>
-
-    </div> 
+    </div>
     
     <footer class="main-footer">
-        <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
-        <p>โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
+        <p>สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2024 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
 
     <script>
@@ -357,6 +659,11 @@
         const tbody = document.getElementById("linkTableBody");
         const noDataRow = document.getElementById("noDataRow");
         let searchInput; 
+
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mainNavigation');
+            nav.classList.toggle('active');
+        }
 
         function sortTable(columnIndex, direction) {
             const collator = new Intl.Collator('th', { sensitivity: 'base' });
@@ -375,37 +682,41 @@
             });
             displayPage(currentPage);
         }
+
         function displayPage(page) {
             currentPage = page;
             const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
             const filter = searchInput.value.toLowerCase(); 
             const filteredRows = allTableRows.filter(row => {
                 const cells = row.getElementsByTagName("td");
-                const name = (cells[0].textContent || cells[0].innerText).toLowerCase();
-                const status = (cells[3].textContent || cells[3].innerText).toLowerCase();
-                const type = (cells[4].textContent || cells[4].innerText).toLowerCase();
-                const department = (cells[5].textContent || cells[5].innerText).toLowerCase();
-                const email = (cells[7].textContent || cells[7].innerText).toLowerCase();
-                
-                const combinedText = name + " " + status + " " + type + " " + department + " " + email;
-                return combinedText.includes(filter);
+                const textContent = Array.from(cells).map(cell => 
+                    (cell.textContent || cell.innerText).toLowerCase()
+                ).join(" ");
+                return textContent.includes(filter);
             });
+
             tbody.innerHTML = ''; 
+
             if (filteredRows.length === 0) {
-                if(noDataRow) tbody.appendChild(noDataRow);
+                noDataRow.style.display = '';
+                tbody.appendChild(noDataRow);
                 totalPages = 1;
                 currentPage = 1;
             } else {
+                noDataRow.style.display = 'none';
                 totalPages = Math.ceil(filteredRows.length / itemsPerPage);
                 if (page > totalPages) currentPage = totalPages;
                 if (page < 1) currentPage = 1;
+
                 const startIndex = (currentPage - 1) * itemsPerPage;
                 const endIndex = startIndex + itemsPerPage;
                 const slicedRows = filteredRows.slice(startIndex, endIndex);
+
                 slicedRows.forEach(row => {
                     tbody.appendChild(row);
                 });
             }
+
             document.getElementById("currentPage").textContent = currentPage;
             document.getElementById("totalPages").textContent = totalPages;
             document.getElementById("btnFirst").disabled = (currentPage === 1);
@@ -413,37 +724,29 @@
             document.getElementById("btnNext").disabled = (currentPage === totalPages);
             document.getElementById("btnLast").disabled = (currentPage === totalPages);
         }
+
         document.addEventListener('DOMContentLoaded', () => {
             allTableRows = Array.from(tbody.children).filter(row => row.id !== 'noDataRow');
             searchInput = document.getElementById("searchInput"); 
+
             document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
             document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
             document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
             document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
             document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
             searchInput.addEventListener('keyup', () => displayPage(1)); 
+
             displayPage(1);
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const nav = document.getElementById('mainNavigation');
+                const toggle = document.querySelector('.mobile-menu-toggle');
+                if (nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                    nav.classList.remove('active');
+                }
+            });
         });
-    </script>
-    <script>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                const messages = {{ messages | tojson }};
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                });
-                messages.forEach(([category, message]) => {
-                    Toast.fire({
-                        icon: category,
-                        title: message
-                    });
-                });
-            {% endif %}
-        {% endwith %}
     </script>
 </body>
 </html>
