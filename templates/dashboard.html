@@ -560,9 +560,13 @@
 <body>
     
     <header class="main-header">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/BMA Logo.png') }}" alt="BMA Logo">
-        </div>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </div>
+			
+	<button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
         
         <div class="navigation">
             <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
@@ -591,6 +595,7 @@
             <a href="{{ url_for('logout') }}">
                 <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
             </a>
+            </div>
         </div>
     </header>
     
