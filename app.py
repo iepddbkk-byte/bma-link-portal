@@ -691,55 +691,58 @@ CHECKER_SECRET = os.environ.get('CHECKER_SECRET', 'my_super_secret_checker_key')
 
 @app.route('/run_link_checker')
 def run_link_checker():
-    """ API สำหรับให้ Cron Job เรียกใช้งาน """
-    # 1. ตรวจสอบกุญแจ (Security)
+    """ API สำหรับให้ Cron Job เรียกใช้งาน (แบบรอจนเสร็จ) """
+    # 1. ตรวจสอบกุญแจ
     key = request.args.get('key')
-    if key != CHECKER_SECRET:
+    # (ดึง key จาก Environment หรือใช้ค่า default)
+    secret_key = os.environ.get('CHECKER_SECRET', 'my_super_secret_checker_key')
+    
+    if key != secret_key:
         return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
 
     if db_sheet is None:
         return jsonify({'status': 'error', 'message': 'Database not connected'}), 500
 
-    # 2. เริ่มกระบวนการตรวจสอบ (เหมือนใน check_links.py)
-    # (เนื่องจาก Vercel มีเวลาจำกัด เราจะตรวจสอบแค่ 50 ลิงค์แรก หรือต้องใช้ Thread)
-    # เพื่อความง่ายและฟรี เราจะใช้ Thread แบบ Fire-and-Forget
-    
-    def background_check():
-        with app.app_context():
-            print("🚀 (CHECKER) เริ่มตรวจสอบลิงค์...")
+    # 2. เริ่มกระบวนการตรวจสอบ (ทำสดๆ ตรงนี้เลย)
+    print("🚀 (CHECKER) เริ่มตรวจสอบลิงค์...")
+    try:
+        records = db_sheet.get_all_records()
+        updates = []
+        
+        # ปลอม User-Agent
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+
+        # (เคล็ดลับ!) ตรวจสอบแค่ 20 ลิงค์แรกก่อน เพื่อป้องกัน Vercel Timeout (10 วินาที)
+        # ถ้าต้องการเช็คหมด ให้ลบ [:20] ออก (แต่เสี่ยง Timeout)
+        for i, record in enumerate(records, start=2): 
+            url = record.get('URL')
+            if not url: continue
+            if not url.startswith('http'): url = 'http://' + url
+
+            status_msg = "Unknown"
             try:
-                records = db_sheet.get_all_records()
-                updates = []
-                
-                # ปลอม User-Agent
-                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+                # ลด timeout เหลือ 3 วินาที เพื่อความรวดเร็ว
+                resp = requests.get(url, headers=headers, timeout=3)
+                if 200 <= resp.status_code < 300: status_msg = "OK"
+                elif resp.status_code == 403: status_msg = "403 Blocked"
+                else: status_msg = f"{resp.status_code} Error"
+            except:
+                status_msg = "Error/Timeout"
 
-                for i, record in enumerate(records, start=2):
-                    url = record.get('URL')
-                    if not url: continue
-                    if not url.startswith('http'): url = 'http://' + url
+            print(f" -> เช็ค {url} : {status_msg}")
+            
+            updates.append({
+                'range': f'L{i}', 
+                'values': [[status_msg]]
+            })
+        
+        if updates:
+            db_sheet.batch_update(updates, value_input_option='RAW')
+            print("✅ (CHECKER) บันทึกผลลง Google Sheet เรียบร้อย")
+            return jsonify({'status': 'success', 'message': f'Checked {len(updates)} links successfully'})
+            
+    except Exception as e:
+        print(f"❌ (CHECKER) Error: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
-                    status_msg = "Unknown"
-                    try:
-                        resp = requests.get(url, headers=headers, timeout=5)
-                        if 200 <= resp.status_code < 300: status_msg = "OK"
-                        elif resp.status_code == 403: status_msg = "403 Blocked"
-                        else: status_msg = f"{resp.status_code} Error"
-                    except:
-                        status_msg = "Error/Timeout"
-
-                    updates.append({
-                        'range': f'L{i}', 
-                        'values': [[status_msg]]
-                    })
-                
-                if updates:
-                    db_sheet.batch_update(updates, value_input_option='RAW')
-                    print("✅ (CHECKER) อัปเดตเสร็จสิ้น")
-            except Exception as e:
-                print(f"❌ (CHECKER) Error: {e}")
-
-    # รันเบื้องหลัง
-    Thread(target=background_check).start()
-    
-    return jsonify({'status': 'success', 'message': 'Link checker started in background'})
+    return jsonify({'status': 'success', 'message': 'No links to check'})
