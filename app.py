@@ -11,6 +11,7 @@ import string
 import os
 import json # (เพิ่ม import json)
 from collections import Counter
+import requests
 
 # Import Flask-Mail และ itsdangerous
 from flask_mail import Mail, Message
@@ -677,3 +678,66 @@ if __name__ == '__main__':
     # ใช้พอร์ตที่ Render กำหนด (ถ้ามี) ถ้าไม่มีใช้ 5000
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+    
+# ... (import อื่นๆ) ...
+import requests # (อย่าลืมเพิ่มบรรทัดนี้บนสุด)
+
+
+# --- (ใหม่!) 12. ระบบตรวจสอบลิงค์ (Link Checker) ---
+# เราจะใช้ Secret Key เพื่อป้องกันคนอื่นมากดเล่น
+CHECKER_SECRET = os.environ.get('CHECKER_SECRET', 'my-super-secret-checker-key')
+
+@app.route('/run_link_checker')
+def run_link_checker():
+    """ API สำหรับให้ Cron Job เรียกใช้งาน """
+    # 1. ตรวจสอบกุญแจ (Security)
+    key = request.args.get('key')
+    if key != CHECKER_SECRET:
+        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
+
+    if db_sheet is None:
+        return jsonify({'status': 'error', 'message': 'Database not connected'}), 500
+
+    # 2. เริ่มกระบวนการตรวจสอบ (เหมือนใน check_links.py)
+    # (เนื่องจาก Vercel มีเวลาจำกัด เราจะตรวจสอบแค่ 50 ลิงค์แรก หรือต้องใช้ Thread)
+    # เพื่อความง่ายและฟรี เราจะใช้ Thread แบบ Fire-and-Forget
+    
+    def background_check():
+        with app.app_context():
+            print("🚀 (CHECKER) เริ่มตรวจสอบลิงค์...")
+            try:
+                records = db_sheet.get_all_records()
+                updates = []
+                
+                # ปลอม User-Agent
+                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+
+                for i, record in enumerate(records, start=2):
+                    url = record.get('URL')
+                    if not url: continue
+                    if not url.startswith('http'): url = 'http://' + url
+
+                    status_msg = "Unknown"
+                    try:
+                        resp = requests.get(url, headers=headers, timeout=5)
+                        if 200 <= resp.status_code < 300: status_msg = "OK"
+                        elif resp.status_code == 403: status_msg = "403 Blocked"
+                        else: status_msg = f"{resp.status_code} Error"
+                    except:
+                        status_msg = "Error/Timeout"
+
+                    updates.append({
+                        'range': f'L{i}', 
+                        'values': [[status_msg]]
+                    })
+                
+                if updates:
+                    db_sheet.batch_update(updates, value_input_option='RAW')
+                    print("✅ (CHECKER) อัปเดตเสร็จสิ้น")
+            except Exception as e:
+                print(f"❌ (CHECKER) Error: {e}")
+
+    # รันเบื้องหลัง
+    Thread(target=background_check).start()
+    
+    return jsonify({'status': 'success', 'message': 'Link checker started in background'})
