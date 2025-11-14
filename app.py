@@ -11,6 +11,8 @@ import string
 import os
 import json # (เพิ่ม import json)
 from collections import Counter
+
+from threading import Thread 
 import requests
 
 # Import Flask-Mail และ itsdangerous
