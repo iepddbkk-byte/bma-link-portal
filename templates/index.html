@@ -747,18 +747,21 @@
             document.getElementById("btnLast").disabled = (currentPage === totalPages);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            allTableRows = Array.from(tbody.children).filter(row => row.id !== 'noDataRow');
-            searchInput = document.getElementById("searchInput"); 
+			document.addEventListener('DOMContentLoaded', () => {
+			// รอให้ DOM โหลดเสร็จจริงๆ
+			setTimeout(() => {
+			const rows = tbody.querySelectorAll('tr');
+			allTableRows = Array.from(rows).filter(row => row.id !== 'noDataRow');
 
-            document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
-            document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
-            document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
-            document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
-            document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
-            searchInput.addEventListener('keyup', () => displayPage(1)); 
+			if (allTableRows.length > 0) {
+				displayPage(1);
+			} else {
+            // ถ้าไม่มีข้อมูล ให้แสดง noDataRow
+				if(noDataRow) noDataRow.style.display = '';
+			}
+				}, 100); // หน่วงเวลาเล็กน้อย 0.1 วินาที
 
-            displayPage(1);
+			searchInput = document.getElementById("searchInput"); 
 
             // Close mobile menu when clicking outside
             document.addEventListener('click', (e) => {
