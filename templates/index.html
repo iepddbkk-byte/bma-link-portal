@@ -682,11 +682,6 @@
         const noDataRow = document.getElementById("noDataRow");
         let searchInput; 
 
-        function toggleMobileMenu() {
-            const nav = document.getElementById('mainNavigation');
-            nav.classList.toggle('active');
-        }
-
         function sortTable(columnIndex, direction) {
             const collator = new Intl.Collator('th', { sensitivity: 'base' });
             allTableRows.sort((rowA, rowB) => {
@@ -704,41 +699,37 @@
             });
             displayPage(currentPage);
         }
-
         function displayPage(page) {
             currentPage = page;
             const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
             const filter = searchInput.value.toLowerCase(); 
             const filteredRows = allTableRows.filter(row => {
                 const cells = row.getElementsByTagName("td");
-                const textContent = Array.from(cells).map(cell => 
-                    (cell.textContent || cell.innerText).toLowerCase()
-                ).join(" ");
-                return textContent.includes(filter);
+                const name = (cells[0].textContent || cells[0].innerText).toLowerCase();
+                const status = (cells[3].textContent || cells[3].innerText).toLowerCase();
+                const type = (cells[4].textContent || cells[4].innerText).toLowerCase();
+                const department = (cells[5].textContent || cells[5].innerText).toLowerCase();
+                const email = (cells[7].textContent || cells[7].innerText).toLowerCase();
+                
+                const combinedText = name + " " + status + " " + type + " " + department + " " + email;
+                return combinedText.includes(filter);
             });
-
             tbody.innerHTML = ''; 
-
             if (filteredRows.length === 0) {
-                noDataRow.style.display = '';
-                tbody.appendChild(noDataRow);
+                if(noDataRow) tbody.appendChild(noDataRow);
                 totalPages = 1;
                 currentPage = 1;
             } else {
-                noDataRow.style.display = 'none';
                 totalPages = Math.ceil(filteredRows.length / itemsPerPage);
                 if (page > totalPages) currentPage = totalPages;
                 if (page < 1) currentPage = 1;
-
                 const startIndex = (currentPage - 1) * itemsPerPage;
                 const endIndex = startIndex + itemsPerPage;
                 const slicedRows = filteredRows.slice(startIndex, endIndex);
-
                 slicedRows.forEach(row => {
                     tbody.appendChild(row);
                 });
             }
-
             document.getElementById("currentPage").textContent = currentPage;
             document.getElementById("totalPages").textContent = totalPages;
             document.getElementById("btnFirst").disabled = (currentPage === 1);
@@ -746,32 +737,37 @@
             document.getElementById("btnNext").disabled = (currentPage === totalPages);
             document.getElementById("btnLast").disabled = (currentPage === totalPages);
         }
-
-			document.addEventListener('DOMContentLoaded', () => {
-			// รอให้ DOM โหลดเสร็จจริงๆ
-			setTimeout(() => {
-			const rows = tbody.querySelectorAll('tr');
-			allTableRows = Array.from(rows).filter(row => row.id !== 'noDataRow');
-
-			if (allTableRows.length > 0) {
-				displayPage(1);
-			} else {
-            // ถ้าไม่มีข้อมูล ให้แสดง noDataRow
-				if(noDataRow) noDataRow.style.display = '';
-			}
-				}, 100); // หน่วงเวลาเล็กน้อย 0.1 วินาที
-
-			searchInput = document.getElementById("searchInput"); 
-
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', (e) => {
-                const nav = document.getElementById('mainNavigation');
-                const toggle = document.querySelector('.mobile-menu-toggle');
-                if (nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
-                    nav.classList.remove('active');
-                }
-            });
+        document.addEventListener('DOMContentLoaded', () => {
+            allTableRows = Array.from(tbody.children).filter(row => row.id !== 'noDataRow');
+            searchInput = document.getElementById("searchInput"); 
+            document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
+            document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
+            document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
+            document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
+            document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
+            searchInput.addEventListener('keyup', () => displayPage(1)); 
+            displayPage(1);
         });
+    </script>
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                const messages = {{ messages | tojson }};
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+                messages.forEach(([category, message]) => {
+                    Toast.fire({
+                        icon: category,
+                        title: message
+                    });
+                });
+            {% endif %}
+        {% endwith %}
     </script>
 </body>
 </html>
