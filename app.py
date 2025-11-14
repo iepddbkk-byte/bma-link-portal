@@ -92,8 +92,9 @@ def send_async_email(app, msg):
             print(f"❌ Failed to send email: {e}")
 
 def send_reset_email(username, recipient_email):
-    """ สร้าง Token และส่งอีเมล (แบบไม่รอผล) """
+    """ สร้าง Token และส่งอีเมล (แบบรอจนเสร็จ เพื่อให้ใช้บน Vercel ได้) """
     token = s.dumps(username, salt='password-reset-salt')
+    # ใช้ _external=True เพื่อให้ได้ URL เต็มๆ ของ Vercel
     reset_url = url_for('reset_password_page', token=token, _external=True)
     
     msg_title = "คำขอรีเซ็ตรหัสผ่าน - BMA Link Registry"
@@ -111,9 +112,13 @@ def send_reset_email(username, recipient_email):
     """
     msg = Message(msg_title, recipients=[recipient_email], body=msg_body)
     
-    # ใช้ Thread เพื่อส่งอีเมลแบบเบื้องหลัง
-    Thread(target=send_async_email, args=(app, msg)).start()
-    print(f"⏳ กำลังส่งอีเมลไปยัง {recipient_email} (Background Process)...")
+    try:
+        # ⚠️ (แก้ไข!) สั่งส่งตรงๆ เลย ไม่ต้องใช้ Thread
+        mail.send(msg)
+        print(f"✅ ส่งอีเมลสำเร็จไปยัง: {recipient_email}")
+    except Exception as e:
+        # ถ้าส่งไม่ผ่าน ให้ปริ้น Error ออกมาดูใน Logs
+        print(f"❌ ส่งอีเมลล้มเหลว: {e}")
 
 def generate_invite_code():
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
