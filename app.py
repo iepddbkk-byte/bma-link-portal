@@ -9,9 +9,8 @@ import datetime
 import random
 import string
 import os
+import json # (เพิ่ม import json)
 from collections import Counter
-from threading import Thread 
-import json
 
 # Import Flask-Mail และ itsdangerous
 from flask_mail import Mail, Message
@@ -20,16 +19,17 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignat
 # --- 1. ตั้งค่า Flask App ---
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-app.config['SECRET_KEY'] = os.urandom(24) 
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
 
 # --- 2. ตั้งค่า FLASK-MAIL ---
-# ⚠️ (สำคัญ!) ตรวจสอบว่าคุณตั้งค่า Environment Variables บน Render แล้ว
-# หรือใส่ค่าตรงๆ ที่นี่สำหรับการทดสอบในเครื่อง (แต่ระวังเรื่องความปลอดภัย)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
+
+# ใช้ค่าจาก Environment หรือค่าสำรองที่คุณใส่มา
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'iepdd.bkk@gmail.com') 
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'gemq daaw qbbq xfts')  
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'haus xdqu afbt hgxz')  
+
 app.config['MAIL_DEFAULT_SENDER'] = ('BMA Link Registry', app.config['MAIL_USERNAME'])
 
 mail = Mail(app)
@@ -49,27 +49,26 @@ invite_sheet = None
 feedback_sheet = None 
 
 try:
-    # (วิธีใหม่!) อ่านจาก Environment Variable ถ้ามี
+    # (รองรับทั้ง Vercel และ Local)
     json_creds = os.environ.get('GOOGLE_CREDENTIALS')
     
     if json_creds:
-        # กรณีรันบน Vercel (อ่านจากตัวแปร)
+        # กรณีรันบน Server (อ่านจากตัวแปร)
         creds_dict = json.loads(json_creds)
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPE)
     else:
         # กรณีรันในเครื่อง (อ่านจากไฟล์)
-        creds = ServiceAccountCredentials.from_json_keyfile_name('my-project-12345.json', SCOPE)
+        creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
 
     client = gspread.authorize(creds)
     spreadsheet = client.open_by_key(SHEET_KEY)
     
-    # ... (ส่วน worksheet เหมือนเดิม) ...
     db_sheet = spreadsheet.worksheet("Database")
     staff_sheet = spreadsheet.worksheet("StaffList")
     invite_sheet = spreadsheet.worksheet("InviteCodes")
     feedback_sheet = spreadsheet.worksheet("Feedback")
     
-    print("✅ เชื่อมต่อ Google Sheet สำเร็จ!")
+    print("✅ เชื่อมต่อ Google Sheet ครบทุกแท็บสำเร็จ!")
 
 except Exception as e:
     print(f"❌ เกิดข้อผิดพลาดในการเชื่อมต่อ Sheet: {e}")
@@ -83,46 +82,42 @@ def generate_new_id():
 def get_current_timestamp():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-def send_async_email(app, msg):
-    with app.app_context():
-        try:
-            mail.send(msg)
-            print("✅ Email sent successfully via background thread.")
-        except Exception as e:
-            print(f"❌ Failed to send email: {e}")
-
-def send_reset_email(username, recipient_email):
-    """ สร้าง Token และส่งอีเมล (แบบรอจนเสร็จ เพื่อให้ใช้บน Vercel ได้) """
-    token = s.dumps(username, salt='password-reset-salt')
-    # ใช้ _external=True เพื่อให้ได้ URL เต็มๆ ของ Vercel
-    reset_url = url_for('reset_password_page', token=token, _external=True)
-    
-    msg_title = "คำขอรีเซ็ตรหัสผ่าน - BMA Link Registry"
-    msg_body = f"""
-    สวัสดีครับ,
-    เราได้รับคำขอรีเซ็ตรหัสผ่านสำหรับ Username: {username}
-    หากคุณเป็นผู้ร้องขอ กรุณาคลิกลิงค์ด้านล่างเพื่อตั้งรหัสผ่านใหม่:
-    
-    {reset_url}
-    
-    (ลิงค์นี้จะหมดอายุภายใน 1 ชั่วโมง)
-    
-    ขอบคุณครับ
-    BMA Link Registry
-    """
-    msg = Message(msg_title, recipients=[recipient_email], body=msg_body)
-    
-    try:
-        # ⚠️ (แก้ไข!) สั่งส่งตรงๆ เลย ไม่ต้องใช้ Thread
-        mail.send(msg)
-        print(f"✅ ส่งอีเมลสำเร็จไปยัง: {recipient_email}")
-    except Exception as e:
-        # ถ้าส่งไม่ผ่าน ให้ปริ้น Error ออกมาดูใน Logs
-        print(f"❌ ส่งอีเมลล้มเหลว: {e}")
-
 def generate_invite_code():
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return f"INVITE-{code}"
+
+def send_reset_email(username, recipient_email):
+    """ 
+    สร้าง Token และส่งอีเมล (แบบ Synchronous - รอจนเสร็จ) 
+    เพื่อให้ทำงานบน Vercel/Serverless ได้
+    """
+    try:
+        token = s.dumps(username, salt='password-reset-salt')
+        # _external=True เพื่อให้ได้ URL เต็ม (https://...)
+        reset_url = url_for('reset_password_page', token=token, _external=True)
+        
+        msg_title = "คำขอรีเซ็ตรหัสผ่าน - BMA Link Registry"
+        msg_body = f"""
+        สวัสดีครับ,
+        เราได้รับคำขอรีเซ็ตรหัสผ่านสำหรับ Username: {username}
+        หากคุณเป็นผู้ร้องขอ กรุณาคลิกลิงค์ด้านล่างเพื่อตั้งรหัสผ่านใหม่:
+        
+        {reset_url}
+        
+        (ลิงค์นี้จะหมดอายุภายใน 1 ชั่วโมง)
+        
+        ขอบคุณครับ
+        BMA Link Registry
+        """
+        msg = Message(msg_title, recipients=[recipient_email], body=msg_body)
+        
+        # ส่งทันที (รอจนกว่าจะเสร็จ)
+        mail.send(msg)
+        print(f"✅ ส่งอีเมลรีเซ็ตไปยัง {recipient_email} สำเร็จ")
+        return True
+    except Exception as e:
+        print(f"❌ ส่งอีเมลล้มเหลว: {e}")
+        return False
 
 
 # --- API (ตรวจสอบ Username/Invite Code) ---
@@ -286,12 +281,17 @@ def forgot_password():
             if user_found:
                 username = user_found['Username']
                 email = user_found['Email']
-                send_reset_email(username, email)
-            flash('หาก Username นี้มีอยู่ในระบบ เราได้ส่งลิงค์รีเซ็ตรหัสผ่านไปให้แล้ว (กรุณาตรวจสอบอีเมลที่ท่านใช้สมัคร)', 'info')
+                # (แก้ไข!) ส่งแบบ Synchronous
+                success = send_reset_email(username, email)
+                if not success:
+                     flash('เกิดข้อผิดพลาดในการส่งอีเมล', 'error')
+                     return redirect(url_for('forgot_password'))
+
+            flash('หาก Username นี้มีอยู่ในระบบ เราได้ส่งลิงค์รีเซ็ตรหัสผ่านไปให้แล้ว', 'info')
             return redirect(url_for('login_page'))
         except Exception as e:
             print(f"❌ เกิดข้อผิดพลาดในการส่งอีเมลรีเซ็ต: {e}")
-            flash('เกิดข้อผิดพลาดในการส่งอีเมล (Authentication Error 535)', 'error')
+            flash('เกิดข้อผิดพลาดในการส่งอีเมล (Error)', 'error')
             return redirect(url_for('forgot_password'))
     return render_template('forgot_password.html')
 
@@ -674,4 +674,6 @@ def feedback_action():
 
 # --- 11. รันเซิร์ฟเวอร์ ---
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    # ใช้พอร์ตที่ Render กำหนด (ถ้ามี) ถ้าไม่มีใช้ 5000
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
