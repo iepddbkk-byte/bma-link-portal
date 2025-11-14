@@ -535,33 +535,29 @@
 	<button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
         
         <div class="navigation">
-            <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
-            <a href="{{ url_for('home') }}">
-                <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
-            </a>
-            
-            {% if session.get('level') == 'Admin' %}
-            <a href="{{ url_for('admin_panel') }}">
-                <button type="button" class="btn-admin">👑 Admin Panel</button>
-            </a>
+            {% if session.get('logged_in') %}
+                <span>สวัสดี, {{ session.name }}!</span>
+                
+                {% if session.get('level') == 'Admin' %}
+                <a href="{{ url_for('admin_panel') }}">
+                    <button type="button" class="btn-admin">👑 Admin Panel</button>
+                </a>
+                {% endif %}
+                <a href="{{ url_for('analytics_page') }}">
+                    <button type="button" class="btn-analytics">📊 Analytics</button>
+                </a>
+                <a href="{{ url_for('dashboard') }}">
+                    <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+                </a>
+                <a href="{{ url_for('feedback_page') }}">
+                    <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+                </a>
+                <a href="{{ url_for('logout') }}">
+                    <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+                </a>
+            {% else %}
+                <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
             {% endif %}
-
-            <a href="{{ url_for('analytics_page') }}">
-                <button type="button" class="btn-analytics">📊 Analytics</button>
-            </a>
-
-            <a href="{{ url_for('dashboard') }}">
-                <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-            </a>
-            
-            <a href="{{ url_for('feedback_page') }}">
-                <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
-            </a>
-
-            <a href="{{ url_for('logout') }}">
-                <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-            </a>
-            </div>
         </div>
     </header>
     
