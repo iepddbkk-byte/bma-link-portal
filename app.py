@@ -11,6 +11,7 @@ import string
 import os
 from collections import Counter
 from threading import Thread 
+import json
 
 # Import Flask-Mail และ itsdangerous
 from flask_mail import Mail, Message
@@ -48,19 +49,28 @@ invite_sheet = None
 feedback_sheet = None 
 
 try:
-    creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
+    # (วิธีใหม่!) อ่านจาก Environment Variable ถ้ามี
+    json_creds = os.environ.get('GOOGLE_CREDENTIALS')
+    
+    if json_creds:
+        # กรณีรันบน Vercel (อ่านจากตัวแปร)
+        creds_dict = json.loads(json_creds)
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPE)
+    else:
+        # กรณีรันในเครื่อง (อ่านจากไฟล์)
+        creds = ServiceAccountCredentials.from_json_keyfile_name('my-project-12345.json', SCOPE)
+
     client = gspread.authorize(creds)
     spreadsheet = client.open_by_key(SHEET_KEY)
     
+    # ... (ส่วน worksheet เหมือนเดิม) ...
     db_sheet = spreadsheet.worksheet("Database")
     staff_sheet = spreadsheet.worksheet("StaffList")
     invite_sheet = spreadsheet.worksheet("InviteCodes")
     feedback_sheet = spreadsheet.worksheet("Feedback")
     
-    print("✅ เชื่อมต่อ Google Sheet 'Database', 'StaffList', 'InviteCodes', และ 'Feedback' สำเร็จ!")
+    print("✅ เชื่อมต่อ Google Sheet สำเร็จ!")
 
-except FileNotFoundError:
-    print(f"❌ ไม่พบไฟล์ credentials '{CREDS_FILE}'")
 except Exception as e:
     print(f"❌ เกิดข้อผิดพลาดในการเชื่อมต่อ Sheet: {e}")
 
