@@ -327,6 +327,11 @@
         .btn-logout { 
             background: linear-gradient(135deg, var(--button-red), var(--button-red-hover));
         }
+        
+        /* เพิ่มปุ่ม Login (สีเขียว) */
+        .btn-login {
+            background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
+        }
 
         /* Pagination */
         .pagination-controls {
@@ -630,7 +635,7 @@
                         <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
                     </a>
                 {% else %}
-                    <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
+                    <a href="{{ url_for('login_page') }}"><button type="button" class="btn-login">สำหรับเจ้าหน้าที่</button></a>
                 {% endif %}
             </div>
         </div>
