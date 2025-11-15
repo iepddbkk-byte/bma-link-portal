@@ -555,6 +555,9 @@
                 <a href="{{ url_for('logout') }}">
                     <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
                 </a>
+				<a href="{{ url_for('profile_page') }}">
+					<button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
+				</a>
             {% else %}
                 <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
             {% endif %}

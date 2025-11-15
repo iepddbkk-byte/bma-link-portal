@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ข้อมูลส่วนตัว - BMA Link Registry</title>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --bma-green: #00963C;
+            --bma-green-hover: #007a30;
+            --button-red: #dc3545;
+            --button-blue: #007bff;
+            --button-yellow: #ffc107;
+            --button-gray: #6c757d;
+            --light-gray: #f4f4f4;
+            --text-color: #333;
+        }
+        body { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            margin: 0; padding: 0;
+            background-color: var(--light-gray); 
+            color: var(--text-color);
+        }
+        /* (Header Style เหมือนไฟล์อื่น - คัดลอกมาได้เลย หรือใช้ include ถ้าทำเป็น) */
+        .main-header { background-color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 3px solid var(--bma-green); min-height: 80px; }
+        .main-header .logo-container img { height: 70px; margin-right: 15px; }
+        .main-header .navigation { display: flex; align-items: center; gap: 10px; }
+        .main-header .navigation span { font-size: 1.1em; color: var(--text-color); white-space: nowrap; }
+        
+        /* ปุ่มต่างๆ */
+        button, .btn { font-family: 'Kanit', sans-serif; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 1em; transition: 0.3s; display: inline-block; }
+        .btn-home { background-color: var(--button-blue); } .btn-home:hover { background-color: #0056b3; }
+        .btn-dashboard { background-color: var(--bma-green); } .btn-dashboard:hover { background-color: var(--bma-green-hover); }
+        .btn-logout { background-color: var(--button-red); } .btn-logout:hover { background-color: #c82333; }
+        .btn-profile { background-color: var(--button-yellow); color: #212529; } .btn-profile:hover { background-color: #e0a800; }
+
+        /* --- Profile Styles (ใหม่) --- */
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        
+        .profile-cover {
+            height: 150px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--bma-green), #005a24);
+        }
+        
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 5px solid white;
+            background-color: #fff;
+            margin-top: -70px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .profile-info { padding: 20px 40px 40px 40px; width: 100%; box-sizing: border-box; }
+        .profile-name { font-size: 1.8em; font-weight: 600; margin: 10px 0 5px 0; color: var(--text-color); }
+        .profile-username { color: var(--button-gray); font-size: 1.1em; margin-bottom: 20px; }
+        
+        .profile-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        .badge-admin { background-color: var(--button-yellow); color: #212529; }
+        .badge-user { background-color: var(--bma-green); color: white; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 30px;
+        }
+        .stat-item {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .stat-value { font-size: 1.5em; font-weight: 600; color: var(--bma-green); }
+        .stat-label { color: var(--button-gray); font-size: 0.9em; margin-top: 5px; }
+        
+        .info-list {
+            text-align: left;
+            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .info-label { font-weight: 500; color: var(--button-gray); }
+        .info-data { font-weight: 500; color: var(--text-color); }
+
+        .footer { text-align: center; margin-top: 40px; color: var(--button-gray); font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+        </div>
+        <div class="navigation">
+            <a href="{{ url_for('home') }}" class="btn btn-home">⬅️ กลับหน้าหลัก</a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">🖥️ Dashboard</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-logout">🚪 ออกจากระบบ</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="profile-card">
+            <div class="profile-cover"></div>
+            
+            <div class="profile-avatar">
+                <img src="https://ui-avatars.com/api/?name={{ user['ชื่อ'] }}&background=00963C&color=fff&size=150&bold=true" alt="Profile">
+            </div>
+            
+            <div class="profile-info">
+                <h1 class="profile-name">{{ user['ชื่อ'] }}</h1>
+                <p class="profile-username">@{{ user['Username'] }}</p>
+                
+                {% if user['Level'] == 'Admin' %}
+                    <span class="profile-badge badge-admin">👑 ผู้ดูแลระบบ (Admin)</span>
+                {% else %}
+                    <span class="profile-badge badge-user">👤 เจ้าหน้าที่ (User)</span>
+                {% endif %}
+
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-briefcase"></i> ตำแหน่ง</span>
+                        <span class="info-data">{{ user['ตำแหน่ง'] }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-building"></i> หน่วยงาน</span>
+                        <span class="info-data">{{ user['หน่วยงาน'] }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-envelope"></i> อีเมล</span>
+                        <span class="info-data">{{ user['Email'] }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-phone"></i> เบอร์โทร</span>
+                        <span class="info-data">{{ user['เบอร์โทร'] }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-clock"></i> สมัครเมื่อ</span>
+                        <span class="info-data">{{ user['CreatedAt'] }}</span>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ links_count }}</div>
+                        <div class="stat-label"><i class="fas fa-link"></i> ลิงค์ที่สร้าง</div>
+                    </div>
+                    </div>
+                
+                <div style="margin-top: 30px;">
+                    <button onclick="Swal.fire('ฟีเจอร์นี้กำลังพัฒนา', 'ระบบแก้ไขข้อมูลส่วนตัวจะเปิดให้ใช้งานเร็วๆ นี้', 'info')" class="btn btn-home" style="background-color: var(--button-gray);">
+                        <i class="fas fa-edit"></i> แก้ไขข้อมูลส่วนตัว
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
+    </div>
+
+</body>
+</html>

@@ -746,3 +746,31 @@ def run_link_checker():
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
     return jsonify({'status': 'success', 'message': 'No links to check'})
+    
+# --- 13. Route (Profile) ---
+@app.route('/profile')
+def profile_page():
+    if not session.get('logged_in'):
+        return redirect(url_for('login_page'))
+    
+    username = session.get('username')
+    
+    # ค้นหาข้อมูลผู้ใช้จาก Sheet 'StaffList'
+    try:
+        all_staff = staff_sheet.get_all_records()
+        user_info = next((u for u in all_staff if u['Username'] == username), None)
+        
+        if not user_info:
+            flash('ไม่พบข้อมูลผู้ใช้', 'error')
+            return redirect(url_for('dashboard'))
+            
+        # นับจำนวนลิงค์ที่ผู้ใช้นี้สร้าง (จาก Sheet 'Database')
+        all_links = db_sheet.get_all_records()
+        user_links_count = sum(1 for link in all_links if link.get('CreatorUsername') == username)
+        
+        return render_template('profile.html', session=session, user=user_info, links_count=user_links_count)
+        
+    except Exception as e:
+        print(f"Error loading profile: {e}")
+        flash('เกิดข้อผิดพลาดในการโหลดข้อมูลส่วนตัว', 'error')
+        return redirect(url_for('dashboard'))
