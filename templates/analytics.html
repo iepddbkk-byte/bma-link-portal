@@ -2,9 +2,11 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Dashboard - BMA</title>
     
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -14,186 +16,504 @@
         :root {
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
+            --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
             --button-red-hover: #c82333;
             --button-blue: #007bff;
             --button-blue-hover: #0056b3;
             --button-yellow: #ffc107;
+            --button-yellow-hover: #e0a800;
             --button-gray: #6c757d;
-            --light-gray: #f4f4f4;
-            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-        body { 
-            font-family: 'Kanit', Arial, sans-serif; 
-            margin: 0; padding: 0;
-            background-color: var(--light-gray); 
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--text-color);
+            min-height: 100vh;
+            padding-bottom: 60px;
         }
+
+        /* Header */
         .main-header {
-            background-color: #fff;
-            padding: 10px 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-md);
             border-bottom: 3px solid var(--bma-green);
-            min-height: 80px; 
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
         }
-        .main-header .logo-container img { height: 70px; margin-right: 15px; }
+
+        .main-header .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .main-header .logo-container img {
+            height: 60px;
+            transition: transform 0.3s ease;
+        }
+
+        .main-header .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
         .main-header .navigation {
-            display: flex; align-items: center; gap: 10px; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
+
         .main-header .navigation span {
-            font-size: 1.1em;
+            font-size: 1em;
             color: var(--text-color);
-            white-space: nowrap;
+            font-weight: 500;
+            margin-right: 10px;
         }
-        .container {
-            max-width: 1300px;
-            margin: 20px auto; 
-            padding: 20px;
-            background-color: transparent; 
-            border-radius: 8px;
-            box-shadow: none; 
-        }
-        h1, h2 { 
-            color: var(--text-color);
-            border-bottom: 2px solid #ddd; 
-            padding-bottom: 10px;
-        }
+
+        /* Buttons */
         button {
             font-family: 'Kanit', Arial, sans-serif;
-            color: white; border: none; 
-            padding: 8px 12px;
-            border-radius: 4px; cursor: pointer; 
-            font-size: 1em;
-            transition: background-color 0.3s; 
-            text-decoration: none !important;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
             white-space: nowrap;
+            box-shadow: var(--shadow-sm);
         }
-        .main-header .btn-home { background-color: var(--button-blue); } 
-        .main-header .btn-home:hover { background-color: var(--button-blue-hover); }
-        .main-header .btn-dashboard { background-color: var(--bma-green); }
-        .main-header .btn-dashboard:hover { background-color: var(--bma-green-hover); }
-        .main-header .btn-analytics { background-color: var(--button-blue); }
-        .main-header .btn-analytics:hover { background-color: var(--button-blue-hover); }
-        .main-header .btn-admin { background-color: var(--button-yellow); color: #212529 !important; }
-        .main-header .btn-admin:hover { background-color: var(--button-yellow-hover); }
-        .main-header .btn-feedback { background-color: var(--button-gray); }
-        .main-header .btn-feedback:hover { background-color: #5a6268; }
-        .main-header .btn-logout { background-color: var(--button-red); } 
-        .main-header .btn-logout:hover { background-color: var(--button-red-hover); }
-        
-        .main-footer {
-            background-color: var(--bma-green);
-            color: white; text-align: center;
-            padding: 20px; margin-top: 30px;
-            font-size: 0.9em;
-        }
-        .main-footer p { margin: 5px 0; }
 
-        /* (CSS สำหรับการ์ดสรุป) */
-        .stat-card-row {
-            display: grid; /* (ปรับปรุง!) ใช้ Grid */
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* (ปรับปรุง!) */
-            gap: 25px;
-            margin-bottom: 25px;
+        .main-header .btn-home {
+            background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%);
         }
+        .main-header .btn-home:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .main-header .btn-dashboard {
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+        }
+        .main-header .btn-dashboard:hover {
+            background: linear-gradient(135deg, #007a30 0%, #006428 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .main-header .btn-analytics {
+            background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%);
+        }
+        .main-header .btn-analytics:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .main-header .btn-admin {
+            background: linear-gradient(135deg, var(--button-yellow) 0%, #e0a800 100%);
+            color: #212529 !important;
+        }
+        .main-header .btn-admin:hover {
+            background: linear-gradient(135deg, #e0a800 0%, #c69500 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .main-header .btn-feedback {
+            background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
+        }
+        .main-header .btn-feedback:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .main-header .btn-logout {
+            background: linear-gradient(135deg, var(--button-red) 0%, #c82333 100%);
+        }
+        .main-header .btn-logout:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Title */
+        h2 {
+            color: var(--bma-green);
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--bma-green-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Stat Cards */
+        .stat-card-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
         .stat-card {
             display: flex;
             align-items: center;
             gap: 20px;
-            background-color: #fff;
+            background: white;
             padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid #ddd;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease;
         }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .stat-card.card-blue { border-left-color: var(--button-blue); }
+        .stat-card.card-green { border-left-color: var(--bma-green); }
+        .stat-card.card-yellow { border-left-color: var(--button-yellow); }
+        .stat-card.card-gray { border-left-color: var(--button-gray); }
+
         .stat-card-icon {
             font-size: 2.5em;
             padding: 20px;
-            border-radius: 50%;
+            border-radius: 15px;
             color: #fff;
-            width: 40px; 
-            height: 40px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
         }
-        .icon-links { background-color: var(--button-blue); }
-        .icon-active { background-color: var(--bma-green); }
-        .icon-users { background-color: var(--button-yellow); color: var(--text-color); }
-        .icon-feedback { background-color: var(--button-gray); } /* (ใหม่!) */
-        .icon-star { background-color: var(--button-yellow); color: var(--text-color); } /* (ใหม่!) */
 
+        .icon-links {
+            background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%);
+        }
+        .icon-active {
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+        }
+        .icon-users {
+            background: linear-gradient(135deg, var(--button-yellow) 0%, #e0a800 100%);
+        }
+        .icon-feedback {
+            background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
+        }
+        .icon-star {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        }
+
+        .stat-card-info {
+            flex: 1;
+        }
 
         .stat-card-info h3 {
-            margin: 0;
-            font-size: 1.1em;
+            margin: 0 0 5px 0;
+            font-size: 0.95em;
             color: var(--button-gray);
             font-weight: 500;
-        }
-        .stat-card-info .stat-number {
-            font-size: 2.2em;
-            font-weight: 500;
-            color: var(--text-color);
-        }
-        .stat-card-info .stat-number .unit { /* (ใหม่!) */
-            font-size: 0.6em;
-            color: var(--button-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* (CSS สำหรับพื้นที่กราฟ) */
+        .stat-card-info .stat-number {
+            font-size: 2.5em;
+            font-weight: 600;
+            color: var(--text-color);
+            line-height: 1;
+        }
+
+        .stat-card-info .stat-number .unit {
+            font-size: 0.5em;
+            color: var(--button-gray);
+            font-weight: 400;
+        }
+
+        /* Chart Grid */
         .chart-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 25px;
-            margin-top: 25px;
+            margin-top: 30px;
         }
+
         .chart-container {
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
         }
+
+        .chart-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
         .chart-container-full {
-             grid-column: 1 / -1; 
+            grid-column: 1 / -1;
         }
+
         .chart-container h3 {
             text-align: center;
-            margin-top: 0;
-            font-weight: 500;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 1.2em;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
         }
-        
-        /* (ใหม่!) CSS สำหรับกล่อง Feedback */
+
+        .chart-container h3 i {
+            color: var(--bma-green);
+            margin-right: 8px;
+        }
+
+        /* Feedback List */
         .feedback-list {
             list-style: none;
             padding: 0;
             margin: 0;
-            max-height: 300px; /* (จำกัดความสูง) */
-            overflow-y: auto; /* (เพิ่ม Scrollbar) */
+            max-height: 350px;
+            overflow-y: auto;
         }
+
         .feedback-list li {
-            border-bottom: 1px solid #eee;
-            padding: 10px 5px;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 15px 10px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin-bottom: 5px;
         }
+
+        .feedback-list li:hover {
+            background: var(--bma-green-light);
+            transform: translateX(5px);
+        }
+
         .feedback-list li:last-child {
             border-bottom: none;
         }
+
         .feedback-list p {
-            margin: 0 0 5px 0;
+            margin: 0 0 8px 0;
             font-size: 1em;
+            line-height: 1.5;
+            color: var(--text-color);
         }
+
         .feedback-list .user {
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: 500;
             color: var(--button-gray);
+            font-style: italic;
         }
-        
-        @media (max-width: 900px) {
-            .chart-grid { grid-template-columns: 1fr; }
-            .stat-card-row { grid-template-columns: 1fr; }
+
+        .feedback-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .feedback-list::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 10px;
+        }
+
+        .feedback-list::-webkit-scrollbar-thumb {
+            background: var(--bma-green);
+            border-radius: 10px;
+        }
+
+        /* Footer */
+        .main-footer {
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            font-size: 0.9em;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .main-footer p {
+            margin: 8px 0;
+            opacity: 0.95;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 20px;
+                margin: 20px 15px;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .stat-card-row {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-header {
+                flex-direction: column;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .main-header .navigation {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-header .navigation span {
+                width: 100%;
+                text-align: center;
+            }
+
+            .container {
+                padding: 15px;
+                margin: 15px 10px;
+            }
+
+            h2 {
+                font-size: 1.3em;
+                padding: 15px;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-card-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2em;
+                padding: 15px;
+            }
+
+            .stat-card-info .stat-number {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-header .logo-container img {
+                height: 45px;
+            }
+
+            button {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            h2 {
+                font-size: 1.1em;
+            }
+
+            .stat-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stat-card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8em;
+            }
+
+            .chart-container {
+                padding: 20px 15px;
+            }
+        }
+
+        /* Smooth Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bma-green);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--bma-green-hover);
         }
     </style>
 </head>
@@ -232,28 +552,28 @@
         <h2>📊 Analytics Dashboard (สรุปผลผู้บริหาร)</h2>
 
         <div class="stat-card-row">
-            <div class="stat-card">
+            <div class="stat-card card-blue">
                 <div class="stat-card-icon icon-links"><i class="fas fa-link"></i></div>
                 <div class="stat-card-info">
                     <h3>ลิงค์ทั้งหมด</h3>
                     <div class="stat-number">{{ chart_data.total_links | default(0) }}</div>
                 </div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-green">
                 <div class="stat-card-icon icon-active"><i class="fas fa-check-circle"></i></div>
                 <div class="stat-card-info">
                     <h3>ลิงค์ที่ใช้งาน</h3>
                     <div class="stat-number">{{ chart_data.active_links | default(0) }}</div>
                 </div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-yellow">
                 <div class="stat-card-icon icon-users"><i class="fas fa-users"></i></div>
                 <div class="stat-card-info">
                     <h3>ผู้ใช้งานทั้งหมด</h3>
                     <div class="stat-number">{{ chart_data.total_users | default(0) }}</div>
                 </div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-gray">
                 <div class="stat-card-icon icon-feedback"><i class="fas fa-comment-dots"></i></div>
                 <div class="stat-card-info">
                     <h3>ผู้ตอบแบบสำรวจ</h3>
@@ -263,14 +583,14 @@
         </div>
 
         <div class="stat-card-row">
-            <div class="stat-card">
+            <div class="stat-card card-yellow">
                 <div class="stat-card-icon icon-star"><i class="fas fa-star"></i></div>
                 <div class="stat-card-info">
                     <h3>คะแนนความพึงพอใจ (เฉลี่ย)</h3>
                     <div class="stat-number">{{ chart_data.avg_sat | default(0) }} <span class="unit">/ 5</span></div>
                 </div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card card-yellow">
                 <div class="stat-card-icon icon-star"><i class="fas fa-star"></i></div>
                 <div class="stat-card-info">
                     <h3>คะแนนความง่าย (เฉลี่ย)</h3>
@@ -281,15 +601,15 @@
 
         <div class="chart-grid">
             <div class="chart-container">
-                <h3>สัดส่วนลิงค์ตามประเภทงาน</h3>
+                <h3><i class="fas fa-chart-pie"></i> สัดส่วนลิงค์ตามประเภทงาน</h3>
                 <canvas id="categoryPieChart"></canvas>
             </div>
             <div class="chart-container">
-                <h3>5 หน่วยงานที่เพิ่มลิงค์สูงสุด</h3>
+                <h3><i class="fas fa-chart-bar"></i> 5 หน่วยงานที่เพิ่มลิงค์สูงสุด</h3>
                 <canvas id="departmentBarChart"></canvas>
             </div>
             <div class="chart-container chart-container-full">
-                <h3>จำนวนลิงค์ที่เพิ่มขึ้น (รายเดือน)</h3>
+                <h3><i class="fas fa-chart-line"></i> จำนวนลิงค์ที่เพิ่มขึ้น (รายเดือน)</h3>
                 <canvas id="monthlyLineChart"></canvas>
             </div>
         </div>
@@ -305,7 +625,12 @@
                             <span class="user">- (โดย: {{ item.user }})</span>
                         </li>
                     {% else %}
-                        <li><p style="text-align: center; color: #888;">ยังไม่มีข้อเสนอแนะ</p></li>
+                        <li>
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>ยังไม่มีข้อเสนอแนะ</p>
+                            </div>
+                        </li>
                     {% endfor %}
                 </ul>
             </div>
@@ -318,7 +643,12 @@
                             <span class="user">- (โดย: {{ item.user }})</span>
                         </li>
                     {% else %}
-                        <li><p style="text-align: center; color: #888;">ยังไม่มีคำขอฟีเจอร์</p></li>
+                        <li>
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>ยังไม่มีคำขอฟีเจอร์</p>
+                            </div>
+                        </li>
                     {% endfor %}
                 </ul>
             </div>
@@ -327,8 +657,9 @@
     </div> 
     
     <footer class="main-footer">
-        <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
-        <p>โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
+        <p>สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
     </footer>
 
     <script>
@@ -341,6 +672,7 @@
         const bmaOrange = 'rgba(253, 126, 20, 0.7)';
         const bmaTeal = 'rgba(32, 201, 151, 0.7)';
         const colorPalette = [bmaGreen, bmaBlue, bmaYellow, bmaRed, bmaGray, bmaOrange, bmaTeal];
+        
         function getBmaColors(count) {
             const colors = [];
             for (let i = 0; i < count; i++) {
@@ -348,6 +680,7 @@
             }
             return colors;
         }
+        
         Chart.defaults.font.family = "'Kanit', sans-serif";
         Chart.defaults.font.size = 14;
 
@@ -361,12 +694,25 @@
                         label: 'จำนวนลิงค์',
                         data: chartData.category_data,
                         backgroundColor: getBmaColors(chartData.category_data.length),
-                        borderWidth: 1
+                        borderWidth: 2,
+                        borderColor: '#fff'
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { position: 'top' } } }
+                options: { 
+                    responsive: true, 
+                    plugins: { 
+                        legend: { 
+                            position: 'top',
+                            labels: {
+                                padding: 15,
+                                font: { size: 12 }
+                            }
+                        } 
+                    } 
+                }
             });
         }
+        
         if (chartData.dept_labels && chartData.dept_data) {
             const ctx2 = document.getElementById('departmentBarChart').getContext('2d');
             new Chart(ctx2, {
@@ -378,16 +724,27 @@
                         data: chartData.dept_data,
                         backgroundColor: getBmaColors(chartData.dept_data.length),
                         borderColor: '#fff',
-                        borderWidth: 1
+                        borderWidth: 2,
+                        borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { precision: 0 },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
                 }
             });
         }
+        
         if (chartData.month_labels && chartData.month_data) {
             const ctx3 = document.getElementById('monthlyLineChart').getContext('2d');
             new Chart(ctx3, {
@@ -397,17 +754,31 @@
                     datasets: [{
                         label: 'จำนวนลิงค์ที่เพิ่ม',
                         data: chartData.month_data,
-                        backgroundColor: 'rgba(0, 150, 60, 0.2)',
+                        backgroundColor: 'rgba(0, 150, 60, 0.1)',
                         borderColor: 'rgba(0, 150, 60, 1)',
-                        borderWidth: 2,
+                        borderWidth: 3,
                         fill: true,
-                        tension: 0.1 
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: 'rgba(0, 150, 60, 1)',
+                        pointBorderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { precision: 0 },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
                 }
             });
         }
