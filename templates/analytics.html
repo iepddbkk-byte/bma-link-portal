@@ -48,111 +48,121 @@
 
         /* Header */
         .main-header {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: white;
+            padding: 15px 20px;
             box-shadow: var(--shadow-md);
-            border-bottom: 3px solid var(--bma-green);
+            border-bottom: 4px solid var(--bma-green);
             position: sticky;
             top: 0;
             z-index: 1000;
             backdrop-filter: blur(10px);
         }
 
-        .main-header .logo-container {
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .main-header .logo-container img {
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-container img {
             height: 60px;
             transition: transform 0.3s ease;
         }
 
-        .main-header .logo-container img:hover {
+        .logo-container img:hover {
             transform: scale(1.05);
         }
 
-        .main-header .navigation {
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bma-green);
+            display: none;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--bma-green);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .navigation {
             display: flex;
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
         }
 
-        .main-header .navigation span {
-            font-size: 1em;
+        .navigation span {
+            font-size: 0.95rem;
             color: var(--text-color);
             font-weight: 500;
-            margin-right: 10px;
+            padding: 8px 16px;
+            background: var(--bma-green-light);
+            border-radius: 20px;
+            display: none;
+            white-space: nowrap;
         }
 
         /* Buttons */
-        button {
+        button, a {
             font-family: 'Kanit', Arial, sans-serif;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
+            padding: 10px 16px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.95em;
+            font-size: 0.95rem;
             font-weight: 500;
             transition: all 0.3s ease;
             text-decoration: none;
             white-space: nowrap;
             box-shadow: var(--shadow-sm);
+            display: inline-block;
         }
 
-        .main-header .btn-home {
-            background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%);
-        }
-        .main-header .btn-home:hover {
-            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        button:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
-        .main-header .btn-dashboard {
-            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+
+        .btn-home {
+            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
         }
-        .main-header .btn-dashboard:hover {
-            background: linear-gradient(135deg, #007a30 0%, #006428 100%);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        .btn-dashboard {
+            background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
         }
-        .main-header .btn-analytics {
-            background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%);
+        .btn-analytics {
+            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
         }
-        .main-header .btn-analytics:hover {
-            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        .main-header .btn-admin {
-            background: linear-gradient(135deg, var(--button-yellow) 0%, #e0a800 100%);
+        .btn-admin {
+            background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover));
             color: #212529 !important;
         }
-        .main-header .btn-admin:hover {
-            background: linear-gradient(135deg, #e0a800 0%, #c69500 100%);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        .btn-feedback {
+            background: linear-gradient(135deg, var(--button-gray), #5a6268);
         }
-        .main-header .btn-feedback {
-            background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
+        .btn-profile {
+            background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover));
+            color: #212529 !important;
         }
-        .main-header .btn-feedback:hover {
-            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        .main-header .btn-logout {
-            background: linear-gradient(135deg, var(--button-red) 0%, #c82333 100%);
-        }
-        .main-header .btn-logout:hover {
-            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        .btn-logout {
+            background: linear-gradient(135deg, var(--button-red), var(--button-red-hover));
         }
 
         /* Container */
@@ -400,41 +410,44 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 1024px) {
-            .container {
-                padding: 20px;
-                margin: 20px 15px;
-            }
-
-            h2 {
-                font-size: 1.5em;
-            }
-
-            .stat-card-row {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-        }
-
         @media (max-width: 768px) {
-            .main-header {
-                flex-direction: column;
-                padding: 15px;
-                gap: 15px;
+            .mobile-menu-toggle {
+                display: block;
             }
 
-            .main-header .navigation {
+            .navigation {
+                display: none;
                 width: 100%;
+                flex-direction: column;
+                background: white;
+                padding: 15px;
+                border-radius: 12px;
+                margin-top: 10px;
+                box-shadow: var(--shadow-md);
+            }
+
+            .navigation.active {
+                display: flex;
+            }
+
+            .navigation button,
+            .navigation a {
+                width: 100%;
+                text-align: center;
                 justify-content: center;
             }
 
-            .main-header .navigation span {
-                width: 100%;
-                text-align: center;
+            .navigation span {
+                display: none !important;
+            }
+
+            .logo-text {
+                display: none;
             }
 
             .container {
-                padding: 15px;
-                margin: 15px 10px;
+                padding: 20px 15px;
+                margin: 20px 10px;
             }
 
             h2 {
@@ -466,8 +479,32 @@
             }
         }
 
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .logo-text {
+                display: block;
+            }
+
+            .navigation span {
+                display: block;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .logo-text {
+                display: block;
+            }
+
+            .navigation span {
+                display: block;
+            }
+        }
+
         @media (max-width: 480px) {
-            .main-header .logo-container img {
+            .logo-container img {
                 height: 45px;
             }
 
@@ -515,36 +552,54 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--bma-green-hover);
         }
+
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>
     
     <header class="main-header">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-        </div>
-        <div class="navigation">
-            <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
-            <a href="{{ url_for('home') }}">
-                <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
-            </a>
-            {% if session.get('level') == 'Admin' %}
-            <a href="{{ url_for('admin_panel') }}">
-                <button type="button" class="btn-admin">👑 Admin Panel</button>
-            </a>
-            {% endif %}
-            <a href="{{ url_for('analytics_page') }}">
-                <button type="button" class="btn-analytics">📊 Analytics</button>
-            </a>
-            <a href="{{ url_for('dashboard') }}">
-                <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-            </a>
-            <a href="{{ url_for('feedback_page') }}">
-                <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
-            </a>
-            <a href="{{ url_for('logout') }}">
-                <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-            </a>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </div>
+            
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            
+            <div class="navigation" id="mainNavigation">
+                {% if session.get('logged_in') %}
+                    <span>สวัสดี, {{ session.name }}!</span>
+                    
+                    <a href="{{ url_for('home') }}">
+                        <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
+                    </a>
+                    {% if session.get('level') == 'Admin' %}
+                    <a href="{{ url_for('admin_panel') }}">
+                        <button type="button" class="btn-admin">👑 Admin Panel</button>
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('analytics_page') }}">
+                        <button type="button" class="btn-analytics">📊 Analytics</button>
+                    </a>
+                    <a href="{{ url_for('dashboard') }}">
+                        <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+                    </a>
+                    <a href="{{ url_for('feedback_page') }}">
+                        <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+                    </a>
+                    <a href="{{ url_for('profile_page') }}">
+                        <button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
+                    </a>
+                    <a href="{{ url_for('logout') }}">
+                        <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
+                {% endif %}
+            </div>
         </div>
     </header>
     
@@ -660,9 +715,28 @@
         <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
         <p>สำนักยุทธศาสตร์และประเมินผล</p>
         <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2024 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
 
     <script>
+        // Toggle Mobile Menu Function
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mainNavigation');
+            nav.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('click', (e) => {
+                const nav = document.getElementById('mainNavigation');
+                const toggle = document.querySelector('.mobile-menu-toggle');
+                if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                    nav.classList.remove('active');
+                }
+            });
+        });
+
+        // Chart.js Code
         const chartData = {{ chart_data | tojson }};
         const bmaGreen = 'rgba(0, 150, 60, 0.7)';
         const bmaBlue = 'rgba(0, 123, 255, 0.7)';

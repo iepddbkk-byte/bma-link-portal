@@ -803,7 +803,7 @@
             document.getElementById("btnLast").disabled = (currentPage === totalPages);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+			document.addEventListener('DOMContentLoaded', () => {
             allTableRows = Array.from(tbody.children).filter(row => row.id !== 'noDataRow');
             
             document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
@@ -816,7 +816,7 @@
             displayPage(1);
 
             // Close mobile menu when clicking outside
-            document.addEventListener('click', (e) => {
+        document.addEventListener('click', (e) => {
                 const nav = document.getElementById('mainNavigation');
                 const toggle = document.querySelector('.mobile-menu-toggle');
                 if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
