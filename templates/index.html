@@ -2,9 +2,11 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ทะเบียนลิงค์ BMA</title>
     
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -12,6 +14,7 @@
         :root {
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
+            --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
             --button-red-hover: #c82333;
             --button-blue: #007bff;
@@ -19,194 +22,509 @@
             --button-yellow: #ffc107;
             --button-yellow-hover: #e0a800;
             --button-gray: #6c757d;
-            --light-gray: #f4f4f4;
-            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
-            margin: 0; 
-            padding: 0;
-            background-color: var(--light-gray); 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--text-color);
+            min-height: 100vh;
+            padding-bottom: 60px;
         }
 
+        /* Header Styles */
         .main-header {
-            background-color: #fff;
-            padding: 10px 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between; 
             align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-md);
             border-bottom: 3px solid var(--bma-green);
-            min-height: 80px; 
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
         }
+
         .main-header .logo-container { 
             display: flex;
             align-items: center;
+            gap: 15px;
         }
+
         .main-header img {
-            height: 70px; 
-            margin-right: 15px;
+            height: 60px;
+            transition: transform 0.3s ease;
         }
 
-        .container {
-            max-width: 1300px;
-            margin: 20px auto; 
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
-        }
-
-        h1 { 
-            color: var(--text-color);
-            border-bottom: 2px solid var(--light-gray);
-            padding-bottom: 10px;
-        }
-
-        .search-container {
-            margin: 20px 0;
-        }
-        #searchInput {
-            width: 100%;
-            padding: 10px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            font-size: 0.95em; 
-        }
-        th, td { 
-            padding: 12px; 
-            border: 1px solid #ddd; 
-            text-align: left; 
-            word-break: break-word; 
-        }
-        th { 
-            background-color: var(--bma-green); 
-            color: white; 
-            text-align: center; 
-            vertical-align: middle; 
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        /* จัดกลางคอลัมน์สถานะลิงค์ (3) และ สถานะใช้งาน (4) */
-        table tbody td:nth-child(3),
-        table tbody td:nth-child(4) {
-            text-align: center;
-        }
-
-        a { 
-            color: var(--bma-green); 
-            text-decoration: none;
-        }
-        a:hover { 
-            text-decoration: underline; 
-        }
-        
-        button { 
-            font-family: 'Kanit', Arial, sans-serif; 
-            background-color: var(--bma-green); 
-            color: white; 
-            border: none; 
-            padding: 8px 12px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 1em; 
-            transition: background-color 0.3s;
-            white-space: nowrap; 
-        }
-        button:hover {
-            background-color: var(--bma-green-hover);
-        }
-
-        .sort-buttons {
-            margin-top: 5px;
-        }
-        .sort-buttons button {
-            font-size: 0.8em; 
-            padding: 4px 6px;
-            background-color: #fff; 
-            color: var(--bma-green);
-            border: 1px solid var(--bma-green);
-        }
-        .sort-buttons button:hover {
-            background-color: var(--light-gray);
+        .main-header img:hover {
+            transform: scale(1.05);
         }
 
         .main-header .navigation {
             display: flex; 
             align-items: center; 
-            gap: 10px; 
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .main-header .navigation span {
-            margin-right: 0; 
-            font-size: 1.1em;
-            color: var(--text-color); 
-        }
-        .main-header .btn-dashboard { background-color: var(--bma-green); }
-        .main-header .btn-dashboard:hover { background-color: var(--bma-green-hover); }
-        .main-header .btn-analytics { background-color: var(--button-blue); }
-        .main-header .btn-analytics:hover { background-color: var(--button-blue-hover); }
-        .main-header .btn-admin { background-color: var(--button-yellow); color: #212529 !important; }
-        .main-header .btn-admin:hover { background-color: var(--button-yellow-hover); }
-        .main-header .btn-feedback { background-color: var(--button-gray); }
-        .main-header .btn-feedback:hover { background-color: #5a6268; }
-        .main-header .btn-logout { background-color: var(--button-red); }
-        .main-header .btn-logout:hover { background-color: var(--button-red-hover); }
 
+        .main-header .navigation span {
+            font-size: 1em;
+            color: var(--text-color);
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto; 
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Title */
+        h1 { 
+            color: var(--bma-green);
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--bma-green-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Search Container */
+        .search-container {
+            margin: 25px 0;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1em;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            background: var(--light-gray);
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--bma-green);
+            background: white;
+            box-shadow: 0 0 0 4px var(--bma-green-light);
+        }
+
+        .search-container::before {
+            content: "🔍";
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+        }
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-top: 20px;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.95em;
+            background: white;
+        }
+
+        th, td { 
+            padding: 16px; 
+            text-align: left; 
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th { 
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+            color: white; 
+            text-align: center;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--bma-green-light);
+            transform: scale(1.01);
+            box-shadow: var(--shadow-sm);
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background-color: var(--bma-green-light);
+        }
+
+        table tbody td:nth-child(3),
+        table tbody td:nth-child(4) {
+            text-align: center;
+        }
+
+        /* Links */
+        a { 
+            color: var(--bma-green); 
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        a:hover { 
+            color: var(--bma-green-hover);
+            text-decoration: underline;
+        }
+
+        /* Buttons */
+        button { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            background-color: var(--bma-green); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 25px;
+            cursor: pointer; 
+            font-size: 0.95em; 
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+        }
+
+        button:hover {
+            background-color: var(--bma-green-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Sort Buttons */
+        .sort-buttons {
+            margin-top: 8px;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .sort-buttons button {
+            font-size: 0.75em; 
+            padding: 5px 10px;
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .sort-buttons button:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: translateY(0);
+        }
+
+        /* Navigation Button Styles */
+        .main-header .btn-dashboard { 
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+        }
+        .main-header .btn-analytics { 
+            background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%);
+        }
+        .main-header .btn-admin { 
+            background: linear-gradient(135deg, var(--button-yellow) 0%, #e0a800 100%);
+            color: #212529 !important;
+        }
+        .main-header .btn-feedback { 
+            background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
+        }
+        .main-header .btn-logout { 
+            background: linear-gradient(135deg, var(--button-red) 0%, #c82333 100%);
+        }
+
+        /* Pagination */
         .pagination-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            margin-top: 20px;
-            border-top: 1px solid #eee;
+            padding: 20px 0;
+            margin-top: 25px;
+            border-top: 2px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
         }
+
+        .pagination-items {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .pagination-items select {
             font-family: 'Kanit', sans-serif;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 8px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
+
+        .pagination-items select:focus {
+            outline: none;
+            border-color: var(--bma-green);
+        }
+
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .pagination-nav button {
-            background-color: #6c757d;
-            margin: 0 2px;
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            padding: 8px 15px;
+            min-width: 40px;
         }
-        .pagination-nav button:hover {
-            background-color: #5a6268;
-        }
+
         .pagination-nav button:disabled {
-            background-color: #ccc;
+            background: #e0e0e0;
+            color: #999;
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.6;
+            transform: none;
         }
+
+        .pagination-nav button:disabled:hover {
+            transform: none;
+            box-shadow: var(--shadow-sm);
+        }
+
         .pagination-nav span {
             margin: 0 10px;
             font-weight: 500;
+            color: var(--text-color);
         }
 
+        /* Footer */
         .main-footer {
-            background-color: var(--bma-green);
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
             color: white;
             text-align: center;
-            padding: 20px;
-            margin-top: 30px;
+            padding: 25px;
+            margin-top: 40px;
             font-size: 0.9em;
+            box-shadow: var(--shadow-lg);
         }
+
         .main-footer p {
-            margin: 5px 0;
+            margin: 8px 0;
+            opacity: 0.95;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .status-ok {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-blocked {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 20px;
+                margin: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-header {
+                flex-direction: column;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .main-header .navigation {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-header .navigation span {
+                width: 100%;
+                text-align: center;
+            }
+
+            .container {
+                padding: 15px;
+                margin: 15px 10px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 1.3em;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 12px 8px;
+            }
+
+            button {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            .pagination-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .pagination-items,
+            .pagination-nav {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-header img {
+                height: 45px;
+            }
+
+            h1 {
+                font-size: 1.1em;
+            }
+
+            #searchInput {
+                padding: 12px 15px 12px 45px;
+                font-size: 0.9em;
+            }
+
+            table {
+                font-size: 0.75em;
+            }
+
+            th, td {
+                padding: 10px 6px;
+            }
+
+            .sort-buttons {
+                flex-direction: column;
+            }
+
+            .sort-buttons button {
+                width: 100%;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--bma-green);
+        }
+
+        /* Smooth Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bma-green);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--bma-green-hover);
         }
     </style>
 </head>
@@ -215,7 +533,7 @@
     <header class="main-header">
         <div class="logo-container">
             <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-            </div>
+        </div>
 
         <div class="navigation">
             {% if session.get('logged_in') %}
@@ -249,86 +567,90 @@
         <h1>📋 ทะเบียนลิงค์ BMA</h1>
         
         {% if error %}
-            <p style="color: red; font-weight: bold;">เกิดข้อผิดพลาดในการโหลดข้อมูล: {{ error }}</p>
+            <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #c62828;">
+                <strong>⚠️ เกิดข้อผิดพลาด:</strong> {{ error }}
+            </div>
         {% endif %}
 
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="🔍 ค้นหา (ชื่อ, สถานะ, ประเภท, หน่วยงาน, ผู้สร้าง)...">
+            <input type="text" id="searchInput" placeholder="ค้นหา (ชื่อ, สถานะ, ประเภท, หน่วยงาน, ผู้สร้าง)...">
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>
-                        🔗 ชื่อลิงค์
-                        <div class="sort-buttons">
-                            <button onclick="sortTable(0, 'asc')">A-Z (ก-ฮ)</button>
-                            <button onclick="sortTable(0, 'desc')">Z-A (ฮ-ก)</button>
-                        </div>
-                    </th>
-                    <th>📝 รายละเอียด</th>
-                    <th>🚦 สถานะลิงค์</th>
-                    <th>📊 สถานะการใช้งาน</th>
-                    <th>📂 ประเภท</th>
-                    <th>🏢 หน่วยงาน</th>
-                    <th>📞 เบอร์ติดต่อ</th>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            🔗 ชื่อลิงค์
+                            <div class="sort-buttons">
+                                <button onclick="sortTable(0, 'asc')">A-Z (ก-ฮ)</button>
+                                <button onclick="sortTable(0, 'desc')">Z-A (ฮ-ก)</button>
+                            </div>
+                        </th>
+                        <th>📄 รายละเอียด</th>
+                        <th>🚦 สถานะลิงค์</th>
+                        <th>📊 สถานะการใช้งาน</th>
+                        <th>📂 ประเภท</th>
+                        <th>🏢 หน่วยงาน</th>
+                        <th>📞 เบอร์ติดต่อ</th>
+                        <th>👤 ผู้สร้าง</th>
+                        <th>🗓️ วันที่อัปเดต</th>
+                    </tr>
+                </thead>
+                <tbody id="linkTableBody">
                     
-                    <th>👤 ผู้สร้าง</th>
-                    
-                    <th>🗓️ วันที่อัปเดต</th>
-                </tr>
-            </thead>
-            <tbody id="linkTableBody">
-                
-                {% for link in links %}
-                <tr>
-                    <td>
-                        <a href="{{ link.URL }}" target="_blank">{{ link.ชื่อลิงก์ }}</a>
-                    </td>
-                    <td>{{ link.หมายเหตุ }}</td>
-                    
-                    <td>
-                        {% if link.LinkStatus == 'OK' %}
-                            <span style="color: green; font-weight: 500;">🟢 ปกติ</span>
-                        {% elif link.LinkStatus == '403 Blocked' %}
-                            <span style="color: #007bff; font-weight: 500;">🔵 ถูกบล็อก</span>
-                        {% elif link.LinkStatus %}
-                            <span style="color: red; font-weight: 500;">🔴 {{ link.LinkStatus }}</span>
-                        {% else %}
-                            <span style="color: gray;">⚪ (ยังไม่ตรวจสอบ)</span>
-                        {% endif %}
-                    </td>
+                    {% for link in links %}
+                    <tr>
+                        <td>
+                            <a href="{{ link.URL }}" target="_blank">{{ link.ชื่อลิงก์ }}</a>
+                        </td>
+                        <td>{{ link.หมายเหตุ }}</td>
+                        
+                        <td>
+                            {% if link.LinkStatus == 'OK' %}
+                                <span class="status-badge status-ok">🟢 ปกติ</span>
+                            {% elif link.LinkStatus == '403 Blocked' %}
+                                <span class="status-badge status-blocked">🔵 ถูกบล็อก</span>
+                            {% elif link.LinkStatus %}
+                                <span class="status-badge status-error">🔴 {{ link.LinkStatus }}</span>
+                            {% else %}
+                                <span class="status-badge" style="background: #f5f5f5; color: #666;">⚪ (ยังไม่ตรวจสอบ)</span>
+                            {% endif %}
+                        </td>
 
-                    <td>
-                        {% if link.สถานะ == 'ใช้งาน' %}
-                            <span style="color: green;">● ใช้งาน</span>
-                        {% elif link.สถานะ == 'ปรับปรุง' %}
-                            <span style="color: #FFC107;">● ปรับปรุง</span>
-                        {% elif link.สถานะ == 'เลิกใช้งาน' %}
-                            <span style="color: red;">● เลิกใช้งาน</span>
-                        {% else %}
-                            {{ link.สถานะ }}
-                        {% endif %}
-                    </td>
-                    <td>{{ link.ประเภท }}</td>
-                    <td>{{ link.หน่วยงาน }}</td>
-                    <td>{{ link.เบอร์โทรติดต่อ }}</td>
-                    
-                    <td>
-                        <a href="{{ url_for('view_profile', username=link.CreatorUsername) }}" target="_blank" style="font-weight: 500;">
-                            {{ link.CreatorUsername }}
-                        </a>
-                    </td>
+                        <td>
+                            {% if link.สถานะ == 'ใช้งาน' %}
+                                <span class="status-badge status-ok">● ใช้งาน</span>
+                            {% elif link.สถานะ == 'ปรับปรุง' %}
+                                <span class="status-badge status-pending">● ปรับปรุง</span>
+                            {% elif link.สถานะ == 'เลิกใช้งาน' %}
+                                <span class="status-badge status-error">● เลิกใช้งาน</span>
+                            {% else %}
+                                {{ link.สถานะ }}
+                            {% endif %}
+                        </td>
+                        <td>{{ link.ประเภท }}</td>
+                        <td>{{ link.หน่วยงาน }}</td>
+                        <td>{{ link.เบอร์โทรติดต่อ }}</td>
+                        
+                        <td>
+                            <a href="{{ url_for('view_profile', username=link.CreatorUsername) }}" target="_blank" style="font-weight: 500;">
+                                {{ link.CreatorUsername }}
+                            </a>
+                        </td>
 
-                    <td>{{ link.วันที่อัปเดต.split(' ')[0] }}</td>
-                </tr>
-                {% else %}
-                <tr id="noDataRow">
-                    <td colspan="9" style="text-align: center;">ไม่พบข้อมูลลิงค์</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        <td>{{ link.วันที่อัปเดต.split(' ')[0] }}</td>
+                    </tr>
+                    {% else %}
+                    <tr id="noDataRow">
+                        <td colspan="9" style="text-align: center; padding: 30px; color: #999;">
+                            📭 ไม่พบข้อมูลลิงค์
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <div class="pagination-controls">
             <div class="pagination-items">
@@ -343,19 +665,20 @@
                 <span> รายการ</span>
             </div>
             <div class="pagination-nav">
-                <button id="btnFirst"> << </button>
-                <button id="btnPrev"> < </button>
+                <button id="btnFirst"> ⏮ </button>
+                <button id="btnPrev"> ◀ </button>
                 <span> หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span> </span>
-                <button id="btnNext"> > </button>
-                <button id="btnLast"> >> </button>
+                <button id="btnNext"> ▶ </button>
+                <button id="btnLast"> ⏭ </button>
             </div>
         </div>
 
     </div> 
     
     <footer class="main-footer">
-        <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
-        <p>โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
+        <p>สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
     </footer>
 
     <script>
@@ -383,6 +706,7 @@
             });
             displayPage(currentPage);
         }
+
         function displayPage(page) {
             currentPage = page;
             const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
@@ -393,12 +717,12 @@
                 const status = (cells[3].textContent || cells[3].innerText).toLowerCase();
                 const type = (cells[4].textContent || cells[4].innerText).toLowerCase();
                 const department = (cells[5].textContent || cells[5].innerText).toLowerCase();
-                // (แก้ไข!) ค้นหาจากคอลัมน์ผู้สร้าง (index 7) แทน email เดิม
                 const creator = (cells[7].textContent || cells[7].innerText).toLowerCase();
                 
                 const combinedText = name + " " + status + " " + type + " " + department + " " + creator;
                 return combinedText.includes(filter);
             });
+
             tbody.innerHTML = ''; 
             if (filteredRows.length === 0) {
                 if(noDataRow) tbody.appendChild(noDataRow);
@@ -415,6 +739,7 @@
                     tbody.appendChild(row);
                 });
             }
+
             document.getElementById("currentPage").textContent = currentPage;
             document.getElementById("totalPages").textContent = totalPages;
             document.getElementById("btnFirst").disabled = (currentPage === 1);
@@ -422,6 +747,7 @@
             document.getElementById("btnNext").disabled = (currentPage === totalPages);
             document.getElementById("btnLast").disabled = (currentPage === totalPages);
         }
+
         document.addEventListener('DOMContentLoaded', () => {
             allTableRows = Array.from(tbody.children).filter(row => row.id !== 'noDataRow');
             searchInput = document.getElementById("searchInput"); 
