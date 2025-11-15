@@ -4,73 +4,439 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เพิ่มลิงค์ใหม่ - BMA</title>
+    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
+    
     <style>
-        @import url('https://fonts.f0nt.com/css/saowchingcha.css');
+        :root {
+            --bma-green: #00963C;
+            --bma-green-hover: #007a30;
+            --bma-green-light: #e8f5e9;
+            --button-gray: #6c757d;
+            --light-gray: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --success-bg: #d4edda;
+            --success-color: #155724;
+            --error-bg: #f8d7da;
+            --error-color: #721c24;
+            --info-bg: #cce5ff;
+            --info-color: #004085;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Sao Ching Cha', Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-        h1, h2 { color: #333; }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Kanit', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            min-height: 100vh;
             padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        form div {
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Back Button */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            margin-bottom: 30px;
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Title */
+        h2 {
+            color: var(--bma-green);
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--bma-green-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: "➕";
+            font-size: 1.2em;
+        }
+
+        /* Flash Messages */
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
+        }
+
+        .flashes li {
+            padding: 15px 20px;
+            border-radius: 12px;
             margin-bottom: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-sm);
         }
-        form label {
-            display: block;
-            margin-bottom: 5px;
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .flashes .success {
+            background-color: var(--success-bg);
+            color: var(--success-color);
+            border-left: 4px solid #28a745;
+        }
+
+        .flashes .success::before {
+            content: "✓";
+            font-size: 1.3em;
             font-weight: bold;
         }
-        
+
+        .flashes .error {
+            background-color: var(--error-bg);
+            color: var(--error-color);
+            border-left: 4px solid #dc3545;
+        }
+
+        .flashes .error::before {
+            content: "✕";
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .flashes .info {
+            background-color: var(--info-bg);
+            color: var(--info-color);
+            border-left: 4px solid #17a2b8;
+        }
+
+        .flashes .info::before {
+            content: "ℹ";
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        form div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        form label::before {
+            content: "📌";
+            font-size: 0.9em;
+        }
+
+        /* Input Fields */
         form input[type="text"],
         form input[type="url"],
         form input[type="email"],
         form input[type="tel"],
         form textarea,
-        form select { /* (ปรับปรุง!) เพิ่ม select เข้ามา */
-            width: 100%; /* (ปรับปรุง!) */
-            box-sizing: border-box; 
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Sao Ching Cha', Arial, sans-serif;
-            font-size: 1.1em;
-            background-color: #fff; /* (ใหม่!) */
+        form select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Kanit', Arial, sans-serif;
+            font-size: 1em;
+            background-color: var(--light-gray);
+            transition: all 0.3s ease;
+            color: var(--text-color);
         }
-        
-        button {
-            font-family: 'Sao Ching Cha', Arial, sans-serif;
-            background-color: #00963C; 
+
+        form input[type="text"]:focus,
+        form input[type="url"]:focus,
+        form input[type="email"]:focus,
+        form input[type="tel"]:focus,
+        form textarea:focus,
+        form select:focus {
+            outline: none;
+            border-color: var(--bma-green);
+            background-color: white;
+            box-shadow: 0 0 0 4px var(--bma-green-light);
+            transform: translateY(-2px);
+        }
+
+        form input::placeholder,
+        form textarea::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Textarea */
+        form textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+        }
+
+        /* Select Dropdown */
+        form select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 45px;
+        }
+
+        form select option {
+            padding: 10px;
+        }
+
+        form optgroup {
+            font-weight: 600;
+            color: var(--bma-green);
+            font-style: normal;
+        }
+
+        form optgroup option {
+            font-weight: 400;
+            color: var(--text-color);
+            padding-left: 20px;
+        }
+
+        /* Submit Button */
+        button[type="submit"] {
+            font-family: 'Kanit', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 16px 32px;
+            border-radius: 25px;
             cursor: pointer;
             font-size: 1.1em;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        button:hover { background-color: #007a30; }
-        .btn-back { background-color: #6c757d; }
-        .btn-back:hover { background-color: #5a6268; }
-        
-        .flashes { list-style: none; padding: 0; margin: 15px 0; }
-        .flashes li { padding: 10px; border-radius: 4px; margin-bottom: 10px; }
-        .flashes .success { background-color: #d4edda; color: #155724; }
-        .flashes .error { background-color: #f8d7da; color: #721c24; }
-        .flashes .info { background-color: #cce5ff; color: #004085; }
+
+        button[type="submit"]::before {
+            content: "✓";
+            font-size: 1.2em;
+        }
+
+        button[type="submit"]:hover {
+            background: linear-gradient(135deg, #007a30 0%, #006428 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(-1px);
+        }
+
+        /* Required Field Indicator */
+        form label:has(+ input[required])::after,
+        form label:has(+ select[required])::after,
+        form label:has(+ textarea[required])::after {
+            content: "*";
+            color: #dc3545;
+            margin-left: 4px;
+            font-weight: bold;
+        }
+
+        /* Field Groups with Icons */
+        .field-with-icon {
+            position: relative;
+        }
+
+        .field-with-icon input,
+        .field-with-icon select,
+        .field-with-icon textarea {
+            padding-left: 45px;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+            color: var(--bma-green);
+            pointer-events: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 25px 20px;
+                border-radius: 15px;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            form {
+                gap: 20px;
+            }
+
+            form input[type="text"],
+            form input[type="url"],
+            form input[type="email"],
+            form input[type="tel"],
+            form textarea,
+            form select {
+                padding: 12px 15px;
+                font-size: 0.95em;
+            }
+
+            button[type="submit"] {
+                padding: 14px 28px;
+                font-size: 1em;
+            }
+
+            .btn-back {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h2 {
+                font-size: 1.3em;
+            }
+
+            form label {
+                font-size: 0.9em;
+            }
+
+            form input[type="text"],
+            form input[type="url"],
+            form input[type="email"],
+            form input[type="tel"],
+            form textarea,
+            form select {
+                padding: 11px 14px;
+                font-size: 0.9em;
+            }
+
+            button[type="submit"] {
+                padding: 12px 24px;
+                font-size: 0.95em;
+            }
+        }
+
+        /* Smooth Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bma-green);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--bma-green-hover);
+        }
+
+        /* Focus visible for accessibility */
+        *:focus-visible {
+            outline: 2px solid var(--bma-green);
+            outline-offset: 2px;
+        }
+
+        /* Hover effects for better UX */
+        form div:hover label {
+            color: var(--bma-green);
+        }
+
+        /* Info text */
+        .info-text {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <a href="{{ url_for('dashboard') }}"><button type="button" class="btn-back">⬅️ กลับหน้า Dashboard</button></a>
+        <a href="{{ url_for('dashboard') }}" class="btn-back">
+            ⬅️ กลับหน้า Dashboard
+        </a>
 
         <h2>เพิ่มลิงค์ใหม่</h2>
 
@@ -87,11 +453,12 @@
         <form action="{{ url_for('add_link_action') }}" method="POST">
             <div>
                 <label for="ชื่อลิงก์">ชื่อลิงก์ (จำเป็น)</label>
-                <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" required>
+                <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" placeholder="ระบุชื่อลิงค์ที่ต้องการ..." required>
             </div>
+
             <div>
                 <label for="URL">URL (จำเป็น)</label>
-                <input type="url" id="URL" name="URL" placeholder="https://..." required>
+                <input type="url" id="URL" name="URL" placeholder="https://example.com" required>
             </div>
             
             <div>
@@ -135,8 +502,9 @@
 
             <div>
                 <label for="หน่วยงาน">หน่วยงาน (จำเป็น)</label>
-                <input type="text" id="หน่วยงาน" name="หน่วยงาน" required>
+                <input type="text" id="หน่วยงาน" name="หน่วยงาน" placeholder="ระบุชื่อหน่วยงาน/สำนัก/กอง..." required>
             </div>
+
             <div>
                 <label for="สถานะ">สถานะ (จำเป็น)</label>
                 <select id="สถานะ" name="สถานะ" required>
@@ -145,18 +513,23 @@
                     <option value="เลิกใช้งาน">เลิกใช้งาน</option>
                 </select>
             </div>
+
             <div>
                 <label for="อีเมลผู้รับผิดชอบ">อีเมลผู้รับผิดชอบ (จำเป็น)</label>
-                <input type="email" id="อีเมลผู้รับผิดชอบ" name="อีเมลผู้รับผิดชอบ" required>
+                <input type="email" id="อีเมลผู้รับผิดชอบ" name="อีเมลผู้รับผิดชอบ" placeholder="example@bangkok.go.th" required>
             </div>
+
             <div>
                 <label for="เบอร์โทรติดต่อ">เบอร์โทรติดต่อ (จำเป็น)</label>
-                <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ" required>
+                <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ" placeholder="02-xxx-xxxx หรือ 0-xxxx-xxxx ต่อ xxxx" required>
             </div>
+
             <div>
                 <label for="หมายเหตุ">หมายเหตุ (ถ้ามี)</label>
-                <textarea id="หมายเหตุ" name="หมายเหตุ" rows="3"></textarea>
+                <textarea id="หมายเหตุ" name="หมายเหตุ" rows="3" placeholder="ระบุรายละเอียดเพิ่มเติม หรือหมายเหตุพิเศษ (ถ้ามี)..."></textarea>
+                <span class="info-text">💡 ข้อมูลนี้ไม่จำเป็นต้องกรอก แต่ช่วยให้เข้าใจข้อมูลได้ดีขึ้น</span>
             </div>
+
             <div>
                 <button type="submit">ยืนยันเพิ่มลิงค์</button>
             </div>
