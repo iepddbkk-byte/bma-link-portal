@@ -2,15 +2,21 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Feedback - BMA Link Registry</title>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ส่ง Feedback - BMA Link Registry</title>
+    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* --- Global Variables & Reset (Same as Index) --- */
         :root {
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
+            --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
             --button-red-hover: #c82333;
             --button-blue: #007bff;
@@ -18,170 +24,270 @@
             --button-yellow: #ffc107;
             --button-yellow-hover: #e0a800;
             --button-gray: #6c757d;
-            --light-gray: #f4f4f4;
-            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
-            margin: 0; padding: 0;
-            background-color: var(--light-gray); 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--text-color);
+            min-height: 100vh;
+            padding-bottom: 60px;
         }
+
+        /* --- Header Styles --- */
         .main-header {
-            background-color: #fff;
-            padding: 10px 20px;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: var(--shadow-md);
+            border-bottom: 4px solid var(--bma-green);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-bottom: 3px solid var(--bma-green);
-            min-height: 80px; 
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .main-header .logo-container img { height: 70px; margin-right: 15px; }
-        .main-header .navigation {
-            display: flex; align-items: center; gap: 10px; 
+
+        .logo-container { 
+            display: flex; align-items: center; gap: 15px;
         }
-        .main-header .navigation span {
-            font-size: 1.1em;
-            color: var(--text-color);
-            white-space: nowrap;
+
+        .logo-container img {
+            height: 60px; transition: transform 0.3s ease;
         }
-        .container {
-            max-width: 800px; /* (ขนาดที่เหมาะกับฟอร์ม) */
-            margin: 20px auto; 
-            padding: 20px 30px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        .logo-container img:hover { transform: scale(1.05); }
+
+        .logo-text {
+            font-size: 1.5rem; font-weight: 600; color: var(--bma-green); display: none;
         }
-        h1, h2 { 
-            color: var(--text-color);
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-            text-align: center;
-            margin-top: 10px;
+
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--bma-green); color: white;
+            border: none; padding: 10px 15px;
+            border-radius: 8px; cursor: pointer;
+            font-size: 1.2rem;
         }
-        button, .btn {
-            font-family: 'Kanit', Arial, sans-serif;
+
+        .navigation {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+
+        .navigation span {
+            font-size: 0.95rem; color: var(--text-color); font-weight: 500;
+            padding: 8px 16px; background: var(--bma-green-light);
+            border-radius: 20px; display: none; white-space: nowrap;
+        }
+
+        /* --- Buttons --- */
+        button, a button { 
+            font-family: 'Kanit', Arial, sans-serif; 
             color: white; border: none; 
-            padding: 8px 12px;
-            border-radius: 4px; cursor: pointer; 
-            font-size: 1em;
-            transition: background-color 0.3s; 
-            text-decoration: none !important;
-            white-space: nowrap;
+            padding: 10px 16px; border-radius: 8px;
+            cursor: pointer; font-size: 0.95rem; 
+            transition: all 0.3s ease; white-space: nowrap;
+            font-weight: 500; box-shadow: var(--shadow-sm);
+            text-decoration: none; display: inline-block;
         }
-        .main-header .btn-home { background-color: var(--button-blue); } 
-        .main-header .btn-home:hover { background-color: var(--button-blue-hover); }
-        .main-header .btn-dashboard { background-color: var(--bma-green); }
-        .main-header .btn-dashboard:hover { background-color: var(--bma-green-hover); }
-        .main-header .btn-analytics { background-color: var(--button-blue); }
-        .main-header .btn-analytics:hover { background-color: var(--button-blue-hover); }
-        .main-header .btn-admin { background-color: var(--button-yellow); color: #212529 !important; }
-        .main-header .btn-admin:hover { background-color: var(--button-yellow-hover); }
-        .main-header .btn-logout { background-color: var(--button-red); } 
-        .main-header .btn-logout:hover { background-color: var(--button-red-hover); }
-        .main-header .btn-feedback { background-color: var(--button-gray); } /* (ปุ่ม Feedback) */
-        .main-header .btn-feedback:hover { background-color: #5a6268; }
+        button:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        button:active { transform: translateY(0); }
 
-        .main-footer {
-            background-color: var(--bma-green);
-            color: white; text-align: center;
-            padding: 20px; margin-top: 30px;
-            font-size: 0.9em;
+        .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
+        .btn-analytics { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+        .btn-admin { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
+        .btn-feedback { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
+        .btn-profile { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
+        .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
+        .btn-home { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+
+        /* --- Container --- */
+        .container {
+            max-width: 800px; /* Narrower for form */
+            margin: 30px auto; 
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
         }
-        .main-footer p { margin: 5px 0; }
-        
-        /* (ใหม่!) CSS สำหรับฟอร์ม Feedback */
-        form div {
-            margin-bottom: 20px;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+
+        /* --- Form Styles --- */
+        h2 { 
+            color: var(--bma-green);
+            font-size: 1.8em; font-weight: 600;
+            margin-bottom: 10px; padding-bottom: 15px;
+            border-bottom: 3px solid var(--bma-green-light);
+            text-align: center;
+        }
+
+        .sub-header {
+            text-align: center; color: var(--button-gray);
+            margin-bottom: 30px; font-size: 0.95rem;
+        }
+
+        form div { margin-bottom: 25px; }
+
         form label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            font-size: 1.1em;
-        }
-        form textarea {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Kanit', Arial, sans-serif;
-            font-size: 1em;
-            height: 100px;
-        }
-        .btn-submit-feedback {
-            background-color: var(--bma-green);
-            font-size: 1.1em;
-            padding: 12px 20px;
-            width: 100%;
-        }
-        .btn-submit-feedback:hover {
-            background-color: var(--bma-green-hover);
+            display: block; margin-bottom: 10px;
+            font-weight: 500; font-size: 1.1em;
+            color: var(--text-color);
         }
 
-        /* (ใหม่!) CSS สำหรับ Star Rating */
+        form textarea {
+            width: 100%; padding: 15px;
+            font-family: 'Kanit', sans-serif; font-size: 1em;
+            border: 2px solid var(--border-color);
+            border-radius: 15px; background: var(--light-gray);
+            transition: all 0.3s ease; height: 120px; resize: vertical;
+        }
+
+        form textarea:focus {
+            outline: none; border-color: var(--bma-green);
+            background: white; box-shadow: 0 0 0 4px var(--bma-green-light);
+        }
+
+        .btn-submit-feedback {
+            background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
+            width: 100%; padding: 15px; font-size: 1.1em; margin-top: 10px;
+        }
+
+        /* --- Star Rating CSS --- */
         .star-rating {
             display: flex;
-            flex-direction: row-reverse; /* (สำคัญ!) ทำให้ดาวดวงที่ 5 มาก่อน */
+            flex-direction: row-reverse; 
             justify-content: center;
-            font-size: 2.5em; /* ขนาดของดาว */
-            gap: 5px;
+            font-size: 2.5em; 
+            gap: 10px;
+            background: var(--light-gray);
+            padding: 10px;
+            border-radius: 50px;
+            border: 1px dashed var(--border-color);
         }
-        .star-rating input[type="radio"] {
-            display: none; /* ซ่อน Radio Button จริง */
-        }
+        .star-rating input[type="radio"] { display: none; }
         .star-rating label {
-            color: #ccc; /* สีดาว (ว่าง) */
-            cursor: pointer;
-            transition: color 0.2s;
-            margin: 0;
-            padding: 0 5px;
+            color: #ccc; cursor: pointer;
+            transition: all 0.2s; margin: 0;
         }
-        /* (เวทมนตร์!) เมื่อ Hover หรือ Check ให้ดาว (และดาวก่อนหน้า) เปลี่ยนสี */
         .star-rating input[type="radio"]:checked ~ label,
         .star-rating label:hover,
         .star-rating label:hover ~ label {
-            color: var(--button-yellow);
+            color: var(--button-yellow); transform: scale(1.1);
         }
+
+        /* --- Footer --- */
+        .main-footer {
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+            color: white; text-align: center;
+            padding: 25px; margin-top: 40px;
+            font-size: 0.9em; box-shadow: var(--shadow-lg);
+        }
+        .main-footer p { margin: 8px 0; opacity: 0.95; }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle { display: block; }
+            .navigation {
+                display: none; width: 100%;
+                flex-direction: column;
+                background: white; padding: 15px;
+                border-radius: 12px; margin-top: 10px;
+                box-shadow: var(--shadow-md);
+            }
+            .navigation.active { display: flex; }
+            .navigation button, .navigation a {
+                width: 100%; text-align: center; justify-content: center;
+            }
+            .navigation span { display: none !important; }
+            .logo-text { display: none; }
+            .container { padding: 20px; margin: 20px 15px; }
+            h2 { font-size: 1.4em; }
+            .star-rating { font-size: 2em; }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .logo-text { display: block; }
+            .navigation span { display: block; }
+        }
+        
+        @media (min-width: 1025px) {
+            .logo-text { display: block; }
+            .navigation span { display: block; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--light-gray); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--bma-green); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--bma-green-hover); }
     </style>
 </head>
 <body>
     
     <header class="main-header">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-        </div>
-        <div class="navigation">
-            <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
-            <a href="{{ url_for('home') }}">
-                <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
-            </a>
-            {% if session.get('level') == 'Admin' %}
-            <a href="{{ url_for('admin_panel') }}">
-                <button type="button" class="btn-admin">👑 Admin Panel</button>
-            </a>
-            {% endif %}
-            <a href="{{ url_for('analytics_page') }}">
-                <button type="button" class="btn-analytics">📊 Analytics</button>
-            </a>
-            <a href="{{ url_for('dashboard') }}">
-                <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-            </a>
-            <a href="{{ url_for('feedback_page') }}">
-                <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
-            </a>
-            <a href="{{ url_for('logout') }}">
-                <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-            </a>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </div>
+
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+
+            <div class="navigation" id="mainNavigation">
+                {% if session.get('logged_in') %}
+                    <span>สวัสดี, {{ session.name }}!</span>
+                    
+                    <a href="{{ url_for('home') }}">
+                        <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
+                    </a>
+
+                    {% if session.get('level') == 'Admin' %}
+                    <a href="{{ url_for('admin_panel') }}">
+                        <button type="button" class="btn-admin">👑 Admin Panel</button>
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('analytics_page') }}">
+                        <button type="button" class="btn-analytics">📊 Analytics</button>
+                    </a>
+                    <a href="{{ url_for('dashboard') }}">
+                        <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+                    </a>
+                    <a href="{{ url_for('profile_page') }}">
+                        <button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
+                    </a>
+                    <a href="{{ url_for('logout') }}">
+                        <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login_page') }}"><button>เข้าสู่ระบบ</button></a>
+                {% endif %}
+            </div>
         </div>
     </header>
     
     <div class="container">
         <h2>📝 แบบสำรวจความพึงพอใจ</h2>
-        <p style="text-align: center; margin-top: -15px; color: var(--button-gray);">
+        <p class="sub-header">
             ทีมงานต้องการข้อเสนอแนะจากท่าน (ผู้ใช้: {{ session.username }}) เพื่อนำไปปรับปรุงระบบให้ดียิ่งขึ้น
         </p>
 
@@ -190,22 +296,22 @@
             <div>
                 <label for="satisfaction">1. โดยรวม ท่านพึงพอใจกับระบบนี้เพียงใด?</label>
                 <div class="star-rating">
-                    <input type="radio" id="sat-5" name="satisfaction" value="5" required><label for="sat-5"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="sat-4" name="satisfaction" value="4"><label for="sat-4"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="sat-3" name="satisfaction" value="3"><label for="sat-3"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="sat-2" name="satisfaction" value="2"><label for="sat-2"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="sat-1" name="satisfaction" value="1"><label for="sat-1"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="sat-5" name="satisfaction" value="5" required><label for="sat-5" title="ดีมาก"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="sat-4" name="satisfaction" value="4"><label for="sat-4" title="ดี"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="sat-3" name="satisfaction" value="3"><label for="sat-3" title="ปานกลาง"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="sat-2" name="satisfaction" value="2"><label for="sat-2" title="พอใช้"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="sat-1" name="satisfaction" value="1"><label for="sat-1" title="ปรับปรุง"><i class="fas fa-star"></i></label>
                 </div>
             </div>
 
             <div>
                 <label for="ease_of_use">2. ท่านคิดว่าระบบนี้ใช้งานง่ายเพียงใด?</label>
                 <div class="star-rating">
-                    <input type="radio" id="ease-5" name="ease_of_use" value="5" required><label for="ease-5"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="ease-4" name="ease_of_use" value="4"><label for="ease-4"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="ease-3" name="ease_of_use" value="3"><label for="ease-3"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="ease-2" name="ease_of_use" value="2"><label for="ease-2"><i class="fas fa-star"></i></label>
-                    <input type="radio" id="ease-1" name="ease_of_use" value="1"><label for="ease-1"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="ease-5" name="ease_of_use" value="5" required><label for="ease-5" title="ง่ายมาก"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="ease-4" name="ease_of_use" value="4"><label for="ease-4" title="ง่าย"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="ease-3" name="ease_of_use" value="3"><label for="ease-3" title="ปานกลาง"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="ease-2" name="ease_of_use" value="2"><label for="ease-2" title="ยาก"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="ease-1" name="ease_of_use" value="1"><label for="ease-1" title="ยากมาก"><i class="fas fa-star"></i></label>
                 </div>
             </div>
 
@@ -227,9 +333,28 @@
     </div> 
     
     <footer class="main-footer">
-        <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
-        <p>โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
+        <p>สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2024 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
+
+    <script>
+        // Toggle Mobile Menu Function (Same as Index)
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mainNavigation');
+            nav.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('mainNavigation');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+            }
+        });
+    </script>
 
     <script>
         {% with messages = get_flashed_messages(with_categories=true) %}

@@ -2,299 +2,441 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel - BMA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - BMA Link Registry</title>
     
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* --- Global Variables & Reset --- */
         :root {
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
+            --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
             --button-red-hover: #c82333;
             --button-blue: #007bff;
             --button-blue-hover: #0056b3;
             --button-yellow: #ffc107;
             --button-yellow-hover: #e0a800;
-            --light-gray: #f4f4f4;
-            --text-color: #333;
+            --button-gray: #6c757d;
+            --light-gray: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
-            margin: 0; padding: 0;
-            background-color: var(--light-gray); 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--text-color);
+            min-height: 100vh;
+            padding-bottom: 60px;
         }
+
+        /* --- Header Styles --- */
         .main-header {
-            background-color: #fff;
-            padding: 10px 20px;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: var(--shadow-md);
+            border-bottom: 4px solid var(--bma-green);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-bottom: 3px solid var(--bma-green);
-            min-height: 80px; 
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .main-header .logo-container img { height: 70px; margin-right: 15px; }
-        .main-header .navigation {
-            display: flex; align-items: center; gap: 10px; 
+
+        .logo-container { 
+            display: flex; align-items: center; gap: 15px;
         }
-        .main-header .navigation span {
-            font-size: 1.1em;
-            color: var(--text-color);
-            white-space: nowrap;
+
+        .logo-container img {
+            height: 60px; transition: transform 0.3s ease;
         }
+        .logo-container img:hover { transform: scale(1.05); }
+
+        .logo-text {
+            font-size: 1.5rem; font-weight: 600; color: var(--bma-green); display: none;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--bma-green); color: white;
+            border: none; padding: 10px 15px;
+            border-radius: 8px; cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .navigation {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+
+        .navigation span {
+            font-size: 0.95rem; color: var(--text-color); font-weight: 500;
+            padding: 8px 16px; background: var(--bma-green-light);
+            border-radius: 20px; display: none; white-space: nowrap;
+        }
+
+        /* --- Buttons in Nav & General --- */
+        button, a button { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            color: white; border: none; 
+            padding: 8px 14px; border-radius: 8px;
+            cursor: pointer; font-size: 0.9rem; 
+            transition: all 0.3s ease; white-space: nowrap;
+            font-weight: 500; box-shadow: var(--shadow-sm);
+            text-decoration: none; display: inline-block;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        
+        .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
+        .btn-analytics { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+        .btn-admin { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
+        .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
+        .btn-home { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+
+        /* --- Admin Grid Layout --- */
         .container {
-            max-width: 1300px;
-            margin: 20px auto; 
-            padding: 20px;
-            background-color: transparent;
-            border-radius: 8px;
-            box-shadow: none;
+            max-width: 1400px;
+            margin: 30px auto; 
+            padding: 0 20px;
+            animation: fadeIn 0.5s ease;
         }
-        h1, h2 { 
-            color: var(--text-color);
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        /* (ใหม่!) แบ่ง 2 คอลัมน์ */
+
+        h2 {
+            color: var(--bma-green);
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
+            display: flex; align-items: center; gap: 10px;
+        }
+
         .admin-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1.2fr 0.8fr; /* แบ่งสัดส่วนซ้ายขวา */
             gap: 25px;
         }
+
         .admin-card {
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 20px 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid white;
         }
+
         .admin-card h3 {
-            margin-top: 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            color: var(--text-color);
+            border-bottom: 3px solid var(--bma-green-light);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        /* --- Table Styles --- */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
         }
 
         table { 
-            width: 100%; border-collapse: collapse; 
-            margin-top: 20px; 
-            font-size: 0.9em;
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            font-size: 0.9em; background: white;
         }
+
         th, td { 
-            padding: 8px 10px;
-            border: 1px solid #ddd; 
-            text-align: left; 
-            word-break: break-word; 
+            padding: 12px 15px; text-align: left; 
+            border-bottom: 1px solid var(--border-color);
         }
+
         th { 
-            background-color: #f4f4f4; 
-            color: #333; 
-            text-align: center;
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+            color: white; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 0.85em;
         }
-        tr:nth-child(even) { background-color: #f9f9f9; }
         
-        button, .btn, a.btn {
-            font-family: 'Kanit', Arial, sans-serif;
-            color: white; border: none; 
-            padding: 6px 10px; /* (เล็กลง) */
-            border-radius: 4px; cursor: pointer; 
-            font-size: 0.95em; /* (เล็กลง) */
-            transition: background-color 0.3s; 
-            text-decoration: none !important;
-            white-space: nowrap;
-        }
-        /* (ปุ่มใน Header) */
-        .main-header .btn-home { background-color: var(--button-blue); } 
-        .main-header .btn-home:hover { background-color: var(--button-blue-hover); }
-        .main-header .btn-dashboard { background-color: var(--bma-green); }
-        .main-header .btn-dashboard:hover { background-color: var(--bma-green-hover); }
-        .main-header .btn-analytics { background-color: var(--button-blue); }
-        .main-header .btn-analytics:hover { background-color: var(--button-blue-hover); }
-        .main-header .btn-admin { background-color: var(--button-yellow); color: #212529 !important; } /* (ปุ่ม Admin) */
-        .main-header .btn-admin:hover { background-color: var(--button-yellow-hover); }
-        .main-header .btn-logout { background-color: var(--button-red); } 
-        .main-header .btn-logout:hover { background-color: var(--button-red-hover); }
+        th:first-child { border-top-left-radius: 12px; }
+        th:last-child { border-top-right-radius: 12px; }
 
-        /* (ปุ่มในตาราง) */
-        .btn-update { background-color: var(--bma-green); }
-        .btn-update:hover { background-color: var(--bma-green-hover); }
-        .btn-delete { background-color: var(--button-red); } 
-        .btn-delete:hover { background-color: var(--button-red-hover); }
-        .btn-generate { background-color: var(--button-blue); width: 100%; font-size: 1em; padding: 10px; }
-        .btn-generate:hover { background-color: var(--button-blue-hover); }
+        tbody tr:hover { background: var(--bma-green-light); }
 
-        /* (ฟอร์มในตาราง) */
-        .action-form {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            justify-content: center;
+        /* --- Form & Action Elements --- */
+        .btn-generate { 
+            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
+            width: 100%; margin-bottom: 15px; padding: 12px;
+            font-size: 1em; display: flex; justify-content: center; align-items: center; gap: 8px;
         }
-        .action-form-inline {
-            display: inline-block;
-            margin: 0;
-        }
-        .action-form select {
+        
+        .action-form { display: flex; gap: 5px; align-items: center; }
+        .action-form-inline { display: inline-block; margin: 0; }
+        
+        select {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             font-family: 'Kanit', sans-serif;
-            padding: 4px;
-            font-size: 0.95em;
+            background: white;
         }
 
+        .btn-update { 
+            padding: 6px 10px; font-size: 0.85rem;
+            background: var(--bma-green);
+        }
+        .btn-delete { 
+            padding: 6px 10px; font-size: 0.85rem;
+            background: var(--button-red);
+        }
+
+        /* --- Status Badges --- */
+        .status-badge {
+            padding: 4px 10px; border-radius: 15px;
+            font-size: 0.8em; font-weight: 500;
+        }
+        .status-ok { background: #e8f5e9; color: #2e7d32; }
+        .status-used { background: #ffebee; color: #c62828; }
+
+        /* --- Footer --- */
         .main-footer {
-            background-color: var(--bma-green);
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
             color: white; text-align: center;
-            padding: 20px; margin-top: 30px;
-            font-size: 0.9em;
+            padding: 25px; margin-top: 40px;
+            font-size: 0.9em; box-shadow: var(--shadow-lg);
         }
-        .main-footer p { margin: 5px 0; }
-        
-        @media (max-width: 900px) {
+        .main-footer p { margin: 8px 0; opacity: 0.95; }
+
+        /* --- Responsive --- */
+        @media (max-width: 1024px) {
             .admin-grid { grid-template-columns: 1fr; }
+            .logo-text { display: block; }
+            .navigation span { display: block; }
         }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle { display: block; }
+            .navigation {
+                display: none; width: 100%;
+                flex-direction: column;
+                background: white; padding: 15px;
+                border-radius: 12px; margin-top: 10px;
+                box-shadow: var(--shadow-md);
+            }
+            .navigation.active { display: flex; }
+            .navigation button, .navigation a { width: 100%; }
+            .navigation span { display: none !important; }
+            .logo-text { display: none; }
+            
+            th, td { padding: 10px; font-size: 0.85em; }
+            h2 { font-size: 1.5em; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--light-gray); }
+        ::-webkit-scrollbar-thumb { background: var(--bma-green); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--bma-green-hover); }
     </style>
 </head>
 <body>
     
     <header class="main-header">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-        </div>
-        <div class="navigation">
-            <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
-            <a href="{{ url_for('home') }}">
-                <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
-            </a>
-            <a href="{{ url_for('analytics_page') }}">
-                <button type="button" class="btn-analytics">📊 Analytics</button>
-            </a>
-            <a href="{{ url_for('admin_panel') }}">
-                <button type="button" class="btn-admin">👑 Admin Panel</button>
-            </a>
-            <a href="{{ url_for('dashboard') }}">
-                <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-            </a>
-            <a href="{{ url_for('logout') }}">
-                <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-            </a>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </div>
+
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+
+            <div class="navigation" id="mainNavigation">
+                <span>สวัสดี, {{ session.name }} ({{ session.level }})</span>
+                
+                <a href="{{ url_for('home') }}">
+                    <button type="button" class="btn-home">⬅️ หน้าหลัก</button>
+                </a>
+                <a href="{{ url_for('analytics_page') }}">
+                    <button type="button" class="btn-analytics">📊 Analytics</button>
+                </a>
+                <a href="{{ url_for('admin_panel') }}">
+                    <button type="button" class="btn-admin">👑 Admin Panel</button>
+                </a>
+                <a href="{{ url_for('dashboard') }}">
+                    <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+                </a>
+                <a href="{{ url_for('logout') }}">
+                    <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+                </a>
+            </div>
         </div>
     </header>
     
     <div class="container">
-        <h2>👑 Admin Control Panel</h2>
+        <h2>👑 Admin Control Panel <span style="font-size:0.6em; color: #777; font-weight:400; margin-left:10px;">(ระบบจัดการผู้ดูแล)</span></h2>
 
         <div class="admin-grid">
             
             <div class="admin-card">
-                <h3><i class="fas fa-users"></i> จัดการผู้ใช้งาน (StaffList)</h3>
+                <h3><i class="fas fa-users-cog"></i> จัดการผู้ใช้งาน (Staff List)</h3>
                 
-                <table id="user-table">
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>ระดับ (Level)</th>
-                            <th>ชื่อ</th>
-                            <th>จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in staff_list %}
-                        <tr>
-                            <td>{{ user.Username }}</td>
-                            <td>
-                                <form class="action-form" action="{{ url_for('change_user_level') }}" method="POST">
-                                    <input type="hidden" name="username" value="{{ user.Username }}">
-                                    <select name="level" {% if user.Username == session.username %}disabled{% endif %}>
-                                        <option value="Admin" {% if user.Level == 'Admin' %}selected{% endif %}>Admin</option>
-                                        <option value="Users" {% if user.Level == 'Users' %}selected{% endif %}>Users</option>
-                                    </select>
-                                    <button type="submit" class="btn-update" {% if user.Username == session.username %}disabled{% endif %}>
-                                        <i class="fas fa-save"></i>
-                                    </button>
-                                </form>
-                            </td>
-                            <td>{{ user.ชื่อ }}</td>
-                            <td style="text-align: center;">
-                                <form class="action-form-inline delete-user-form" action="{{ url_for('delete_user') }}" method="POST">
-                                    <input type="hidden" name="username" value="{{ user.Username }}">
-                                    <button type="submit" class="btn-delete" {% if user.Username == session.username %}disabled{% endif %}>
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-wrapper">
+                    <table id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>ระดับ (Level)</th>
+                                <th>ชื่อเจ้าหน้าที่</th>
+                                <th style="text-align: center;">ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in staff_list %}
+                            <tr>
+                                <td style="font-weight: 500;">{{ user.Username }}</td>
+                                <td>
+                                    <form class="action-form" action="{{ url_for('change_user_level') }}" method="POST">
+                                        <input type="hidden" name="username" value="{{ user.Username }}">
+                                        <select name="level" {% if user.Username == session.username %}disabled{% endif %}>
+                                            <option value="Admin" {% if user.Level == 'Admin' %}selected{% endif %}>Admin</option>
+                                            <option value="Users" {% if user.Level == 'Users' %}selected{% endif %}>Users</option>
+                                        </select>
+                                        <button type="submit" class="btn-update" {% if user.Username == session.username %}disabled{% endif %} title="บันทึก">
+                                            <i class="fas fa-save"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>{{ user.ชื่อ }}</td>
+                                <td style="text-align: center;">
+                                    <form class="action-form-inline delete-user-form" action="{{ url_for('delete_user') }}" method="POST">
+                                        <input type="hidden" name="username" value="{{ user.Username }}">
+                                        <button type="submit" class="btn-delete" {% if user.Username == session.username %}disabled{% endif %} title="ลบผู้ใช้">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="admin-card">
-                <h3><i class="fas fa-key"></i> จัดการรหัสเชิญ (InviteCodes)</h3>
+                <h3><i class="fas fa-key"></i> รหัสเชิญ (Invite Codes)</h3>
                 
-                <form action="{{ url_for('generate_code') }}" method="POST" style="margin-bottom: 20px;">
+                <form action="{{ url_for('generate_code') }}" method="POST">
                     <button type="submit" class="btn-generate">
-                        <i class="fas fa-plus-circle"></i> สร้างรหัสเชิญใหม่
+                        <i class="fas fa-plus-circle"></i> สร้างรหัสเชิญใหม่ (Generate)
                     </button>
                 </form>
 
-                <table id="code-table">
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Status</th>
-                            <th>Used By</th>
-                            <th>ลบ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for code in invite_codes %}
-                        <tr>
-                            <td>{{ code.Code }}</td>
-                            <td style="text-align: center;">
-                                {% if code.Status == 'Available' %}
-                                    <span style="color: green;">{{ code.Status }}</span>
-                                {% else %}
-                                    <span style="color: red;">{{ code.Status }}</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ code.UsedByUsername }}</td>
-                            <td style="text-align: center;">
-                                <form class="action-form-inline delete-code-form" action="{{ url_for('delete_code') }}" method="POST">
-                                    <input type="hidden" name="code" value="{{ code.Code }}">
-                                    <button type="submit" class="btn-delete">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-wrapper">
+                    <table id="code-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th style="text-align: center;">สถานะ</th>
+                                <th>ใช้โดย</th>
+                                <th style="text-align: center;">ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for code in invite_codes %}
+                            <tr>
+                                <td style="font-family: monospace; font-size: 1.1em;">{{ code.Code }}</td>
+                                <td style="text-align: center;">
+                                    {% if code.Status == 'Available' %}
+                                        <span class="status-badge status-ok">ว่าง</span>
+                                    {% else %}
+                                        <span class="status-badge status-used">ใช้แล้ว</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if code.UsedByUsername %}
+                                        {{ code.UsedByUsername }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+                                    <form class="action-form-inline delete-code-form" action="{{ url_for('delete_code') }}" method="POST">
+                                        <input type="hidden" name="code" value="{{ code.Code }}">
+                                        <button type="submit" class="btn-delete" title="ลบรหัส">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #999; padding: 20px;">
+                                    ไม่มีรหัสเชิญในระบบ
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-        </div> </div> 
+        </div> 
+    </div> 
     
     <footer class="main-footer">
-        <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
-        <p>โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
+        <p>สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2024 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
 
     <script>
-        // (ใหม่!) JavaScript สำหรับยืนยันการลบ (แบบเดียวกับ Dashboard)
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mainNavigation');
+            nav.classList.toggle('active');
+        }
 
-        // ยืนยันการลบ "ผู้ใช้"
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('mainNavigation');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+            }
+        });
+
+        // Confirm Delete User
         document.querySelectorAll('.delete-user-form').forEach(form => {
             form.addEventListener('submit', function(event) {
                 event.preventDefault(); 
-                const currentForm = this;
-                const username = currentForm.querySelector('input[name="username"]').value;
+                const username = this.querySelector('input[name="username"]').value;
 
                 Swal.fire({
-                    title: 'ยืนยันการลบผู้ใช้',
+                    title: 'ยืนยันการลบผู้ใช้?',
                     text: `คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้ "${username}"? (การกระทำนี้ไม่สามารถย้อนกลับได้)`,
                     icon: 'warning',
                     showCancelButton: true,
@@ -304,21 +446,20 @@
                     cancelButtonText: 'ยกเลิก'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        currentForm.submit(); 
+                        this.submit(); 
                     }
                 });
             });
         });
 
-        // ยืนยันการลบ "รหัสเชิญ"
+        // Confirm Delete Code
         document.querySelectorAll('.delete-code-form').forEach(form => {
             form.addEventListener('submit', function(event) {
                 event.preventDefault(); 
-                const currentForm = this;
-                const code = currentForm.querySelector('input[name="code"]').value;
+                const code = this.querySelector('input[name="code"]').value;
 
                 Swal.fire({
-                    title: 'ยืนยันการลบรหัส',
+                    title: 'ยืนยันการลบรหัส?',
                     text: `คุณแน่ใจหรือไม่ว่าต้องการลบรหัส "${code}"?`,
                     icon: 'warning',
                     showCancelButton: true,
@@ -328,7 +469,7 @@
                     cancelButtonText: 'ยกเลิก'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        currentForm.submit(); 
+                        this.submit(); 
                     }
                 });
             });

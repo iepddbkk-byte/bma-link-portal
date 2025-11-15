@@ -151,7 +151,7 @@ def run_link_checker():
             try:
                 resp = requests.get(url, headers=headers, timeout=3)
                 if 200 <= resp.status_code < 300: status_msg = "OK"
-                elif resp.status_code == 403: status_msg = "403 Blocked"
+                elif resp.status_code == 403: status_msg = "OK"
                 else: status_msg = f"{resp.status_code} Error"
             except:
                 status_msg = "Error/Timeout"

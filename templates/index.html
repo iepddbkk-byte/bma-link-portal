@@ -46,46 +46,75 @@
 
         /* Header Styles */
         .main-header {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between; 
-            align-items: center; 
+            background: white;
+            padding: 15px 20px;
             box-shadow: var(--shadow-md);
-            border-bottom: 3px solid var(--bma-green);
+            border-bottom: 4px solid var(--bma-green);
             position: sticky;
             top: 0;
             z-index: 1000;
             backdrop-filter: blur(10px);
         }
 
-        .main-header .logo-container { 
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-container { 
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .main-header img {
+        .logo-container img {
             height: 60px;
             transition: transform 0.3s ease;
         }
 
-        .main-header img:hover {
+        .logo-container img:hover {
             transform: scale(1.05);
         }
 
-        .main-header .navigation {
-            display: flex; 
-            align-items: center; 
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bma-green);
+            display: none;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--bma-green);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
             gap: 10px;
             flex-wrap: wrap;
         }
 
-        .main-header .navigation span {
-            font-size: 1em;
+        .navigation span {
+            font-size: 0.95rem;
             color: var(--text-color);
             font-weight: 500;
-            margin-right: 10px;
+            padding: 8px 16px;
+            background: var(--bma-green-light);
+            border-radius: 20px;
+            display: none;
+            white-space: nowrap;
         }
 
         /* Container */
@@ -230,23 +259,23 @@
         }
 
         /* Buttons */
-        button { 
+        button, a button { 
             font-family: 'Kanit', Arial, sans-serif; 
-            background-color: var(--bma-green); 
             color: white; 
             border: none; 
-            padding: 10px 20px; 
-            border-radius: 25px;
+            padding: 10px 16px; 
+            border-radius: 8px;
             cursor: pointer; 
-            font-size: 0.95em; 
+            font-size: 0.95rem; 
             transition: all 0.3s ease;
             white-space: nowrap;
             font-weight: 500;
             box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            display: inline-block;
         }
 
         button:hover {
-            background-color: var(--bma-green-hover);
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
@@ -264,8 +293,8 @@
         }
 
         .sort-buttons button {
-            font-size: 0.75em; 
-            padding: 5px 10px;
+            font-size: 0.75rem; 
+            padding: 4px 8px;
             background-color: rgba(255,255,255,0.2);
             color: white;
             border: 1px solid rgba(255,255,255,0.3);
@@ -274,25 +303,29 @@
 
         .sort-buttons button:hover {
             background-color: rgba(255,255,255,0.3);
-            transform: translateY(0);
+            transform: none;
         }
 
         /* Navigation Button Styles */
-        .main-header .btn-dashboard { 
-            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+        .btn-dashboard { 
+            background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
         }
-        .main-header .btn-analytics { 
-            background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%);
+        .btn-analytics { 
+            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
         }
-        .main-header .btn-admin { 
-            background: linear-gradient(135deg, var(--button-yellow) 0%, #e0a800 100%);
+        .btn-admin { 
+            background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover));
             color: #212529 !important;
         }
-        .main-header .btn-feedback { 
-            background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
+        .btn-feedback { 
+            background: linear-gradient(135deg, var(--button-gray), #5a6268);
         }
-        .main-header .btn-logout { 
-            background: linear-gradient(135deg, var(--button-red) 0%, #c82333 100%);
+        .btn-profile {
+            background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover));
+            color: #212529 !important;
+        }
+        .btn-logout { 
+            background: linear-gradient(135deg, var(--button-red), var(--button-red-hover));
         }
 
         /* Pagination */
@@ -407,32 +440,39 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 1024px) {
-            .container {
-                padding: 20px;
-                margin: 20px 15px;
-            }
-
-            h1 {
-                font-size: 1.5em;
-            }
-        }
-
         @media (max-width: 768px) {
-            .main-header {
-                flex-direction: column;
-                padding: 15px;
-                gap: 15px;
+            .mobile-menu-toggle {
+                display: block;
             }
 
-            .main-header .navigation {
+            .navigation {
+                display: none;
                 width: 100%;
+                flex-direction: column;
+                background: white;
+                padding: 15px;
+                border-radius: 12px;
+                margin-top: 10px;
+                box-shadow: var(--shadow-md);
+            }
+
+            .navigation.active {
+                display: flex;
+            }
+
+            .navigation button,
+            .navigation a {
+                width: 100%;
+                text-align: center;
                 justify-content: center;
             }
 
-            .main-header .navigation span {
-                width: 100%;
-                text-align: center;
+            .navigation span {
+                display: none !important;
+            }
+
+            .logo-text {
+                display: none;
             }
 
             .container {
@@ -469,8 +509,37 @@
             }
         }
 
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 20px;
+                margin: 20px 15px;
+            }
+
+            .logo-text {
+                display: block;
+            }
+
+            .navigation span {
+                display: block;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .logo-text {
+                display: block;
+            }
+
+            .navigation span {
+                display: block;
+            }
+        }
+
         @media (max-width: 480px) {
-            .main-header img {
+            .logo-container img {
                 height: 45px;
             }
 
@@ -500,13 +569,6 @@
             }
         }
 
-        /* Loading Animation */
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: var(--bma-green);
-        }
-
         /* Smooth Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
@@ -526,39 +588,51 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--bma-green-hover);
         }
+
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>
     
     <header class="main-header">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-        </div>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </div>
 
-        <div class="navigation">
-            {% if session.get('logged_in') %}
-                <span>สวัสดี, {{ session.name }}!</span>
-                
-                {% if session.get('level') == 'Admin' %}
-                <a href="{{ url_for('admin_panel') }}">
-                    <button type="button" class="btn-admin">👑 Admin Panel</button>
-                </a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+
+            <div class="navigation" id="mainNavigation">
+                {% if session.get('logged_in') %}
+                    <span>สวัสดี, {{ session.name }}!</span>
+                    
+                    {% if session.get('level') == 'Admin' %}
+                    <a href="{{ url_for('admin_panel') }}">
+                        <button type="button" class="btn-admin">👑 Admin Panel</button>
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('analytics_page') }}">
+                        <button type="button" class="btn-analytics">📊 Analytics</button>
+                    </a>
+                    <a href="{{ url_for('dashboard') }}">
+                        <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+                    </a>
+                    <a href="{{ url_for('feedback_page') }}">
+                        <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+                    </a>
+                    <a href="{{ url_for('profile_page') }}">
+                        <button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
+                    </a>
+                    <a href="{{ url_for('logout') }}">
+                        <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
                 {% endif %}
-                <a href="{{ url_for('analytics_page') }}">
-                    <button type="button" class="btn-analytics">📊 Analytics</button>
-                </a>
-                <a href="{{ url_for('dashboard') }}">
-                    <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-                </a>
-                <a href="{{ url_for('feedback_page') }}">
-                    <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
-                </a>
-                <a href="{{ url_for('logout') }}">
-                    <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-                </a>
-            {% else %}
-                <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
-            {% endif %}
+            </div>
         </div>
     </header>
     
@@ -644,7 +718,7 @@
                     {% else %}
                     <tr id="noDataRow">
                         <td colspan="9" style="text-align: center; padding: 30px; color: #999;">
-                            📭 ไม่พบข้อมูลลิงค์
+                            🔭 ไม่พบข้อมูลลิงค์
                         </td>
                     </tr>
                     {% endfor %}
@@ -665,11 +739,11 @@
                 <span> รายการ</span>
             </div>
             <div class="pagination-nav">
-                <button id="btnFirst"> ⏮ </button>
+                <button id="btnFirst"> ⮜ </button>
                 <button id="btnPrev"> ◀ </button>
                 <span> หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span> </span>
                 <button id="btnNext"> ▶ </button>
-                <button id="btnLast"> ⏭ </button>
+                <button id="btnLast"> ⮞ </button>
             </div>
         </div>
 
@@ -679,9 +753,17 @@
         <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
         <p>สำนักยุทธศาสตร์และประเมินผล</p>
         <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2024 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
 
     <script>
+        // Toggle Mobile Menu Function
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mainNavigation');
+            nav.classList.toggle('active');
+        }
+
+        // Pagination and Search Functions
         let allTableRows = []; 
         let currentPage = 1;
         let totalPages = 1;
@@ -751,32 +833,38 @@
         document.addEventListener('DOMContentLoaded', () => {
             allTableRows = Array.from(tbody.children).filter(row => row.id !== 'noDataRow');
             searchInput = document.getElementById("searchInput"); 
+            
             document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
             document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
             document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
             document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
             document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
             searchInput.addEventListener('keyup', () => displayPage(1)); 
+            
             displayPage(1);
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const nav = document.getElementById('mainNavigation');
+                const toggle = document.querySelector('.mobile-menu-toggle');
+                if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                    nav.classList.remove('active');
+				}
+            });
         });
     </script>
+		
     <script>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                const messages = {{ messages | tojson }};
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                });
-                messages.forEach(([category, message]) => {
-                    Toast.fire({
-                        icon: category,
-                        title: message
+                {% for category, message in messages %}
+                    Swal.fire({
+                        icon: '{{ category }}',
+                        title: '{{ message }}',
+                        showConfirmButton: false,
+                        timer: 3000
                     });
-                });
+                {% endfor %}
             {% endif %}
         {% endwith %}
     </script>
