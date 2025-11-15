@@ -157,6 +157,7 @@
         .btn-feedback { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
         .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
         .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
+        .btn-profile { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
 
         /* Action Buttons */
         .action-buttons {
@@ -424,13 +425,6 @@
             white-space: nowrap;
         }
 
-        /* No Permission Text */
-        .no-permission {
-            font-size: 0.85rem;
-            color: var(--button-gray);
-            font-style: italic;
-        }
-
         /* Footer */
         .main-footer {
             background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
@@ -489,11 +483,11 @@
             }
 
             table {
-                font-size: 0.8rem;
+                font-size: 0.85rem;
             }
 
             th, td {
-                padding: 10px 6px;
+                padding: 10px 8px;
             }
 
             .pagination-controls {
@@ -566,37 +560,35 @@
                 <div class="logo-text">ทะเบียนลิงค์ BMA</div>
             </div>
 			
-	<button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
         
-        <div class="navigation" id="mainNavigation">
-            <span>สวัสดี, {{ session.name }} (ระดับ: {{ session.level }})</span>
-            <a href="{{ url_for('home') }}">
-                <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
-            </a>
-            
-            {% if session.get('level') == 'Admin' %}
-            <a href="{{ url_for('admin_panel') }}">
-                <button type="button" class="btn-admin">👑 Admin Panel</button>
-            </a>
-            {% endif %}
-
-            <a href="{{ url_for('analytics_page') }}">
-                <button type="button" class="btn-analytics">📊 Analytics</button>
-            </a>
-
-            <a href="{{ url_for('dashboard') }}">
-                <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-            </a>
-            
-            <a href="{{ url_for('feedback_page') }}">
-                <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
-            </a>
-			<a href="{{ url_for('profile_page') }}">
-				<button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
-			</a>
-            <a href="{{ url_for('logout') }}">
-                <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-            </a>
+            <div class="navigation" id="mainNavigation">
+                {% if session.get('logged_in') %}
+                    <span>สวัสดี, {{ session.name }}!</span>
+                    
+                    {% if session.get('level') == 'Admin' %}
+                    <a href="{{ url_for('admin_panel') }}">
+                        <button type="button" class="btn-admin">👑 Admin Panel</button>
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('analytics_page') }}">
+                        <button type="button" class="btn-analytics">📊 Analytics</button>
+                    </a>
+                    <a href="{{ url_for('dashboard') }}">
+                        <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+                    </a>
+                    <a href="{{ url_for('feedback_page') }}">
+                        <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+                    </a>
+                    <a href="{{ url_for('profile_page') }}">
+                        <button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
+                    </a>
+                    <a href="{{ url_for('logout') }}">
+                        <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
+                {% endif %}
             </div>
         </div>
     </header>
@@ -609,7 +601,7 @@
 
             <div class="search-container">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="ค้นหาทุกลิงค์ (ชื่อ, สถานะ, ประเภท, หน่วยงาน, อีเมล)...">
+                <input type="text" id="searchInput" placeholder="ค้นหาทุกลิงค์ (ชื่อ, สถานะ, ประเภท, หน่วยงาน, ผู้สร้าง)...">
             </div>
 
             <div class="table-container">
@@ -629,12 +621,15 @@
                             <th>📂 ประเภท</th>
                             <th>🏢 หน่วยงาน</th>
                             <th>📞 เบอร์ติดต่อ</th>
-                            <th>📧 อีเมล</th>
+                            
+                            <th>👤 ผู้สร้าง</th>
+                            
                             <th>🗓️ วันที่อัปเดต</th>
                             <th>⚙️ จัดการ</th>
                         </tr>
                     </thead>
             <tbody id="linkTableBody">
+                
                 {% for link in links %}
                 <tr>
                     <td>
@@ -645,6 +640,7 @@
                         {% endif %}
                     </td>
                     <td>{{ link.หมายเหตุ }}</td>
+                    
                     <td>
                         {% if link.LinkStatus == 'OK' %}
                             <span style="color: green; font-weight: 500;">🟢 ปกติ</span>
@@ -656,6 +652,7 @@
                             <span style="color: gray;">⚪ (ยังไม่ตรวจสอบ)</span>
                         {% endif %}
                     </td>
+
                     <td>
                         {% if link.สถานะ == 'ใช้งาน' %}
                             <span style="color: green;">● ใช้งาน</span>
@@ -670,8 +667,15 @@
                     <td>{{ link.ประเภท }}</td>
                     <td>{{ link.หน่วยงาน }}</td>
                     <td>{{ link.เบอร์โทรติดต่อ }}</td>
-                    <td>{{ link.อีเมลผู้รับผิดชอบ }}</td>
+                    
+                    <td>
+                        <a href="{{ url_for('view_profile', username=link.CreatorUsername) }}" target="_blank" style="font-weight: 500; color: var(--text-color); text-decoration: none;" onmouseover="this.style.color='var(--bma-green)'" onmouseout="this.style.color='var(--text-color)'">
+                            {{ link.CreatorUsername }}
+                        </a>
+                    </td>
+
                     <td>{{ link.วันที่อัปเดต.split(' ')[0] }}</td>
+                    
                     <td>
                         <div class="action-buttons">
                         {% if session.level == 'Admin' or (session.level == 'Users' and link.CreatorUsername == session.username) %}
@@ -724,7 +728,7 @@
         <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2024 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
 
-<script>
+    <script>
         // 1. ส่วนจัดการตารางและการค้นหา
         let allTableRows = []; 
         let currentPage = 1;
@@ -869,22 +873,5 @@
             {% endif %}
         {% endwith %}
     </script>
-	<script>
-    function toggleMobileMenu() {
-        const nav = document.getElementById('mainNavigation'); // มันจะหา id นี้
-        if (nav) {
-            nav.classList.toggle('active');
-        }
-    }
-    
-    // (เสริม) ปิดเมนูเมื่อคลิกข้างนอก
-    document.addEventListener('click', (e) => {
-        const nav = document.getElementById('mainNavigation');
-        const toggle = document.querySelector('.mobile-menu-toggle');
-        if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
-            nav.classList.remove('active');
-        }
-    });
-	</script>
 </body>
 </html>
