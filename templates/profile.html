@@ -188,9 +188,11 @@
                     </div>
                 
                 <div style="margin-top: 30px;">
-                    <button onclick="Swal.fire('ฟีเจอร์นี้กำลังพัฒนา', 'ระบบแก้ไขข้อมูลส่วนตัวจะเปิดให้ใช้งานเร็วๆ นี้', 'info')" class="btn btn-home" style="background-color: var(--button-gray);">
-                        <i class="fas fa-edit"></i> แก้ไขข้อมูลส่วนตัว
-                    </button>
+					<a href="{{ url_for('edit_profile_page') }}" style="text-decoration: none;">
+						<button class="btn btn-home" style="background-color: var(--button-gray); width: 100%;">
+						<i class="fas fa-edit"></i> แก้ไขข้อมูลส่วนตัว
+						</button>
+					</a>
                 </div>
 
             </div>

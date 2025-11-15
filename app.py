@@ -774,3 +774,77 @@ def profile_page():
         print(f"Error loading profile: {e}")
         flash('เกิดข้อผิดพลาดในการโหลดข้อมูลส่วนตัว', 'error')
         return redirect(url_for('dashboard'))
+        
+# --- 14. Routes (ระบบแก้ไขข้อมูลส่วนตัว) ---
+
+@app.route('/edit_profile')
+def edit_profile_page():
+    """ แสดงหน้าฟอร์มแก้ไขข้อมูลส่วนตัว """
+    if not session.get('logged_in'):
+        return redirect(url_for('login_page'))
+    
+    username = session.get('username')
+    
+    try:
+        # ดึงข้อมูลผู้ใช้จาก Sheet
+        all_staff = staff_sheet.get_all_records()
+        user_info = next((u for u in all_staff if u['Username'] == username), None)
+        
+        if not user_info:
+            flash('ไม่พบข้อมูลผู้ใช้', 'error')
+            return redirect(url_for('dashboard'))
+            
+        return render_template('edit_profile.html', session=session, user=user_info)
+        
+    except Exception as e:
+        print(f"Error loading edit profile: {e}")
+        flash('เกิดข้อผิดพลาดในการโหลดข้อมูล', 'error')
+        return redirect(url_for('profile_page'))
+
+@app.route('/edit_profile_action', methods=['POST'])
+def edit_profile_action():
+    """ บันทึกการแก้ไขข้อมูลส่วนตัว """
+    if not session.get('logged_in'):
+        return redirect(url_for('login_page'))
+    
+    username = session.get('username')
+    
+    try:
+        # 1. รับข้อมูลจากฟอร์ม
+        fullname = request.form.get('fullname')   # ชื่อ-นามสกุล
+        position = request.form.get('position')   # ตำแหน่ง
+        department = request.form.get('department') # หน่วยงาน
+        email = request.form.get('email')         # อีเมล
+        phone = request.form.get('phone')         # เบอร์โทร
+        
+        # 2. ค้นหาแถวของผู้ใช้ใน Sheet
+        cell = staff_sheet.find(username)
+        if not cell:
+            flash('ไม่พบผู้ใช้ในระบบ', 'error')
+            return redirect(url_for('profile_page'))
+        
+        # 3. อัปเดตข้อมูลลง Google Sheet (รวบยอดเพื่อความเร็ว)
+        # คอลัมน์ D(4) ถึง H(8) คือ: ชื่อ, ตำแหน่ง, หน่วยงาน, เบอร์โทร, Email
+        # หมายเหตุ: เช็คลำดับคอลัมน์ใน Sheet ให้ดี (D=ชื่อ, E=ตำแหน่ง, F=หน่วยงาน, G=เบอร์, H=Email)
+        
+        # อัปเดตทีละเซลล์ (ปลอดภัยและชัวร์ที่สุด)
+        staff_sheet.update_cell(cell.row, 4, fullname)   # D: ชื่อ
+        staff_sheet.update_cell(cell.row, 5, position)   # E: ตำแหน่ง
+        staff_sheet.update_cell(cell.row, 6, department) # F: หน่วยงาน
+        staff_sheet.update_cell(cell.row, 7, phone)      # G: เบอร์โทร
+        staff_sheet.update_cell(cell.row, 8, email)      # H: Email
+        
+        # อัปเดตเวลาแก้ไขล่าสุด (คอลัมน์ J)
+        staff_sheet.update_cell(cell.row, 10, get_current_timestamp())
+        
+        # 4. อัปเดตข้อมูลใน Session (เพื่อให้หน้าเว็บเปลี่ยนทันที)
+        session['name'] = fullname
+        session['email'] = email
+        
+        flash('บันทึกข้อมูลส่วนตัวเรียบร้อยแล้ว', 'success')
+        return redirect(url_for('profile_page'))
+
+    except Exception as e:
+        print(f"Error updating profile: {e}")
+        flash(f'เกิดข้อผิดพลาด: {e}', 'error')
+        return redirect(url_for('edit_profile_page'))
