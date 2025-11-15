@@ -186,15 +186,15 @@
                         <div class="stat-label"><i class="fas fa-link"></i> ลิงค์ที่สร้าง</div>
                     </div>
                     </div>
-                
+				{% if is_own_profile %}
                 <div style="margin-top: 30px;">
-					<a href="{{ url_for('edit_profile_page') }}" style="text-decoration: none;">
-						<button class="btn btn-home" style="background-color: var(--button-gray); width: 100%;">
-						<i class="fas fa-edit"></i> แก้ไขข้อมูลส่วนตัว
-						</button>
-					</a>
+                    <a href="{{ url_for('edit_profile_page') }}">
+                        <button class="btn-home" style="background-color: var(--button-gray); width: 100%; font-size: 1.1em; padding: 12px;">
+                            <i class="fas fa-edit"></i> แก้ไขข้อมูลส่วนตัว
+                        </button>
+                    </a>
                 </div>
-
+                {% endif %}
             </div>
         </div>
     </div>
