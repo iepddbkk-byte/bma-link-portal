@@ -119,17 +119,18 @@ def generate_invite_code():
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return f"INVITE-{code}"
 
-# (*** ใหม่! ***) ฟังก์ชันแปลง List เป็น Dict (ใช้ Headers ที่เรากำหนด)
+# (*** แก้ไข Bug! ***) ฟังก์ชันแปลง List เป็น Dict (กรองแถวว่าง)
 def records_to_dict(records_list, headers):
     """ แปลง list of lists (ที่ได้จาก get_all_values) เป็น list of dicts """
     records_dict = []
     # ข้ามแถวแรก (Header) เริ่มที่แถวที่ 2 (index 1)
     for row in records_list[1:]:
-        # ใช้ zip เพื่อจับคู่ Header กับข้อมูลในแถว
-        # และใช้ dict() เพื่อสร้าง Dictionary
-        # ใช้ headers[:len(row)] เพื่อป้องกัน Error ถ้าแถวข้อมูลสั้นกว่า Header
-        record = dict(zip(headers, row))
-        records_dict.append(record)
+        # (*** นี่คือจุดที่แก้ไข ***)
+        # ตรวจสอบว่าแถวนั้นมีข้อมูล (คอลัมน์ A (ID) ต้องไม่ว่าง)
+        if row and row[0]: 
+            # ใช้ headers[:len(headers)] เพื่อป้องกันกรณีแถวยาวกว่า Headers
+            record = dict(zip(headers, row[:len(headers)])) 
+            records_dict.append(record)
     return records_dict
 
 # (*** ใหม่! ***) ฟังก์ชันดึงข้อมูล Database ที่แปลงแล้ว
@@ -192,16 +193,13 @@ def run_link_checker():
     if db_sheet is None: return jsonify({'status': 'error', 'message': 'Database not connected'}), 500
     print("🚀 (CHECKER) เริ่มตรวจสอบลิงค์...")
     try:
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         records = get_db_records()
         updates = []
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
 
-        # (ปรับปรุง!) ตรวจสอบคอลัมน์ URL (H) และอัปเดต LinkStatus (M)
-        # +2 เพราะ index เริ่มที่ 0 และแถวแรกคือ Header (ข้อมูลจริงเริ่มที่ i=0 + 2 = แถว 2)
         for i, record in enumerate(records[:30]): 
-            row_index = i + 2 
-            url = record.get('URL') # คอลัมน์ H
+            row_index = i + 2 # +2 เพราะ index เริ่มที่ 0 และแถวแรกคือ Header
+            url = record.get('URL')
             if not url: continue
             if not url.startswith('http'): url = 'http://' + url
             status_msg = "Unknown"
@@ -213,7 +211,6 @@ def run_link_checker():
             except:
                 status_msg = "Error/Timeout"
             
-            # (แก้ไข!) อัปเดตคอลัมน์ M (LinkStatus)
             updates.append({'range': f'M{row_index}', 'values': [[status_msg]]})
         
         if updates:
@@ -239,7 +236,6 @@ def links_page():
         return render_template('links_page.html', links=[], error="Sheet Error", session=session, agency_name="Error")
     try:
         agency_filter = request.args.get('agency') 
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         all_records = get_db_records()
         
         if agency_filter:
@@ -277,7 +273,6 @@ def login_action():
     try:
         username = request.form.get('username')
         password = request.form.get('password')
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         staff_list = get_staff_records()
         user_found = next((u for u in staff_list if u['Username'].lower() == username.lower()), None)
         
@@ -319,10 +314,7 @@ def register_action():
         email = request.form.get('email')
         phone = request.form.get('phone')
         invite_code = request.form.get('invite_code')
-        position = request.form.get('position')
-        # (*** แก้ไข! ***) เปลี่ยน 'division' เป็น 'department' (ตาม register.html)
-        # ไม่ครับ... register.html ที่ผมแก้ไปใช้ 'division'
-        # ผมจะยึดตาม 'division' และ 'main_agency'
+        position = request.form.get('position') 
         division = request.form.get('division') # กอง/กลุ่มงาน/ฝ่าย
         main_agency = request.form.get('main_agency') # ส่วนราชการ
 
@@ -337,7 +329,6 @@ def register_action():
         hashed_password = generate_password_hash(password)
         current_time = get_current_timestamp()
         
-        # (ปรับปรุง!) โครงสร้าง 11 คอลัมน์ (A-K) ของ StaffList
         # A: Username, B: Hash, C: Level, D: ชื่อ, E: ตำแหน่ง, F: หน่วยงาน(กอง/กลุ่มงาน), 
         # G: ส่วนราชการ, H: เบอร์, I: Email, J: CreatedAt, K: UpdatedAt
         new_row_final = [
@@ -372,7 +363,6 @@ def forgot_password():
     if request.method == 'POST':
         try:
             username_input = request.form.get('username')
-            # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
             all_staff = get_staff_records()
             user_found = next((u for u in all_staff if u['Username'].lower() == username_input.lower()), None)
             if user_found:
@@ -419,12 +409,10 @@ def profile_page():
 def view_profile(username):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         all_staff = get_staff_records()
         user_info = next((u for u in all_staff if u['Username'] == username), None)
         if not user_info: flash(f'ไม่พบผู้ใช้: {username}', 'error'); return redirect(url_for('dashboard'))
 
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         all_links = get_db_records()
         count = sum(1 for link in all_links if link.get('CreatorUsername') == username)
         is_own = (username == session.get('username'))
@@ -435,7 +423,6 @@ def view_profile(username):
 def edit_profile_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         all_staff = get_staff_records()
         user_info = next((u for u in all_staff if u['Username'] == session.get('username')), None)
         return render_template('edit_profile.html', session=session, user=user_info)
@@ -449,13 +436,11 @@ def edit_profile_action():
         email = request.form.get('email')
         phone = request.form.get('phone')
         position = request.form.get('position')
-        # (*** แก้ไข! ***) ใช้ 'division' (ตาม edit_profile.html)
-        division = request.form.get('division') # กอง/กลุ่มงาน
+        division = request.form.get('division') # กอง/กลุ่มงาน (จาก edit_profile.html)
         main_agency = request.form.get('main_agency') # ส่วนราชการ
         
         cell = staff_sheet.find(session.get('username'))
         if cell:
-            # (ปรับปรุง!) อัปเดตคอลัมน์ StaffList (A-K)
             staff_sheet.update_cell(cell.row, 4, fullname)    # D: ชื่อ
             staff_sheet.update_cell(cell.row, 5, position)    # E: ตำแหน่ง
             staff_sheet.update_cell(cell.row, 6, division)    # F: หน่วยงาน(กอง/กลุ่มงาน)
@@ -481,7 +466,6 @@ def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     if db_sheet is None: return render_template('dashboard.html', session=session, links=[])
     try: 
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         all_links = get_db_records()
         return render_template('dashboard.html', session=session, links=all_links)
     except: return redirect(url_for('home'))
@@ -502,20 +486,17 @@ def add_link_action():
         ]}
         main_agency = session.get('main_agency', 'N/A') 
         
-        # (แก้ไข!) โครงสร้างชีท Database (A-L)
-        # A:ID, B:ประเภท, C:หน่วยงาน(Sub), D:ส่วนราชการ(Main), E:อีเมล, F:เบอร์,
-        # G:ชื่อลิงก์, H:URL, I:สถานะ, J:รายละเอียด, K:วันที่, L:Creator
         new_row = [
             generate_new_id(),  # A
             data['ประเภท'],       # B
-            data['หน่วยงาน'],     # C (จาก Form)
-            main_agency,        # D (จาก Session)
+            data['หน่วยงาน'],     # C
+            main_agency,        # D
             data['อีเมลผู้รับผิดชอบ'], # E
             data['เบอร์โทรติดต่อ'], # F
             data['ชื่อลิงก์'],    # G
             data['URL'],        # H
             data['สถานะ'],      # I
-            data['รายละเอียด'],   # J (จาก Form)
+            data['รายละเอียด'],   # J
             get_current_timestamp(), # K
             session.get('username') # L
         ]
@@ -531,7 +512,6 @@ def delete_link_action(link_id):
         cell = db_sheet.find(link_id)
         if not cell: return redirect(url_for('dashboard'))
         
-        # (ปรับปรุง!) คอลัมน์ CreatorUsername อยู่ที่ L (index 11)
         row_data = db_sheet.row_values(cell.row)
         creator = row_data[11] # L คือ index 11
         
@@ -547,7 +527,6 @@ def delete_link_action(link_id):
 def edit_link_page(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         all_links = get_db_records()
         link = next((l for l in all_links if l['ID'] == link_id), None)
         if not link: return redirect(url_for('dashboard'))
@@ -586,18 +565,17 @@ def update_link_action(link_id):
         else:
             main_agency = row_vals[3] # D (index 3) - ใช้ค่าเดิม
         
-        # (แก้ไข!) อัปเดตแถวตามโครงสร้าง A-L
         new_vals = [
             link_id,            # A
             data['ประเภท'],       # B
-            data['หน่วยงาน'],     # C (จาก Form)
-            main_agency,        # D (Main Agency)
+            data['หน่วยงาน'],     # C
+            main_agency,        # D
             data['อีเมลผู้รับผิดชอบ'], # E
             data['เบอร์โทรติดต่อ'], # F
             data['ชื่อลิงก์'],    # G
             data['URL'],        # H
             data['สถานะ'],      # I
-            data['รายละเอียด'],   # J (จาก Form)
+            data['รายละเอียด'],   # J
             get_current_timestamp(), # K
             creator             # L
         ]
@@ -613,17 +591,16 @@ def analytics_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     if db_sheet is None: return render_template('analytics.html', session=session, chart_data={})
     try:
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         links = get_db_records()
         users = get_staff_records()
-        feedback = feedback_sheet.get_all_records() # (Feedback ใช้ get_all_records ได้)
+        feedback = feedback_sheet.get_all_records()
         
         cat_counts = Counter(l['ประเภท'] for l in links if l.get('ประเภท'))
         dept_counts = Counter(l['ส่วนราชการ'] for l in links if l.get('ส่วนราชการ')).most_common(5)
         
         monthly = {}
         for l in links:
-            if l.get('วันที่อัปเดต'): # คอลัมน์ K
+            if l.get('วันที่อัปเดต'):
                 try: 
                     m = datetime.datetime.strptime(l['วันที่อัปเดต'].split()[0], '%Y-%m-%d').strftime('%Y-%m')
                     monthly[m] = monthly.get(m, 0) + 1
@@ -657,7 +634,6 @@ def analytics_page():
 def admin_panel():
     if not session.get('logged_in') or session.get('level') != 'Admin': return redirect(url_for('dashboard'))
     try:
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         return render_template('admin_panel.html', 
                                session=session, 
                                staff_list=get_staff_records(), 
@@ -725,7 +701,6 @@ def feedback_action():
 @app.route('/get_links', methods=['GET'])
 def get_all_links():
     try: 
-        # (*** แก้ไข! ***) ใช้ฟังก์ชันใหม่
         return jsonify({"status": "success", "data": get_db_records()})
     except: return jsonify({"status": "error"}), 500
 
