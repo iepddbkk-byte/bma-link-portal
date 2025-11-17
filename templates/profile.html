@@ -134,7 +134,7 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr; /* (ปรับปรุง!) ให้แสดงผลเดียวเต็ม */
+            grid-template-columns: 1fr;
             gap: 20px;
             width: 100%;
             margin-top: 20px;
@@ -163,7 +163,7 @@
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid #eee;
-            flex-wrap: wrap; /* (ปรับปรุง!) เผื่อมือถือ */
+            flex-wrap: wrap; 
             gap: 5px;
         }
         .info-item:last-child { border-bottom: none; }
@@ -219,7 +219,8 @@
                     <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">🖥️ Dashboard</a>
                     <a href="{{ url_for('feedback_page') }}" class="btn btn-feedback">📝 ส่ง Feedback</a>
                     
-                    {% if not is_own_profile %} <a href="{{ url_for('profile_page') }}" class="btn btn-profile">👤 กลับโปรไฟล์ฉัน</a>
+                    {% if not is_own_profile %} 
+                    <a href="{{ url_for('profile_page') }}" class="btn btn-profile">👤 กลับโปรไฟล์ฉัน</a>
                     {% endif %}
 
                     <a href="{{ url_for('logout') }}" class="btn btn-logout">🚪 ออกจากระบบ</a>
@@ -317,6 +318,27 @@
                 nav.classList.remove('active');
             }
         });
+    </script>
+    
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                const messages = {{ messages | tojson }};
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+                messages.forEach(([category, message]) => {
+                    Toast.fire({
+                        icon: category,
+                        title: message
+                    });
+                });
+            {% endif %}
+        {% endwith %}
     </script>
 
 </body>
