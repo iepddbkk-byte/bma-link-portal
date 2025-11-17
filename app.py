@@ -531,32 +531,54 @@ def delete_link_action(link_id):
 
 @app.route('/edit/<link_id>')
 def edit_link_page(link_id):
-    if not session.get('logged_in'): return redirect(url_for('login_page'))
+    if not session.get('logged_in'): 
+        return redirect(url_for('login_page'))
+    
     try:
+        # ดึงข้อมูลทั้งหมดและค้นหาลิงก์ที่ต้องการ
         all_links = get_db_records()
-        link = next((l for l in all_links if l.get('ID', '').strip() == link_id.strip()), None)
+        
+        # (*** แก้ไข ***) ใช้การเปรียบเทียบที่ปลอดภัยกว่า
+        link = None
+        for l in all_links:
+            if l.get('ID', '').strip() == link_id.strip():
+                link = l
+                break
         
         if not link: 
-            flash(f'ไม่พบลิงค์ ID: {link_id}', 'error') # (*** เพิ่ม Log ***)
+            print(f'[ERROR] ไม่พบลิงก์ ID: {link_id}')  # Debug log
+            flash(f'ไม่พบลิงก์ ID: {link_id}', 'error')
             return redirect(url_for('dashboard'))
         
-        # (*** แก้ไข Bug 2 ***) ใช้ .get() และ .strip() เพื่อความปลอดภัย
+        # (*** แก้ไข ***) ตรวจสอบสิทธิ์อย่างปลอดภัย
         creator = link.get('CreatorUsername', '').strip()
         username = session.get('username', '').strip()
-
-        if session.get('level') != 'Admin' and creator != username:
-            flash('ไม่มีสิทธิ์แก้ไขลิงค์นี้', 'error') # (*** เพิ่ม Log ***)
-            return redirect(url_for('dashboard'))
-        
         is_admin = (session.get('level') == 'Admin')
         
+        # Debug log
+        print(f'[DEBUG] Link ID: {link_id}')
+        print(f'[DEBUG] Creator: "{creator}"')
+        print(f'[DEBUG] Current User: "{username}"')
+        print(f'[DEBUG] Is Admin: {is_admin}')
+        
+        # ตรวจสอบสิทธิ์การแก้ไข
+        if not is_admin and creator != username:
+            print(f'[ERROR] ไม่มีสิทธิ์แก้ไข - Creator: "{creator}" vs User: "{username}"')
+            flash('คุณไม่มีสิทธิ์แก้ไขลิงก์นี้', 'error')
+            return redirect(url_for('dashboard'))
+        
+        # ส่งข้อมูลไปยังหน้า template
         return render_template('edit_link.html', 
                                session=session, 
                                link=link,
-                               locked_agency=link.get('ส่วนราชการ'),
+                               locked_agency=link.get('ส่วนราชการ', 'N/A'),
                                is_admin=is_admin)
+    
     except Exception as e: 
-        print(f"Edit Page Error: {e}") # (*** เพิ่ม Log ***)
+        print(f'[ERROR] Edit Page Error: {str(e)}')  # Debug log
+        import traceback
+        traceback.print_exc()  # แสดง stack trace เต็ม
+        flash(f'เกิดข้อผิดพลาด: {str(e)}', 'error')
         return redirect(url_for('dashboard'))
 
 @app.route('/update_action/<link_id>', methods=['POST'])
