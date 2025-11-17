@@ -126,10 +126,15 @@ def records_to_dict(records_list, headers):
     # ข้ามแถวแรก (Header) เริ่มที่แถวที่ 2 (index 1)
     for row in records_list[1:]:
         # (*** นี่คือจุดที่แก้ไข ***)
-        # ตรวจสอบว่าแถวนั้นมีข้อมูล (คอลัมน์ A (ID) ต้องไม่ว่าง)
+        # ตรวจสอบว่าแถวนั้นมีข้อมูล (คอลัมน์ A (ID หรือ Username) ต้องไม่ว่าง)
         if row and row[0]: 
-            # ใช้ headers[:len(headers)] เพื่อป้องกันกรณีแถวยาวกว่า Headers
-            record = dict(zip(headers, row[:len(headers)])) 
+            # สร้าง Dictionary โดยจับคู่ Header กับข้อมูล
+            record = {}
+            for i, header in enumerate(headers):
+                if i < len(row):
+                    record[header] = row[i] # ใส่ข้อมูลถ้ามี
+                else:
+                    record[header] = "" # ใส่ค่าว่างถ้าข้อมูลในแถวสั้นกว่า Header
             records_dict.append(record)
     return records_dict
 
@@ -329,8 +334,6 @@ def register_action():
         hashed_password = generate_password_hash(password)
         current_time = get_current_timestamp()
         
-        # A: Username, B: Hash, C: Level, D: ชื่อ, E: ตำแหน่ง, F: หน่วยงาน(กอง/กลุ่มงาน), 
-        # G: ส่วนราชการ, H: เบอร์, I: Email, J: CreatedAt, K: UpdatedAt
         new_row_final = [
             username,           # A
             hashed_password,    # B (PasswordHash)
@@ -468,7 +471,9 @@ def dashboard():
     try: 
         all_links = get_db_records()
         return render_template('dashboard.html', session=session, links=all_links)
-    except: return redirect(url_for('home'))
+    except Exception as e: 
+        print(f"Dashboard Error: {e}") # (*** เพิ่ม Log ***)
+        return redirect(url_for('home'))
 
 @app.route('/add')
 def add_link_page():
@@ -513,9 +518,10 @@ def delete_link_action(link_id):
         if not cell: return redirect(url_for('dashboard'))
         
         row_data = db_sheet.row_values(cell.row)
-        creator = row_data[11] # L คือ index 11
+        # (*** แก้ไข Bug 2 ***) ใช้ .strip() เพื่อป้องกัน
+        creator = row_data[11].strip() # L คือ index 11
         
-        if session['level'] == 'Admin' or creator == session['username']:
+        if session['level'] == 'Admin' or creator == session['username'].strip():
             db_sheet.delete_rows(cell.row)
             flash('ลบสำเร็จ', 'success')
         else:
@@ -528,13 +534,20 @@ def edit_link_page(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
         all_links = get_db_records()
-        link = next((l for l in all_links if l['ID'] == link_id), None)
-        if not link: return redirect(url_for('dashboard'))
+        link = next((l for l in all_links if l.get('ID', '').strip() == link_id.strip()), None)
         
-        if session['level'] != 'Admin' and link['CreatorUsername'] != session['username']:
-            flash('ไม่มีสิทธิ์', 'error'); return redirect(url_for('dashboard'))
+        if not link: 
+            flash(f'ไม่พบลิงค์ ID: {link_id}', 'error') # (*** เพิ่ม Log ***)
+            return redirect(url_for('dashboard'))
         
-        user_main_agency = session.get('main_agency', 'N/A')
+        # (*** แก้ไข Bug 2 ***) ใช้ .get() และ .strip() เพื่อความปลอดภัย
+        creator = link.get('CreatorUsername', '').strip()
+        username = session.get('username', '').strip()
+
+        if session.get('level') != 'Admin' and creator != username:
+            flash('ไม่มีสิทธิ์แก้ไขลิงค์นี้', 'error') # (*** เพิ่ม Log ***)
+            return redirect(url_for('dashboard'))
+        
         is_admin = (session.get('level') == 'Admin')
         
         return render_template('edit_link.html', 
@@ -542,17 +555,22 @@ def edit_link_page(link_id):
                                link=link,
                                locked_agency=link.get('ส่วนราชการ'),
                                is_admin=is_admin)
-    except: return redirect(url_for('dashboard'))
+    except Exception as e: 
+        print(f"Edit Page Error: {e}") # (*** เพิ่ม Log ***)
+        return redirect(url_for('dashboard'))
 
 @app.route('/update_action/<link_id>', methods=['POST'])
 def update_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
         cell = db_sheet.find(link_id)
+        if not cell: return redirect(url_for('dashboard'))
+
         row_vals = db_sheet.row_values(cell.row)
-        creator = row_vals[11] # Creator คือ L (index 11)
+        # (*** แก้ไข Bug 2 ***) ใช้ .strip()
+        creator = row_vals[11].strip() # Creator คือ L (index 11)
         
-        if session['level'] != 'Admin' and creator != session['username']:
+        if session['level'] != 'Admin' and creator != session['username'].strip():
              flash('ไม่มีสิทธิ์', 'error'); return redirect(url_for('dashboard'))
         
         data = {k: request.form.get(k) for k in [
@@ -577,7 +595,7 @@ def update_link_action(link_id):
             data['สถานะ'],      # I
             data['รายละเอียด'],   # J
             get_current_timestamp(), # K
-            creator             # L
+            creator             # L (ใช้ creator ที่ .strip() แล้ว)
         ]
         range_name = f"A{cell.row}:L{cell.row}"
         db_sheet.update(range_name, [new_vals])
