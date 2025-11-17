@@ -119,20 +119,29 @@ def generate_invite_code():
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return f"INVITE-{code}"
 
-# (*** แก้ไข Bug! ***) ฟังก์ชันแปลง List เป็น Dict (กรองแถวว่าง)
+# (*** ❗️❗️❗️ นี่คือส่วนที่แก้ไข ❗️❗️❗️ ***)
+# (*** แก้ไข Bug! ***) ฟังก์ชันแปลง List เป็น Dict (กรองแถวว่าง และ Strip)
 def records_to_dict(records_list, headers):
-    """ แปลง list of lists (ที่ได้จาก get_all_values) เป็น list of dicts """
+    """ 
+    แปลง list of lists (ที่ได้จาก get_all_values) เป็น list of dicts 
+    (*** แก้ไข ***) และ .strip() ค่า string ทั้งหมด
+    """
     records_dict = []
     # ข้ามแถวแรก (Header) เริ่มที่แถวที่ 2 (index 1)
     for row in records_list[1:]:
         # (*** นี่คือจุดที่แก้ไข ***)
-        # ตรวจสอบว่าแถวนั้นมีข้อมูล (คอลัมน์ A (ID หรือ Username) ต้องไม่ว่าง)
-        if row and row[0]: 
-            # สร้าง Dictionary โดยจับคู่ Header กับข้อมูล
+        # ตรวจสอบว่าแถวนั้นมีข้อมูล (คอลัมน์ A (ID หรือ Username) ต้องไม่ว่างและไม่เป็นแค่ช่องว่าง)
+        if row and row[0] and str(row[0]).strip(): 
             record = {}
             for i, header in enumerate(headers):
                 if i < len(row):
-                    record[header] = row[i] # ใส่ข้อมูลถ้ามี
+                    value = row[i]
+                    # (*** นี่คือจุดที่แก้ไขหลัก ***)
+                    # ถ้าเป็น string ให้ strip ถ้าไม่ (เช่นตัวเลข) ก็ใช้ค่าเดิม
+                    if isinstance(value, str):
+                        record[header] = value.strip()
+                    else:
+                        record[header] = value
                 else:
                     record[header] = "" # ใส่ค่าว่างถ้าข้อมูลในแถวสั้นกว่า Header
             records_dict.append(record)
@@ -172,7 +181,11 @@ def check_username():
         data = request.get_json()
         username = data.get('username')
         if not username: return jsonify({'available': False})
-        all_usernames = staff_sheet.col_values(1) 
+        
+        # (*** หมายเหตุ: get_staff_records() ถูกแก้ไขแล้ว ข้อมูลจึงสะอาด ***)
+        all_staff = get_staff_records() 
+        all_usernames = [u['Username'] for u in all_staff]
+        
         is_available = username.lower() not in [u.lower() for u in all_usernames]
         return jsonify({'available': is_available})
     except: return jsonify({'available': False})
@@ -278,15 +291,17 @@ def login_action():
     try:
         username = request.form.get('username')
         password = request.form.get('password')
+        
+        # (*** หมายเหตุ: get_staff_records() ถูกแก้ไขแล้ว ข้อมูลจึงสะอาด ***)
         staff_list = get_staff_records()
         user_found = next((u for u in staff_list if u['Username'].lower() == username.lower()), None)
         
         if user_found and check_password_hash(user_found['PasswordHash'], password):
             session['logged_in'] = True
-            session['username'] = user_found['Username']
-            session['level'] = user_found['Level']
-            session['name'] = user_found['ชื่อ']
-            session['email'] = user_found['Email']
+            session['username'] = user_found['Username'] # ค่านี้สะอาดแล้ว
+            session['level'] = user_found['Level']       # ค่านี้สะอาดแล้ว
+            session['name'] = user_found['ชื่อ']         # ค่านี้สะอาดแล้ว
+            session['email'] = user_found['Email']       # ค่านี้สะอาดแล้ว
             session['main_agency'] = user_found.get('ส่วนราชการ', 'N/A') 
             
             flash('เข้าสู่ระบบสำเร็จ!', 'success') 
@@ -323,7 +338,9 @@ def register_action():
         division = request.form.get('division') # กอง/กลุ่มงาน/ฝ่าย
         main_agency = request.form.get('main_agency') # ส่วนราชการ
 
-        all_usernames = staff_sheet.col_values(1)
+        # (*** หมายเหตุ: get_staff_records() ถูกแก้ไขแล้ว ข้อมูลจึงสะอาด ***)
+        all_staff = get_staff_records()
+        all_usernames = [u['Username'] for u in all_staff]
         if username.lower() in [u.lower() for u in all_usernames]:
             flash('Username ซ้ำ', 'error'); return redirect(url_for('register_page'))
         
@@ -366,7 +383,7 @@ def forgot_password():
     if request.method == 'POST':
         try:
             username_input = request.form.get('username')
-            all_staff = get_staff_records()
+            all_staff = get_staff_records() # ข้อมูลสะอาด
             user_found = next((u for u in all_staff if u['Username'].lower() == username_input.lower()), None)
             if user_found:
                 success = send_reset_email(user_found['Username'], user_found['Email'])
@@ -412,11 +429,11 @@ def profile_page():
 def view_profile(username):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        all_staff = get_staff_records()
+        all_staff = get_staff_records() # ข้อมูลสะอาด
         user_info = next((u for u in all_staff if u['Username'] == username), None)
         if not user_info: flash(f'ไม่พบผู้ใช้: {username}', 'error'); return redirect(url_for('dashboard'))
 
-        all_links = get_db_records()
+        all_links = get_db_records() # ข้อมูลสะอาด
         count = sum(1 for link in all_links if link.get('CreatorUsername') == username)
         is_own = (username == session.get('username'))
         return render_template('profile.html', session=session, user=user_info, links_count=count, is_own_profile=is_own)
@@ -426,7 +443,7 @@ def view_profile(username):
 def edit_profile_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        all_staff = get_staff_records()
+        all_staff = get_staff_records() # ข้อมูลสะอาด
         user_info = next((u for u in all_staff if u['Username'] == session.get('username')), None)
         return render_template('edit_profile.html', session=session, user=user_info)
     except: return redirect(url_for('profile_page'))
@@ -469,10 +486,10 @@ def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     if db_sheet is None: return render_template('dashboard.html', session=session, links=[])
     try: 
-        all_links = get_db_records()
+        all_links = get_db_records() # ข้อมูลสะอาด
         return render_template('dashboard.html', session=session, links=all_links)
     except Exception as e: 
-        print(f"Dashboard Error: {e}") # (*** เพิ่ม Log ***)
+        print(f"Dashboard Error: {e}") 
         return redirect(url_for('home'))
 
 @app.route('/add')
@@ -514,14 +531,14 @@ def add_link_action():
 def delete_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        cell = db_sheet.find(link_id)
+        # (*** หมายเหตุ: link_id ที่มาจาก dashboard (หลังแก้) จะสะอาดแล้ว ***)
+        cell = db_sheet.find(link_id) 
         if not cell: return redirect(url_for('dashboard'))
         
         row_data = db_sheet.row_values(cell.row)
-        # (*** แก้ไข Bug 2 ***) ใช้ .strip() เพื่อป้องกัน
-        creator = row_data[11].strip() # L คือ index 11
+        creator = row_data[11].strip() # (*** .strip() ที่นี่ปลอดภัย เผื่อข้อมูลเก่ายังไม่สะอาด ***)
         
-        if session['level'] == 'Admin' or creator == session['username'].strip():
+        if session['level'] == 'Admin' or creator == session['username']: # (*** .strip() ที่ session.username ไม่จำเป็นแล้ว ***)
             db_sheet.delete_rows(cell.row)
             flash('ลบสำเร็จ', 'success')
         else:
@@ -535,24 +552,24 @@ def edit_link_page(link_id):
         return redirect(url_for('login_page'))
     
     try:
-        # ดึงข้อมูลทั้งหมดและค้นหาลิงก์ที่ต้องการ
+        # ดึงข้อมูลทั้งหมด (สะอาดแล้ว)
         all_links = get_db_records()
         
-        # (*** แก้ไข ***) ใช้การเปรียบเทียบที่ปลอดภัยกว่า
+        # (*** แก้ไข ***) ใช้การเปรียบเทียบที่สะอาดแล้ว
         link = None
         for l in all_links:
-            if l.get('ID', '').strip() == link_id.strip():
+            if l.get('ID', '') == link_id: # (*** ไม่ต้อง .strip() ทั้งสองข้าง ***)
                 link = l
                 break
         
         if not link: 
-            print(f'[ERROR] ไม่พบลิงก์ ID: {link_id}')  # Debug log
+            print(f'[ERROR] ไม่พบลิงก์ ID: {link_id}')  
             flash(f'ไม่พบลิงก์ ID: {link_id}', 'error')
             return redirect(url_for('dashboard'))
         
-        # (*** แก้ไข ***) ตรวจสอบสิทธิ์อย่างปลอดภัย
-        creator = link.get('CreatorUsername', '').strip()
-        username = session.get('username', '').strip()
+        # (*** แก้ไข ***) ตรวจสอบสิทธิ์ (สะอาดแล้ว)
+        creator = link.get('CreatorUsername', '') # (*** ไม่ต้อง .strip() ***)
+        username = session.get('username', '') # (*** ไม่ต้อง .strip() ***)
         is_admin = (session.get('level') == 'Admin')
         
         # Debug log
@@ -575,9 +592,9 @@ def edit_link_page(link_id):
                                is_admin=is_admin)
     
     except Exception as e: 
-        print(f'[ERROR] Edit Page Error: {str(e)}')  # Debug log
+        print(f'[ERROR] Edit Page Error: {str(e)}')  
         import traceback
-        traceback.print_exc()  # แสดง stack trace เต็ม
+        traceback.print_exc()  
         flash(f'เกิดข้อผิดพลาด: {str(e)}', 'error')
         return redirect(url_for('dashboard'))
 
@@ -585,14 +602,13 @@ def edit_link_page(link_id):
 def update_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        cell = db_sheet.find(link_id)
+        cell = db_sheet.find(link_id) # link_id สะอาดแล้ว
         if not cell: return redirect(url_for('dashboard'))
 
         row_vals = db_sheet.row_values(cell.row)
-        # (*** แก้ไข Bug 2 ***) ใช้ .strip()
-        creator = row_vals[11].strip() # Creator คือ L (index 11)
+        creator = row_vals[11].strip() # (*** .strip() ที่นี่ปลอดภัย เผื่อข้อมูลเก่ายังไม่สะอาด ***)
         
-        if session['level'] != 'Admin' and creator != session['username'].strip():
+        if session['level'] != 'Admin' and creator != session['username']: # (*** session.username สะอาดแล้ว ***)
              flash('ไม่มีสิทธิ์', 'error'); return redirect(url_for('dashboard'))
         
         data = {k: request.form.get(k) for k in [
@@ -631,8 +647,8 @@ def analytics_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     if db_sheet is None: return render_template('analytics.html', session=session, chart_data={})
     try:
-        links = get_db_records()
-        users = get_staff_records()
+        links = get_db_records() # ข้อมูลสะอาด
+        users = get_staff_records() # ข้อมูลสะอาด
         feedback = feedback_sheet.get_all_records()
         
         cat_counts = Counter(l['ประเภท'] for l in links if l.get('ประเภท'))
@@ -676,7 +692,7 @@ def admin_panel():
     try:
         return render_template('admin_panel.html', 
                                session=session, 
-                               staff_list=get_staff_records(), 
+                               staff_list=get_staff_records(), # ข้อมูลสะอาด
                                invite_codes=invite_sheet.get_all_records())
     except: return redirect(url_for('dashboard'))
 
