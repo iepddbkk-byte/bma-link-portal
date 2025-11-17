@@ -120,7 +120,7 @@
         }
 
         /* Buttons */
-        button, a {
+        button, a, a.btn { /* (ปรับปรุง) ให้ a.btn ชัดเจน */
             font-family: 'Kanit', Arial, sans-serif;
             color: white;
             border: none;
@@ -136,7 +136,7 @@
             display: inline-block;
         }
 
-        button:hover {
+        button:hover, a:hover, a.btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
@@ -479,21 +479,7 @@
             }
         }
 
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .container {
-                padding: 20px 15px;
-            }
-
-            .logo-text {
-                display: block;
-            }
-
-            .navigation span {
-                display: block;
-            }
-        }
-
-        @media (min-width: 1025px) {
+        @media (min-width: 769px) { /* (ปรับปรุง) */
             .logo-text {
                 display: block;
             }
@@ -508,7 +494,7 @@
                 height: 45px;
             }
 
-            button {
+            button, a, a.btn { /* (ปรับปรุง) */
                 padding: 8px 15px;
                 font-size: 0.9em;
             }
@@ -571,33 +557,20 @@
             
             <div class="navigation" id="mainNavigation">
                 {% if session.get('logged_in') %}
-                    <span>สวัสดี, {{ session.name }}!</span>
+                    <span class="user-greeting">สวัสดี, {{ session.name }}!</span>
                     
-                    <a href="{{ url_for('home') }}">
-                        <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
-                    </a>
+                    <a href="{{ url_for('home') }}" class="btn btn-home">🏠 กลับหน้าหลัก</a>
+                    
                     {% if session.get('level') == 'Admin' %}
-                    <a href="{{ url_for('admin_panel') }}">
-                        <button type="button" class="btn-admin">👑 Admin Panel</button>
-                    </a>
+                    <a href="{{ url_for('admin_panel') }}" class="btn btn-admin">👑 Admin Panel</a>
                     {% endif %}
-                    <a href="{{ url_for('analytics_page') }}">
-                        <button type="button" class="btn-analytics">📊 Analytics</button>
-                    </a>
-                    <a href="{{ url_for('dashboard') }}">
-                        <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-                    </a>
-                    <a href="{{ url_for('feedback_page') }}">
-                        <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
-                    </a>
-                    <a href="{{ url_for('profile_page') }}">
-                        <button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
-                    </a>
-                    <a href="{{ url_for('logout') }}">
-                        <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-                    </a>
+                    
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">🖥️ Dashboard</a>
+                    <a href="{{ url_for('feedback_page') }}" class="btn btn-feedback">📝 ส่ง Feedback</a>
+                    <a href="{{ url_for('profile_page') }}" class="btn btn-profile">👤 ข้อมูลส่วนตัว</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-logout">🚪 ออกจากระบบ</a>
                 {% else %}
-                    <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
+                    <a href="{{ url_for('login_page') }}" class="btn btn-home">🏠 กลับหน้าหลัก</a>
                 {% endif %}
             </div>
         </div>
@@ -660,7 +633,7 @@
                 <canvas id="categoryPieChart"></canvas>
             </div>
             <div class="chart-container">
-                <h3><i class="fas fa-chart-bar"></i> 5 หน่วยงานที่เพิ่มลิงค์สูงสุด</h3>
+                <h3><i class="fas fa-chart-bar"></i> 5 ส่วนราชการที่เพิ่มลิงค์สูงสุด</h3>
                 <canvas id="departmentBarChart"></canvas>
             </div>
             <div class="chart-container chart-container-full">
@@ -715,7 +688,7 @@
         <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
         <p>สำนักยุทธศาสตร์และประเมินผล</p>
         <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
-        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2024 Bangkok Metropolitan Administration. All rights reserved.</p>
+        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
 
     <script>

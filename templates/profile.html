@@ -12,11 +12,15 @@
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --button-red: #dc3545;
+            --button-red-hover: #c82333;
             --button-blue: #007bff;
+            --button-blue-hover: #0056b3;
             --button-yellow: #ffc107;
+            --button-yellow-hover: #e0a800;
             --button-gray: #6c757d;
             --light-gray: #f4f4f4;
             --text-color: #333;
+            --bma-green-light: #e8f5e9;
         }
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
@@ -24,20 +28,61 @@
             background-color: var(--light-gray); 
             color: var(--text-color);
         }
-        /* (Header Style เหมือนไฟล์อื่น - คัดลอกมาได้เลย หรือใช้ include ถ้าทำเป็น) */
-        .main-header { background-color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 3px solid var(--bma-green); min-height: 80px; }
-        .main-header .logo-container img { height: 70px; margin-right: 15px; }
-        .main-header .navigation { display: flex; align-items: center; gap: 10px; }
-        .main-header .navigation span { font-size: 1.1em; color: var(--text-color); white-space: nowrap; }
         
-        /* ปุ่มต่างๆ */
-        button, .btn { font-family: 'Kanit', sans-serif; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 1em; transition: 0.3s; display: inline-block; }
-        .btn-home { background-color: var(--button-blue); } .btn-home:hover { background-color: #0056b3; }
-        .btn-dashboard { background-color: var(--bma-green); } .btn-dashboard:hover { background-color: var(--bma-green-hover); }
-        .btn-logout { background-color: var(--button-red); } .btn-logout:hover { background-color: #c82333; }
-        .btn-profile { background-color: var(--button-yellow); color: #212529; } .btn-profile:hover { background-color: #e0a800; }
+        /* --- Header Style (ปรับปรุงให้เหมือน Dashboard) --- */
+        .main-header {
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--bma-green);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .logo-container { display: flex; align-items: center; gap: 15px; }
+        .logo-container img { height: 60px; }
+        .logo-text { font-size: 1.5rem; font-weight: 600; color: var(--bma-green); }
+        .navigation { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .user-greeting {
+            font-size: 0.95rem; color: var(--text-color); font-weight: 500;
+            padding: 8px 16px; background: var(--bma-green-light);
+            border-radius: 20px; white-space: nowrap;
+        }
+        .mobile-menu-toggle {
+            display: none; background: var(--bma-green); color: white;
+            border: none; padding: 10px 15px; border-radius: 8px;
+            cursor: pointer; font-size: 1.2rem;
+        }
+        
+        /* --- Button Styles (เหมือน Dashboard) --- */
+        button, .btn, a.btn { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            color: white; border: none; padding: 10px 16px; border-radius: 8px; 
+            cursor: pointer; font-size: 0.95rem; transition: all 0.3s ease;
+            white-space: nowrap; font-weight: 500; 
+            text-decoration: none !important; display: inline-block;
+        }
+        button:hover, .btn:hover { transform: translateY(-2px); }
+        .btn-home { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+        .btn-analytics { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+        .btn-admin { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
+        .btn-feedback { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
+        .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
+        .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
+        .btn-profile { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
+        /* --- (จบ) Header Styles --- */
 
-        /* --- Profile Styles (ใหม่) --- */
+
+        /* --- Profile Styles --- */
         .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
         
         .profile-card {
@@ -89,7 +134,7 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1fr; /* (ปรับปรุง!) ให้แสดงผลเดียวเต็ม */
             gap: 20px;
             width: 100%;
             margin-top: 20px;
@@ -118,24 +163,70 @@
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid #eee;
+            flex-wrap: wrap; /* (ปรับปรุง!) เผื่อมือถือ */
+            gap: 5px;
         }
         .info-item:last-child { border-bottom: none; }
         .info-label { font-weight: 500; color: var(--button-gray); }
-        .info-data { font-weight: 500; color: var(--text-color); }
+        .info-data { font-weight: 500; color: var(--text-color); text-align: right; }
 
         .footer { text-align: center; margin-top: 40px; color: var(--button-gray); font-size: 0.9em; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle { display: block; }
+            .navigation {
+                display: none; width: 100%; flex-direction: column;
+                background: white; padding: 15px; border-radius: 12px;
+                margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+            .navigation.active { display: flex; }
+            .navigation button, .navigation a { width: 100%; justify-content: center; }
+            .user-greeting { display: none !important; }
+            .logo-text { display: none; }
+            .profile-info { padding: 20px; }
+            .info-item { flex-direction: column; align-items: flex-start; }
+            .info-data { text-align: left; }
+        }
+        @media (min-width: 769px) {
+            .logo-text { display: block; }
+            .user-greeting { display: block; }
+        }
     </style>
 </head>
 <body>
 
     <header class="main-header">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-        </div>
-        <div class="navigation">
-            <a href="{{ url_for('home') }}" class="btn btn-home">⬅️ กลับหน้าหลัก</a>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">🖥️ Dashboard</a>
-            <a href="{{ url_for('logout') }}" class="btn btn-logout">🚪 ออกจากระบบ</a>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ข้อมูลส่วนตัว</div>
+            </div>
+            
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        
+            <div class="navigation" id="mainNavigation">
+                {% if session.get('logged_in') %}
+                    <span class="user-greeting">สวัสดี, {{ session.name }}!</span>
+                    
+                    <a href="{{ url_for('home') }}" class="btn btn-home">🏠 กลับหน้าหลัก</a>
+                    
+                    {% if session.get('level') == 'Admin' %}
+                    <a href="{{ url_for('admin_panel') }}" class="btn btn-admin">👑 Admin Panel</a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('analytics_page') }}" class="btn btn-analytics">📊 Analytics</a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">🖥️ Dashboard</a>
+                    <a href="{{ url_for('feedback_page') }}" class="btn btn-feedback">📝 ส่ง Feedback</a>
+                    
+                    {% if not is_own_profile %} <a href="{{ url_for('profile_page') }}" class="btn btn-profile">👤 กลับโปรไฟล์ฉัน</a>
+                    {% endif %}
+
+                    <a href="{{ url_for('logout') }}" class="btn btn-logout">🚪 ออกจากระบบ</a>
+                {% else %}
+                    <a href="{{ url_for('login_page') }}" class="btn btn-home">🏠 กลับหน้าหลัก</a>
+                {% endif %}
+            </div>
         </div>
     </header>
 
@@ -162,10 +253,17 @@
                         <span class="info-label"><i class="fas fa-briefcase"></i> ตำแหน่ง</span>
                         <span class="info-data">{{ user['ตำแหน่ง'] }}</span>
                     </div>
+                    
                     <div class="info-item">
-                        <span class="info-label"><i class="fas fa-building"></i> หน่วยงาน</span>
-                        <span class="info-data">{{ user['หน่วยงาน'] }}</span>
+                        <span class="info-label"><i class="fas fa-users"></i> กลุ่มงาน/ฝ่าย/กอง</span>
+                        <span class="info-data">{{ user['กอง'] }}</span>
                     </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-building"></i> ส่วนราชการ</span>
+                        <span class="info-data">{{ user['ส่วนราชการ'] }}</span>
+                    </div>
+                    
                     <div class="info-item">
                         <span class="info-label"><i class="fas fa-envelope"></i> อีเมล</span>
                         <span class="info-data">{{ user['Email'] }}</span>
@@ -185,11 +283,12 @@
                         <div class="stat-value">{{ links_count }}</div>
                         <div class="stat-label"><i class="fas fa-link"></i> ลิงค์ที่สร้าง</div>
                     </div>
-                    </div>
-				{% if is_own_profile %}
+                </div>
+                
+                {% if is_own_profile %}
                 <div style="margin-top: 30px;">
                     <a href="{{ url_for('edit_profile_page') }}">
-                        <button class="btn-home" style="background-color: var(--button-gray); width: 100%; font-size: 1.1em; padding: 12px;">
+                        <button class="btn" style="background-color: var(--button-gray); width: 100%; font-size: 1.1em; padding: 12px;">
                             <i class="fas fa-edit"></i> แก้ไขข้อมูลส่วนตัว
                         </button>
                     </a>
@@ -202,6 +301,23 @@
     <div class="footer">
         <p>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง สำนักยุทธศาสตร์และประเมินผล</p>
     </div>
+    
+    <script>
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mainNavigation');
+            nav.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('mainNavigation');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+            }
+        });
+    </script>
 
 </body>
 </html>

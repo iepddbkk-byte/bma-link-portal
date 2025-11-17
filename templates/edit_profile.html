@@ -11,30 +11,182 @@
         :root {
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
+            --bma-green-light: #e8f5e9;
+            --button-red: #dc3545;
+            --button-blue: #007bff;
+            --button-yellow: #ffc107;
             --button-gray: #6c757d;
-            --light-gray: #f4f4f4;
-            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-        body { font-family: 'Kanit', sans-serif; margin: 0; padding: 20px; background-color: var(--light-gray); color: var(--text-color); display: flex; justify-content: center; min-height: 100vh; }
-        .container { max-width: 800px; width: 100%; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h2 { color: var(--text-color); border-bottom: 2px solid #ddd; padding-bottom: 15px; margin-top: 0; }
-        form div { margin-bottom: 20px; }
-        form label { display: block; margin-bottom: 8px; font-weight: 500; }
-        form input, form select { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Kanit', sans-serif; font-size: 1em; }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* --- Header (เหมือนไฟล์อื่น) --- */
+        .main-header {
+            background: white;
+            padding: 15px 20px;
+            box-shadow: var(--shadow-md);
+            border-bottom: 4px solid var(--bma-green);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-container { display: flex; align-items: center; gap: 15px; }
+        .logo-container img { height: 60px; }
+        .logo-text { font-size: 1.5rem; font-weight: 600; color: var(--bma-green); }
+        .navigation { display: flex; align-items: center; gap: 10px; }
+        .btn {
+            font-family: 'Kanit', Arial, sans-serif; color: white; border: none;
+            padding: 10px 16px; border-radius: 8px; cursor: pointer;
+            font-size: 0.95rem; transition: all 0.3s ease;
+            text-decoration: none; font-weight: 500;
+        }
+        .btn-back { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
+        .btn-back:hover { background: linear-gradient(135deg, #5a6268, #495057); }
+
+        /* --- Form Container --- */
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--bma-green);
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--bma-green-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* --- Form --- */
+        form { display: flex; flex-direction: column; gap: 25px; }
+        form div { display: flex; flex-direction: column; }
+        form label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-size: 0.95em;
+        }
+        
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="tel"],
+        form select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Kanit', Arial, sans-serif;
+            font-size: 1em;
+            background-color: var(--light-gray);
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        form input:focus,
+        form select:focus {
+            outline: none;
+            border-color: var(--bma-green);
+            background-color: white;
+            box-shadow: 0 0 0 4px var(--bma-green-light);
+        }
         
         /* ช่องที่แก้ไขไม่ได้ */
-        input[readonly] { background-color: #e9ecef; cursor: not-allowed; color: #6c757d; }
+        input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        input[readonly]:focus {
+            box-shadow: none;
+            border-color: var(--border-color);
+        }
         
-        button { font-family: 'Kanit', sans-serif; background-color: var(--bma-green); color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 1.1em; transition: 0.3s; width: 100%; }
-        button:hover { background-color: var(--bma-green-hover); }
-        .btn-back { background-color: var(--button-gray); width: auto; margin-bottom: 20px; padding: 8px 15px; font-size: 1em; }
-        .btn-back:hover { background-color: #5a6268; }
+        /* Select Dropdown */
+        form select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+        }
+        form optgroup {
+            font-weight: 600;
+            color: var(--bma-green);
+        }
+
+        /* Submit Button */
+        button[type="submit"] {
+            font-family: 'Kanit', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            margin-top: 10px;
+        }
+        button[type="submit"]:hover {
+            background: linear-gradient(135deg, #007a30 0%, #006428 100%);
+            transform: translateY(-3px);
+        }
     </style>
 </head>
 <body>
 
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">แก้ไขข้อมูล</div>
+            </div>
+            <div class="navigation">
+                 <a href="{{ url_for('profile_page') }}" class="btn btn-back">⬅️ ยกเลิก</a>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
-        <a href="{{ url_for('profile_page') }}"><button type="button" class="btn-back">⬅️ ยกเลิก / กลับหน้าข้อมูลส่วนตัว</button></a>
 
         <h2>✏️ แก้ไขข้อมูลส่วนตัว</h2>
 
@@ -53,11 +205,16 @@
                 <label for="position">ตำแหน่ง</label>
                 <input type="text" id="position" name="position" value="{{ user['ตำแหน่ง'] }}" required>
             </div>
+            
+            <div>
+                <label for="division">กลุ่มงาน/ฝ่าย/กอง</label>
+                <input type="text" id="division" name="division" value="{{ user['กอง'] }}" required>
+            </div>
 
             <div>
-                <label for="department">หน่วยงาน</label>
-                <select id="department" name="department" required>
-                    <option value="" disabled>--- กรุณาเลือกหน่วยงาน ---</option>
+                <label for="main_agency">ส่วนราชการ (สำนัก/เขต)</label>
+                <select id="main_agency" name="main_agency" required>
+                    <option value="" disabled>--- กรุณาเลือกส่วนราชการ ---</option>
                     
                     <optgroup label="ระดับสำนัก">
                         <option value="สำนักงานเลขานุการสภากรุงเทพมหานคร">สำนักงานเลขานุการสภากรุงเทพมหานคร</option>
@@ -163,10 +320,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const userDept = "{{ user['หน่วยงาน'] }}";
-            const deptSelect = document.getElementById('department');
-            if (userDept) {
-                deptSelect.value = userDept;
+            // (ปรับปรุง! Req #3)
+            const userAgency = "{{ user['ส่วนราชการ'] }}";
+            const agencySelect = document.getElementById('main_agency');
+            if (userAgency) {
+                agencySelect.value = userAgency;
             }
         });
     </script>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทะเบียนลิงค์ BMA - {{ agency_name }}</title>
+    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --bma-green: #00963C;
+            --bma-green-hover: #007a30;
+            --bma-green-light: #e8f5e9;
+            --button-red: #dc3545;
+            --button-red-hover: #c82333;
+            --button-blue: #007bff;
+            --button-blue-hover: #0056b3;
+            --button-yellow: #ffc107;
+            --button-yellow-hover: #e0a800;
+            --button-gray: #6c757d;
+            --light-gray: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        /* --- Header Styles (เหมือนเดิม) --- */
+        .main-header {
+            background: white;
+            padding: 15px 20px;
+            box-shadow: var(--shadow-md);
+            border-bottom: 4px solid var(--bma-green);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-container { 
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-container img {
+            height: 60px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bma-green);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--bma-green);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .navigation span {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            background: var(--bma-green-light);
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto; 
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* (ปรับปรุง!) Title */
+        h1 { 
+            color: var(--bma-green);
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--bma-green-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Search Container */
+        .search-container {
+            margin: 25px 0;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1em;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            background: var(--light-gray);
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--bma-green);
+            background: white;
+            box-shadow: 0 0 0 4px var(--bma-green-light);
+        }
+
+        .search-container::before {
+            content: "🔍";
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+        }
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-top: 20px;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.95em;
+            background: white;
+        }
+
+        th, td { 
+            padding: 16px; 
+            text-align: left; 
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap; /* (ปรับปรุง) กันข้อความตกบรรทัด */
+        }
+        
+        /* (ปรับปรุง!) ทำให้คอลัมน์รายละเอียดขยายได้ */
+        td:nth-child(2) { 
+             white-space: normal; 
+             min-width: 200px;
+        }
+
+        th { 
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+            color: white; 
+            text-align: center;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        th:first-child { border-top-left-radius: 12px; }
+        th:last-child { border-top-right-radius: 12px; }
+
+        tbody tr { transition: all 0.3s ease; }
+        tbody tr:hover {
+            background: var(--bma-green-light);
+            transform: scale(1.01);
+            box-shadow: var(--shadow-sm);
+        }
+        tbody tr:nth-child(even) { background-color: #fafafa; }
+        tbody tr:nth-child(even):hover { background-color: var(--bma-green-light); }
+
+        table tbody td:nth-child(3),
+        table tbody td:nth-child(4) {
+            text-align: center;
+        }
+
+        a { color: var(--bma-green); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+        a:hover { color: var(--bma-green-hover); text-decoration: underline; }
+
+        /* Buttons */
+        button, a.btn { 
+            font-family: 'Kanit', Arial, sans-serif; 
+            color: white; border: none; padding: 10px 16px; border-radius: 8px;
+            cursor: pointer; font-size: 0.95rem; transition: all 0.3s ease;
+            white-space: nowrap; font-weight: 500; box-shadow: var(--shadow-sm);
+            text-decoration: none; display: inline-block;
+        }
+        button:hover, a.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+        /* Sort Buttons */
+        .sort-buttons { margin-top: 8px; display: flex; gap: 5px; justify-content: center; }
+        .sort-buttons button {
+            font-size: 0.75rem; padding: 4px 8px; background-color: rgba(255,255,255,0.2);
+            color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);
+        }
+        .sort-buttons button:hover { background-color: rgba(255,255,255,0.3); transform: none; }
+
+        /* Navigation Button Styles */
+        .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
+        .btn-analytics { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+        .btn-admin { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
+        .btn-feedback { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
+        .btn-profile { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
+        .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
+        .btn-login { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
+        
+        /* (ใหม่) ปุ่มกลับหน้าแรก (Portal) */
+        .btn-portal {
+             background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
+        }
+
+        /* Pagination */
+        .pagination-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 0; margin-top: 25px; border-top: 2px solid var(--border-color);
+            flex-wrap: wrap; gap: 15px;
+        }
+        .pagination-items { display: flex; align-items: center; gap: 10px; }
+        .pagination-items select {
+            font-family: 'Kanit', sans-serif; padding: 8px 15px;
+            border: 2px solid var(--border-color); border-radius: 20px;
+            background: white; cursor: pointer; transition: all 0.3s ease;
+        }
+        .pagination-items select:focus { outline: none; border-color: var(--bma-green); }
+        .pagination-nav { display: flex; align-items: center; gap: 8px; }
+        .pagination-nav button { background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); padding: 8px 15px; min-width: 40px; }
+        .pagination-nav button:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; opacity: 0.6; transform: none; }
+        .pagination-nav button:disabled:hover { transform: none; box-shadow: var(--shadow-sm); }
+        .pagination-nav span { margin: 0 10px; font-weight: 500; color: var(--text-color); }
+
+        /* Footer */
+        .main-footer {
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+            color: white; text-align: center; padding: 25px; margin-top: 40px;
+            font-size: 0.9em; box-shadow: var(--shadow-lg);
+        }
+        .main-footer p { margin: 8px 0; }
+
+        /* Status Badges */
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
+        .status-ok { background: #e8f5e9; color: #2e7d32; }
+        .status-blocked { background: #e3f2fd; color: #1976d2; }
+        .status-error { background: #ffebee; color: #c62828; }
+        .status-pending { background: #fff3e0; color: #ef6c00; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle { display: block; }
+            .navigation {
+                display: none; width: 100%; flex-direction: column;
+                background: white; padding: 15px; border-radius: 12px;
+                margin-top: 10px; box-shadow: var(--shadow-md);
+            }
+            .navigation.active { display: flex; }
+            .navigation button, .navigation a { width: 100%; text-align: center; justify-content: center; }
+            .navigation span { display: none !important; }
+            .logo-text { display: none; }
+            .container { padding: 15px; margin: 15px 10px; border-radius: 15px; }
+            h1 { font-size: 1.3em; }
+            table { font-size: 0.85em; }
+            th, td { padding: 12px 8px; }
+            button { padding: 8px 15px; font-size: 0.9em; }
+            .pagination-controls { flex-direction: column; align-items: stretch; }
+            .pagination-items, .pagination-nav { justify-content: center; }
+        }
+
+        /* (ที่เหลือเหมือนเดิม) */
+        @media (min-width: 769px) {
+            .logo-text { display: block; }
+            .navigation span { display: block; }
+        }
+        @media (max-width: 480px) {
+            .logo-container img { height: 45px; }
+            h1 { font-size: 1.1em; }
+            #searchInput { padding: 12px 15px 12px 45px; font-size: 0.9em; }
+            table { font-size: 0.75em; }
+            th, td { padding: 10px 6px; }
+            .sort-buttons { flex-direction: column; }
+            .sort-buttons button { width: 100%; }
+        }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--light-gray); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--bma-green); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--bma-green-hover); }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body>
+    
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </div>
+
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+
+            <div class="navigation" id="mainNavigation">
+                <a href="{{ url_for('home') }}">
+                    <button type="button" class="btn-portal">🏠 กลับหน้าหลัก</button>
+                </a>
+                
+                {% if session.get('logged_in') %}
+                    <span>สวัสดี, {{ session.name }}!</span>
+                    
+                    {% if session.get('level') == 'Admin' %}
+                    <a href="{{ url_for('admin_panel') }}">
+                        <button type="button" class="btn-admin">👑 Admin Panel</button>
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('analytics_page') }}">
+                        <button type="button" class="btn-analytics">📊 Analytics</button>
+                    </a>
+                    <a href="{{ url_for('dashboard') }}">
+                        <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
+                    </a>
+                    <a href="{{ url_for('feedback_page') }}">
+                        <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
+                    </a>
+                    <a href="{{ url_for('profile_page') }}">
+                        <button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
+                    </a>
+                    <a href="{{ url_for('logout') }}">
+                        <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login_page') }}"><button type="button" class="btn-login">สำหรับเจ้าหน้าที่</button></a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+
+        <h1><i class="fas fa-link" style="color: var(--bma-green);"></i> 
+            {{ agency_name }}
+        </h1>
+        
+        {% if error %}
+            <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #c62828;">
+                <strong>⚠️ เกิดข้อผิดพลาด:</strong> {{ error }}
+            </div>
+        {% endif %}
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="ค้นหา (ชื่อ, สถานะ, ประเภท, ส่วนราชการ, ผู้สร้าง)...">
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            🔗 ชื่อลิงค์
+                            <div class="sort-buttons">
+                                <button onclick="sortTable(0, 'asc')">A-Z (ก-ฮ)</button>
+                                <button onclick="sortTable(0, 'desc')">Z-A (ฮ-ก)</button>
+                            </div>
+                        </th>
+                        <th>📄 รายละเอียด</th> <th>🚦 สถานะลิงค์</th>
+                        <th>📊 สถานะการใช้งาน</th>
+                        <th>📂 ประเภท</th>
+                        <th>🏢 หน่วยงาน (กลุ่ม/ฝ่าย/กอง)</th> <th>🏛️ ส่วนราชการ (สำนัก/เขต)</th> <th>📞 เบอร์ติดต่อ</th>
+                        <th>👤 ผู้สร้าง</th>
+                        <th>🗓️ วันที่อัปเดต</th>
+                    </tr>
+                </thead>
+                <tbody id="linkTableBody">
+                    
+                    {% for link in links %}
+                    <tr>
+                        <td>
+                            <a href="{{ link.URL }}" target="_blank">{{ link.ชื่อลิงก์ }}</a>
+                        </td>
+                        <td>{{ link.รายละเอียด }}</td> <td>
+                            {% if link.LinkStatus == 'OK' %}
+                                <span class="status-badge status-ok">🟢 ปกติ</span>
+                            {% elif link.LinkStatus == '403 Blocked' %}
+                                <span class="status-badge status-blocked">🔵 ถูกบล็อก</span>
+                            {% elif link.LinkStatus %}
+                                <span class="status-badge status-error">🔴 {{ link.LinkStatus }}</span>
+                            {% else %}
+                                <span class="status-badge" style="background: #f5f5f5; color: #666;">⚪ (ยังไม่ตรวจสอบ)</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if link.สถานะ == 'ใช้งาน' %}
+                                <span class="status-badge status-ok">● ใช้งาน</span>
+                            {% elif link.สถานะ == 'ปรับปรุง' %}
+                                <span class="status-badge status-pending">● ปรับปรุง</span>
+                            {% elif link.สถานะ == 'เลิกใช้งาน' %}
+                                <span class="status-badge status-error">● เลิกใช้งาน</span>
+                            {% else %}
+                                {{ link.สถานะ }}
+                            {% endif %}
+                        </td>
+                        <td>{{ link.ประเภท }}</td>
+                        <td>{{ link.หน่วยงาน }}</td> <td>{{ link.ส่วนราชการ }}</td> <td>{{ link.เบอร์โทรติดต่อ }}</td>
+                        
+                        <td>
+                            <a href="{{ url_for('view_profile', username=link.CreatorUsername) }}" target="_blank" style="font-weight: 500;">
+                                {{ link.CreatorUsername }}
+                            </a>
+                        </td>
+
+                        <td>{{ link.วันที่อัปเดต.split(' ')[0] }}</td>
+                    </tr>
+                    {% else %}
+                    <tr id="noDataRow">
+                        <td colspan="10" style="text-align: center; padding: 30px; color: #999;">
+                            🔭 ไม่พบข้อมูลลิงค์สำหรับ {{ agency_name }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-controls">
+            <div class="pagination-items">
+                <span>แสดง: </span>
+                <select id="itemsPerPage">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="99999">ทั้งหมด</option>
+                </select>
+                <span> รายการ</span>
+            </div>
+            <div class="pagination-nav">
+                    <button id="btnFirst" title="หน้าแรก">«</button>
+                    <button id="btnPrev" title="หน้าก่อนหน้า">‹</button>
+                    <span>หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span></span>
+                    <button id="btnNext" title="หน้าถัดไป">›</button>
+                    <button id="btnLast" title="หน้าสุดท้าย">»</button>
+                </div>
+        </div>
+
+    </div> 
+    
+    <footer class="main-footer">
+        <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
+        <p>สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Toggle Mobile Menu Function
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mainNavigation');
+            nav.classList.toggle('active');
+        }
+
+        // Pagination and Search Functions
+        let allTableRows = []; 
+        let currentPage = 1;
+        let totalPages = 1;
+        const tbody = document.getElementById("linkTableBody");
+        const noDataRow = document.getElementById("noDataRow");
+        let searchInput; 
+
+        function sortTable(columnIndex, direction) {
+            const collator = new Intl.Collator('th', { sensitivity: 'base' });
+            allTableRows.sort((rowA, rowB) => {
+                const cellA = rowA.getElementsByTagName("td")[columnIndex].querySelector('a') 
+                              ? rowA.getElementsByTagName("td")[columnIndex].querySelector('a').textContent.trim() 
+                              : rowA.getElementsByTagName("td")[columnIndex].textContent.trim();
+                const cellB = rowB.getElementsByTagName("td")[columnIndex].querySelector('a')
+                              ? rowB.getElementsByTagName("td")[columnIndex].querySelector('a').textContent.trim()
+                              : rowB.getElementsByTagName("td")[columnIndex].textContent.trim();
+                if (direction === 'asc') {
+                    return collator.compare(cellA, cellB);
+                } else {
+                    return collator.compare(cellB, cellA);
+                }
+            });
+            displayPage(currentPage);
+        }
+
+        function displayPage(page) {
+            currentPage = page;
+            const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
+            const filter = searchInput.value.toLowerCase(); 
+            const filteredRows = allTableRows.filter(row => {
+                const cells = row.getElementsByTagName("td");
+                
+                // (ปรับปรุง!) อัปเดตการค้นหาให้ตรงคอลัมน์
+                const name = (cells[0].textContent || cells[0].innerText).toLowerCase(); // ชื่อลิงค์
+                const status = (cells[3].textContent || cells[3].innerText).toLowerCase(); // สถานะใช้งาน
+                const type = (cells[4].textContent || cells[4].innerText).toLowerCase(); // ประเภท
+                const main_agency = (cells[6].textContent || cells[6].innerText).toLowerCase(); // ส่วนราชการ
+                const creator = (cells[8].textContent || cells[8].innerText).toLowerCase(); // ผู้สร้าง
+                
+                const combinedText = name + " " + status + " " + type + " " + main_agency + " " + creator;
+                return combinedText.includes(filter);
+            });
+
+            tbody.innerHTML = ''; 
+            if (filteredRows.length === 0) {
+                if(noDataRow) tbody.appendChild(noDataRow);
+                totalPages = 1;
+                currentPage = 1;
+            } else {
+                totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+                if (page > totalPages) currentPage = totalPages;
+                if (page < 1) currentPage = 1;
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const slicedRows = filteredRows.slice(startIndex, endIndex);
+                slicedRows.forEach(row => {
+                    tbody.appendChild(row);
+                });
+            }
+
+            document.getElementById("currentPage").textContent = currentPage;
+            document.getElementById("totalPages").textContent = totalPages;
+            document.getElementById("btnFirst").disabled = (currentPage === 1);
+            document.getElementById("btnPrev").disabled = (currentPage === 1);
+            document.getElementById("btnNext").disabled = (currentPage === totalPages);
+            document.getElementById("btnLast").disabled = (currentPage === totalPages);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            allTableRows = Array.from(tbody.children).filter(row => row.id !== 'noDataRow');
+            searchInput = document.getElementById("searchInput"); 
+            
+            document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
+            document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
+            document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
+            document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
+            document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
+            searchInput.addEventListener('keyup', () => displayPage(1)); 
+            
+            displayPage(1);
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const nav = document.getElementById('mainNavigation');
+                const toggle = document.querySelector('.mobile-menu-toggle');
+                if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                    nav.classList.remove('active');
+				}
+            });
+        });
+    </script>
+		
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    Swal.fire({
+                        icon: '{{ category }}',
+                        title: '{{ message }}',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </script>
+</body>
+</html>

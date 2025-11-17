@@ -125,10 +125,16 @@
                 <label for="position">ตำแหน่ง (จำเป็น)</label>
                 <input type="text" id="position" name="position" required>
             </div>
-			<div>
-                <label for="department">หน่วยงาน (จำเป็น)</label>
-                <select id="department" name="department" required>
-                    <option value="" disabled selected>--- กรุณาเลือกหน่วยงาน ---</option>
+            
+            <div>
+                <label for="division">กลุ่มงาน/ฝ่าย/กอง (จำเป็น)</label>
+                <input type="text" id="division" name="division" required>
+            </div>
+			
+            <div>
+                <label for="department">ส่วนราชการ (สำนัก/เขต) (จำเป็น)</label>
+                <select id="department" name="main_agency" required>
+                    <option value="" disabled selected>--- กรุณาเลือกส่วนราชการ ---</option>
                     
                     <optgroup label="ระดับสำนัก">
                         <option value="สำนักงานเลขานุการสภากรุงเทพมหานคร">สำนักงานเลขานุการสภากรุงเทพมหานคร</option>
@@ -235,8 +241,8 @@
 
     <script>
         // --- 1. เลือก Elements ---
-        const inviteCodeInput = document.getElementById('invite_code'); // (ใหม่!)
-        const inviteCodeMessage = document.getElementById('invite-code-message'); // (ใหม่!)
+        const inviteCodeInput = document.getElementById('invite_code'); 
+        const inviteCodeMessage = document.getElementById('invite-code-message'); 
         const usernameInput = document.getElementById('username');
         const usernameMessage = document.getElementById('username-message');
         const passwordInput = document.getElementById('password');
@@ -246,13 +252,12 @@
         const registerForm = document.getElementById('registerForm');
 
         // สถานะการตรวจสอบ
-        let isInviteCodeValid = false; // (ใหม่!)
+        let isInviteCodeValid = false; 
         let isUsernameAvailable = false;
         let isPasswordConfirmed = false;
 
         // --- 2. ฟังก์ชันตรวจสอบสถานะปุ่ม Submit ---
         function checkFormValidity() {
-            // (ปรับปรุง!) ต้องเช็ก 3 อย่าง
             if (isInviteCodeValid && isUsernameAvailable && isPasswordConfirmed) {
                 submitButton.disabled = false;
             } else {
@@ -260,11 +265,11 @@
             }
         }
         
-        // --- (ใหม่!) 3. ฟังก์ชันตรวจสอบรหัสเชิญ (เรียก API) ---
+        // --- 3. ฟังก์ชันตรวจสอบรหัสเชิญ (เรียก API) ---
         async function checkInviteCode() {
             const inviteCode = inviteCodeInput.value;
             
-            if (inviteCode.length < 3) { // (สั้นไป)
+            if (inviteCode.length < 3) {
                 inviteCodeMessage.textContent = 'กรุณากรอกรหัสเชิญ';
                 inviteCodeMessage.className = 'message error';
                 inviteCodeInput.classList.add('invalid');
@@ -283,13 +288,13 @@
                 const data = await response.json();
 
                 if (data.available) {
-                    inviteCodeMessage.textContent = data.message; // 'รหัสเชิญถูกต้อง'
+                    inviteCodeMessage.textContent = data.message; 
                     inviteCodeMessage.className = 'message success';
                     inviteCodeInput.classList.add('valid');
                     inviteCodeInput.classList.remove('invalid');
                     isInviteCodeValid = true;
                 } else {
-                    inviteCodeMessage.textContent = data.message; // 'ไม่ถูกต้อง' หรือ 'ใช้ไปแล้ว'
+                    inviteCodeMessage.textContent = data.message; 
                     inviteCodeMessage.className = 'message error';
                     inviteCodeInput.classList.add('invalid');
                     inviteCodeInput.classList.remove('valid');
@@ -304,7 +309,7 @@
             checkFormValidity();
         }
 
-        // --- 4. ฟังก์ชันตรวจสอบ Username ซ้ำ (เหมือนเดิม) ---
+        // --- 4. ฟังก์ชันตรวจสอบ Username ซ้ำ ---
         async function checkUsername() {
             const username = usernameInput.value;
             if (username.length < 3) {
@@ -344,7 +349,7 @@
             checkFormValidity();
         }
 
-        // --- 5. ฟังก์ชันตรวจสอบรหัสผ่านตรงกัน (เหมือนเดิม) ---
+        // --- 5. ฟังก์ชันตรวจสอบรหัสผ่านตรงกัน ---
         function validatePassword() {
             const pass = passwordInput.value;
             const confirmPass = confirmPasswordInput.value;
@@ -353,7 +358,7 @@
                  passwordMessage.textContent = '';
                  isPasswordConfirmed = false;
                  confirmPasswordInput.classList.remove('valid', 'invalid');
-            } else if (pass.length > 0 && pass === confirmPass) { // (ปรับปรุง!)
+            } else if (pass.length > 0 && pass === confirmPass) { 
                 passwordMessage.textContent = 'รหัสผ่านตรงกัน';
                 passwordMessage.className = 'message success';
                 confirmPasswordInput.classList.add('valid');
@@ -369,7 +374,7 @@
             checkFormValidity();
         }
         
-        // --- 6. ฟังก์ชัน Debounce (เหมือนเดิม) ---
+        // --- 6. ฟังก์ชัน Debounce ---
         function debounce(func, delay) {
             let timeout;
             return function(...args) {
@@ -379,16 +384,15 @@
         }
         
         const debouncedCheckUsername = debounce(checkUsername, 500);
-        const debouncedCheckInviteCode = debounce(checkInviteCode, 500); // (ใหม่!)
+        const debouncedCheckInviteCode = debounce(checkInviteCode, 500); 
 
         // --- 7. ผูก Event Listeners ---
-        inviteCodeInput.addEventListener('keyup', debouncedCheckInviteCode); // (ใหม่!)
+        inviteCodeInput.addEventListener('keyup', debouncedCheckInviteCode); 
         usernameInput.addEventListener('keyup', debouncedCheckUsername);
         passwordInput.addEventListener('keyup', validatePassword);
         confirmPasswordInput.addEventListener('keyup', validatePassword);
         
         registerForm.addEventListener('submit', function(event) {
-            // (ปรับปรุง!) เช็ก 3 อย่าง
             if (!isInviteCodeValid || !isUsernameAvailable || !isPasswordConfirmed) {
                 event.preventDefault(); // หยุดการส่งฟอร์ม
                 Swal.fire({

@@ -224,6 +224,20 @@
             font-style: italic;
         }
 
+        /* (ใหม่! Req #2) สไตล์สำหรับช่อง Readonly */
+        form input[readonly] {
+            background-color: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            font-weight: 500;
+        }
+        form input[readonly]:focus {
+            box-shadow: none; /* ไม่ต้องมี focus effect */
+            transform: none;
+            border-color: var(--border-color);
+        }
+
+
         /* Textarea */
         form textarea {
             resize: vertical;
@@ -452,7 +466,7 @@
 
         <form action="{{ url_for('add_link_action') }}" method="POST">
             <div>
-                <label for="ชื่อลิงก์">ชื่อลิงก์ (จำเป็น)</label>
+                <label for="ชื่อลิงก์">ชื่อลิงค์ (จำเป็น)</label>
                 <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" placeholder="ระบุชื่อลิงค์ที่ต้องการ..." required>
             </div>
 
@@ -501,8 +515,14 @@
             </div>
 
             <div>
-                <label for="หน่วยงาน">หน่วยงาน (จำเป็น)</label>
-                <input type="text" id="หน่วยงาน" name="หน่วยงาน" placeholder="ระบุชื่อหน่วยงาน/สำนัก/กอง..." required>
+                <label for="หน่วยงาน">หน่วยงาน (กลุ่มงาน/ฝ่าย/กอง) (จำเป็น)</label>
+                <input type="text" id="หน่วยงาน" name="หน่วยงาน" placeholder="ระบุชื่อกลุ่มงาน/ฝ่าย/กอง (เช่น กลุ่มงานยุทธศาสตร์)..." required>
+            </div>
+
+            <div>
+                <label for="ส่วนราชการ">ส่วนราชการ (สำนัก/เขต) (ล็อคอัตโนมัติ)</label>
+                <input type="text" id="ส่วนราชการ" name="ส่วนราชการ" value="{{ locked_agency }}" readonly>
+                <span class="info-text">💡 ข้อมูลนี้จะถูกดึงจากโปรไฟล์ของคุณโดยอัตโนมัติ</span>
             </div>
 
             <div>
@@ -525,8 +545,8 @@
             </div>
 
             <div>
-                <label for="หมายเหตุ">หมายเหตุ (ถ้ามี)</label>
-                <textarea id="หมายเหตุ" name="หมายเหตุ" rows="3" placeholder="ระบุรายละเอียดเพิ่มเติม หรือหมายเหตุพิเศษ (ถ้ามี)..."></textarea>
+                <label for="รายละเอียด">รายละเอียด (ถ้ามี)</label>
+                <textarea id="รายละเอียด" name="รายละเอียด" rows="3" placeholder="ระบุรายละเอียดเพิ่มเติม หรือหมายเหตุพิเศษ (ถ้ามี)..."></textarea>
                 <span class="info-text">💡 ข้อมูลนี้ไม่จำเป็นต้องกรอก แต่ช่วยให้เข้าใจข้อมูลได้ดีขึ้น</span>
             </div>
 
