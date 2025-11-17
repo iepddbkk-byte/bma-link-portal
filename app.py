@@ -697,7 +697,7 @@ def delete_code():
     if not session.get('logged_in') or session.get('level') != 'Admin': return redirect(url_for('login_page'))
     try:
         cell = invite_sheet.find(request.form.get('code'))
-        if cell: invite_sheet.delete_rows(cell.row); flash('ลบสำเร็จ', 'success')
+        if cell: invite_sheet.delete_rows(cell.row); flash('สำเร็จ', 'success')
     except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
 
