@@ -328,58 +328,65 @@
                             <th>⚙️ จัดการ</th>
                         </tr>
                     </thead>
-            <tbody id="linkTableBody">
+<tbody id="linkTableBody">
                 
                 {% for link in links %}
                 <tr>
                     <td>
-                        {% if link.สถานะ == 'ใช้งาน' %}
-                            <a href="{{ link.URL }}" target="_blank">{{ link.ชื่อลิงก์ }}</a>
+                        {% if link['สถานะ'] == 'ใช้งาน' %}
+                            <a href="{{ link['URL'] }}" target="_blank">{{ link['ชื่อลิงค์'] }}</a>
                         {% else %}
-                            {{ link.ชื่อลิงก์ }}
+                            {{ link['ชื่อลิงค์'] }}
                         {% endif %}
                     </td>
-                    <td>{{ link.รายละเอียด }}</td> <td>
-                        {% if link.LinkStatus == 'OK' %}
+                    <td>{{ link['รายละเอียด'] }}</td>
+                    
+                    <!-- สถานะลิงก์ -->
+                    <td>
+                        {% if link['LinkStatus'] == 'OK' %}
                             <span class="status-badge status-ok">🟢 ปกติ</span>
-                        {% elif link.LinkStatus == '403 Blocked' %}
+                        {% elif link['LinkStatus'] == '403 Blocked' %}
                             <span class="status-badge status-blocked">🔵 ถูกบล็อก</span>
-                        {% elif link.LinkStatus %}
-                            <span class="status-badge status-error">🔴 {{ link.LinkStatus }}</span>
+                        {% elif link['LinkStatus'] %}
+                            <span class="status-badge status-error">🔴 {{ link['LinkStatus'] }}</span>
                         {% else %}
                             <span class="status-badge status-unknown">⚪ (ยังไม่ตรวจสอบ)</span>
                         {% endif %}
                     </td>
 
+                    <!-- สถานะการใช้งาน -->
                     <td>
-                        {% if link.สถานะ == 'ใช้งาน' %}
+                        {% if link['สถานะ'] == 'ใช้งาน' %}
                             <span class="status-badge status-active">● ใช้งาน</span>
-                        {% elif link.สถานะ == 'ปรับปรุง' %}
+                        {% elif link['สถานะ'] == 'ปรับปรุง' %}
                             <span class="status-badge status-updating">● ปรับปรุง</span>
-                        {% elif link.สถานะ == 'เลิกใช้งาน' %}
+                        {% elif link['สถานะ'] == 'เลิกใช้งาน' %}
                             <span class="status-badge status-inactive">● เลิกใช้งาน</span>
                         {% else %}
-                            {{ link.สถานะ }}
+                            {{ link['สถานะ'] }}
                         {% endif %}
                     </td>
-                    <td>{{ link.ประเภท }}</td>
-                    <td>{{ link.หน่วยงาน }}</td> <td>{{ link.ส่วนราชการ }}</td> <td>{{ link.เบอร์โทรติดต่อ }}</td>
+                    
+                    <td>{{ link['ประเภท'] }}</td>
+                    <td>{{ link['หน่วยงาน'] }}</td>
+                    <td>{{ link['ส่วนราชการ'] }}</td>
+                    <td>{{ link['เบอร์โทรติดต่อ'] }}</td>
                     
                     <td>
-                        <a href="{{ url_for('view_profile', username=link.CreatorUsername) }}" target="_blank" style="font-weight: 500; color: var(--text-color); text-decoration: none;" onmouseover="this.style.color='var(--bma-green)'" onmouseout="this.style.color='var(--text-color)'">
-                            {{ link.CreatorUsername }}
+                        <a href="{{ url_for('view_profile', username=link['CreatorUsername']) }}" target="_blank" style="font-weight: 500; color: var(--text-color); text-decoration: none;" onmouseover="this.style.color='var(--bma-green)'" onmouseout="this.style.color='var(--text-color)'">
+                            {{ link['CreatorUsername'] }}
                         </a>
                     </td>
 
-                    <td>{{ link.วันที่อัปเดต.split(' ')[0] }}</td>
+                    <td>{{ link['วันที่อัปเดต'].split(' ')[0] }}</td>
                     
                     <td>
                         <div class="action-buttons">
-                        {% if session.level == 'Admin' or (session.level == 'Users' and link.CreatorUsername == session.username) %}
-                            <form action="{{ url_for('delete_link_action', link_id=link.ID) }}" method="POST" class="delete-form">
+                        {% if session.level == 'Admin' or (session.level == 'Users' and link['CreatorUsername'] == session.username) %}
+                            <form action="{{ url_for('delete_link_action', link_id=link['ID']) }}" method="POST" class="delete-form">
                                 <button type="submit" class="btn-delete">🅾️ ลบ</button>
                             </form>
-                            <a href="{{ url_for('edit_link_page', link_id=link.ID) }}" class="btn-edit">✏️ แก้ไข</a>
+                            <a href="{{ url_for('edit_link_page', link_id=link['ID']) }}" class="btn-edit">✏️ แก้ไข</a>
                         {% else %}
                             <i style="font-size: 0.9em; color: #6c757d;">(ไม่มีสิทธิ์)</i>
                         {% endif %}
@@ -388,7 +395,8 @@
                 </tr>
                 {% else %}
                 <tr id="noDataRow">
-                    <td colspan="11" style="text-align: center;">ไม่พบข้อมูลลิงค์</td> </tr>
+                    <td colspan="11" style="text-align: center;">ไม่พบข้อมูลลิงค์</td>
+                </tr>
                 {% endfor %}
             </tbody>
                 </table>
