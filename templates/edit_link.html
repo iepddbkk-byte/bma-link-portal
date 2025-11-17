@@ -703,11 +703,11 @@
                     categorySelect.value = currentCategory;
                 } else {
                     // ถ้าไม่มี (เช่น เป็นค่าเก่า) ให้พยายามเลือก 'อื่นๆ'
-                    // หรือปล่อยให้เป็น default (ซึ่งโค้ด Jinja {% if ... selected %} จัดการแล้ว)
+                    
+                    // (*** ❗️❗️❗️ นี่คือส่วนที่แก้ไข ❗️❗️❗️ ***)
+                    {# หรือปล่อยให้เป็น default (ซึ่งโค้ด Jinja {% if ... selected %} จัดการแล้ว) #}
                 }
             }
         });
-    </img>
-
-</body>
+    </script> </body>
 </html>
