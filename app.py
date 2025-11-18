@@ -475,6 +475,8 @@ def edit_profile_action():
 
 
 # --- 9. Routes (Dashboard & Links) ---
+# ในไฟล์ app.py
+
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
@@ -482,21 +484,24 @@ def dashboard():
     try: 
         all_links = get_db_records() 
         
-        # (*** ❗️❗️❗️ นี่คือส่วนที่แก้ไข ❗️❗️❗️ ***)
-        # ประมวลผลวันที่ล่วงหน้า เพื่อป้องกัน Error ใน Jinja
+        # ประมวลผลวันที่ล่วงหน้า
         for link in all_links:
             date_str = link.get('วันที่อัปเดต')
             if date_str:
-                # พยายามแยกเอาเฉพาะส่วนวันที่
                 try:
                     link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0]
                 except:
-                    link['วันที่อัปเดต_สั้น'] = date_str # ถ้า .split() ไม่ได้ ก็ใช้ค่าเดิม
+                    link['วันที่อัปเดต_สั้น'] = date_str 
             else:
-                # (*** ❗️❗️❗️ นี่คือบรรทัดที่แก้ไข Typo ❗️❗️❗️ ***)
-                link['วันที่อัปเดต_สั้น'] = '' # (แก้จาก 'T' เป็น 'ต')
+                link['วันที่อัปเดต_สั้น'] = ''
 
-        return render_template('dashboard.html', session=session, links=all_links)
+        # (*** ❗️ แก้ไขตรงนี้: เพิ่ม bureaus=... และ districts=... ส่งไปที่ template ***)
+        return render_template('dashboard.html', 
+                               session=session, 
+                               links=all_links,
+                               bureaus=bureaus_list,      # <-- เพิ่ม
+                               districts=districts_list)  # <-- เพิ่ม
+
     except Exception as e: 
         print(f"Dashboard Error: {e}") 
         return redirect(url_for('home'))

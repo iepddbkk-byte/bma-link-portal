@@ -45,7 +45,7 @@
             line-height: 1.6;
         }
 
-        /* --- Header Styles (เหมือนเดิม) --- */
+        /* --- Header Styles --- */
         .main-header {
             background: white;
             padding: 15px 20px;
@@ -80,7 +80,7 @@
             cursor: pointer; font-size: 1.2rem;
         }
         
-        /* --- Button Styles (เหมือนเดิม) --- */
+        /* --- Button Styles --- */
         button, .btn, a.btn-edit { 
             font-family: 'Kanit', Arial, sans-serif; 
             color: white; border: none; padding: 10px 16px; border-radius: 8px; 
@@ -111,7 +111,7 @@
             padding: 6px 12px; font-size: 0.85rem;
         }
 
-        /* --- Container & Card (เหมือนเดิม) --- */
+        /* --- Container & Card --- */
         .container { max-width: 1400px; margin: 30px auto; padding: 20px; }
         .content-card {
             background: white; border-radius: 16px; padding: 30px;
@@ -125,8 +125,19 @@
             display: flex; align-items: center; gap: 10px;
         }
 
-        /* --- Search & Table (เหมือนเดิม) --- */
-        .search-container { margin: 25px 0; position: relative; }
+        /* --- Search & Table --- */
+        .search-container { 
+            margin: 25px 0; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
         #searchInput {
             width: 100%; padding: 15px 20px 15px 50px;
             font-family: 'Kanit', sans-serif; font-size: 1rem;
@@ -142,6 +153,39 @@
             transform: translateY(-50%); color: var(--button-gray);
             font-size: 1.2rem;
         }
+
+        /* (*** ❗️ ใหม่ ❗️ สไตล์สำหรับ Dropdown Filter ***) */
+        .filter-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-label {
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        #agencyFilter {
+            width: 100%;
+            padding: 12px 15px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            background-color: white;
+            /* Custom Arrow */
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+        #agencyFilter:focus {
+            outline: none; border-color: var(--bma-green);
+            box-shadow: 0 0 0 4px var(--bma-green-light);
+        }
+        optgroup { font-weight: 600; color: var(--bma-green); }
+
         .table-container {
             overflow-x: auto; border-radius: 12px;
             box-shadow: var(--shadow-sm); margin-top: 20px;
@@ -153,14 +197,9 @@
         th, td { 
             padding: 14px 12px; text-align: left;
             border-bottom: 1px solid var(--border-color);
-            white-space: nowrap; /* (ปรับปรุง) */
+            white-space: nowrap; 
         }
-        
-        /* (ปรับปรุง!) ทำให้คอลัมน์รายละเอียดขยายได้ */
-        td:nth-child(2) { 
-             white-space: normal; 
-             min-width: 150px;
-        }
+        td:nth-child(2) { white-space: normal; min-width: 150px; }
         
         th { 
             background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
@@ -177,7 +216,7 @@
         a { color: var(--bma-green); text-decoration: none; font-weight: 500; transition: all 0.3s; }
         a:hover { color: var(--bma-green-hover); text-decoration: underline; }
 
-        /* --- Status Badges (เหมือนเดิม) --- */
+        /* --- Status Badges --- */
         .status-badge {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 6px 12px; border-radius: 20px;
@@ -191,7 +230,7 @@
         .status-updating { background: #fff3cd; color: #856404; }
         .status-inactive { background: #f8d7da; color: #721c24; }
 
-        /* --- Sort & Pagination (เหมือนเดิม) --- */
+        /* --- Sort & Pagination --- */
         .sort-buttons {
             margin-top: 8px; display: flex; gap: 5px;
             justify-content: center; flex-wrap: wrap;
@@ -221,7 +260,7 @@
         .pagination-nav button:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
         .pagination-nav span { font-weight: 500; padding: 0 10px; white-space: nowrap; }
 
-        /* --- Footer (เหมือนเดิม) --- */
+        /* --- Footer --- */
         .main-footer {
             background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
             color: white; text-align: center; padding: 30px 20px;
@@ -229,7 +268,7 @@
         }
         .main-footer p { margin: 8px 0; font-size: 0.95rem; }
 
-        /* --- Responsive (เหมือนเดิม, ยกเว้น column) --- */
+        /* --- Responsive --- */
         @media (max-width: 768px) {
             .mobile-menu-toggle { display: block; }
             .navigation {
@@ -248,7 +287,6 @@
             .pagination-controls { justify-content: center; }
             .pagination-items, .pagination-nav { width: 100%; justify-content: center; }
 
-            /* (ปรับปรุง!) ซ่อนคอลัมน์เพิ่มบนมือถือ */
             th:nth-child(2), td:nth-child(2), /* รายละเอียด */
             th:nth-child(7), td:nth-child(7), /* ส่วนราชการ */
             th:nth-child(8), td:nth-child(8), /* เบอร์ติดต่อ */
@@ -304,8 +342,26 @@
             <a href="{{ url_for('add_link_page') }}"><button class="btn-add">➕ เพิ่มลิงค์ใหม่</button></a>
 
             <div class="search-container">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="ค้นหาทุกลิงค์ (ชื่อ, สถานะ, ประเภท, ส่วนราชการ, ผู้สร้าง)...">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="ค้นหาทุกลิงค์ (ชื่อ, สถานะ, ประเภท, ส่วนราชการ, ผู้สร้าง)...">
+                </div>
+                
+                <div class="filter-wrapper">
+                    <select id="agencyFilter">
+                        <option value="">🏢 แสดงทุกส่วนราชการ (ทั้งหมด)</option>
+                        <optgroup label="ระดับสำนัก">
+                            {% for bureau in bureaus %}
+                            <option value="{{ bureau }}">{{ bureau }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="สำนักงานเขต">
+                            {% for district in districts %}
+                            <option value="{{ district }}">{{ district }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                </div>
             </div>
 
             <div class="table-container">
@@ -322,7 +378,11 @@
                             <th>📄 รายละเอียด</th> <th>🚦 สถานะลิงค์</th> 
                             <th>📊 สถานะการใช้งาน</th>
                             <th>📂 ประเภท</th>
-                            <th>🏢 หน่วยงาน (กลุ่ม/ฝ่าย)</th> <th>🏛️ ส่วนราชการ (สำนัก/เขต)</th> <th>📞 เบอร์ติดต่อ</th>
+                            <th>🏢 หน่วยงาน (กลุ่ม/ฝ่าย)</th> 
+                            
+                            <th>🏛️ ส่วนราชการ (สำนัก/เขต)</th> 
+                            
+                            <th>📞 เบอร์ติดต่อ</th>
                             <th>👤 ผู้สร้าง</th>
                             <th>🗓️ วันที่อัปเดต</th>
                             <th>⚙️ จัดการ</th>
@@ -438,6 +498,8 @@
         const tbody = document.getElementById("linkTableBody");
         const noDataRow = document.getElementById("noDataRow");
         const searchInput = document.getElementById("searchInput");
+        // (*** ❗️ ใหม่ ❗️ รับค่าจาก Dropdown ***)
+        const agencyFilter = document.getElementById("agencyFilter");
 
         function toggleMobileMenu() {
             const nav = document.getElementById('mainNavigation');
@@ -465,15 +527,24 @@
         function displayPage(page) {
             currentPage = page;
             const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
-            const filter = searchInput.value.toLowerCase();
-            
-            // (ปรับปรุง!) ตรรกะการค้นหานี้ (textContent) ยืดหยุ่นและครอบคลุมคอลัมน์ใหม่ (ส่วนราชการ) โดยอัตโนมัติ
+            const filterText = searchInput.value.toLowerCase();
+            const selectedAgency = agencyFilter.value; // (*** ❗️ ใหม่ ❗️ ***)
+
+            // (*** ❗️ แก้ไข Logic การกรอง ❗️ ***)
             const filteredRows = allTableRows.filter(row => {
+                // 1. กรองด้วยข้อความค้นหา
                 const cells = row.getElementsByTagName("td");
                 const textContent = Array.from(cells).map(cell => 
                     (cell.textContent || cell.innerText).toLowerCase()
                 ).join(" ");
-                return textContent.includes(filter);
+                const matchesText = textContent.includes(filterText);
+
+                // 2. กรองด้วยส่วนราชการ (Dropdown)
+                // ส่วนราชการอยู่คอลัมน์ที่ 7 (index 6)
+                const agencyCell = cells[6].textContent.trim();
+                const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);
+
+                return matchesText && matchesAgency;
             });
 
             tbody.innerHTML = ''; 
@@ -512,7 +583,10 @@
             document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
             document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
             document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
+            
+            // (*** ❗️ เพิ่ม Event Listeners ❗️ ***)
             searchInput.addEventListener('keyup', () => displayPage(1)); 
+            agencyFilter.addEventListener('change', () => displayPage(1)); 
 
             displayPage(1);
 
