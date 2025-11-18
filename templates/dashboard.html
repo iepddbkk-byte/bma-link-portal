@@ -341,7 +341,6 @@
                     </td>
                     <td>{{ link['รายละเอียด'] }}</td>
                     
-                    <!-- สถานะลิงก์ -->
                     <td>
                         {% if link['LinkStatus'] == 'OK' %}
                             <span class="status-badge status-ok">🟢 ปกติ</span>
@@ -354,7 +353,6 @@
                         {% endif %}
                     </td>
 
-                    <!-- สถานะการใช้งาน -->
                     <td>
                         {% if link['สถานะ'] == 'ใช้งาน' %}
                             <span class="status-badge status-active">● ใช้งาน</span>
@@ -378,7 +376,7 @@
                         </a>
                     </td>
 
-                    <td>{{ link['วันที่อัปเดต'].split(' ')[0] }}</td>
+                    <td>{{ link['วันที่อัปเดต_สั้น'] }}</td>
                     
                     <td>
                         <div class="action-buttons">
