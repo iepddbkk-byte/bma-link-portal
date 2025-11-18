@@ -313,7 +313,7 @@
                     <thead>
                         <tr>
                             <th>
-                                🔗 ชื่อลิงค์
+                                🔗 ชื่อลิงก์ 
                                 <div class="sort-buttons">
                                     <button onclick="sortTable(0, 'asc')">A-Z (ก-ฮ)</button>
                                     <button onclick="sortTable(0, 'desc')">Z-A (ฮ-ก)</button>
@@ -334,9 +334,9 @@
                 <tr>
                     <td>
                         {% if link['สถานะ'] == 'ใช้งาน' %}
-                            <a href="{{ link['URL'] }}" target="_blank">{{ link['ชื่อลิงค์'] }}</a>
+                            <a href="{{ link['URL'] }}" target="_blank">{{ link['ชื่อลิงก์'] }}</a>
                         {% else %}
-                            {{ link['ชื่อลิงค์'] }}
+                            {{ link['ชื่อลิงก์'] }}
                         {% endif %}
                     </td>
                     <td>{{ link['รายละเอียด'] }}</td>
