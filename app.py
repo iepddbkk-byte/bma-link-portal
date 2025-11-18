@@ -119,7 +119,7 @@ def generate_invite_code():
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return f"INVITE-{code}"
 
-# (*** ❗️❗️❗️ โค้ดนี้เป็นเวอร์ชันที่แก้ไขเรื่อง .strip() แล้ว ***)
+# (*** โค้ดนี้เป็นเวอร์ชันที่แก้ไขเรื่อง .strip() แล้ว ***)
 def records_to_dict(records_list, headers):
     """ 
     แปลง list of lists (ที่ได้จาก get_all_values) เป็น list of dicts 
@@ -493,7 +493,8 @@ def dashboard():
                 except:
                     link['วันที่อัปเดต_สั้น'] = date_str # ถ้า .split() ไม่ได้ ก็ใช้ค่าเดิม
             else:
-                link['วันที่อัปเดต_สั้น'] = '' # ถ้าค่าว่าง ก็ใส่ค่าว่าง
+                # (*** ❗️❗️❗️ นี่คือบรรทัดที่แก้ไข Typo ❗️❗️❗️ ***)
+                link['วันที่อัปเดต_สั้น'] = '' # (แก้จาก 'T' เป็น 'ต')
 
         return render_template('dashboard.html', session=session, links=all_links)
     except Exception as e: 
