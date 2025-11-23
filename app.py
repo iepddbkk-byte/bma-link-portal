@@ -282,7 +282,16 @@ def home():
     if db_sheet is None: 
         return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=[], error="Sheet Error")
     try:
-        Thread(target=increment_site_views).start()
+        # --- LOGIC การนับแบบ UNIQUE VIEW (แก้ไขใหม่) ---
+        # ตรวจสอบว่าใน Session มีตัวแปร 'visited_home' หรือไม่
+        if not session.get('visited_home'):
+            # ถ้ายังไม่มี (คือเพิ่งเข้ามาครั้งแรกในรอบนี้) ให้ไปบวกเลขเพิ่ม
+            Thread(target=increment_site_views).start()
+            # จากนั้นบันทึกว่า "นับไปแล้วนะ" ลงใน Session ของผู้ใช้คนนี้
+            session['visited_home'] = True
+            # ตั้งค่าให้ Session อยู่นานเท่าไหร่ก็ได้ (ปกติ Flask จะจัดการให้ หรือกำหนด lifetime ได้)
+        
+        # ---------------------------------------------
 
         total_views = 0
         if stats_sheet:
