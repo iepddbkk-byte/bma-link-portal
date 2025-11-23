@@ -6,98 +6,110 @@
     <title>ทะเบียนลิงค์ BMA - หน้าหลัก</title>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     <script src="https://unpkg.com/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
+            /* Theme Colors (Consistent with Dashboard) */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
+            --button-red: #dc3545;
             --button-blue: #007bff;
+            --button-yellow: #ffc107;
             --button-gray: #6c757d;
             --text-color: #2c3e50;
-            --bg-color: #f8f9fa;
+            --border-color: #e0e0e0;
+            --bg-grad-start: #f5f7fa;
+            --bg-grad-end: #c3cfe2;
+            
+            --header-height: 80px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
         
         body {
             font-family: 'Kanit', Arial, sans-serif;
-            background-color: var(--bg-color);
+            background-color: #f8f9fa;
             margin: 0;
             color: var(--text-color);
-            padding-top: 80px; /* เผื่อพื้นที่ให้ Header แบบ Fixed */
+            padding-top: var(--header-height); /* เผื่อพื้นที่ให้ Header */
         }
 
-        /* --- Header (Modern Navbar) --- */
+        /* --- 1. Header & Navigation (Modern Style) --- */
         .main-header {
             background: white;
-            padding: 15px 30px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            position: fixed; /* เปลี่ยนเป็น fixed ให้ติดด้านบนตลอด */
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 1000;
-            height: 80px;
+            height: var(--header-height);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: all 0.3s ease;
         }
 
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             text-decoration: none;
         }
 
-        .logo-container img { height: 50px; }
-        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--bma-green); }
+        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
+        .logo-container img:hover { transform: scale(1.05); }
+        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        /* เมนู Desktop */
+        /* Desktop Menu */
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 8px;
         }
 
         .nav-link {
             text-decoration: none;
             color: var(--text-color);
             font-weight: 500;
-            padding: 8px 15px;
-            border-radius: 20px;
-            transition: 0.3s;
+            padding: 8px 16px;
+            border-radius: 50px; /* Pill Shape */
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.95rem;
+            white-space: nowrap;
         }
-        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
+        .nav-link i { font-size: 1.1em; }
         
-        .btn-login-nav {
-            background: var(--bma-green);
-            color: white !important;
-            padding: 10px 25px;
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0, 150, 60, 0.3);
-        }
-        .btn-login-nav:hover { background: var(--bma-green-hover); transform: translateY(-2px); }
+        /* Active State */
+        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
+        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
+        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
-        .user-profile-pic { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--bma-green); }
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* Toggle Hamburger (Mobile) */
+        /* Mobile Hamburger */
         .mobile-toggle {
             display: none;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             cursor: pointer;
             color: var(--text-color);
+            padding: 10px;
         }
 
-        /* --- Container --- */
+        /* --- Container & Stats --- */
         .container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
         }
 
-        /* --- Dashboard Stats Section (Modern Grid) --- */
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 2fr; /* สัดส่วน 1:2 */
@@ -120,7 +132,7 @@
             position: relative;
             overflow: hidden;
         }
-        .stat-card-main::before { /* ลวดลายพื้นหลัง */
+        .stat-card-main::before {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 10%);
             background-size: 20px 20px; opacity: 0.3;
@@ -134,8 +146,8 @@
             background: white;
             border-radius: 20px;
             padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
+            box-shadow: var(--shadow-md);
+            border: 1px solid #f0f0f0;
         }
         .card-header {
             display: flex; justify-content: space-between; align-items: center;
@@ -173,7 +185,7 @@
         .quick-search { 
             max-width: 700px; margin: 0 auto; display: flex; gap: 10px; 
             background: white; padding: 10px; border-radius: 50px; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1); border: 1px solid #eee;
+            box-shadow: var(--shadow-lg); border: 1px solid #eee;
         }
         .quick-search select { 
             flex: 1; padding: 12px 20px; border: none; outline: none; 
@@ -220,27 +232,54 @@
         }
         .menu-icon { width: 30px; height: 30px; background: var(--bma-green-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--bma-green); }
 
-        /* --- Responsive --- */
+        /* --- Footer --- */
+        .main-footer {
+            background: white; color: #666;
+            text-align: center; padding: 30px;
+            margin-top: 60px; border-top: 1px solid #eee;
+        }
+
+        /* --- Responsive Media Queries --- */
+        @media (max-width: 992px) {
+            .nav-link span { display: none; }
+            .nav-link i { font-size: 1.3rem; margin: 0; }
+            .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
+            .user-profile-pic { width: 100%; height: 100%; }
+        }
+
         @media (max-width: 768px) {
+            body { padding-top: 70px; }
+            .main-header { padding: 0 15px; height: 70px; }
+            .logo-text { font-size: 1.1rem; }
+            .mobile-toggle { display: block; }
+            
+            /* Mobile Menu (Slide Down) */
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 70px; left: 0; width: 100%;
+                background: white;
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+                border-top: 1px solid #f0f0f0;
+            }
+            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
+            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+            .nav-link {
+                width: 100%; border-radius: 12px;
+                padding: 12px 15px; margin-bottom: 5px;
+                justify-content: flex-start;
+            }
+            .nav-link span { display: inline; }
+            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+
             .stats-grid { grid-template-columns: 1fr; }
             .quick-search { flex-direction: column; border-radius: 20px; padding: 15px; }
             .search-btn { width: 100%; margin-top: 10px; }
-            
-            /* Mobile Menu */
-            .mobile-toggle { display: block; }
-            .nav-menu {
-                display: none; /* ซ่อนเริ่มต้น */
-                position: absolute;
-                top: 80px; left: 0; width: 100%;
-                background: white;
-                flex-direction: column;
-                padding: 20px;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-                border-top: 1px solid #eee;
-            }
-            .nav-menu.active { display: flex; }
-            .nav-link { width: 100%; padding: 15px; border-radius: 10px; }
-            .btn-login-nav { width: 100%; text-align: center; }
+            .link-name { max-width: 180px; }
         }
     </style>
 </head>
@@ -257,24 +296,28 @@
         </div>
 
         <nav class="nav-menu" id="navMenu">
+            <a href="{{ url_for('home') }}" class="nav-link active-nav" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+
             {% if session.get('logged_in') %}
-                <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-columns"></i> Dashboard</a>
-                
                 {% if session.get('level') == 'Admin' %}
-                <a href="{{ url_for('admin_panel') }}" class="nav-link"><i class="fas fa-crown"></i> Admin</a>
+                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
                 {% endif %}
                 
-                <a href="{{ url_for('profile_page') }}" class="nav-link">
+                <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+                <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
-                    {{ session.name }}
+                    <span>{{ session.name }}</span>
                 </a>
                 
-                <a href="{{ url_for('logout') }}" class="nav-link" style="color: #dc3545;">
-                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
+                    <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
                 </a>
             {% else %}
-                <a href="{{ url_for('login_page') }}" class="nav-link btn-login-nav">
-                    <i class="fas fa-user-lock"></i> เจ้าหน้าที่เข้าสู่ระบบ
+                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;">
+                    <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
                 </a>
             {% endif %}
         </nav>
@@ -364,6 +407,12 @@
         </div>
 
     </div>
+    
+    <footer class="main-footer">
+        <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
+        <p>สำนักยุทธศาสตร์และประเมินผล</p>
+        <p style="font-size: 0.85rem; margin-top: 10px; color: #999;">© 2025 Bangkok Metropolitan Administration.</p>
+    </footer>
 
     <script>
         // Toggle Mobile Menu
@@ -371,6 +420,15 @@
             const menu = document.getElementById('navMenu');
             menu.classList.toggle('active');
         }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-toggle');
+            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+            }
+        });
 
         // Search Logic
         document.getElementById('quickSearchForm').addEventListener('submit', function(e) {
@@ -381,15 +439,15 @@
     </script>
     
     <script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
 </body>
 </html>

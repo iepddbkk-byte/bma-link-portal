@@ -13,12 +13,14 @@
     
     <style>
         :root {
+            /* Theme Colors (Standardized) */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
             --button-blue: #007bff;
             --button-yellow: #ffc107;
+            --button-gray: #6c757d;
             --text-color: #2c3e50;
             --border-color: #e0e0e0;
             --bg-grad-start: #f5f7fa;
@@ -39,7 +41,7 @@
             padding-top: var(--header-height); /* เว้นที่ให้ Header */
         }
 
-        /* --- 1. Responsive Header (Style เดียวกับ Index) --- */
+        /* --- 1. Header & Navigation (Unified Style) --- */
         .main-header {
             background: white;
             padding: 0 30px;
@@ -60,7 +62,8 @@
             gap: 12px;
             text-decoration: none;
         }
-        .logo-container img { height: 45px; width: auto; }
+        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
+        .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
         /* Desktop Menu */
@@ -86,11 +89,12 @@
         .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
         .nav-link i { font-size: 1.1em; }
         
+        /* Active State */
         .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
         .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
         .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
-        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); }
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
         /* Mobile Hamburger */
         .mobile-toggle {
@@ -101,13 +105,14 @@
             padding: 10px;
         }
 
-        /* --- 2. Container & Cards --- */
+        /* --- 2. Dashboard Content Styles --- */
         .container {
             max-width: 1400px;
             margin: 30px auto;
             padding: 0 20px;
             animation: fadeIn 0.6s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .content-card {
             background: white;
@@ -115,7 +120,7 @@
             padding: 30px;
             box-shadow: var(--shadow-lg);
             position: relative;
-            overflow: hidden; /* ป้องกัน Content ล้น */
+            overflow: hidden;
         }
 
         h2 {
@@ -127,84 +132,55 @@
             display: flex; align-items: center; gap: 12px;
         }
 
-        /* --- 3. Search & Filters (Responsive Layout) --- */
+        /* Search & Filters */
         .search-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap; /* ให้พับลงมาเมื่อจอเล็ก */
+            display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;
         }
-
         .search-input-wrapper { flex: 2; position: relative; min-width: 280px; }
         .filter-wrapper { flex: 1; min-width: 200px; }
 
         #searchInput, #agencyFilter {
-            width: 100%;
-            padding: 14px 20px 14px 45px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            background-color: #f9f9f9;
-            transition: 0.3s;
+            width: 100%; padding: 14px 20px 14px 45px;
+            font-family: 'Kanit', sans-serif; font-size: 1rem;
+            border: 1px solid var(--border-color); border-radius: 12px;
+            background-color: #f9f9f9; transition: 0.3s;
         }
         #searchInput:focus, #agencyFilter:focus {
-            background-color: white;
-            border-color: var(--bma-green);
-            box-shadow: 0 0 0 4px var(--bma-green-light);
-            outline: none;
+            background-color: white; border-color: var(--bma-green);
+            box-shadow: 0 0 0 4px var(--bma-green-light); outline: none;
         }
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
 
-        /* --- 4. Table Styling & Badges --- */
-        .table-responsive {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; /* บังคับความกว้างขั้นต่ำ */ }
-        
-        th {
-            background: var(--bma-green);
-            color: white;
-            padding: 15px;
-            font-weight: 500;
-            text-align: left;
-            white-space: nowrap;
-        }
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
-            color: #555;
-        }
+        /* Table */
+        .table-responsive { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { background: var(--bma-green); color: white; padding: 15px; font-weight: 500; text-align: left; white-space: nowrap; }
+        td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; color: #555; }
         tr:last-child td { border-bottom: none; }
         tr:hover { background-color: #f8fff9; }
 
-        /* Custom Scrollbar for Table */
+        /* Scrollbar */
         .table-responsive::-webkit-scrollbar { height: 8px; }
         .table-responsive::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
         .table-responsive::-webkit-scrollbar-thumb:hover { background: var(--bma-green); }
 
-        /* Badges */
+        /* Badges & Buttons */
         .status-badge { padding: 5px 12px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
         .status-ok { background: #d4edda; color: #155724; }
         .status-error { background: #f8d7da; color: #721c24; }
         .status-blocked { background: #cce5ff; color: #004085; }
         .status-unknown { background: #e2e3e5; color: #383d41; }
 
-        /* Action Buttons */
-        .action-buttons { display: flex; gap: 8px; }
+        .action-buttons { display: flex; gap: 8px; justify-content: center; }
         .btn-icon {
-            width: 35px; height: 35px;
-            border-radius: 8px;
+            width: 35px; height: 35px; border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            border: none; cursor: pointer; transition: 0.2s;
-            text-decoration: none; color: white;
+            border: none; cursor: pointer; transition: 0.2s; text-decoration: none; color: white;
         }
         .btn-edit { background: var(--button-yellow); color: #333; }
         .btn-delete { background: var(--button-red); }
         .btn-icon:hover { transform: translateY(-2px); filter: brightness(0.95); }
+
         .btn-add { 
             background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
             color: white; border: none; padding: 12px 25px; border-radius: 50px;
@@ -214,95 +190,73 @@
         }
         .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,150,60,0.4); }
 
-        /* Share Button */
         .btn-share {
             width: 32px; height: 32px; border-radius: 50%;
             background: #17a2b8; color: white; border: none;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: 0.3s;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;
         }
         .btn-share:hover { background: #138496; transform: scale(1.1); }
 
-        /* --- 5. Pagination --- */
+        /* Pagination */
         .pagination-controls {
             display: flex; justify-content: space-between; align-items: center;
             margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;
             flex-wrap: wrap; gap: 15px;
         }
         .pagination-nav button {
-            background: white; border: 1px solid #ddd;
-            width: 36px; height: 36px; border-radius: 8px;
+            background: white; border: 1px solid #ddd; width: 36px; height: 36px; border-radius: 8px;
             cursor: pointer; transition: 0.2s;
         }
         .pagination-nav button:hover:not(:disabled) { background: var(--bma-green); color: white; border-color: var(--bma-green); }
         .pagination-nav button:disabled { opacity: 0.5; cursor: default; }
 
-        /* --- 6. Footer --- */
+        /* Footer */
         .main-footer {
-            background: white; color: #666;
-            text-align: center; padding: 30px;
+            background: white; color: #666; text-align: center; padding: 30px;
             margin-top: 60px; border-top: 1px solid #eee;
         }
 
-        /* ================= MEDIA QUERIES (หัวใจของ Responsive) ================= */
-        
+        /* --- Responsive Media Queries --- */
         @media (max-width: 992px) {
-            /* Tablet Adjustments */
-            .nav-link span { display: none; } /* ซ่อนข้อความเมนู เหลือแต่ไอคอนเมื่อจอเริ่มเล็ก */
+            .nav-link span { display: none; }
             .nav-link i { font-size: 1.3rem; margin: 0; }
             .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
             .user-profile-pic { width: 100%; height: 100%; }
         }
 
         @media (max-width: 768px) {
-            /* Mobile Layout */
             body { padding-top: 70px; }
             .main-header { padding: 0 15px; height: 70px; }
             .logo-text { font-size: 1.1rem; }
             .mobile-toggle { display: block; }
 
-            /* Mobile Menu (Slide Down) */
             .nav-menu {
-                display: none;
-                position: absolute;
-                top: 70px; left: 0; width: 100%;
-                background: white;
-                flex-direction: column;
-                align-items: stretch;
-                padding: 15px;
-                box-shadow: 0 10px 15px rgba(0,0,0,0.05);
-                border-top: 1px solid #f0f0f0;
+                display: none; position: absolute; top: 70px; left: 0; width: 100%;
+                background: white; flex-direction: column; align-items: stretch;
+                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
             }
             .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
             @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-            .nav-link {
-                width: 100%; border-radius: 12px;
-                padding: 12px 15px; margin-bottom: 5px;
-                justify-content: flex-start;
-            }
-            .nav-link span { display: inline; } /* แสดงข้อความกลับมาในเมนูมือถือ */
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; }
+            .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
 
-            /* Adjust Content */
             .container { padding: 0 15px; margin: 20px auto; }
             .content-card { padding: 20px 15px; border-radius: 15px; }
             h2 { font-size: 1.4rem; }
             .btn-add { width: 100%; justify-content: center; }
-
-            /* Search Stack */
+            
             .search-container { flex-direction: column; gap: 10px; }
             .search-input-wrapper, .filter-wrapper { min-width: 100%; }
 
-            /* Table Optimization for Mobile */
-            /* ซ่อนคอลัมน์ที่ไม่จำเป็นจริงๆ เพื่อประหยัดที่ */
+            /* Table Mobile Optimization: Hide less important columns */
             th:nth-child(2), td:nth-child(2), /* รายละเอียด */
             th:nth-child(7), td:nth-child(7), /* ส่วนราชการ */
             th:nth-child(8), td:nth-child(8), /* เบอร์ */
             th:nth-child(10), td:nth-child(10) /* วันที่ */
             { display: none; }
             
-            /* ปรับแต่ง Pagination บนมือถือ */
             .pagination-controls { justify-content: center; }
             .pagination-items { width: 100%; text-align: center; margin-bottom: 10px; }
         }
@@ -327,6 +281,8 @@
                 {% if session.get('level') == 'Admin' %}
                 <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
                 {% endif %}
+                
+                <a href="{{ url_for('dashboard') }}" class="nav-link active-nav" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
                 
                 <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
                 <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
@@ -527,7 +483,6 @@
         });
 
         // --- JavaScript Logic (Pagination, Search, Sort) ---
-        // (รักษา Logic เดิมไว้แต่ปรับปรุงการเลือก Elements)
         let allTableRows = []; 
         let currentPage = 1;
         let totalPages = 1;
@@ -555,7 +510,7 @@
             // กรองข้อมูล
             const filteredRows = allTableRows.filter(row => {
                 const textContent = row.innerText.toLowerCase();
-                const agencyCell = row.children[6].innerText.trim(); // เช็ค Index ให้ตรงกับคอลัมน์ส่วนราชการ
+                const agencyCell = row.children[6].innerText.trim(); 
                 
                 const matchesText = textContent.includes(filterText);
                 const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);
@@ -578,7 +533,6 @@
                 filteredRows.slice(startIndex, endIndex).forEach(row => tbody.appendChild(row));
             }
             
-            // Update UI Stats
             document.getElementById("currentPage").textContent = currentPage;
             document.getElementById("totalPages").textContent = totalPages;
             document.getElementById("btnFirst").disabled = (currentPage === 1);
@@ -588,10 +542,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // เก็บข้อมูลแถวทั้งหมด (ยกเว้นแถว No Data)
             allTableRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
             
-            // Bind Events
             document.getElementById("btnFirst").onclick = () => displayPage(1);
             document.getElementById("btnPrev").onclick = () => displayPage(currentPage - 1);
             document.getElementById("btnNext").onclick = () => displayPage(currentPage + 1);
@@ -600,7 +552,7 @@
             searchInput.onkeyup = () => displayPage(1);
             agencyFilter.onchange = () => displayPage(1);
 
-            displayPage(1); // เริ่มต้นทำงาน
+            displayPage(1); 
         });
 
         // --- Delete Confirmation ---
@@ -664,6 +616,17 @@
                 });
             {% endif %}
         {% endwith %}
+    </script>
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
     </script>
 </body>
 </html>
