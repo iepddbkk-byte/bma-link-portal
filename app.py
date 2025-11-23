@@ -525,11 +525,41 @@ def dashboard():
     if db_sheet is None: return render_template('dashboard.html', session=session, links=[])
     try: 
         all_links = get_db_records() 
-        for link in all_links:
-            date_str = link.get('วันที่อัปเดต')
-            link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
-        return render_template('dashboard.html', session=session, links=all_links, bureaus=bureaus_list, districts=districts_list)  
+        
+        # --- คำนวณ Top 10 Links และ Clicks ---
+        for l in all_links:
+            try: l['Clicks'] = int(l.get('Clicks', 0))
+            except: l['Clicks'] = 0
+            date_str = l.get('วันที่อัปเดต')
+            l['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
+            
+        top_10 = sorted(all_links, key=lambda x: x['Clicks'], reverse=True)[:10]
+        
+        # --- ดึงยอดวิวรวม ---
+        total_views = 0
+        if stats_sheet:
+            try: total_views = int(stats_sheet.cell(1, 2).value or 0)
+            except: pass
+            
+        # --- ส่งข้อมูลไปยัง template ---
+        chart_data = {
+            "total_views": total_views,
+            "top_10_links": top_10,
+            "total_links": len(all_links),
+            "active_links": sum(1 for l in all_links if l.get('สถานะ') == 'ใช้งาน'),
+            "total_users": len(get_staff_records()) # Estimate
+        }
+
+        return render_template('dashboard.html', 
+                               session=session, 
+                               links=all_links, 
+                               bureaus=bureaus_list, 
+                               districts=districts_list,
+                               chart_data=chart_data,
+                               total_views=total_views,
+                               top_10_links=top_10)  
     except Exception as e: 
+        print(f"Dashboard Error: {e}")
         return redirect(url_for('home'))
 
 @app.route('/add')
@@ -628,7 +658,6 @@ def analytics_page():
         feedback = feedback_sheet.get_all_records()
         
         # --- คำนวณ Top 10 Links ---
-        # แปลง Clicks เป็น int และเรียงลำดับจากมากไปน้อย
         for l in links:
             try: l['Clicks'] = int(l.get('Clicks', 0))
             except: l['Clicks'] = 0
@@ -640,7 +669,6 @@ def analytics_page():
             try: total_views = int(stats_sheet.cell(1, 2).value or 0)
             except: pass
 
-        # --- ส่วนเดิม (กราฟและสถิติอื่นๆ) ---
         cat_counts = Counter(l['ประเภท'] for l in links if l.get('ประเภท'))
         dept_counts = Counter(l['ส่วนราชการ'] for l in links if l.get('ส่วนราชการ')).most_common(5)
         monthly = {}
@@ -660,12 +688,10 @@ def analytics_page():
             if f.get('Comments'): comments.append({'user': f['Username'], 'text': f['Comments']})
             if f.get('FeatureRequest'): features.append({'user': f['Username'], 'text': f['FeatureRequest']})
         
-        # --- รวมข้อมูลทั้งหมดส่งไป HTML ---
         chart_data = {
-            "total_views": total_views,          # <--- เพิ่มตัวนี้
-            "top_10_links": top_10,              # <--- เพิ่มตัวนี้
-            "total_links": len(links), 
-            "total_users": len(users), 
+            "total_views": total_views,
+            "top_10_links": top_10,
+            "total_links": len(links), "total_users": len(users), 
             "active_links": sum(1 for l in links if l.get('สถานะ') == 'ใช้งาน'),
             "total_responses": len(feedback),
             "category_labels": list(cat_counts.keys()), "category_data": list(cat_counts.values()),
@@ -676,9 +702,9 @@ def analytics_page():
             "recent_comments": comments[-5:][::-1], "recent_features": features[-5:][::-1]
         }
         return render_template('analytics.html', session=session, chart_data=chart_data)
-    except Exception as e: 
+    except Exception as e:
         print(f"Analytics Error: {e}")
-        return redirect(url_for('dashboard')))
+        return redirect(url_for('dashboard'))
 
 @app.route('/admin')
 def admin_panel():
