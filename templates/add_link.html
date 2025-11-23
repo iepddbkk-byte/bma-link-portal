@@ -25,12 +25,6 @@
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
-            --success-bg: #d4edda;
-            --success-color: #155724;
-            --error-bg: #f8d7da;
-            --error-color: #721c24;
-            --info-bg: #cce5ff;
-            --info-color: #004085;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -62,7 +56,6 @@
         }
         .btn-back:hover { background: linear-gradient(135deg, #5a6268 0%, #495057 100%); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
-        /* Title */
         h2 {
             color: var(--bma-green); font-size: 2em; font-weight: 600;
             margin-bottom: 30px; padding-bottom: 15px;
@@ -71,16 +64,14 @@
         }
         h2::before { content: "➕"; font-size: 1.2em; }
 
-        /* Form Styles */
         form { display: flex; flex-direction: column; gap: 25px; }
-        form div { display: flex; flex-direction: column; }
         form label {
             font-weight: 600; margin-bottom: 8px; color: var(--text-color);
             font-size: 0.95em; display: flex; align-items: center; gap: 5px;
         }
         form label::before { content: "📌"; font-size: 0.9em; }
 
-        /* Inputs */
+        /* Input Fields */
         form input[type="text"], form input[type="url"], form input[type="email"],
         form input[type="tel"], form textarea, form select {
             width: 100%; padding: 14px 18px;
@@ -96,9 +87,7 @@
         form input[readonly] {
             background-color: #e9ecef; color: #6c757d; cursor: not-allowed; font-weight: 500;
         }
-        form input[readonly]:focus { box-shadow: none; transform: none; border-color: var(--border-color); }
 
-        /* Textarea & Select */
         form textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
         form select {
             cursor: pointer; appearance: none;
@@ -107,21 +96,6 @@
         }
         form optgroup { font-weight: 600; color: var(--bma-green); }
 
-        /* Input Group Row */
-        .input-group-row { display: flex; gap: 10px; align-items: stretch; }
-        .input-group-row input { flex-grow: 1; }
-
-        /* Button Tool */
-        .btn-tool {
-            font-family: 'Kanit', sans-serif;
-            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
-            color: white; border: none; padding: 0 20px; border-radius: 12px;
-            cursor: pointer; font-weight: 500; white-space: nowrap;
-            transition: all 0.3s ease; box-shadow: var(--shadow-sm);
-            display: flex; align-items: center; gap: 5px;
-        }
-        .btn-tool:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-
         /* Submit Button */
         button[type="submit"] {
             font-family: 'Kanit', Arial, sans-serif;
@@ -129,30 +103,69 @@
             color: white; border: none; padding: 16px 32px;
             border-radius: 25px; cursor: pointer; font-size: 1.1em;
             font-weight: 600; transition: all 0.3s ease;
-            box-shadow: var(--shadow-md); margin-top: 10px;
-            display: flex; align-items: center; justify-content: center;
-            gap: 10px; width: 100%;
+            box-shadow: var(--shadow-md); margin-top: 10px; width: 100%;
         }
         button[type="submit"]:hover {
             background: linear-gradient(135deg, #007a30 0%, #006428 100%);
-            transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* (ใหม่!) Shortener Box (Embed iframe) */
+        .shortener-box {
+            border: 2px dashed var(--button-blue);
+            background-color: #f0f8ff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .shortener-header {
+            background-color: var(--button-blue);
+            color: white;
+            padding: 10px 15px;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .shortener-header:hover { background-color: var(--button-blue-hover); }
+        
+        /* ซ่อนเนื้อหา Iframe ไว้ก่อน (Toggle) */
+        .shortener-content {
+            display: none; /* ซ่อนเริ่มต้น */
+            padding: 0;
+            background: white;
+        }
+        .shortener-content.active {
+            display: block; /* แสดงเมื่อกด */
+        }
+
+        iframe {
+            width: 100%;
+            height: 500px; /* ความสูงพอประมาณให้เห็นฟอร์ม */
+            border: none;
+            display: block;
+        }
+        
+        .fallback-link {
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid #eee;
         }
 
         /* Required Indicator */
         form label:has(+ input[required])::after,
-        form label:has(+ .input-group-row input[required])::after,
         form label:has(+ select[required])::after,
         form label:has(+ textarea[required])::after {
             content: "*"; color: #dc3545; margin-left: 4px; font-weight: bold;
         }
         .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container { padding: 25px 20px; }
-            .input-group-row { flex-direction: column; gap: 5px; }
-            .btn-tool { padding: 12px; justify-content: center; width: 100%; }
-        }
     </style>
 </head>
 <body>
@@ -172,13 +185,26 @@
 
             <div>
                 <label for="URL">URL (จำเป็น)</label>
-                <div class="input-group-row">
-                    <input type="url" id="URL" name="URL" placeholder="https://example.com" required>
-                    <button type="button" class="btn-tool" onclick="openBmaShortener()" title="เปิดหน้าต่างย่อลิงค์ กทม.">
-                        <i class="fas fa-cut"></i> ย่อลิงค์ กทม.
-                    </button>
+                <input type="url" id="URL" name="URL" placeholder="https://example.com" required>
+                
+                <div class="shortener-box">
+                    <div class="shortener-header" onclick="toggleShortener()">
+                        <span><i class="fas fa-cut"></i> ต้องการย่อลิงค์ (u.bangkok.go.th)? คลิกที่นี่</span>
+                        <i class="fas fa-chevron-down" id="shortenerIcon"></i>
+                    </div>
+                    <div class="shortener-content" id="shortenerContent">
+                        <iframe src="https://u.bangkok.go.th/index.php" title="BMA Shortener"></iframe>
+                        
+                        <div class="fallback-link">
+                            ⚠️ หากหน้าเว็บไม่แสดง (หน้าจอขาว) เป็นเพราะระบบความปลอดภัยของเครือข่าย <br>
+                            <a href="https://u.bangkok.go.th/index.php" target="_blank" style="color: var(--button-blue); font-weight: bold;">
+                                คลิกที่นี่เพื่อเปิดในหน้าต่างใหม่
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <span class="info-text">💡 กดปุ่มย่อลิงค์เพื่อเปิดเครื่องมือ แล้วก๊อปปี้ลิงค์สั้นมาวางในช่องนี้</span>
+                
+                <span class="info-text">💡 ก๊อปปี้ลิงค์สั้นจากกรอบด้านบน แล้วนำมาวางในช่อง URL</span>
             </div>
             
             <div>
@@ -247,7 +273,6 @@
             <div>
                 <label for="รายละเอียด">รายละเอียด (ถ้ามี)</label>
                 <textarea id="รายละเอียด" name="รายละเอียด" rows="3" placeholder="ระบุรายละเอียดเพิ่มเติม หรือหมายเหตุพิเศษ (ถ้ามี)..."></textarea>
-                <span class="info-text">💡 ข้อมูลนี้ไม่จำเป็นต้องกรอก แต่ช่วยให้เข้าใจข้อมูลได้ดีขึ้น</span>
             </div>
 
             <div>
@@ -258,18 +283,20 @@
     </div>
 
     <script>
-        // (แก้ไข!) ฟังก์ชันเปิดหน้าต่าง Popup แบบ Native JS (ไม่พึ่ง Swal)
-        function openBmaShortener() {
-            const width = 1000;
-            const height = 700;
-            const left = (window.screen.width - width) / 2;
-            const top = (window.screen.height - height) / 2;
+        // ฟังก์ชันเปิด/ปิด ส่วนย่อลิงค์
+        function toggleShortener() {
+            const content = document.getElementById('shortenerContent');
+            const icon = document.getElementById('shortenerIcon');
             
-            window.open(
-                'https://u.bangkok.go.th/index.php', 
-                'BMA_Shortener_Tool', 
-                `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no`
-            );
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                content.classList.add('active');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
         }
     </script>
 
@@ -304,6 +331,18 @@
             {% endif %}
         {% endwith %}
     </script>
-
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
 </body>
 </html>
