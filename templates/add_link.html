@@ -25,9 +25,19 @@
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --success-bg: #d4edda;
+            --success-color: #155724;
+            --error-bg: #f8d7da;
+            --error-color: #721c24;
+            --info-bg: #cce5ff;
+            --info-color: #004085;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Kanit', Arial, sans-serif;
@@ -38,92 +48,228 @@
         }
 
         .container {
-            max-width: 900px; margin: 0 auto; padding: 40px;
-            background: white; border-radius: 20px;
-            box-shadow: var(--shadow-lg); animation: fadeIn 0.5s ease;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* Back Button */
         .btn-back {
-            display: inline-flex; align-items: center; gap: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
-            color: white; border: none; padding: 12px 24px;
-            border-radius: 25px; cursor: pointer; font-size: 1em; font-weight: 500;
-            transition: all 0.3s ease; box-shadow: var(--shadow-sm);
-            text-decoration: none; margin-bottom: 30px;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            margin-bottom: 30px;
         }
-        .btn-back:hover { background: linear-gradient(135deg, #5a6268 0%, #495057 100%); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
+        .btn-back:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Title */
         h2 {
-            color: var(--bma-green); font-size: 2em; font-weight: 600;
-            margin-bottom: 30px; padding-bottom: 15px;
+            color: var(--bma-green);
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
             border-bottom: 3px solid var(--bma-green-light);
-            display: flex; align-items: center; gap: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        h2::before { content: "➕"; font-size: 1.2em; }
 
-        form { display: flex; flex-direction: column; gap: 25px; }
-        form label {
-            font-weight: 600; margin-bottom: 8px; color: var(--text-color);
-            font-size: 0.95em; display: flex; align-items: center; gap: 5px;
+        h2::before {
+            content: "➕";
+            font-size: 1.2em;
         }
-        form label::before { content: "📌"; font-size: 0.9em; }
+
+        /* Flash Messages */
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
+        }
+
+        .flashes li {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .flashes .success { background-color: var(--success-bg); color: var(--success-color); border-left: 4px solid #28a745; }
+        .flashes .error { background-color: var(--error-bg); color: var(--error-color); border-left: 4px solid #dc3545; }
+        .flashes .info { background-color: var(--info-bg); color: var(--info-color); border-left: 4px solid #17a2b8; }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        form div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        form label::before {
+            content: "📌";
+            font-size: 0.9em;
+        }
 
         /* Input Fields */
-        form input[type="text"], form input[type="url"], form input[type="email"],
-        form input[type="tel"], form textarea, form select {
-            width: 100%; padding: 14px 18px;
-            border: 2px solid var(--border-color); border-radius: 12px;
-            font-family: 'Kanit', Arial, sans-serif; font-size: 1em;
-            background-color: var(--light-gray); transition: all 0.3s ease;
+        form input[type="text"],
+        form input[type="url"],
+        form input[type="email"],
+        form input[type="tel"],
+        form textarea,
+        form select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Kanit', Arial, sans-serif;
+            font-size: 1em;
+            background-color: var(--light-gray);
+            transition: all 0.3s ease;
             color: var(--text-color);
         }
-        form input:focus, form select:focus, form textarea:focus {
-            outline: none; border-color: var(--bma-green); background-color: white;
-            box-shadow: 0 0 0 4px var(--bma-green-light); transform: translateY(-2px);
-        }
-        form input[readonly] {
-            background-color: #e9ecef; color: #6c757d; cursor: not-allowed; font-weight: 500;
+
+        form input:focus,
+        form input[type="url"]:focus,
+        form input[type="email"]:focus,
+        form input[type="tel"]:focus,
+        form textarea:focus,
+        form select:focus {
+            outline: none;
+            border-color: var(--bma-green);
+            background-color: white;
+            box-shadow: 0 0 0 4px var(--bma-green-light);
+            transform: translateY(-2px);
         }
 
+        form input::placeholder,
+        form textarea::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Readonly Field */
+        form input[readonly] {
+            background-color: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            font-weight: 500;
+        }
+        form input[readonly]:focus {
+            box-shadow: none; transform: none; border-color: var(--border-color);
+        }
+
+        /* Textarea & Select */
         form textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
         form select {
-            cursor: pointer; appearance: none;
+            cursor: pointer;
+            appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 15px center; padding-right: 45px;
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 45px;
         }
         form optgroup { font-weight: 600; color: var(--bma-green); }
 
-        /* Submit Button */
-        button[type="submit"] {
-            font-family: 'Kanit', Arial, sans-serif;
-            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white; border: none; padding: 16px 32px;
-            border-radius: 25px; cursor: pointer; font-size: 1.1em;
-            font-weight: 600; transition: all 0.3s ease;
-            box-shadow: var(--shadow-md); margin-top: 10px; width: 100%;
+        /* Input Group Row สำหรับปุ่มย่อลิงค์ */
+        .input-group-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch; 
         }
-        button[type="submit"]:hover {
-            background: linear-gradient(135deg, #007a30 0%, #006428 100%);
-            transform: translateY(-3px);
+        
+        .input-group-row input {
+            flex-grow: 1;
         }
 
-        /* (ใหม่!) Shortener Box (Embed iframe) */
+        /* ปุ่มเครื่องมือ */
+        .btn-tool {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-tool:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* (ปรับปรุง!) Shortener Box (กล่องย่อลิงค์) */
         .shortener-box {
-            border: 2px dashed var(--button-blue);
-            background-color: #f0f8ff;
+            /* เปลี่ยนจาก dashed เป็น solid และปรับสี */
+            border: 1px solid #d0d7de; 
+            background-color: #ffffff;
             border-radius: 12px;
             overflow: hidden;
-            margin-top: 10px;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* เพิ่มเงาเบาๆ */
+            transition: all 0.3s ease;
         }
         
         .shortener-header {
-            background-color: var(--button-blue);
+            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
             color: white;
-            padding: 10px 15px;
-            font-size: 0.95em;
+            padding: 12px 20px;
+            font-size: 1em;
             font-weight: 500;
             cursor: pointer;
             display: flex;
@@ -131,41 +277,78 @@
             align-items: center;
             transition: background-color 0.3s;
         }
-        .shortener-header:hover { background-color: var(--button-blue-hover); }
+        .shortener-header:hover {
+            filter: brightness(1.1);
+        }
         
-        /* ซ่อนเนื้อหา Iframe ไว้ก่อน (Toggle) */
         .shortener-content {
-            display: none; /* ซ่อนเริ่มต้น */
+            display: none; 
             padding: 0;
             background: white;
+            border-top: 1px solid #eee;
         }
         .shortener-content.active {
-            display: block; /* แสดงเมื่อกด */
+            display: block; 
         }
 
         iframe {
             width: 100%;
-            height: 500px; /* ความสูงพอประมาณให้เห็นฟอร์ม */
+            height: 500px; 
             border: none;
             display: block;
         }
         
         .fallback-link {
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            font-size: 0.9em;
+            font-size: 0.95em;
             color: #666;
+            background-color: #f9f9f9;
             border-top: 1px solid #eee;
+        }
+
+        /* Submit Button */
+        button[type="submit"] {
+            font-family: 'Kanit', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background: linear-gradient(135deg, #007a30 0%, #006428 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4);
         }
 
         /* Required Indicator */
         form label:has(+ input[required])::after,
+        form label:has(+ .input-group-row input[required])::after,
         form label:has(+ select[required])::after,
         form label:has(+ textarea[required])::after {
             content: "*"; color: #dc3545; margin-left: 4px; font-weight: bold;
         }
         .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
 
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 25px 20px; }
+            .input-group-row { flex-direction: column; gap: 5px; } 
+            .btn-tool { padding: 12px; justify-content: center; width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -177,6 +360,16 @@
 
         <h2>เพิ่มลิงค์ใหม่</h2>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
         <form action="{{ url_for('add_link_action') }}" method="POST">
             <div>
                 <label for="ชื่อลิงก์">ชื่อลิงค์ (จำเป็น)</label>
@@ -185,11 +378,13 @@
 
             <div>
                 <label for="URL">URL (จำเป็น)</label>
-                <input type="url" id="URL" name="URL" placeholder="https://example.com" required>
+                <div class="input-group-row">
+                    <input type="url" id="URL" name="URL" placeholder="https://example.com" required>
+                </div>
                 
                 <div class="shortener-box">
                     <div class="shortener-header" onclick="toggleShortener()">
-                        <span><i class="fas fa-cut"></i> ต้องการย่อลิงค์ (u.bangkok.go.th)? คลิกที่นี่</span>
+                        <span><i class="fas fa-cut"></i> เครื่องมือย่อลิงค์ กทม. (คลิกเพื่อใช้งาน)</span>
                         <i class="fas fa-chevron-down" id="shortenerIcon"></i>
                     </div>
                     <div class="shortener-content" id="shortenerContent">
@@ -197,14 +392,14 @@
                         
                         <div class="fallback-link">
                             ⚠️ หากหน้าเว็บไม่แสดง (หน้าจอขาว) เป็นเพราะระบบความปลอดภัยของเครือข่าย <br>
-                            <a href="https://u.bangkok.go.th/index.php" target="_blank" style="color: var(--button-blue); font-weight: bold;">
-                                คลิกที่นี่เพื่อเปิดในหน้าต่างใหม่
+                            <a href="https://u.bangkok.go.th/index.php" target="_blank" style="color: var(--button-blue); font-weight: bold; text-decoration: none;">
+                                <i class="fas fa-external-link-alt"></i> คลิกที่นี่เพื่อเปิดในหน้าต่างใหม่
                             </a>
                         </div>
                     </div>
                 </div>
                 
-                <span class="info-text">💡 ก๊อปปี้ลิงค์สั้นจากกรอบด้านบน แล้วนำมาวางในช่อง URL</span>
+                <span class="info-text">💡 ก๊อปปี้ลิงค์สั้นจากเครื่องมือด้านบน แล้วนำมาวางในช่อง URL</span>
             </div>
             
             <div>
@@ -323,7 +518,7 @@
                         });
                     {% endfor %}
                 } else {
-                    // Fallback: ถ้า Swal พัง ให้ใช้ alert ธรรมดา
+                    // Fallback
                     {% for category, message in messages %}
                         alert('{{ message }}');
                     {% endfor %}
