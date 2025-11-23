@@ -316,7 +316,7 @@
                 
                 <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
-                    <span>สวัสดี, {{ session.name }}</span>
+                    <span>{{ session.name }}</span>
                 </a>
                 
                 <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
