@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard - BMA</title>
+    <title>Dashboard - BMA</title>
     
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap"></noscript>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            /* Theme Colors (Matches Dashboard) */
+            /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
@@ -29,231 +28,213 @@
             
             --header-height: 80px;
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-		/* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+        
+        /* FIX FONT */
         body, button, input, select, textarea, optgroup {
             font-family: 'Kanit', sans-serif;
         }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Kanit', Arial, sans-serif;
+        body { 
             background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
-            padding-top: var(--header-height); /* เว้นที่ให้ Header */
-            padding-bottom: 60px;
+            padding-top: var(--header-height);
         }
 
-        /* --- 1. Header & Navigation (New Style) --- */
+        /* --- Header & Navigation --- */
         .main-header {
             background: white;
             padding: 0 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             transition: all 0.3s ease;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        /* Desktop Menu */
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .nav-menu { display: flex; align-items: center; gap: 8px; }
 
         .nav-link {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            white-space: nowrap;
+            text-decoration: none; color: var(--text-color); font-weight: 500;
+            padding: 8px 16px; border-radius: 50px; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;
         }
         .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
         .nav-link i { font-size: 1.1em; }
         
-        /* Active State for Analytics Page */
         .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
-        
         .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
         .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* Mobile Hamburger */
-        .mobile-toggle {
-            display: none;
-            font-size: 1.6rem;
-            cursor: pointer;
-            color: var(--text-color);
-            padding: 10px;
-        }
+        .mobile-toggle { display: none; font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 10px; }
 
-        /* --- 2. Container & Content --- */
+        /* --- Container --- */
         .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-            animation: fadeIn 0.5s ease;
+            max-width: 1400px; margin: 30px auto; padding: 0 20px; animation: fadeIn 0.6s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            color: var(--bma-green);
-            font-size: 2em;
-            font-weight: 600;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--bma-green-light);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: var(--shadow-md);
-        }
-
-        /* Stat Cards */
-        .stat-card-row {
+        /* --- NEW STATS SECTION --- */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr 2fr; /* 1 ส่วนสำหรับยอดรวม, 2 ส่วนสำหรับ Top 10 */
+            gap: 20px;
+            margin-bottom: 25px;
         }
 
         .stat-card {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: var(--shadow-lg);
-            border-left: 5px solid;
-            transition: all 0.3s ease;
-            animation: slideIn 0.5s ease;
+            background: white; border-radius: 20px; padding: 25px;
+            box-shadow: var(--shadow-lg); position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
+        /* Total Views Card */
+        .total-views-card {
+            background: linear-gradient(135deg, var(--bma-green), #005a24);
+            color: white;
+            align-items: center; justify-content: center; text-align: center;
         }
+        .total-views-card i { font-size: 4rem; opacity: 0.8; margin-bottom: 10px; }
+        .total-views-number { font-size: 3.5rem; font-weight: 800; line-height: 1; margin: 10px 0; }
+        .total-views-label { font-size: 1.1rem; opacity: 0.9; }
 
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
-
-        .stat-card.card-blue { border-left-color: var(--button-blue); }
-        .stat-card.card-green { border-left-color: var(--bma-green); }
-        .stat-card.card-yellow { border-left-color: var(--button-yellow); }
-        .stat-card.card-gray { border-left-color: var(--button-gray); }
-
-        .stat-card-icon {
-            font-size: 2.5em;
-            padding: 20px;
-            border-radius: 15px;
-            color: #fff;
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-md);
+        /* Top 10 List Card */
+        .top-links-card h3 { 
+            font-size: 1.3rem; margin-bottom: 15px; color: var(--text-color); 
+            display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;
         }
-
-        .icon-links { background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%); }
-        .icon-active { background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%); }
-        .icon-users { background: linear-gradient(135deg, var(--button-yellow) 0%, #e0a800 100%); }
-        .icon-feedback { background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%); }
-        .icon-star { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
-
-        .stat-card-info { flex: 1; }
-        .stat-card-info h3 { margin: 0 0 5px 0; font-size: 0.95em; color: var(--button-gray); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-card-info .stat-number { font-size: 2.5em; font-weight: 600; color: var(--text-color); line-height: 1; }
-        .stat-card-info .stat-number .unit { font-size: 0.5em; color: var(--button-gray); font-weight: 400; }
-
-        /* Chart Grid */
-        .chart-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-top: 30px;
+        .ranking-list {
+            list-style: none; padding: 0; margin: 0;
+            max-height: 250px; overflow-y: auto; /* Scrollable */
         }
-
-        .chart-container {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: var(--shadow-lg);
-            transition: all 0.3s ease;
+        .ranking-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 10px; border-bottom: 1px solid #f5f5f5; transition: 0.2s;
         }
-        .chart-container:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
-        .chart-container-full { grid-column: 1 / -1; }
-
-        .chart-container h3 {
-            text-align: center;
-            margin: 0 0 20px 0;
-            font-weight: 600;
-            color: var(--text-color);
-            font-size: 1.2em;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f8f9fa;
+        .ranking-item:hover { background-color: #f9fffb; }
+        .rank-badge {
+            width: 28px; height: 28px; background: var(--bma-green-light); color: var(--bma-green);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 0.9rem; margin-right: 15px; flex-shrink: 0;
         }
-        .chart-container h3 i { color: var(--bma-green); margin-right: 8px; }
-
-        /* Feedback List */
-        .feedback-list { list-style: none; padding: 0; margin: 0; max-height: 350px; overflow-y: auto; }
-        .feedback-list li { border-bottom: 1px solid #f0f0f0; padding: 15px 10px; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 5px; }
-        .feedback-list li:hover { background: var(--bma-green-light); transform: translateX(5px); }
-        .feedback-list li:last-child { border-bottom: none; }
-        .feedback-list p { margin: 0 0 8px 0; font-size: 1em; line-height: 1.5; color: var(--text-color); }
-        .feedback-list .user { font-size: 0.85em; font-weight: 500; color: var(--button-gray); font-style: italic; }
+        .rank-1 { background: #fff8e1; color: #ffc107; border: 1px solid #ffecb3; }
+        .rank-2 { background: #f5f5f5; color: #7f8c8d; border: 1px solid #bdc3c7; }
+        .rank-3 { background: #fff3e0; color: #e67e22; border: 1px solid #ffe0b2; }
         
-        /* Custom Scrollbar */
-        .feedback-list::-webkit-scrollbar, ::-webkit-scrollbar { width: 8px; height: 8px; }
-        .feedback-list::-webkit-scrollbar-track, ::-webkit-scrollbar-track { background: #f8f9fa; border-radius: 10px; }
-        .feedback-list::-webkit-scrollbar-thumb, ::-webkit-scrollbar-thumb { background: var(--bma-green); border-radius: 10px; }
+        .link-info { flex-grow: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-right: 10px; }
+        .link-info a { text-decoration: none; color: var(--text-color); font-weight: 500; }
+        .link-info a:hover { color: var(--bma-green); }
+        .click-count { font-size: 0.9rem; color: #888; display: flex; align-items: center; gap: 5px; }
 
-        /* Empty State */
-        .empty-state { text-align: center; padding: 40px 20px; color: #999; }
-        .empty-state i { font-size: 3em; margin-bottom: 15px; opacity: 0.5; }
+        /* --- Custom Scrollbar for Ranking --- */
+        .ranking-list::-webkit-scrollbar { width: 6px; }
+        .ranking-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        .ranking-list::-webkit-scrollbar-thumb:hover { background: var(--bma-green); }
+
+        /* --- Content Card (Existing Table) --- */
+        .content-card {
+            background: white; border-radius: 20px; padding: 30px;
+            box-shadow: var(--shadow-lg); position: relative; overflow: hidden;
+        }
+
+        h2 {
+            font-size: 1.8rem; color: var(--text-color);
+            margin-bottom: 25px; padding-bottom: 15px;
+            border-bottom: 2px solid var(--bma-green-light);
+            display: flex; align-items: center; gap: 12px;
+        }
+
+        /* Search & Filters */
+        .search-container { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .search-input-wrapper { flex: 2; position: relative; min-width: 280px; }
+        .filter-wrapper { flex: 1; min-width: 200px; }
+
+        #searchInput, #agencyFilter {
+            width: 100%; padding: 14px 20px 14px 45px;
+            font-family: 'Kanit', sans-serif; font-size: 1rem;
+            border: 1px solid var(--border-color); border-radius: 12px;
+            background-color: #f9f9f9; transition: 0.3s;
+        }
+        #searchInput:focus, #agencyFilter:focus {
+            background-color: white; border-color: var(--bma-green);
+            box-shadow: 0 0 0 4px var(--bma-green-light); outline: none;
+        }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+
+        /* Table */
+        .table-responsive { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { background: var(--bma-green); color: white; padding: 15px; font-weight: 500; text-align: left; white-space: nowrap; }
+        td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; color: #555; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f8fff9; }
+
+        /* Badges & Buttons */
+        .status-badge { padding: 5px 12px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+        .status-ok { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .status-blocked { background: #cce5ff; color: #004085; }
+        .status-unknown { background: #e2e3e5; color: #383d41; }
+
+        .action-buttons { display: flex; gap: 8px; justify-content: center; }
+        .btn-icon {
+            width: 35px; height: 35px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            border: none; cursor: pointer; transition: 0.2s; text-decoration: none; color: white;
+        }
+        .btn-edit { background: var(--button-yellow); color: #333; }
+        .btn-delete { background: var(--button-red); }
+        .btn-icon:hover { transform: translateY(-2px); filter: brightness(0.95); }
+
+        .btn-add { 
+            background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
+            color: white; border: none; padding: 12px 25px; border-radius: 50px;
+            font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,150,60,0.3);
+            display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px;
+            text-decoration: none; font-weight: 500; transition: 0.3s;
+        }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,150,60,0.4); }
+
+        .btn-share {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #17a2b8; color: white; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;
+        }
+        .btn-share:hover { background: #138496; transform: scale(1.1); }
+
+        /* Pagination */
+        .pagination-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;
+            flex-wrap: wrap; gap: 15px;
+        }
+        .pagination-nav button {
+            background: white; border: 1px solid #ddd; width: 36px; height: 36px; border-radius: 8px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .pagination-nav button:hover:not(:disabled) { background: var(--bma-green); color: white; border-color: var(--bma-green); }
+        .pagination-nav button:disabled { opacity: 0.5; cursor: default; }
 
         /* Footer */
         .main-footer {
-            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white; text-align: center; padding: 25px; margin-top: 40px; font-size: 0.9em; box-shadow: var(--shadow-lg);
+            background: white; color: #666; text-align: center; padding: 30px;
+            margin-top: 60px; border-top: 1px solid #eee;
         }
-        .main-footer p { margin: 8px 0; opacity: 0.95; }
 
-        /* --- 3. Responsive Media Queries --- */
+        /* --- Responsive --- */
         @media (max-width: 992px) {
-            .nav-link span { display: none; } /* Tablet: Show icons only */
+            .nav-link span { display: none; }
             .nav-link i { font-size: 1.3rem; margin: 0; }
             .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
             .user-profile-pic { width: 100%; height: 100%; }
@@ -265,40 +246,42 @@
             .logo-text { font-size: 1.1rem; }
             .mobile-toggle { display: block; }
 
-            /* Mobile Menu (Slide Down) */
             .nav-menu {
-                display: none;
-                position: absolute;
-                top: 70px; left: 0; width: 100%;
-                background: white;
-                flex-direction: column;
-                align-items: stretch;
-                padding: 15px;
-                box-shadow: 0 10px 15px rgba(0,0,0,0.05);
-                border-top: 1px solid #f0f0f0;
+                display: none; position: absolute; top: 70px; left: 0; width: 100%;
+                background: white; flex-direction: column; align-items: stretch;
+                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
             }
             .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
             @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-            .nav-link {
-                width: 100%; border-radius: 12px;
-                padding: 12px 15px; margin-bottom: 5px;
-                justify-content: flex-start;
-            }
-            .nav-link span { display: inline; } /* Mobile: Show text again */
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; }
+            .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
 
-            /* Content Adjustments */
             .container { padding: 0 15px; margin: 20px auto; }
-            h2 { font-size: 1.3em; padding: 15px; }
-            .chart-grid, .stat-card-row { grid-template-columns: 1fr; }
-            .stat-card { padding: 20px; }
-            .stat-card-icon { width: 60px; height: 60px; font-size: 2em; padding: 15px; }
+            .content-card { padding: 20px 15px; border-radius: 15px; }
+            h2 { font-size: 1.4rem; }
+            .btn-add { width: 100%; justify-content: center; }
+            
+            /* Stats Grid Mobile */
+            .stats-grid { grid-template-columns: 1fr; }
+            
+            .search-container { flex-direction: column; gap: 10px; }
+            .search-input-wrapper, .filter-wrapper { min-width: 100%; }
+
+            th:nth-child(2), td:nth-child(2), /* รายละเอียด */
+            th:nth-child(7), td:nth-child(7), /* ส่วนราชการ */
+            th:nth-child(8), td:nth-child(8), /* เบอร์ */
+            th:nth-child(10), td:nth-child(10) /* วันที่ */
+            { display: none; }
+            
+            .pagination-controls { justify-content: center; }
+            .pagination-items { width: 100%; text-align: center; margin-bottom: 10px; }
         }
     </style>
 </head>
 <body>
-    
+
     <header class="main-header">
         <a href="{{ url_for('home') }}" class="logo-container">
             <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
@@ -317,10 +300,9 @@
                 <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
                 {% endif %}
                 
-                <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                <a href="{{ url_for('dashboard') }}" class="nav-link active-nav" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
                 
-                <a href="{{ url_for('analytics_page') }}" class="nav-link active-nav" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
-                
+                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
                 <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
                 
                 <a href="{{ url_for('profile_page') }}" class="nav-link" title="โปรไฟล์">
@@ -340,128 +322,205 @@
     </header>
     
     <div class="container">
-        <h2>📊 Analytics Dashboard (สรุปผลผู้บริหาร)</h2>
-
-        <div class="stat-card-row">
-            <div class="stat-card card-blue">
-                <div class="stat-card-icon icon-links"><i class="fas fa-link"></i></div>
-                <div class="stat-card-info">
-                    <h3>ลิงค์ทั้งหมด</h3>
-                    <div class="stat-number">{{ chart_data.total_links | default(0) }}</div>
-                </div>
-            </div>
-            <div class="stat-card card-green">
-                <div class="stat-card-icon icon-active"><i class="fas fa-check-circle"></i></div>
-                <div class="stat-card-info">
-                    <h3>ลิงค์ที่ใช้งาน</h3>
-                    <div class="stat-number">{{ chart_data.active_links | default(0) }}</div>
-                </div>
-            </div>
-            <div class="stat-card card-yellow">
-                <div class="stat-card-icon icon-users"><i class="fas fa-users"></i></div>
-                <div class="stat-card-info">
-                    <h3>ผู้ใช้งานทั้งหมด</h3>
-                    <div class="stat-number">{{ chart_data.total_users | default(0) }}</div>
-                </div>
-            </div>
-            <div class="stat-card card-gray">
-                <div class="stat-card-icon icon-feedback"><i class="fas fa-comment-dots"></i></div>
-                <div class="stat-card-info">
-                    <h3>ผู้ตอบแบบสำรวจ</h3>
-                    <div class="stat-number">{{ chart_data.total_responses | default(0) }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="stat-card-row">
-            <div class="stat-card card-yellow">
-                <div class="stat-card-icon icon-star"><i class="fas fa-star"></i></div>
-                <div class="stat-card-info">
-                    <h3>คะแนนความพึงพอใจ (เฉลี่ย)</h3>
-                    <div class="stat-number">{{ chart_data.avg_sat | default(0) }} <span class="unit">/ 5</span></div>
-                </div>
-            </div>
-            <div class="stat-card card-yellow">
-                <div class="stat-card-icon icon-star"><i class="fas fa-star"></i></div>
-                <div class="stat-card-info">
-                    <h3>คะแนนความง่าย (เฉลี่ย)</h3>
-                    <div class="stat-number">{{ chart_data.avg_ease | default(0) }} <span class="unit">/ 5</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="chart-grid">
-            <div class="chart-container">
-                <h3><i class="fas fa-chart-pie"></i> สัดส่วนลิงค์ตามประเภทงาน</h3>
-                <canvas id="categoryPieChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3><i class="fas fa-chart-bar"></i> 5 ส่วนราชการที่เพิ่มลิงค์สูงสุด</h3>
-                <canvas id="departmentBarChart"></canvas>
-            </div>
-            <div class="chart-container chart-container-full">
-                <h3><i class="fas fa-chart-line"></i> จำนวนลิงค์ที่เพิ่มขึ้น (รายเดือน)</h3>
-                <canvas id="monthlyLineChart"></canvas>
-            </div>
-        </div>
         
-        <h2 style="margin-top: 40px;">🗣️ เสียงสะท้อนจากผู้ใช้งาน (5 รายการล่าสุด)</h2>
-        <div class="chart-grid">
-            <div class="chart-container">
-                <h3><i class="fas fa-comment-alt"></i> ข้อเสนอแนะ/ปัญหาที่พบ</h3>
-                <ul class="feedback-list">
-                    {% for item in chart_data.recent_comments %}
-                        <li>
-                            <p>"{{ item.text }}"</p>
-                            <span class="user">- (โดย: {{ item.user }})</span>
-                        </li>
-                    {% else %}
-                        <li>
-                            <div class="empty-state">
-                                <i class="fas fa-inbox"></i>
-                                <p>ยังไม่มีข้อเสนอแนะ</p>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
+        <div class="stats-grid">
+            <div class="stat-card total-views-card">
+                <i class="fas fa-users"></i>
+                <div class="total-views-number">{{ "{:,}".format(total_views|default(0)) }}</div>
+                <div class="total-views-label">ผู้เข้าชมเว็บไซต์ทั้งหมด</div>
             </div>
-            <div class="chart-container">
-                <h3><i class="fas fa-lightbulb"></i> ฟีเจอร์ที่อยากให้มี</h3>
-                <ul class="feedback-list">
-                    {% for item in chart_data.recent_features %}
-                        <li>
-                            <p>"{{ item.text }}"</p>
-                            <span class="user">- (โดย: {{ item.user }})</span>
-                        </li>
+
+            <div class="stat-card top-links-card">
+                <h3><i class="fas fa-trophy" style="color: #ffc107;"></i> 10 อันดับลิงค์ยอดนิยม</h3>
+                <ul class="ranking-list">
+                    {% for link in top_10_links|default([]) %}
+                    <li class="ranking-item">
+                        <div class="rank-badge {% if loop.index <= 3 %}rank-{{ loop.index }}{% endif %}">{{ loop.index }}</div>
+                        <div class="link-info">
+                            <a href="{{ link['URL'] }}" target="_blank" title="{{ link['ชื่อลิงก์'] }}">{{ link['ชื่อลิงก์'] }}</a>
+                        </div>
+                        <div class="click-count"><i class="fas fa-eye"></i> {{ link['Clicks'] }}</div>
+                    </li>
                     {% else %}
-                        <li>
-                            <div class="empty-state">
-                                <i class="fas fa-inbox"></i>
-                                <p>ยังไม่มีคำขอฟีเจอร์</p>
-                            </div>
-                        </li>
+                    <li class="ranking-item" style="justify-content: center; color: #999;">
+                        ยังไม่มีข้อมูลสถิติ
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
 
+        <div class="content-card">
+            <h2>🖥️ Dashboard จัดการลิงค์</h2>
+            
+            <a href="{{ url_for('add_link_page') }}" class="btn-add">
+                <i class="fas fa-plus-circle"></i> เพิ่มลิงค์ใหม่
+            </a>
+
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="ค้นหาทุกลิงค์ (ชื่อ, สถานะ, ผู้สร้าง)...">
+                </div>
+                
+                <div class="filter-wrapper">
+                    <select id="agencyFilter">
+                        <option value="">🏢 ทุกส่วนราชการ (ทั้งหมด)</option>
+                        <optgroup label="ระดับสำนัก">
+                            {% for bureau in bureaus %}
+                            <option value="{{ bureau }}">{{ bureau }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="สำนักงานเขต">
+                            {% for district in districts %}
+                            <option value="{{ district }}">{{ district }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                ชื่อลิงก์ 
+                                <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7;">↕</span>
+                            </th>
+                            <th>รายละเอียด</th> 
+                            <th style="text-align:center;">สถานะลิงค์</th> 
+                            <th style="text-align:center;">การใช้งาน</th>
+                            <th>ประเภท</th>
+                            <th>หน่วยงาน</th> 
+                            <th>ส่วนราชการ</th> 
+                            <th>เบอร์ติดต่อ</th>
+                            <th>ผู้สร้าง</th>
+                            <th>วันที่</th>
+							<th style="text-align: center;">แชร์</th>
+                            <th style="text-align: center;">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="linkTableBody">
+                        {% for link in links %}
+                        <tr>
+                            <td>
+                                {% if link['สถานะ'] == 'ใช้งาน' %}
+                                    <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;">
+                                        <i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}
+                                    </a>
+                                {% else %}
+                                    <span style="color: #888;">{{ link['ชื่อลิงก์'] }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ link['รายละเอียด'] }}</td>
+                            
+                            <td style="text-align: center;">
+                                {% if link['LinkStatus'] == 'OK' %}
+                                    <span class="status-badge status-ok"><i class="fas fa-check-circle"></i> ปกติ</span>
+                                {% elif link['LinkStatus'] == '403 Blocked' %}
+                                    <span class="status-badge status-blocked"><i class="fas fa-ban"></i> Block</span>
+                                {% elif link['LinkStatus'] %}
+                                    <span class="status-badge status-error"><i class="fas fa-exclamation-triangle"></i> {{ link['LinkStatus'] }}</span>
+                                {% else %}
+                                    <span class="status-badge status-unknown">? รอตรวจ</span>
+                                {% endif %}
+                            </td>
+
+                            <td style="text-align: center;">
+                                {% if link['สถานะ'] == 'ใช้งาน' %}
+                                    <span class="status-badge status-ok">ใช้งาน</span>
+                                {% elif link['สถานะ'] == 'ปรับปรุง' %}
+                                    <span class="status-badge" style="background:#fff3cd; color:#856404;">ปรับปรุง</span>
+                                {% else %}
+                                    <span class="status-badge status-error">เลิกใช้</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td>{{ link['ประเภท'] }}</td>
+                            <td>{{ link['หน่วยงาน'] }}</td>
+                            <td>{{ link['ส่วนราชการ'] }}</td>
+                            
+                            <td>{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}</td>
+                            
+                            <td>
+                                <a href="{{ url_for('view_profile', username=link['CreatorUsername']) }}" style="color: var(--text-color);">
+                                    <i class="far fa-user"></i> {{ link['CreatorUsername'] }}
+                                </a>
+                            </td>
+                            <td>{{ link['วันที่อัปเดต_สั้น'] }}</td>
+                            
+                            <td align="center">
+                                <button type="button" class="btn-share" onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')">
+                                    <i class="fas fa-qrcode"></i>
+                                </button>
+                            </td>
+                            
+                            <td>
+                                <div class="action-buttons" style="justify-content: center;">
+                                {% if session.level == 'Admin' or (session.level == 'Users' and link['CreatorUsername'] == session.username) %}
+                                    <a href="{{ url_for('edit_link_page', link_id=link['ID']) }}" class="btn-icon btn-edit" title="แก้ไข">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <form action="{{ url_for('delete_link_action', link_id=link['ID']) }}" method="POST" class="delete-form" style="margin:0;">
+                                        <button type="submit" class="btn-icon btn-delete" title="ลบ">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span style="color:#ccc; font-size:0.8rem;">-</span>
+                                {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr id="noDataRow">
+                            <td colspan="12" style="text-align: center; padding: 30px; color: #999;">
+                                <i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+                                ไม่พบข้อมูลลิงค์
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-controls">
+                <div class="pagination-items">
+                    แสดง: 
+                    <select id="itemsPerPage" style="padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="99999">ทั้งหมด</option>
+                    </select>
+                </div>
+                <div class="pagination-nav">
+                    <button id="btnFirst">«</button>
+                    <button id="btnPrev">‹</button>
+                    <span style="margin: 0 10px; font-weight: 500;">หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span></span>
+                    <button id="btnNext">›</button>
+                    <button id="btnLast">»</button>
+                </div>
+            </div>
+        </div>
     </div> 
     
     <footer class="main-footer">
         <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
         <p>สำนักยุทธศาสตร์และประเมินผล</p>
-        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
-        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
+        <p style="font-size: 0.85rem; margin-top: 10px; color: #999;">© 2025 Bangkok Metropolitan Administration.</p>
     </footer>
 
     <script>
-        // --- 1. Mobile Menu Logic (Updated to match Dashboard) ---
+        // Toggle Hamburger Menu
         function toggleMenu() {
             const menu = document.getElementById('navMenu');
             menu.classList.toggle('active');
         }
-
-        // Close mobile menu when clicking outside
+        
+        // Close menu when clicking outside
         document.addEventListener('click', (e) => {
             const nav = document.getElementById('navMenu');
             const toggle = document.querySelector('.mobile-toggle');
@@ -470,120 +529,134 @@
             }
         });
 
-        // --- 2. Chart.js Code (Existing) ---
-        const chartData = {{ chart_data | tojson }};
-        const bmaGreen = 'rgba(0, 150, 60, 0.7)';
-        const bmaBlue = 'rgba(0, 123, 255, 0.7)';
-        const bmaYellow = 'rgba(255, 193, 7, 0.7)';
-        const bmaRed = 'rgba(220, 53, 69, 0.7)';
-        const bmaGray = 'rgba(108, 117, 125, 0.7)';
-        const bmaOrange = 'rgba(253, 126, 20, 0.7)';
-        const bmaTeal = 'rgba(32, 201, 151, 0.7)';
-        const colorPalette = [bmaGreen, bmaBlue, bmaYellow, bmaRed, bmaGray, bmaOrange, bmaTeal];
-        
-        function getBmaColors(count) {
-            const colors = [];
-            for (let i = 0; i < count; i++) {
-                colors.push(colorPalette[i % colorPalette.length]);
-            }
-            return colors;
-        }
-        
-        Chart.defaults.font.family = "'Kanit', sans-serif";
-        Chart.defaults.font.size = 14;
+        // --- JavaScript Logic (Pagination, Search, Sort) ---
+        let allTableRows = []; 
+        let currentPage = 1;
+        let totalPages = 1;
+        const tbody = document.getElementById("linkTableBody");
+        const noDataRow = document.getElementById("noDataRow");
+        const searchInput = document.getElementById("searchInput");
+        const agencyFilter = document.getElementById("agencyFilter");
 
-        if (chartData.category_labels && chartData.category_data) {
-            const ctx1 = document.getElementById('categoryPieChart').getContext('2d');
-            new Chart(ctx1, {
-                type: 'pie',
-                data: {
-                    labels: chartData.category_labels,
-                    datasets: [{
-                        label: 'จำนวนลิงค์',
-                        data: chartData.category_data,
-                        backgroundColor: getBmaColors(chartData.category_data.length),
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    plugins: { 
-                        legend: { position: 'top', labels: { padding: 15, font: { size: 12 } } } 
-                    } 
-                }
+        function sortTable(columnIndex, direction) {
+            const collator = new Intl.Collator('th', { sensitivity: 'base' });
+            allTableRows.sort((rowA, rowB) => {
+                const cellA = rowA.children[columnIndex].innerText.trim();
+                const cellB = rowB.children[columnIndex].innerText.trim();
+                return direction === 'asc' ? collator.compare(cellA, cellB) : collator.compare(cellB, cellA);
+            });
+            displayPage(currentPage);
+        }
+
+        function displayPage(page) {
+            currentPage = page;
+            const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
+            const filterText = searchInput.value.toLowerCase();
+            const selectedAgency = agencyFilter.value;
+
+            // กรองข้อมูล
+            const filteredRows = allTableRows.filter(row => {
+                const textContent = row.innerText.toLowerCase();
+                const agencyCell = row.children[6].innerText.trim(); 
+                
+                const matchesText = textContent.includes(filterText);
+                const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);
+                return matchesText && matchesAgency;
+            });
+
+            tbody.innerHTML = ''; 
+
+            if (filteredRows.length === 0) {
+                if(noDataRow) { noDataRow.style.display = 'table-row'; tbody.appendChild(noDataRow); }
+                totalPages = 1; currentPage = 1;
+            } else {
+                if(noDataRow) noDataRow.style.display = 'none';
+                totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+                if (page > totalPages) currentPage = totalPages;
+                if (page < 1) currentPage = 1;
+                
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                filteredRows.slice(startIndex, endIndex).forEach(row => tbody.appendChild(row));
+            }
+            
+            document.getElementById("currentPage").textContent = currentPage;
+            document.getElementById("totalPages").textContent = totalPages;
+            document.getElementById("btnFirst").disabled = (currentPage === 1);
+            document.getElementById("btnPrev").disabled = (currentPage === 1);
+            document.getElementById("btnNext").disabled = (currentPage === totalPages);
+            document.getElementById("btnLast").disabled = (currentPage === totalPages);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            allTableRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
+            
+            document.getElementById("btnFirst").onclick = () => displayPage(1);
+            document.getElementById("btnPrev").onclick = () => displayPage(currentPage - 1);
+            document.getElementById("btnNext").onclick = () => displayPage(currentPage + 1);
+            document.getElementById("btnLast").onclick = () => displayPage(totalPages);
+            document.getElementById("itemsPerPage").onchange = () => displayPage(1);
+            searchInput.onkeyup = () => displayPage(1);
+            agencyFilter.onchange = () => displayPage(1);
+
+            displayPage(1); 
+        });
+
+        // --- Delete Confirmation ---
+        document.querySelectorAll('.delete-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: 'ยืนยันการลบ?',
+                    text: "ข้อมูลจะหายไปอย่างถาวร!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'ลบข้อมูล',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) this.submit();
+                });
+            });
+        });
+
+        // --- Share Modal ---
+        function showShareModal(title, originalUrl, linkId) {
+            const permanentLink = `${window.location.origin}/go/${linkId}`;
+            const qrImageUrl = `{{ url_for('generate_qr_code') }}?url=${encodeURIComponent(permanentLink)}`;
+
+            Swal.fire({
+                html: `
+                    <div style="text-align:center;">
+                        <h3 style="color:var(--bma-green); margin-bottom:10px;">📲 แชร์ลิงค์</h3>
+                        <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9rem; word-break:break-all;">
+                            ${permanentLink}
+                        </div>
+                        <img src="${qrImageUrl}" style="width:200px; border:1px solid #eee; padding:10px; border-radius:10px; margin-bottom:15px;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <button onclick="navigator.clipboard.writeText('${permanentLink}'); Swal.showValidationMessage('คัดลอกแล้ว!')" 
+                                style="background:#007bff; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">
+                                <i class="fas fa-copy"></i> คัดลอก
+                            </button>
+                            <a href="${qrImageUrl}" download="QR-${linkId}.png" 
+                                style="background:#28a745; color:white; text-decoration:none; padding:10px; border-radius:5px; display:inline-block;">
+                                <i class="fas fa-download"></i> บันทึก QR
+                            </a>
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true
             });
         }
-        
-        if (chartData.dept_labels && chartData.dept_data) {
-            const ctx2 = document.getElementById('departmentBarChart').getContext('2d');
-            new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: chartData.dept_labels,
-                    datasets: [{
-                        label: 'จำนวนลิงค์',
-                        data: chartData.dept_data,
-                        backgroundColor: getBmaColors(chartData.dept_data.length),
-                        borderColor: '#fff',
-                        borderWidth: 2,
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        }
-        
-        if (chartData.month_labels && chartData.month_data) {
-            const ctx3 = document.getElementById('monthlyLineChart').getContext('2d');
-            new Chart(ctx3, {
-                type: 'line',
-                data: {
-                    labels: chartData.month_labels,
-                    datasets: [{
-                        label: 'จำนวนลิงค์ที่เพิ่ม',
-                        data: chartData.month_data,
-                        backgroundColor: 'rgba(0, 150, 60, 0.1)',
-                        borderColor: 'rgba(0, 150, 60, 1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: 'rgba(0, 150, 60, 1)',
-                        pointBorderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        }
-    </script>
-    
-    <script>
+
+        // --- Flask Flash Messages ---
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 const messages = {{ messages | tojson }};
                 const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true
                 });
                 messages.forEach(([category, message]) => {
                     Toast.fire({ icon: category, title: message });
