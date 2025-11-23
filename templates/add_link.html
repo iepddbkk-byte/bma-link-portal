@@ -102,6 +102,106 @@
         }
         form optgroup { font-weight: 600; color: var(--bma-green); }
 
+        /* (ปรับปรุง) Shortener Box */
+        .shortener-section {
+            border: 1px solid #dce1e6;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 5px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .shortener-toggle {
+            background-color: #f8f9fa;
+            color: var(--button-blue);
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+            border-bottom: 1px solid transparent;
+        }
+        
+        .shortener-toggle:hover {
+            background-color: #e9ecef;
+        }
+
+        .shortener-toggle.active {
+            background-color: var(--button-blue);
+            color: white;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .shortener-content {
+            display: none;
+            height: 500px;
+            position: relative;
+            background-color: #fff;
+        }
+
+        .shortener-content.show { display: block; }
+
+        iframe { width: 100%; height: 100%; border: none; }
+
+        .shortener-fallback {
+            padding: 15px; text-align: center; font-size: 0.9em;
+            background: #fff3cd; color: #856404; border-top: 1px solid #ffeeba;
+        }
+
+        /* (ใหม่!) Toggle Switch สำหรับเลือก Auto QR */
+        .option-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f1f8e9; /* เขียวอ่อนจางๆ */
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #c5e1a5;
+            margin-bottom: 10px;
+        }
+        
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            color: #2e7d32;
+        }
+
+        /* Switch CSS */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--bma-green); }
+        input:focus + .slider { box-shadow: 0 0 1px var(--bma-green); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
         /* Submit Button */
         button[type="submit"] {
             font-family: 'Kanit', Arial, sans-serif;
@@ -116,64 +216,16 @@
             transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 150, 60, 0.3);
         }
 
-        /* (ใหม่) Tools Container: จัดวางปุ่มเครื่องมือ */
-        .tools-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        /* (ใหม่) กล่องสถานะลิงค์ภายใน (ซ้าย) */
-        .tool-item-internal {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background-color: #e8f5e9; /* สีเขียวอ่อน */
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 0.9em;
-            font-weight: 500;
-            cursor: default;
-        }
-        .tool-item-internal i { font-size: 1.1em; }
-
-        /* (ใหม่) ปุ่มลิงค์ภายนอก (ขวา) */
-        .btn-tool-external {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background-color: white;
-            color: var(--button-blue);
-            border: 1px solid var(--button-blue);
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 0.9em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Kanit', sans-serif;
-        }
-        .btn-tool-external:hover {
-            background-color: var(--button-blue);
-            color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
         /* Required Indicator */
         form label:has(+ input[required])::after,
         form label:has(+ select[required])::after,
         form label:has(+ textarea[required])::after {
             content: "*"; color: #dc3545; margin-left: 4px; font-weight: bold;
         }
+        .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .container { padding: 25px 20px; }
-            .tools-container { grid-template-columns: 1fr; } /* เรียงแนวตั้งในมือถือ */
         }
     </style>
 </head>
@@ -189,21 +241,37 @@
         <form action="{{ url_for('add_link_action') }}" method="POST">
             <div>
                 <label for="ชื่อลิงก์">ชื่อลิงค์ (จำเป็น)</label>
-                <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" placeholder="ระบุชื่อที่เข้าใจง่าย (เช่น ระบบเบิกจ่าย...)" required>
+                <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" placeholder="ระบุชื่อลิงค์ที่ต้องการ..." required>
             </div>
 
             <div>
                 <label for="URL">URL ปลายทาง (จำเป็น)</label>
-                <input type="url" id="URL" name="URL" placeholder="วางลิงค์ยาวๆ หรือลิงค์ต้นทางที่นี่ (เช่น https://docs.google.com/...)" required>
                 
-                <div class="tools-container">
-                    <div class="tool-item-internal" title="ระบบจะสร้างลิงค์สั้นและ QR Code ให้โดยอัตโนมัติ">
-                        <i class="fas fa-magic"></i> ระบบย่อลิงค์อัตโนมัติ (แนะนำ)
+                <div class="option-row">
+                    <div class="option-label">
+                        <i class="fas fa-qrcode"></i> สร้าง QR Code และ Short Link อัตโนมัติ
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="auto_qr_enabled" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <input type="url" id="URL" name="URL" placeholder="วางลิงค์ยาวๆ หรือลิงค์ต้นทางที่นี่..." required>
+                
+                <div class="shortener-section">
+                    <div class="shortener-toggle" onclick="toggleShortenerFrame()">
+                        <span><i class="fas fa-external-link-alt"></i> หรือเลือกใช้เครื่องมือ u.bangkok.go.th (คลิก)</span>
+                        <i class="fas fa-chevron-down" id="toggleIcon"></i>
                     </div>
                     
-                    <button type="button" class="btn-tool-external" onclick="openBmaShortener()" title="เปิดหน้าต่างเว็บ u.bangkok.go.th">
-                        <i class="fas fa-external-link-alt"></i> ใช้ u.bangkok.go.th
-                    </button>
+                    <div class="shortener-content" id="iframeContent">
+                        <iframe src="https://u.bangkok.go.th/index.php" title="BMA URL Shortener"></iframe>
+                        
+                        <div class="shortener-fallback">
+                            ⚠️ หากหน้าจอขาว (ไม่แสดงผล) กรุณา <a href="https://u.bangkok.go.th/index.php" target="_blank" style="text-decoration: underline; font-weight: bold;">คลิกที่นี่</a> เพื่อเปิดในหน้าต่างใหม่
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -282,18 +350,23 @@
     </div>
 
     <script>
-        // ฟังก์ชันเปิดเว็บย่อลิงค์ กทม. ในหน้าต่างใหม่ (Native Window)
-        function openBmaShortener() {
-            const width = 1000;
-            const height = 700;
-            const left = (window.screen.width - width) / 2;
-            const top = (window.screen.height - height) / 2;
+        // ฟังก์ชันเปิด/ปิด Iframe
+        function toggleShortenerFrame() {
+            const content = document.getElementById('iframeContent');
+            const toggleBtn = document.querySelector('.shortener-toggle');
+            const icon = document.getElementById('toggleIcon');
             
-            window.open(
-                'https://u.bangkok.go.th/index.php', 
-                'BMA_Shortener_Tool', 
-                `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no`
-            );
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                toggleBtn.classList.remove('active');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                content.classList.add('show');
+                toggleBtn.classList.add('active');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
         }
     </script>
 
@@ -332,6 +405,5 @@ s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
 <!--End of Tawk.to Script-->
-
 </body>
 </html>
