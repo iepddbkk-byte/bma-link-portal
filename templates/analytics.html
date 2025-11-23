@@ -583,6 +583,34 @@
             {% endif %}
         {% endwith %}
     </script>
+	<script>
+        function updateOnlineCount() {
+            // เรียก API heartbeat เพื่ออัปเดตสถานะและรับจำนวนคนออนไลน์
+            fetch("{{ url_for('heartbeat') }}", { 
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.online_count !== undefined) {
+                    const el = document.getElementById('onlineCount');
+                    if(el) el.textContent = data.online_count;
+                }
+            })
+            .catch(err => console.error("Heartbeat error:", err));
+        }
+
+        // เรียกทำงานทันทีเมื่อโหลดหน้าเว็บ
+        updateOnlineCount();
+        
+        // อัปเดตทุกๆ 10 วินาที
+        setInterval(updateOnlineCount, 10000);
+
+        // แจ้งเตือนเมื่อปิดหน้าเว็บ (Offline)
+        window.addEventListener('beforeunload', function() {
+            navigator.sendBeacon("{{ url_for('offline') }}");
+        });
+    </script>
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){

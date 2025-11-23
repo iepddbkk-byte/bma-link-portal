@@ -115,6 +115,49 @@
             padding: 5px;
         }
 
+        /* จัดกลุ่ม Logo กับ Stats ให้อยู่ทางซ้าย */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px; 
+        }
+
+        /* กล่องแสดงจำนวนคนออนไลน์ */
+        .header-online-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--bma-green-light);
+            color: var(--bma-green);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--bma-green);
+            white-space: nowrap;
+        }
+
+        /* Mobile Responsive: ซ่อนคำว่า 'ออนไลน์' บนมือถือเพื่อประหยัดพื้นที่ */
+        @media (max-width: 768px) {
+            .header-online-count span:last-child { display: none; }
+        }
+
+        /* Animation จุดสีเขียวกระพริบ */
+        .pulsating-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
         /* --- Container & Content --- */
         .container {
             max-width: 1400px;
@@ -274,11 +317,19 @@
 </head>
 <body>
     
-    <header class="main-header">
-        <a href="{{ url_for('home') }}" class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-        </a>
+<header class="main-header">
+        <div class="header-left">
+            <a href="{{ url_for('home') }}" class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </a>
+            
+            <div class="header-online-count" title="ผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
+                <span class="pulsating-dot"></span>
+                <span id="onlineCount">-</span>
+                <span>ออนไลน์</span>
+            </div>
+        </div>
 
         <div class="mobile-controls">
             {% if session.get('logged_in') %}
