@@ -1,5 +1,6 @@
 ﻿import gspread
 import qrcode
+from datetime import timedelta
 from io import BytesIO
 from flask import (
     Flask, jsonify, request, render_template, 
@@ -13,6 +14,7 @@ import string
 import os
 import json
 import requests
+import uuid 
 from collections import Counter
 from threading import Thread 
 from PIL import Image
@@ -282,16 +284,14 @@ def home():
     if db_sheet is None: 
         return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=[], error="Sheet Error")
     try:
-        # --- LOGIC การนับแบบ UNIQUE VIEW (แก้ไขใหม่) ---
-        # ตรวจสอบว่าใน Session มีตัวแปร 'visited_home' หรือไม่
+        # --- LOGIC การนับแบบ UNIQUE VIEW ---
         if not session.get('visited_home'):
-            # ถ้ายังไม่มี (คือเพิ่งเข้ามาครั้งแรกในรอบนี้) ให้ไปบวกเลขเพิ่ม
             Thread(target=increment_site_views).start()
-            # จากนั้นบันทึกว่า "นับไปแล้วนะ" ลงใน Session ของผู้ใช้คนนี้
             session['visited_home'] = True
-            # ตั้งค่าให้ Session อยู่นานเท่าไหร่ก็ได้ (ปกติ Flask จะจัดการให้ หรือกำหนด lifetime ได้)
         
-        # ---------------------------------------------
+        # --- สร้าง Visitor ID สำหรับนับคนออนไลน์ ถ้ายังไม่มี ---
+        if not session.get('visitor_id'):
+            session['visitor_id'] = str(uuid.uuid4())
 
         total_views = 0
         if stats_sheet:
@@ -326,6 +326,10 @@ def links_page():
     if db_sheet is None: 
         return render_template('links_page.html', links=[], error="Sheet Error", session=session, agency_name="Error")
     try:
+        # --- สร้าง Visitor ID สำหรับนับคนออนไลน์ ถ้ายังไม่มี ---
+        if not session.get('visitor_id'):
+            session['visitor_id'] = str(uuid.uuid4())
+
         agency_filter = request.args.get('agency') 
         all_records = get_db_records()
         
@@ -533,6 +537,10 @@ def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     if db_sheet is None: return render_template('dashboard.html', session=session, links=[])
     try: 
+        # --- สร้าง Visitor ID ถ้าไม่มี ---
+        if not session.get('visitor_id'):
+            session['visitor_id'] = str(uuid.uuid4())
+
         all_links = get_db_records() 
         
         # --- คำนวณ Top 10 Links และ Clicks ---
@@ -781,6 +789,71 @@ def feedback_action():
 def get_all_links():
     try: return jsonify({"status": "success", "data": get_db_records()})
     except: return jsonify({"status": "error"}), 500
+
+# --- Real-time Online Counter System ---
+
+# ตัวแปร Global สำหรับเก็บ session_id ที่กำลัง active
+# รูปแบบ: {'session_id_or_username': datetime_object}
+online_users = {}
+
+def cleanup_online_users():
+    """เคลียร์ User ที่ไม่ได้ส่ง Heartbeat มาเกิน 1 นาที"""
+    global online_users
+    now = datetime.datetime.now()
+    # เก็บเฉพาะคนที่ Active ภายใน 30 วินาทีที่ผ่านมา (ปรับให้สั้นลงเพื่อให้ตัวเลขลดเร็วขึ้นเมื่อปิดจอ)
+    online_users = {k: v for k, v in online_users.items() if now - v < timedelta(seconds=30)}
+
+@app.route('/heartbeat', methods=['POST'])
+def heartbeat():
+    """Endpoint สำหรับรับสัญญาณชีพจากหน้าเว็บ และส่งจำนวนคนออนไลน์กลับไป"""
+    global online_users
+    
+    # ใช้วิธีระบุตัวตน 2 แบบ: 
+    # 1. ถ้า Login แล้วใช้ Username 
+    # 2. ถ้ายังไม่ Login ให้ใช้ visitor_id จาก session
+    
+    if session.get('logged_in'):
+        user_key = f"user:{session.get('username')}"
+    else:
+        # ถ้าไม่มี visitor_id ให้สร้างใหม่ (กรณีเพิ่งเข้าครั้งแรกผ่าน API นี้)
+        if not session.get('visitor_id'):
+            session['visitor_id'] = str(uuid.uuid4())
+        user_key = f"guest:{session.get('visitor_id')}"
+        
+    # บันทึกเวลาล่าสุดที่ติดต่อมา
+    online_users[user_key] = datetime.datetime.now()
+    
+    # ทำความสะอาดข้อมูลเก่าทุกครั้งที่มีการเรียก (หรือจะแยก Thread ก็ได้ถ้าระบบใหญ่)
+    cleanup_online_users()
+    
+    return jsonify({
+        'status': 'ok',
+        'online_count': len(online_users)
+    })
+
+@app.route('/offline', methods=['POST'])
+def offline():
+    """Endpoint ที่จะถูกเรียกเมื่อปิดหน้าเว็บ (beacon)"""
+    global online_users
+    
+    try:
+        # พยายามหา user_key แบบเดียวกับ heartbeat
+        # หมายเหตุ: beacon อาจจะไม่ส่ง cookies ในบาง browser แต่ Flask session ส่วนใหญ่ใช้ cookie
+        if session.get('logged_in'):
+            user_key = f"user:{session.get('username')}"
+        else:
+            if session.get('visitor_id'):
+                user_key = f"guest:{session.get('visitor_id')}"
+            else:
+                return '', 204 # ไม่มี ID ก็ทำอะไรไม่ได้
+                
+        if user_key in online_users:
+            del online_users[user_key]
+            
+    except Exception as e:
+        print(f"Offline signal error: {e}")
+
+    return '', 204
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

@@ -56,6 +56,12 @@
             transition: all 0.3s ease;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* ปรับระยะห่าง */
+        }
+
         .logo-container {
             display: flex;
             align-items: center;
@@ -66,6 +72,61 @@
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
+
+        /* --- Status Stats Group (Visitor + Online) --- */
+        .header-stats-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .header-visitor-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #f0f2f5;
+            color: var(--text-color);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid #e0e0e0;
+            white-space: nowrap;
+        }
+        .header-visitor-count i { color: #666; font-size: 1em; }
+
+        /* --- Online Counter Style --- */
+        .header-online-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--bma-green-light);
+            color: var(--bma-green);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--bma-green);
+            white-space: nowrap;
+            position: relative;
+        }
+
+        /* Pulsing Dot Animation */
+        .pulsating-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
 
         /* Desktop Menu */
         .nav-menu {
@@ -96,7 +157,7 @@
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* --- Mobile Header Controls (Profile + Hamburger) --- */
+        /* --- Mobile Header Controls --- */
         .mobile-controls { display: none; align-items: center; gap: 15px; }
         
         .mobile-profile-btn {
@@ -115,56 +176,31 @@
             padding: 5px;
         }
 
-        /* --- Container & Stats --- */
+        /* --- Container --- */
         .container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
         }
 
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 25px;
+        /* --- Top Links Card (Updated) --- */
+        .top-links-section {
             margin-bottom: 50px;
         }
-
-        .stat-card-main {
-            background: linear-gradient(135deg, var(--bma-green) 0%, #006428 100%);
-            color: white;
-            border-radius: 20px;
-            padding: 40px 20px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 150, 60, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card-main::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 10%);
-            background-size: 20px 20px; opacity: 0.3;
-        }
-        .stat-icon { font-size: 4rem; margin-bottom: 15px; opacity: 0.9; }
-        .stat-number { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 5px; }
-        .stat-label { font-size: 1.2rem; font-weight: 300; opacity: 0.9; }
 
         .top-links-card {
             background: white;
             border-radius: 20px;
-            padding: 25px;
-            box-shadow: var(--shadow-md);
+            padding: 30px;
+            box-shadow: var(--shadow-lg); /* เพิ่มเงาให้เด่นขึ้น */
             border: 1px solid #f0f0f0;
+            /* max-width: 800px; margin: 0 auto;  <-- ถ้าอยากให้ไม่กว้างเต็มจอก็เปิดอันนี้ */ 
         }
         .card-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;
         }
-        .card-title { font-size: 1.3rem; font-weight: 700; color: var(--text-color); display: flex; align-items: center; gap: 10px; }
+        .card-title { font-size: 1.5rem; font-weight: 700; color: var(--text-color); display: flex; align-items: center; gap: 10px; }
         
         .link-item {
             display: flex; justify-content: space-between; align-items: center;
@@ -175,9 +211,9 @@
         .link-item:hover { transform: translateX(5px); border-color: var(--bma-green-light); box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
         
         .rank-badge {
-            width: 30px; height: 30px; border-radius: 50%;
+            width: 35px; height: 35px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 800; margin-right: 15px; font-size: 0.9rem;
+            font-weight: 800; margin-right: 15px; font-size: 1rem;
         }
         .rank-1 { background: #fff8e1; color: #f1c40f; border: 2px solid #f1c40f; }
         .rank-2 { background: #f5f5f5; color: #95a5a6; border: 2px solid #95a5a6; }
@@ -185,8 +221,8 @@
         .rank-other { background: #f0fcf4; color: var(--bma-green); }
 
         .link-info { display: flex; align-items: center; overflow: hidden; flex-grow: 1; }
-        .link-name { font-weight: 600; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
-        .link-clicks { font-size: 0.9rem; color: #888; display: flex; align-items: center; gap: 5px; margin-left: 15px; }
+        .link-name { font-weight: 600; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.1rem; }
+        .link-clicks { font-size: 0.95rem; color: #888; display: flex; align-items: center; gap: 5px; margin-left: 15px; background: #f8f9fa; padding: 5px 10px; border-radius: 15px; }
 
         /* --- Hero Search --- */
         .hero-section { text-align: center; margin-bottom: 40px; }
@@ -265,38 +301,31 @@
             .main-header { padding: 0 15px; height: 70px; }
             .logo-text { font-size: 1.1rem; }
             
-            /* Show Mobile Controls */
+            /* Mobile Controls */
             .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
+
+            /* Stats on Mobile */
+            .header-visitor-count span { display: none; } /* ซ่อนคำว่าผู้เข้าชมเหลือแต่ไอคอน */
+            .header-visitor-count { padding: 6px; border-radius: 50%; width: 32px; height: 32px; justify-content: center; }
+            .header-online-count span:last-child { display: none; } /* ซ่อนคำว่า ออนไลน์ เหลือแต่ตัวเลข */
             
-            /* Hide Menu Initially */
+            /* Mobile Menu */
             .nav-menu {
-                display: none;
-                position: absolute;
-                top: 70px; left: 0; width: 100%;
-                background: white;
-                flex-direction: column;
-                align-items: stretch;
-                padding: 15px;
-                box-shadow: 0 10px 15px rgba(0,0,0,0.05);
-                border-top: 1px solid #f0f0f0;
+                display: none; position: absolute; top: 70px; left: 0; width: 100%;
+                background: white; flex-direction: column; align-items: stretch;
+                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
             }
             .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
             @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-            .nav-link {
-                width: 100%; border-radius: 12px;
-                padding: 12px 15px; margin-bottom: 5px;
-                justify-content: flex-start;
-                height: auto;
-            }
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; height: auto; }
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
             
-            /* Hide Profile Link in Nav Menu on Mobile (Since it's on top) */
+            /* Hide Profile Link in Menu (Since it's on top) */
             .nav-link.profile-item { display: none; }
 
-            .stats-grid { grid-template-columns: 1fr; }
             .quick-search { flex-direction: column; border-radius: 20px; padding: 15px; }
             .search-btn { width: 100%; margin-top: 10px; }
             .link-name { max-width: 180px; }
@@ -306,10 +335,25 @@
 <body>
 
     <header class="main-header">
-        <a href="{{ url_for('home') }}" class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="Logo">
-            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-        </a>
+        <div class="header-left">
+            <a href="{{ url_for('home') }}" class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </a>
+            
+            <div class="header-stats-group">
+                <div class="header-online-count" title="ผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
+                    <span class="pulsating-dot"></span>
+                    <span id="onlineCount">-</span>
+                    <span>ออนไลน์</span>
+                </div>
+                
+                <div class="header-visitor-count" title="จำนวนผู้เข้าใช้งานเว็บไซต์ทั้งหมด">
+                    <i class="fas fa-eye"></i>
+                    <span>{{ "{:,}".format(total_views|int) }}</span>
+                </div>
+            </div>
+        </div>
 
         <div class="mobile-controls">
             {% if session.get('logged_in') %}
@@ -352,16 +396,13 @@
 
     <div class="container">
         
-        <div class="stats-grid">
-            <div class="stat-card-main">
-                <i class="fas fa-globe-asia stat-icon"></i>
-                <div class="stat-number">{{ "{:,}".format(total_views|int) }}</div>
-                <div class="stat-label">ผู้เข้าใช้งานเว็บไซต์</div>
-            </div>
-
+        <div class="top-links-section">
             <div class="top-links-card">
                 <div class="card-header">
-                    <div class="card-title"><i class="fas fa-fire-alt" style="color: #ff5722;"></i> 5 อันดับลิงค์ยอดนิยม</div>
+                    <div class="card-title">
+                        <i class="fas fa-fire-alt" style="color: #ff5722; font-size: 1.5em;"></i> 
+                        5 อันดับลิงค์ยอดนิยม
+                    </div>
                 </div>
                 
                 {% for link in top_links %}
@@ -370,7 +411,7 @@
                         <div class="rank-badge {% if loop.index <= 3 %}rank-{{ loop.index }}{% else %}rank-other{% endif %}">
                             {{ loop.index }}
                         </div>
-                        <a href="{{ url_for('go_to_link', link_id=link['ID']) }}" target="_blank" style="text-decoration: none;">
+                        <a href="{{ url_for('go_to_link', link_id=link['ID']) }}" target="_blank" style="text-decoration: none; color: inherit;">
                             <div class="link-name">{{ link['ชื่อลิงก์'] }}</div>
                         </a>
                     </div>
@@ -379,8 +420,8 @@
                     </div>
                 </div>
                 {% else %}
-                    <div style="text-align: center; padding: 20px; color: #999;">
-                        <i class="fas fa-chart-bar" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <i class="fas fa-chart-bar" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i><br>
                         กำลังเก็บรวบรวมข้อมูลสถิติ
                     </div>
                 {% endfor %}
@@ -462,6 +503,33 @@
             e.preventDefault();
             const val = document.getElementById('agencySelect').value;
             if(val) window.location.href = "{{ url_for('links_page') }}?agency=" + encodeURIComponent(val);
+        });
+
+        // --- Real-time Online User Counter Logic ---
+        function updateOnlineCount() {
+            fetch("{{ url_for('heartbeat') }}", { 
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.online_count !== undefined) {
+                    const el = document.getElementById('onlineCount');
+                    if(el) el.textContent = data.online_count;
+                }
+            })
+            .catch(err => console.error("Heartbeat error:", err));
+        }
+
+        // 1. เรียกทันทีเมื่อเปิดหน้า
+        updateOnlineCount();
+
+        // 2. เรียกซ้ำทุกๆ 10 วินาที
+        setInterval(updateOnlineCount, 10000);
+
+        // 3. ส่งสัญญาณปิดเมื่อออกจากหน้าเว็บ (Beacon)
+        window.addEventListener('beforeunload', function() {
+            navigator.sendBeacon("{{ url_for('offline') }}");
         });
     </script>
     

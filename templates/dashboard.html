@@ -60,6 +60,12 @@
             transition: all 0.3s ease;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px; 
+        }
+
         .logo-container {
             display: flex;
             align-items: center;
@@ -69,6 +75,45 @@
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
+
+        /* --- Status Stats Group --- */
+        .header-stats-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Online Counter Style */
+        .header-online-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--bma-green-light);
+            color: var(--bma-green);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--bma-green);
+            white-space: nowrap;
+        }
+
+        /* Pulsing Dot Animation */
+        .pulsating-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
 
         /* Desktop Menu */
         .nav-menu {
@@ -246,6 +291,9 @@
             /* Show Mobile Controls */
             .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
+            
+            /* Stats on Mobile */
+            .header-online-count span:last-child { display: none; } /* ซ่อนคำว่า ออนไลน์ */
 
             .nav-menu {
                 display: none; position: absolute; top: 70px; left: 0; width: 100%;
@@ -285,10 +333,20 @@
 <body>
 
     <header class="main-header">
-        <a href="{{ url_for('home') }}" class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-        </a>
+        <div class="header-left">
+            <a href="{{ url_for('home') }}" class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </a>
+            
+            <div class="header-stats-group">
+                <div class="header-online-count" title="ผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
+                    <span class="pulsating-dot"></span>
+                    <span id="onlineCount">-</span>
+                    <span>ออนไลน์</span>
+                </div>
+            </div>
+        </div>
 
         <div class="mobile-controls">
             {% if session.get('logged_in') %}
@@ -645,6 +703,29 @@
                 });
             {% endif %}
         {% endwith %}
+
+        // --- Real-time Online User Counter Logic ---
+        function updateOnlineCount() {
+            fetch("{{ url_for('heartbeat') }}", { 
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.online_count !== undefined) {
+                    const el = document.getElementById('onlineCount');
+                    if(el) el.textContent = data.online_count;
+                }
+            })
+            .catch(err => console.error("Heartbeat error:", err));
+        }
+
+        updateOnlineCount();
+        setInterval(updateOnlineCount, 10000);
+
+        window.addEventListener('beforeunload', function() {
+            navigator.sendBeacon("{{ url_for('offline') }}");
+        });
     </script>
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
