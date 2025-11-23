@@ -8,13 +8,16 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     
+    <script src="https://unpkg.com/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
         :root {
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
             --button-gray: #6c757d;
-            --button-blue: #007bff; /* เพิ่มสีฟ้าสำหรับปุ่มเครื่องมือ */
+            --button-blue: #007bff;
             --button-blue-hover: #0056b3;
             --light-gray: #f8f9fa;
             --text-color: #2c3e50;
@@ -30,11 +33,7 @@
             --info-color: #004085;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Kanit', Arial, sans-serif;
@@ -45,253 +44,113 @@
         }
 
         .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            animation: fadeIn 0.5s ease;
+            max-width: 900px; margin: 0 auto; padding: 40px;
+            background: white; border-radius: 20px;
+            box-shadow: var(--shadow-lg); animation: fadeIn 0.5s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Back Button */
         .btn-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            display: inline-flex; align-items: center; gap: 8px;
             background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-            text-decoration: none;
-            margin-bottom: 30px;
+            color: white; border: none; padding: 12px 24px;
+            border-radius: 25px; cursor: pointer; font-size: 1em; font-weight: 500;
+            transition: all 0.3s ease; box-shadow: var(--shadow-sm);
+            text-decoration: none; margin-bottom: 30px;
         }
-
-        .btn-back:hover {
-            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
+        .btn-back:hover { background: linear-gradient(135deg, #5a6268 0%, #495057 100%); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
         /* Title */
         h2 {
-            color: var(--bma-green);
-            font-size: 2em;
-            font-weight: 600;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
+            color: var(--bma-green); font-size: 2em; font-weight: 600;
+            margin-bottom: 30px; padding-bottom: 15px;
             border-bottom: 3px solid var(--bma-green-light);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
         }
-
-        h2::before {
-            content: "➕";
-            font-size: 1.2em;
-        }
-
-        /* Flash Messages */
-        .flashes {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 25px 0;
-        }
-
-        .flashes li {
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
-            box-shadow: var(--shadow-sm);
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .flashes .success { background-color: var(--success-bg); color: var(--success-color); border-left: 4px solid #28a745; }
-        .flashes .error { background-color: var(--error-bg); color: var(--error-color); border-left: 4px solid #dc3545; }
-        .flashes .info { background-color: var(--info-bg); color: var(--info-color); border-left: 4px solid #17a2b8; }
+        h2::before { content: "➕"; font-size: 1.2em; }
 
         /* Form Styles */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        form div {
-            display: flex;
-            flex-direction: column;
-        }
-
+        form { display: flex; flex-direction: column; gap: 25px; }
+        form div { display: flex; flex-direction: column; }
         form label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-color);
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            font-weight: 600; margin-bottom: 8px; color: var(--text-color);
+            font-size: 0.95em; display: flex; align-items: center; gap: 5px;
         }
+        form label::before { content: "📌"; font-size: 0.9em; }
 
-        form label::before {
-            content: "📌";
-            font-size: 0.9em;
-        }
-
-        /* Input Fields */
-        form input[type="text"],
-        form input[type="url"],
-        form input[type="email"],
-        form input[type="tel"],
-        form textarea,
-        form select {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            font-family: 'Kanit', Arial, sans-serif;
-            font-size: 1em;
-            background-color: var(--light-gray);
-            transition: all 0.3s ease;
+        /* Inputs */
+        form input[type="text"], form input[type="url"], form input[type="email"],
+        form input[type="tel"], form textarea, form select {
+            width: 100%; padding: 14px 18px;
+            border: 2px solid var(--border-color); border-radius: 12px;
+            font-family: 'Kanit', Arial, sans-serif; font-size: 1em;
+            background-color: var(--light-gray); transition: all 0.3s ease;
             color: var(--text-color);
         }
-
-        form input:focus,
-        form input[type="url"]:focus,
-        form input[type="email"]:focus,
-        form input[type="tel"]:focus,
-        form textarea:focus,
-        form select:focus {
-            outline: none;
-            border-color: var(--bma-green);
-            background-color: white;
-            box-shadow: 0 0 0 4px var(--bma-green-light);
-            transform: translateY(-2px);
+        form input:focus, form select:focus, form textarea:focus {
+            outline: none; border-color: var(--bma-green); background-color: white;
+            box-shadow: 0 0 0 4px var(--bma-green-light); transform: translateY(-2px);
         }
-
-        form input::placeholder,
-        form textarea::placeholder {
-            color: #999;
-            font-style: italic;
-        }
-
-        /* Readonly Field */
         form input[readonly] {
-            background-color: #e9ecef;
-            color: #6c757d;
-            cursor: not-allowed;
-            font-weight: 500;
+            background-color: #e9ecef; color: #6c757d; cursor: not-allowed; font-weight: 500;
         }
-        form input[readonly]:focus {
-            box-shadow: none; transform: none; border-color: var(--border-color);
-        }
+        form input[readonly]:focus { box-shadow: none; transform: none; border-color: var(--border-color); }
 
         /* Textarea & Select */
         form textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
         form select {
-            cursor: pointer;
-            appearance: none;
+            cursor: pointer; appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            padding-right: 45px;
+            background-repeat: no-repeat; background-position: right 15px center; padding-right: 45px;
         }
         form optgroup { font-weight: 600; color: var(--bma-green); }
 
-        /* (ใหม่!) Input Group Row สำหรับปุ่มย่อลิงค์ */
-        .input-group-row {
-            display: flex;
-            gap: 10px;
-            align-items: stretch; /* ให้สูงเท่ากัน */
-        }
-        
-        .input-group-row input {
-            flex-grow: 1;
-        }
+        /* Input Group Row */
+        .input-group-row { display: flex; gap: 10px; align-items: stretch; }
+        .input-group-row input { flex-grow: 1; }
 
-        /* (ใหม่!) ปุ่มย่อลิงค์ */
+        /* Button Tool */
         .btn-tool {
             font-family: 'Kanit', sans-serif;
             background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 500;
-            white-space: nowrap;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            color: white; border: none; padding: 0 20px; border-radius: 12px;
+            cursor: pointer; font-weight: 500; white-space: nowrap;
+            transition: all 0.3s ease; box-shadow: var(--shadow-sm);
+            display: flex; align-items: center; gap: 5px;
         }
-        .btn-tool:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
+        .btn-tool:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
         /* Submit Button */
         button[type="submit"] {
             font-family: 'Kanit', Arial, sans-serif;
             background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-md);
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
+            color: white; border: none; padding: 16px 32px;
+            border-radius: 25px; cursor: pointer; font-size: 1.1em;
+            font-weight: 600; transition: all 0.3s ease;
+            box-shadow: var(--shadow-md); margin-top: 10px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; width: 100%;
         }
-
         button[type="submit"]:hover {
             background: linear-gradient(135deg, #007a30 0%, #006428 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4);
+            transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4);
         }
 
         /* Required Indicator */
         form label:has(+ input[required])::after,
-        form label:has(+ .input-group-row input[required])::after, /* รองรับ structure ใหม่ */
+        form label:has(+ .input-group-row input[required])::after,
         form label:has(+ select[required])::after,
         form label:has(+ textarea[required])::after {
             content: "*"; color: #dc3545; margin-left: 4px; font-weight: bold;
         }
-
-        /* Info text */
         .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
 
         /* Responsive */
         @media (max-width: 768px) {
             .container { padding: 25px 20px; }
-            .input-group-row { flex-direction: column; gap: 5px; } /* มือถือให้เรียงลงมา */
+            .input-group-row { flex-direction: column; gap: 5px; }
             .btn-tool { padding: 12px; justify-content: center; width: 100%; }
         }
     </style>
@@ -305,16 +164,6 @@
 
         <h2>เพิ่มลิงค์ใหม่</h2>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <ul class="flashes">
-            {% for category, message in messages %}
-              <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-
         <form action="{{ url_for('add_link_action') }}" method="POST">
             <div>
                 <label for="ชื่อลิงก์">ชื่อลิงค์ (จำเป็น)</label>
@@ -326,7 +175,7 @@
                 <div class="input-group-row">
                     <input type="url" id="URL" name="URL" placeholder="https://example.com" required>
                     <button type="button" class="btn-tool" onclick="openBmaShortener()" title="เปิดหน้าต่างย่อลิงค์ กทม.">
-                        ✂️ ย่อลิงค์ กทม.
+                        <i class="fas fa-cut"></i> ย่อลิงค์ กทม.
                     </button>
                 </div>
                 <span class="info-text">💡 กดปุ่มย่อลิงค์เพื่อเปิดเครื่องมือ แล้วก๊อปปี้ลิงค์สั้นมาวางในช่องนี้</span>
@@ -336,37 +185,31 @@
                 <label for="ประเภท">ประเภท (จำเป็น)</label>
                 <select id="ประเภท" name="ประเภท" required>
                     <option value="" disabled selected>--- เลือกประเภทงาน ---</option>
-                    
                     <optgroup label="ด้านโครงสร้างพื้นฐาน">
                         <option value="การจราจรและขนส่ง">การจราจรและขนส่ง</option>
                         <option value="การโยธาและก่อสร้าง">การโยธาและก่อสร้าง</option>
                         <option value="การระบายน้ำและป้องกันน้ำท่วม">การระบายน้ำและป้องกันน้ำท่วม</option>
                         <option value="ผังเมือง">ผังเมือง</option>
                     </optgroup>
-                    
                     <optgroup label="ด้านคุณภาพชีวิต">
                         <option value="สิ่งแวดล้อมและความสะอาด">สิ่งแวดล้อมและความสะอาด</option>
                         <option value="อนามัยและสาธารณสุข">อนามัยและสาธารณสุข</option>
                         <option value="การแพทย์ (โรงพยาบาล)">การแพทย์ (โรงพยาบาล)</option>
                     </optgroup>
-                    
                     <optgroup label="ด้านการศึกษาและสังคม">
                         <option value="การศึกษา (โรงเรียน)">การศึกษา (โรงเรียน)</option>
                         <option value="วัฒนธรรม กีฬา และการท่องเที่ยว">วัฒนธรรม กีฬา และการท่องเที่ยว</option>
                         <option value="พัฒนาสังคม">พัฒนาสังคม</option>
                     </optgroup>
-                    
                     <optgroup label="ด้านความปลอดภัย">
                         <option value="ป้องกันและบรรเทาสาธารณภัย">ป้องกันและบรรเทาสาธารณภัย</option>
                         <option value="เทศกิจ">เทศกิจ</option>
                     </optgroup>
-                    
                     <optgroup label="ด้านการบริหารและทะเบียน">
                         <option value="การคลังและงบประมาณ">การคลังและงบประมาณ</option>
                         <option value="การทะเบียน (สำนักงานเขต)">การทะเบียน (สำนักงานเขต)</option>
                         <option value="บริหารทั่วไป/สำนักงาน">บริหารทั่วไป/สำนักงาน</option>
                     </optgroup>
-
                     <option value="อื่นๆ">--- อื่นๆ ---</option>
                 </select>
             </div>
@@ -404,6 +247,7 @@
             <div>
                 <label for="รายละเอียด">รายละเอียด (ถ้ามี)</label>
                 <textarea id="รายละเอียด" name="รายละเอียด" rows="3" placeholder="ระบุรายละเอียดเพิ่มเติม หรือหมายเหตุพิเศษ (ถ้ามี)..."></textarea>
+                <span class="info-text">💡 ข้อมูลนี้ไม่จำเป็นต้องกรอก แต่ช่วยให้เข้าใจข้อมูลได้ดีขึ้น</span>
             </div>
 
             <div>
@@ -414,41 +258,52 @@
     </div>
 
     <script>
-        // (ใหม่!) ฟังก์ชันเปิดเว็บย่อลิงค์ใน Modal
+        // (แก้ไข!) ฟังก์ชันเปิดหน้าต่าง Popup แบบ Native JS (ไม่พึ่ง Swal)
         function openBmaShortener() {
-            Swal.fire({
-                title: '✂️ ระบบย่อลิงค์ กทม.',
-                // ใช้ Iframe เพื่อแสดงผลหน้าเว็บ u.bangkok.go.th
-                html: `
-                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 1px solid #ddd;">
-                        <iframe src="https://u.bangkok.go.th/index.php" 
-                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-                                allowfullscreen>
-                        </iframe>
-                    </div>
-                    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
-                        *หมายเหตุ: หากหน้าเว็บไม่แสดง กรุณากด <a href="https://u.bangkok.go.th/index.php" target="_blank" style="color: var(--bma-green);">ที่นี่</a> เพื่อเปิดในแท็บใหม่
-                    </p>
-                `,
-                width: 900, // กว้างพอให้แสดงผลได้ดี
-                showCloseButton: true,
-                showConfirmButton: false, // ไม่ต้องมีปุ่ม OK
-                focusConfirm: false
-            });
+            const width = 1000;
+            const height = 700;
+            const left = (window.screen.width - width) / 2;
+            const top = (window.screen.height - height) / 2;
+            
+            window.open(
+                'https://u.bangkok.go.th/index.php', 
+                'BMA_Shortener_Tool', 
+                `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no`
+            );
         }
     </script>
-    <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
+
+    <script>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                // ตรวจสอบว่า Swal โหลดมาหรือไม่
+                if (typeof Swal !== 'undefined') {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                    {% for category, message in messages %}
+                        Toast.fire({
+                            icon: '{{ category }}',
+                            title: '{{ message }}'
+                        });
+                    {% endfor %}
+                } else {
+                    // Fallback: ถ้า Swal พัง ให้ใช้ alert ธรรมดา
+                    {% for category, message in messages %}
+                        alert('{{ message }}');
+                    {% endfor %}
+                }
+            {% endif %}
+        {% endwith %}
+    </script>
+
 </body>
 </html>
