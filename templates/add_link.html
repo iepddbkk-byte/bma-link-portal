@@ -8,48 +8,108 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     
-    <script src="https://unpkg.com/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
+            /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
-            --button-gray: #6c757d;
+            --button-red: #dc3545;
             --button-blue: #007bff;
             --button-blue-hover: #0056b3;
-            --light-gray: #f8f9fa;
+            --button-yellow: #ffc107;
+            --button-gray: #6c757d;
             --text-color: #2c3e50;
             --border-color: #e0e0e0;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --bg-grad-start: #f5f7fa;
+            --bg-grad-end: #c3cfe2;
+            
+            --header-height: 80px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
-            --success-bg: #d4edda;
-            --success-color: #155724;
-            --error-bg: #f8d7da;
-            --error-color: #721c24;
-            --info-bg: #cce5ff;
-            --info-color: #004085;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* --- 1. Global Font Fix (บังคับใช้ Kanit ทุกจุด รวมถึง SweetAlert) --- */
+        :root, body, h1, h2, h3, h4, h5, h6, p, span, div, a, 
+        button, input, select, textarea, optgroup,
+        .swal2-popup, .swal2-title, .swal2-html-container, .swal2-confirm, .swal2-cancel, .swal2-deny {
+            font-family: 'Kanit', sans-serif !important;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Kanit', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
-            padding: 20px;
+            padding-top: var(--header-height);
         }
 
+        /* --- 2. Header & Navigation --- */
+        .main-header {
+            background: white;
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
+        .logo-container img:hover { transform: scale(1.05); }
+        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
+
+        .nav-menu { display: flex; align-items: center; gap: 8px; }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
+        .nav-link i { font-size: 1.1em; }
+        
+        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
+        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
+        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
+
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        .mobile-toggle {
+            display: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 10px;
+        }
+
+        /* --- 3. Container & Form --- */
         .container {
             max-width: 900px;
-            margin: 0 auto;
+            margin: 40px auto;
             padding: 40px;
             background: white;
             border-radius: 20px;
@@ -57,37 +117,8 @@
             animation: fadeIn 0.5s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Back Button */
-        .btn-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-            text-decoration: none;
-            margin-bottom: 30px;
-        }
-
-        .btn-back:hover {
-            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* Title */
         h2 {
             color: var(--bma-green);
             font-size: 2em;
@@ -95,248 +126,68 @@
             margin-bottom: 30px;
             padding-bottom: 15px;
             border-bottom: 3px solid var(--bma-green-light);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
         }
+        h2::before { content: "➕"; font-size: 0.8em; }
 
-        h2::before {
-            content: "➕";
-            font-size: 1.2em;
-        }
-
-        /* Flash Messages */
-        .flashes {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 25px 0;
-        }
-
-        .flashes li {
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
-            box-shadow: var(--shadow-sm);
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .flashes .success { background-color: var(--success-bg); color: var(--success-color); border-left: 4px solid #28a745; }
-        .flashes .error { background-color: var(--error-bg); color: var(--error-color); border-left: 4px solid #dc3545; }
-        .flashes .info { background-color: var(--info-bg); color: var(--info-color); border-left: 4px solid #17a2b8; }
-
-        /* Form Styles */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        form div {
-            display: flex;
-            flex-direction: column;
-        }
-
+        form { display: flex; flex-direction: column; gap: 25px; }
+        form div { display: flex; flex-direction: column; }
+        
         form label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-color);
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            font-weight: 600; margin-bottom: 8px; color: var(--text-color);
+            font-size: 0.95em; display: flex; align-items: center; gap: 5px;
         }
+        form label::before { content: "📌"; font-size: 0.9em; }
 
-        form label::before {
-            content: "📌";
-            font-size: 0.9em;
-        }
-
-        /* Input Fields */
+        /* Inputs */
         form input[type="text"],
         form input[type="url"],
         form input[type="email"],
         form input[type="tel"],
         form textarea,
         form select {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            font-family: 'Kanit', Arial, sans-serif;
+            width: 100%; padding: 14px 18px;
+            border: 2px solid var(--border-color); border-radius: 12px;
             font-size: 1em;
-            background-color: var(--light-gray);
-            transition: all 0.3s ease;
-            color: var(--text-color);
+            background-color: #f8f9fa; transition: all 0.3s ease; color: var(--text-color);
         }
 
-        form input:focus,
-        form input[type="url"]:focus,
-        form input[type="email"]:focus,
-        form input[type="tel"]:focus,
-        form textarea:focus,
-        form select:focus {
-            outline: none;
-            border-color: var(--bma-green);
-            background-color: white;
-            box-shadow: 0 0 0 4px var(--bma-green-light);
+        form input:focus, form select:focus, form textarea:focus {
+            outline: none; border-color: var(--bma-green);
+            background-color: white; box-shadow: 0 0 0 4px var(--bma-green-light);
             transform: translateY(-2px);
         }
 
-        form input::placeholder,
-        form textarea::placeholder {
-            color: #999;
-            font-style: italic;
-        }
+        form input[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; }
 
-        /* Readonly Field */
-        form input[readonly] {
-            background-color: #e9ecef;
-            color: #6c757d;
-            cursor: not-allowed;
-            font-weight: 500;
-        }
-        form input[readonly]:focus {
-            box-shadow: none; transform: none; border-color: var(--border-color);
-        }
-
-        /* Textarea & Select */
-        form textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
-        form select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            padding-right: 45px;
-        }
-        form optgroup { font-weight: 600; color: var(--bma-green); }
-
-        /* Input Group Row สำหรับปุ่มย่อลิงค์ */
-        .input-group-row {
-            display: flex;
-            gap: 10px;
-            align-items: stretch; 
-        }
-        
-        .input-group-row input {
-            flex-grow: 1;
-        }
-
-        /* ปุ่มเครื่องมือ */
-        .btn-tool {
-            font-family: 'Kanit', sans-serif;
-            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 500;
-            white-space: nowrap;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .btn-tool:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* (ปรับปรุง!) Shortener Box (กล่องย่อลิงค์) */
+        /* Shortener Box */
         .shortener-box {
-            /* เปลี่ยนจาก dashed เป็น solid และปรับสี */
-            border: 1px solid #d0d7de; 
-            background-color: #ffffff;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-top: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* เพิ่มเงาเบาๆ */
-            transition: all 0.3s ease;
+            border: 1px solid #d0d7de; background-color: #ffffff;
+            border-radius: 12px; overflow: hidden; margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        
         .shortener-header {
             background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
-            color: white;
-            padding: 12px 20px;
-            font-size: 1em;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.3s;
+            color: white; padding: 12px 20px; font-weight: 500; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .shortener-header:hover {
-            filter: brightness(1.1);
-        }
-        
-        .shortener-content {
-            display: none; 
-            padding: 0;
-            background: white;
-            border-top: 1px solid #eee;
-        }
-        .shortener-content.active {
-            display: block; 
-        }
-
-        iframe {
-            width: 100%;
-            height: 500px; 
-            border: none;
-            display: block;
-        }
-        
-        .fallback-link {
-            padding: 20px;
-            text-align: center;
-            font-size: 0.95em;
-            color: #666;
-            background-color: #f9f9f9;
-            border-top: 1px solid #eee;
-        }
+        .shortener-content { display: none; background: white; border-top: 1px solid #eee; }
+        .shortener-content.active { display: block; }
+        iframe { width: 100%; height: 500px; border: none; display: block; }
+        .fallback-link { padding: 15px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; }
 
         /* Submit Button */
         button[type="submit"] {
-            font-family: 'Kanit', Arial, sans-serif;
             background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-md);
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
+            color: white; border: none; padding: 16px 32px; border-radius: 25px;
+            cursor: pointer; font-size: 1.1em; font-weight: 600;
+            transition: all 0.3s ease; box-shadow: var(--shadow-md);
+            margin-top: 10px; width: 100%;
         }
+        button[type="submit"]:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4); }
 
-        button[type="submit"]:hover {
-            background: linear-gradient(135deg, #007a30 0%, #006428 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4);
-        }
-
-        /* Required Indicator */
+        /* Indicators */
         form label:has(+ input[required])::after,
-        form label:has(+ .input-group-row input[required])::after,
         form label:has(+ select[required])::after,
         form label:has(+ textarea[required])::after {
             content: "*"; color: #dc3545; margin-left: 4px; font-weight: bold;
@@ -344,31 +195,77 @@
         .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
 
         /* Responsive */
+        @media (max-width: 992px) {
+            .nav-link span { display: none; }
+            .nav-link i { font-size: 1.3rem; margin: 0; }
+            .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
+            .user-profile-pic { width: 100%; height: 100%; }
+        }
+
         @media (max-width: 768px) {
-            .container { padding: 25px 20px; }
-            .input-group-row { flex-direction: column; gap: 5px; } 
-            .btn-tool { padding: 12px; justify-content: center; width: 100%; }
+            body { padding-top: 70px; }
+            .main-header { padding: 0 15px; height: 70px; }
+            .logo-text { font-size: 1.1rem; }
+            .mobile-toggle { display: block; }
+
+            .nav-menu {
+                display: none; position: absolute; top: 70px; left: 0; width: 100%;
+                background: white; flex-direction: column; align-items: stretch;
+                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
+            }
+            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
+            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; }
+            .nav-link span { display: inline; }
+            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+
+            .container { padding: 25px 20px; margin: 20px 15px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <a href="{{ url_for('dashboard') }}" class="btn-back">
-            ⬅️ กลับหน้า Dashboard
+    <header class="main-header">
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
         </a>
 
-        <h2>เพิ่มลิงค์ใหม่</h2>
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <ul class="flashes">
-            {% for category, message in messages %}
-              <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
+        <nav class="nav-menu" id="navMenu">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+                
+                {% if session.get('level') == 'Admin' %}
+                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
+                {% endif %}
+                
+                <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+                <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link" title="โปรไฟล์">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                    <span>{{ session.name }}</span>
+                </a>
+                
+                <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
+                    <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
+                </a>
+            {% else %}
+                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;">
+                    <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
+                </a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>เพิ่มลิงค์ใหม่</h2>
 
         <form action="{{ url_for('add_link_action') }}" method="POST">
             <div>
@@ -378,9 +275,7 @@
 
             <div>
                 <label for="URL">URL (จำเป็น)</label>
-                <div class="input-group-row">
-                    <input type="url" id="URL" name="URL" placeholder="https://example.com" required>
-                </div>
+                <input type="url" id="URL" name="URL" placeholder="https://example.com" required>
                 
                 <div class="shortener-box">
                     <div class="shortener-header" onclick="toggleShortener()">
@@ -389,16 +284,14 @@
                     </div>
                     <div class="shortener-content" id="shortenerContent">
                         <iframe src="https://u.bangkok.go.th/index.php" title="BMA Shortener"></iframe>
-                        
                         <div class="fallback-link">
                             ⚠️ Credit: สำนักดิจิทัล กรุงเทพมหานคร <br>
-                            <a href="https://u.bangkok.go.th/index.php" target="_blank" style="color: var(--button-blue); font-weight: bold; text-decoration: none;">
+                            <a href="https://u.bangkok.go.th/index.php" target="_blank" style="color:var(--button-blue); font-weight:bold; text-decoration:none;">
                                 <i class="fas fa-external-link-alt"></i> คลิกที่นี่เพื่อเปิดในหน้าต่างใหม่
                             </a>
                         </div>
                     </div>
                 </div>
-                
                 <span class="info-text">💡 ก๊อปปี้ลิงค์สั้นจากเครื่องมือด้านบน แล้วนำมาวางในช่อง URL</span>
             </div>
             
@@ -463,6 +356,7 @@
             <div>
                 <label for="เบอร์โทรติดต่อ">เบอร์โทรติดต่อ (จำเป็น)</label>
                 <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ" placeholder="02-xxx-xxxx หรือ 0-xxxx-xxxx ต่อ xxxx" required>
+                <span class="info-text">💡 ระบบจะลบเครื่องหมาย ' (ฝนทอง) ให้อัตโนมัติหากมีการ Copy มาจาก Excel</span>
             </div>
 
             <div>
@@ -471,18 +365,30 @@
             </div>
 
             <div>
-                <button type="submit">ยืนยันเพิ่มลิงค์</button>
+                <button type="submit"><i class="fas fa-save"></i> ยืนยันเพิ่มลิงค์</button>
             </div>
         </form>
 
     </div>
 
     <script>
-        // ฟังก์ชันเปิด/ปิด ส่วนย่อลิงค์
+        // Toggle Mobile Menu
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
+        }
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-toggle');
+            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+            }
+        });
+
+        // Toggle Shortener Box
         function toggleShortener() {
             const content = document.getElementById('shortenerContent');
             const icon = document.getElementById('shortenerIcon');
-            
             if (content.classList.contains('active')) {
                 content.classList.remove('active');
                 icon.classList.remove('fa-chevron-up');
@@ -493,51 +399,55 @@
                 icon.classList.add('fa-chevron-up');
             }
         }
+
+        // --- Phone Number Cleaning Script ---
+        const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
+        if(phoneInput) {
+            // Function to clean input
+            function cleanPhoneInput(input) {
+                let val = input.value;
+                // ลบ ' ที่ขึ้นต้น (เช่น '02...)
+                if (val.startsWith("'")) {
+                    input.value = val.replace(/^'+/, '');
+                }
+            }
+
+            // ตรวจจับตอนพิมพ์
+            phoneInput.addEventListener('input', function(e) {
+                cleanPhoneInput(e.target);
+            });
+            
+            // ตรวจจับตอน Paste (รอเสี้ยววินาทีเพื่อให้ค่าลงไปก่อน)
+            phoneInput.addEventListener('paste', function(e) {
+                setTimeout(() => {
+                    cleanPhoneInput(e.target);
+                }, 10);
+            });
+        }
     </script>
 
     <script>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                // ตรวจสอบว่า Swal โหลดมาหรือไม่
-                if (typeof Swal !== 'undefined') {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top',
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer)
-                            toast.addEventListener('mouseleave', Swal.resumeTimer)
-                        }
-                    });
-                    {% for category, message in messages %}
-                        Toast.fire({
-                            icon: '{{ category }}',
-                            title: '{{ message }}'
-                        });
-                    {% endfor %}
-                } else {
-                    // Fallback
-                    {% for category, message in messages %}
-                        alert('{{ message }}');
-                    {% endfor %}
-                }
+                const Toast = Swal.mixin({
+                    toast: true, position: 'top', showConfirmButton: false, timer: 3000, timerProgressBar: true
+                });
+                {% for category, message in messages %}
+                    Toast.fire({ icon: '{{ category }}', title: '{{ message }}' });
+                {% endfor %}
             {% endif %}
         {% endwith %}
     </script>
-    <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
 </body>
 </html>

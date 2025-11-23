@@ -38,11 +38,11 @@
             background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
-            padding-top: var(--header-height); /* เว้นที่ให้ Header */
+            padding-top: var(--header-height);
             padding-bottom: 60px;
         }
 
-        /* --- 1. Header & Navigation (Standardized) --- */
+        /* --- 1. Header & Navigation --- */
         .main-header {
             background: white;
             padding: 0 30px;
@@ -67,7 +67,6 @@
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        /* Desktop Menu */
         .nav-menu { display: flex; align-items: center; gap: 8px; }
 
         .nav-link {
@@ -86,14 +85,12 @@
         .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
         .nav-link i { font-size: 1.1em; }
         
-        /* Active State */
         .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
         .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
         .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* Mobile Hamburger */
         .mobile-toggle {
             display: none;
             font-size: 1.6rem;
@@ -137,53 +134,63 @@
             font-size: 1.1rem; color: #999;
         }
 
-        /* Table */
-        .table-wrapper { overflow-x: auto; border-radius: 12px; box-shadow: var(--shadow-sm); margin-top: 20px; border: 1px solid #eee; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.95em; background: white; }
-        th, td { padding: 16px; text-align: left; border-bottom: 1px solid #eee; white-space: nowrap; }
-        td:nth-child(2) { white-space: normal; min-width: 200px; } /* รายละเอียด */
+        /* --- Table Styling (Dashboard Style) --- */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; background: white; }
         
-        th { 
-            background: var(--bma-green); color: white; text-align: center; font-weight: 500;
+        th {
+            background: var(--bma-green);
+            color: white;
+            padding: 15px;
+            font-weight: 500;
+            text-align: left;
+            white-space: nowrap;
             position: sticky; top: 0; z-index: 10;
         }
-        
-        tbody tr { transition: all 0.2s ease; }
-        tbody tr:hover { background: #f8fff9; }
-        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f8fff9; }
+
+        /* Custom Scrollbar for Table */
+        .table-responsive::-webkit-scrollbar { height: 8px; }
+        .table-responsive::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        .table-responsive::-webkit-scrollbar-thumb:hover { background: var(--bma-green); }
+
+        /* Links */
         a { color: var(--bma-green); text-decoration: none; font-weight: 500; transition: all 0.2s; }
         a:hover { color: var(--bma-green-hover); text-decoration: underline; }
 
-        /* Sort Buttons */
-        .sort-buttons { margin-top: 8px; display: flex; gap: 5px; justify-content: center; }
-        .sort-buttons button {
-            font-size: 0.75rem; padding: 4px 8px; background-color: rgba(255,255,255,0.2);
-            color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);
-            border-radius: 4px; cursor: pointer;
-        }
-        .sort-buttons button:hover { background-color: rgba(255,255,255,0.3); transform: none; }
-
-        /* Share Button */
-        .btn-share {
-            background: #17a2b8; color: white; padding: 0; width: 36px; height: 36px;
-            border-radius: 50%; border: none; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center;
-            transition: all 0.3s;
-        }
-        .btn-share:hover { transform: scale(1.1); background: #138496; }
-
         /* Badges */
-        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 30px; font-size: 0.85em; font-weight: 500; }
         .status-ok { background: #d4edda; color: #155724; }
         .status-blocked { background: #e3f2fd; color: #1976d2; }
         .status-error { background: #ffebee; color: #c62828; }
         .status-pending { background: #fff3e0; color: #ef6c00; }
         .status-unknown { background: #f5f5f5; color: #666; }
 
+        /* Share Button */
+        .btn-share {
+            width: 35px; height: 35px; border-radius: 50%;
+            background: #17a2b8; color: white; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+        }
+        .btn-share:hover { transform: scale(1.1); background: #138496; }
+
         /* Pagination */
         .pagination-controls {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 0; margin-top: 25px; border-top: 1px solid #eee;
+            margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;
             flex-wrap: wrap; gap: 15px;
         }
         .pagination-items select { padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; }
@@ -230,12 +237,14 @@
             .container { padding: 15px; margin: 15px auto; }
             h1 { font-size: 1.4em; }
             
-            /* Hide columns on mobile */
-            th:nth-child(2), td:nth-child(2),
-            th:nth-child(5), td:nth-child(5),
-            th:nth-child(7), td:nth-child(7),
-            th:nth-child(8), td:nth-child(8),
-            th:nth-child(10), td:nth-child(10) { display: none; }
+            /* Table Mobile Optimization: Hide non-essential columns */
+            th:nth-child(2), td:nth-child(2), /* รายละเอียด */
+            th:nth-child(4), td:nth-child(4), /* สถานะการใช้งาน */
+            th:nth-child(6), td:nth-child(6), /* หน่วยงาน */
+            th:nth-child(7), td:nth-child(7), /* ส่วนราชการ */
+            th:nth-child(8), td:nth-child(8), /* เบอร์ */
+            th:nth-child(10), td:nth-child(10) /* วันที่ */
+            { display: none; }
             
             .pagination-controls { justify-content: center; }
         }
@@ -297,20 +306,17 @@
             <input type="text" id="searchInput" placeholder="ค้นหา (ชื่อ, สถานะ, ประเภท, ส่วนราชการ, ผู้สร้าง)...">
         </div>
 
-        <div class="table-wrapper">
+        <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
                         <th>
-                            🔗 ชื่อลิงค์
-                            <div class="sort-buttons">
-                                <button onclick="sortTable(0, 'asc')">A-Z</button>
-                                <button onclick="sortTable(0, 'desc')">Z-A</button>
-                            </div>
+                            🔗 ชื่อลิงก์
+                            <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7; margin-left:5px;">↕</span>
                         </th>
                         <th>📄 รายละเอียด</th> 
-                        <th>🚦 สถานะลิงค์</th>
-                        <th>📊 สถานะการใช้งาน</th>
+                        <th style="text-align: center;">🚦 สถานะ</th>
+                        <th style="text-align: center;">📊 การใช้งาน</th>
                         <th>📂 ประเภท</th>
                         <th>🏢 หน่วยงาน</th> 
                         <th>🏛️ ส่วนราชการ</th> 
@@ -325,10 +331,12 @@
                     {% for link in links %}
                     <tr>
                         <td>
-                            <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green);">{{ link['ชื่อลิงก์'] }}</a>
+                            <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;">
+                                <i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}
+                            </a>
                         </td>
                         <td>{{ link['รายละเอียด'] }}</td> 
-                        <td>
+                        <td style="text-align: center;">
                             {% if link['LinkStatus'] == 'OK' %}
                                 <span class="status-badge status-ok">🟢 ปกติ</span>
                             {% elif link['LinkStatus'] == '403 Blocked' %}
@@ -340,7 +348,7 @@
                             {% endif %}
                         </td>
 
-                        <td>
+                        <td style="text-align: center;">
                             {% if link['สถานะ'] == 'ใช้งาน' %}
                                 <span class="status-badge status-ok">● ใช้งาน</span>
                             {% elif link['สถานะ'] == 'ปรับปรุง' %}
@@ -368,7 +376,7 @@
 
                         <td>{{ link['วันที่อัปเดต_สั้น'] }}</td>
 
-                        <td style="text-align: center;">
+                        <td align="center">
                             <button type="button" 
                                     class="btn-share" 
                                     title="แชร์ QR Code"
@@ -380,7 +388,8 @@
                     {% else %}
                     <tr id="noDataRow">
                         <td colspan="11" style="text-align: center; padding: 30px; color: #999;">
-                            🔭 ไม่พบข้อมูลลิงค์สำหรับ {{ agency_name }}
+                            <i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+                            ไม่พบข้อมูลลิงค์สำหรับ {{ agency_name }}
                         </td>
                     </tr>
                     {% endfor %}
@@ -444,12 +453,8 @@
         function sortTable(columnIndex, direction) {
             const collator = new Intl.Collator('th', { sensitivity: 'base' });
             allTableRows.sort((rowA, rowB) => {
-                const cellA = rowA.getElementsByTagName("td")[columnIndex].querySelector('a') 
-                              ? rowA.getElementsByTagName("td")[columnIndex].querySelector('a').textContent.trim() 
-                              : rowA.getElementsByTagName("td")[columnIndex].textContent.trim();
-                const cellB = rowB.getElementsByTagName("td")[columnIndex].querySelector('a')
-                              ? rowB.getElementsByTagName("td")[columnIndex].querySelector('a').textContent.trim()
-                              : rowB.getElementsByTagName("td")[columnIndex].textContent.trim();
+                const cellA = rowA.getElementsByTagName("td")[columnIndex].textContent.trim();
+                const cellB = rowB.getElementsByTagName("td")[columnIndex].textContent.trim();
                 if (direction === 'asc') {
                     return collator.compare(cellA, cellB);
                 } else {
@@ -464,33 +469,23 @@
             const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
             const filter = searchInput.value.toLowerCase(); 
             const filteredRows = allTableRows.filter(row => {
-                const cells = row.getElementsByTagName("td");
-                
-                const name = (cells[0].textContent || cells[0].innerText).toLowerCase(); 
-                const status = (cells[3].textContent || cells[3].innerText).toLowerCase(); 
-                const type = (cells[4].textContent || cells[4].innerText).toLowerCase(); 
-                const main_agency = (cells[6].textContent || cells[6].innerText).toLowerCase(); 
-                const creator = (cells[8].textContent || cells[8].innerText).toLowerCase(); 
-                
-                const combinedText = name + " " + status + " " + type + " " + main_agency + " " + creator;
-                return combinedText.includes(filter);
+                const textContent = row.innerText.toLowerCase();
+                return textContent.includes(filter);
             });
 
             tbody.innerHTML = ''; 
             if (filteredRows.length === 0) {
-                if(noDataRow) tbody.appendChild(noDataRow);
+                if(noDataRow) { noDataRow.style.display = 'table-row'; tbody.appendChild(noDataRow); }
                 totalPages = 1;
                 currentPage = 1;
             } else {
+                if(noDataRow) noDataRow.style.display = 'none';
                 totalPages = Math.ceil(filteredRows.length / itemsPerPage);
                 if (page > totalPages) currentPage = totalPages;
                 if (page < 1) currentPage = 1;
                 const startIndex = (currentPage - 1) * itemsPerPage;
                 const endIndex = startIndex + itemsPerPage;
-                const slicedRows = filteredRows.slice(startIndex, endIndex);
-                slicedRows.forEach(row => {
-                    tbody.appendChild(row);
-                });
+                filteredRows.slice(startIndex, endIndex).forEach(row => tbody.appendChild(row));
             }
 
             document.getElementById("currentPage").textContent = currentPage;
@@ -502,7 +497,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            allTableRows = Array.from(tbody.children).filter(row => row.id !== 'noDataRow');
+            allTableRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
             searchInput = document.getElementById("searchInput"); 
             
             document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
