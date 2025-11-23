@@ -9,25 +9,25 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- Global Variables & Reset (Same as Index) --- */
         :root {
+            /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
-            --button-red-hover: #c82333;
             --button-blue: #007bff;
-            --button-blue-hover: #0056b3;
             --button-yellow: #ffc107;
-            --button-yellow-hover: #e0a800;
             --button-gray: #6c757d;
-            --light-gray: #f8f9fa;
             --text-color: #2c3e50;
             --border-color: #e0e0e0;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --bg-grad-start: #f5f7fa;
+            --bg-grad-end: #c3cfe2;
+            
+            --header-height: 80px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
@@ -36,90 +36,81 @@
 
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
+            padding-top: var(--header-height); /* เว้นที่ให้ Header */
             padding-bottom: 60px;
         }
 
-        /* --- Header Styles --- */
+        /* --- 1. Header & Navigation (Standardized Style) --- */
         .main-header {
             background: white;
-            padding: 15px 20px;
-            box-shadow: var(--shadow-md);
-            border-bottom: 4px solid var(--bma-green);
-            position: sticky;
-            top: 0;
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
-            backdrop-filter: blur(10px);
-        }
-
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
+            height: var(--header-height);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            justify-content: space-between;
+            transition: all 0.3s ease;
         }
 
-        .logo-container { 
-            display: flex; align-items: center; gap: 15px;
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
         }
-
-        .logo-container img {
-            height: 60px; transition: transform 0.3s ease;
-        }
+        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
+        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        .logo-text {
-            font-size: 1.5rem; font-weight: 600; color: var(--bma-green); display: none;
+        /* Desktop Menu */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .mobile-menu-toggle {
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
+        .nav-link i { font-size: 1.1em; }
+        
+        /* Active State */
+        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
+        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
+        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
+
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        /* Mobile Hamburger */
+        .mobile-toggle {
             display: none;
-            background: var(--bma-green); color: white;
-            border: none; padding: 10px 15px;
-            border-radius: 8px; cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 10px;
         }
-
-        .navigation {
-            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-        }
-
-        .navigation span {
-            font-size: 0.95rem; color: var(--text-color); font-weight: 500;
-            padding: 8px 16px; background: var(--bma-green-light);
-            border-radius: 20px; display: none; white-space: nowrap;
-        }
-
-        /* --- Buttons --- */
-        button, a button { 
-            font-family: 'Kanit', Arial, sans-serif; 
-            color: white; border: none; 
-            padding: 10px 16px; border-radius: 8px;
-            cursor: pointer; font-size: 0.95rem; 
-            transition: all 0.3s ease; white-space: nowrap;
-            font-weight: 500; box-shadow: var(--shadow-sm);
-            text-decoration: none; display: inline-block;
-        }
-        button:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        button:active { transform: translateY(0); }
-
-        .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
-        .btn-analytics { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
-        .btn-admin { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
-        .btn-feedback { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
-        .btn-profile { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
-        .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
-        .btn-home { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
 
         /* --- Container --- */
         .container {
             max-width: 800px; /* Narrower for form */
-            margin: 30px auto; 
+            margin: 40px auto; 
             padding: 40px;
             background: white;
             border-radius: 20px;
@@ -158,7 +149,7 @@
             width: 100%; padding: 15px;
             font-family: 'Kanit', sans-serif; font-size: 1em;
             border: 2px solid var(--border-color);
-            border-radius: 15px; background: var(--light-gray);
+            border-radius: 15px; background: #f8f9fa;
             transition: all 0.3s ease; height: 120px; resize: vertical;
         }
 
@@ -169,17 +160,20 @@
 
         .btn-submit-feedback {
             background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
+            color: white; border: none; border-radius: 8px;
             width: 100%; padding: 15px; font-size: 1.1em; margin-top: 10px;
+            cursor: pointer; transition: 0.3s; box-shadow: var(--shadow-sm);
         }
+        .btn-submit-feedback:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
-        /* --- Star Rating CSS --- */
+        /* --- Star Rating --- */
         .star-rating {
             display: flex;
             flex-direction: row-reverse; 
             justify-content: center;
             font-size: 2.5em; 
             gap: 10px;
-            background: var(--light-gray);
+            background: #f8f9fa;
             padding: 10px;
             border-radius: 50px;
             border: 1px dashed var(--border-color);
@@ -204,85 +198,88 @@
         }
         .main-footer p { margin: 8px 0; opacity: 0.95; }
 
-        /* --- Responsive --- */
+        /* --- Responsive Media Queries --- */
+        @media (max-width: 992px) {
+            .nav-link span { display: none; }
+            .nav-link i { font-size: 1.3rem; margin: 0; }
+            .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
+            .user-profile-pic { width: 100%; height: 100%; }
+        }
+
         @media (max-width: 768px) {
-            .mobile-menu-toggle { display: block; }
-            .navigation {
-                display: none; width: 100%;
+            body { padding-top: 70px; }
+            .main-header { padding: 0 15px; height: 70px; }
+            .logo-text { font-size: 1.1rem; }
+            .mobile-toggle { display: block; }
+
+            /* Mobile Menu */
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 70px; left: 0; width: 100%;
+                background: white;
                 flex-direction: column;
-                background: white; padding: 15px;
-                border-radius: 12px; margin-top: 10px;
-                box-shadow: var(--shadow-md);
+                align-items: stretch;
+                padding: 15px;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+                border-top: 1px solid #f0f0f0;
             }
-            .navigation.active { display: flex; }
-            .navigation button, .navigation a {
-                width: 100%; text-align: center; justify-content: center;
+            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
+            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+            .nav-link {
+                width: 100%; border-radius: 12px;
+                padding: 12px 15px; margin-bottom: 5px;
+                justify-content: flex-start;
             }
-            .navigation span { display: none !important; }
-            .logo-text { display: none; }
-            .container { padding: 20px; margin: 20px 15px; }
-            h2 { font-size: 1.4em; }
+            .nav-link span { display: inline; }
+            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+
+            .container { padding: 25px 20px; margin: 30px 15px; }
+            h2 { font-size: 1.5em; }
             .star-rating { font-size: 2em; }
         }
-
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .logo-text { display: block; }
-            .navigation span { display: block; }
-        }
-        
-        @media (min-width: 1025px) {
-            .logo-text { display: block; }
-            .navigation span { display: block; }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: var(--light-gray); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: var(--bma-green); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--bma-green-hover); }
     </style>
 </head>
 <body>
     
     <header class="main-header">
-        <div class="header-container">
-            <div class="logo-container">
-                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-            </div>
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+        </a>
 
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-
-            <div class="navigation" id="mainNavigation">
-                {% if session.get('logged_in') %}
-                    <span>สวัสดี, {{ session.name }}!</span>
-                    
-                    <a href="{{ url_for('home') }}">
-                        <button type="button" class="btn-home">⬅️ กลับหน้าหลัก</button>
-                    </a>
-
-                    {% if session.get('level') == 'Admin' %}
-                    <a href="{{ url_for('admin_panel') }}">
-                        <button type="button" class="btn-admin">👑 Admin Panel</button>
-                    </a>
-                    {% endif %}
-                    <a href="{{ url_for('analytics_page') }}">
-                        <button type="button" class="btn-analytics">📊 Analytics</button>
-                    </a>
-                    <a href="{{ url_for('dashboard') }}">
-                        <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-                    </a>
-                    <a href="{{ url_for('profile_page') }}">
-                        <button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
-                    </a>
-                    <a href="{{ url_for('logout') }}">
-                        <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-                    </a>
-                {% else %}
-                    <a href="{{ url_for('login_page') }}"><button>เข้าสู่ระบบ</button></a>
-                {% endif %}
-            </div>
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
         </div>
+        
+        <nav class="nav-menu" id="navMenu">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+                
+                {% if session.get('level') == 'Admin' %}
+                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
+                {% endif %}
+                
+                <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+                
+                <a href="{{ url_for('feedback_page') }}" class="nav-link active-nav" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link" title="โปรไฟล์">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                    <span>{{ session.name }}</span>
+                </a>
+                
+                <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
+                    <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
+                </a>
+            {% else %}
+                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;">
+                    <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
+                </a>
+            {% endif %}
+        </nav>
     </header>
     
     <div class="container">
@@ -340,54 +337,43 @@
     </footer>
 
     <script>
-        // Toggle Mobile Menu Function (Same as Index)
-        function toggleMobileMenu() {
-            const nav = document.getElementById('mainNavigation');
-            nav.classList.toggle('active');
+        // Toggle Mobile Menu (Logic ใหม่)
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
         }
 
-        // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
-            const nav = document.getElementById('mainNavigation');
-            const toggle = document.querySelector('.mobile-menu-toggle');
+            const nav = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-toggle');
             if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
                 nav.classList.remove('active');
             }
         });
-    </script>
 
-    <script>
+        // Flash Messages
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 const messages = {{ messages | tojson }};
                 const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
+                    toast: true, position: 'top', showConfirmButton: false, timer: 3000, timerProgressBar: true
                 });
                 messages.forEach(([category, message]) => {
-                    Toast.fire({
-                        icon: category,
-                        title: message
-                    });
+                    Toast.fire({ icon: category, title: message });
                 });
             {% endif %}
         {% endwith %}
     </script>
-  <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->	
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
 </body>
 </html>

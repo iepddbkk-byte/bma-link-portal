@@ -10,166 +10,110 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
+            /* Theme Colors (Matches Dashboard) */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
-            --button-red-hover: #c82333;
             --button-blue: #007bff;
-            --button-blue-hover: #0056b3;
             --button-yellow: #ffc107;
-            --button-yellow-hover: #e0a800;
             --button-gray: #6c757d;
-            --light-gray: #f8f9fa;
             --text-color: #2c3e50;
             --border-color: #e0e0e0;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --bg-grad-start: #f5f7fa;
+            --bg-grad-end: #c3cfe2;
+            
+            --header-height: 80px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Kanit', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
+            padding-top: var(--header-height); /* เว้นที่ให้ Header */
             padding-bottom: 60px;
         }
 
-        /* Header */
+        /* --- 1. Header & Navigation (New Style) --- */
         .main-header {
             background: white;
-            padding: 15px 20px;
-            box-shadow: var(--shadow-md);
-            border-bottom: 4px solid var(--bma-green);
-            position: sticky;
-            top: 0;
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
-            backdrop-filter: blur(10px);
-        }
-
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
+            height: var(--header-height);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            justify-content: space-between;
+            transition: all 0.3s ease;
         }
 
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            text-decoration: none;
         }
+        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
+        .logo-container img:hover { transform: scale(1.05); }
+        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        .logo-container img {
-            height: 60px;
-            transition: transform 0.3s ease;
-        }
-
-        .logo-container img:hover {
-            transform: scale(1.05);
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--bma-green);
-            display: none;
-        }
-
-        .mobile-menu-toggle {
-            display: none;
-            background: var(--bma-green);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .navigation {
+        /* Desktop Menu */
+        .nav-menu {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 8px;
         }
 
-        .navigation span {
-            font-size: 0.95rem;
+        .nav-link {
+            text-decoration: none;
             color: var(--text-color);
             font-weight: 500;
             padding: 8px 16px;
-            background: var(--bma-green-light);
-            border-radius: 20px;
-            display: none;
-            white-space: nowrap;
-        }
-
-        /* Buttons */
-        button, a, a.btn { /* (ปรับปรุง) ให้ a.btn ชัดเจน */
-            font-family: 'Kanit', Arial, sans-serif;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 0.95rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            text-decoration: none;
             white-space: nowrap;
-            box-shadow: var(--shadow-sm);
-            display: inline-block;
+        }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
+        .nav-link i { font-size: 1.1em; }
+        
+        /* Active State for Analytics Page */
+        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
+        
+        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
+        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
+
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        /* Mobile Hamburger */
+        .mobile-toggle {
+            display: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 10px;
         }
 
-        button:hover, a:hover, a.btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-home {
-            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
-        }
-        .btn-dashboard {
-            background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
-        }
-        .btn-analytics {
-            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
-        }
-        .btn-admin {
-            background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover));
-            color: #212529 !important;
-        }
-        .btn-feedback {
-            background: linear-gradient(135deg, var(--button-gray), #5a6268);
-        }
-        .btn-profile {
-            background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover));
-            color: #212529 !important;
-        }
-        .btn-logout {
-            background: linear-gradient(135deg, var(--button-red), var(--button-red-hover));
-        }
-
-        /* Container */
+        /* --- 2. Container & Content --- */
         .container {
             max-width: 1400px;
             margin: 30px auto;
-            padding: 30px;
+            padding: 0 20px;
             animation: fadeIn 0.5s ease;
         }
 
@@ -178,7 +122,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Title */
         h2 {
             color: var(--bma-green);
             font-size: 2em;
@@ -221,10 +164,7 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
 
         .stat-card.card-blue { border-left-color: var(--button-blue); }
         .stat-card.card-green { border-left-color: var(--bma-green); }
@@ -244,47 +184,16 @@
             box-shadow: var(--shadow-md);
         }
 
-        .icon-links {
-            background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%);
-        }
-        .icon-active {
-            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-        }
-        .icon-users {
-            background: linear-gradient(135deg, var(--button-yellow) 0%, #e0a800 100%);
-        }
-        .icon-feedback {
-            background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
-        }
-        .icon-star {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-        }
+        .icon-links { background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%); }
+        .icon-active { background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%); }
+        .icon-users { background: linear-gradient(135deg, var(--button-yellow) 0%, #e0a800 100%); }
+        .icon-feedback { background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%); }
+        .icon-star { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
 
-        .stat-card-info {
-            flex: 1;
-        }
-
-        .stat-card-info h3 {
-            margin: 0 0 5px 0;
-            font-size: 0.95em;
-            color: var(--button-gray);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-card-info .stat-number {
-            font-size: 2.5em;
-            font-weight: 600;
-            color: var(--text-color);
-            line-height: 1;
-        }
-
-        .stat-card-info .stat-number .unit {
-            font-size: 0.5em;
-            color: var(--button-gray);
-            font-weight: 400;
-        }
+        .stat-card-info { flex: 1; }
+        .stat-card-info h3 { margin: 0 0 5px 0; font-size: 0.95em; color: var(--button-gray); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card-info .stat-number { font-size: 2.5em; font-weight: 600; color: var(--text-color); line-height: 1; }
+        .stat-card-info .stat-number .unit { font-size: 0.5em; color: var(--button-gray); font-weight: 400; }
 
         /* Chart Grid */
         .chart-grid {
@@ -301,15 +210,8 @@
             box-shadow: var(--shadow-lg);
             transition: all 0.3s ease;
         }
-
-        .chart-container:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-        }
-
-        .chart-container-full {
-            grid-column: 1 / -1;
-        }
+        .chart-container:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+        .chart-container-full { grid-column: 1 / -1; }
 
         .chart-container h3 {
             text-align: center;
@@ -318,262 +220,120 @@
             color: var(--text-color);
             font-size: 1.2em;
             padding-bottom: 15px;
-            border-bottom: 2px solid var(--light-gray);
+            border-bottom: 2px solid #f8f9fa;
         }
-
-        .chart-container h3 i {
-            color: var(--bma-green);
-            margin-right: 8px;
-        }
+        .chart-container h3 i { color: var(--bma-green); margin-right: 8px; }
 
         /* Feedback List */
-        .feedback-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            max-height: 350px;
-            overflow-y: auto;
-        }
+        .feedback-list { list-style: none; padding: 0; margin: 0; max-height: 350px; overflow-y: auto; }
+        .feedback-list li { border-bottom: 1px solid #f0f0f0; padding: 15px 10px; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 5px; }
+        .feedback-list li:hover { background: var(--bma-green-light); transform: translateX(5px); }
+        .feedback-list li:last-child { border-bottom: none; }
+        .feedback-list p { margin: 0 0 8px 0; font-size: 1em; line-height: 1.5; color: var(--text-color); }
+        .feedback-list .user { font-size: 0.85em; font-weight: 500; color: var(--button-gray); font-style: italic; }
+        
+        /* Custom Scrollbar */
+        .feedback-list::-webkit-scrollbar, ::-webkit-scrollbar { width: 8px; height: 8px; }
+        .feedback-list::-webkit-scrollbar-track, ::-webkit-scrollbar-track { background: #f8f9fa; border-radius: 10px; }
+        .feedback-list::-webkit-scrollbar-thumb, ::-webkit-scrollbar-thumb { background: var(--bma-green); border-radius: 10px; }
 
-        .feedback-list li {
-            border-bottom: 1px solid #f0f0f0;
-            padding: 15px 10px;
-            transition: all 0.3s ease;
-            border-radius: 8px;
-            margin-bottom: 5px;
-        }
-
-        .feedback-list li:hover {
-            background: var(--bma-green-light);
-            transform: translateX(5px);
-        }
-
-        .feedback-list li:last-child {
-            border-bottom: none;
-        }
-
-        .feedback-list p {
-            margin: 0 0 8px 0;
-            font-size: 1em;
-            line-height: 1.5;
-            color: var(--text-color);
-        }
-
-        .feedback-list .user {
-            font-size: 0.85em;
-            font-weight: 500;
-            color: var(--button-gray);
-            font-style: italic;
-        }
-
-        .feedback-list::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .feedback-list::-webkit-scrollbar-track {
-            background: var(--light-gray);
-            border-radius: 10px;
-        }
-
-        .feedback-list::-webkit-scrollbar-thumb {
-            background: var(--bma-green);
-            border-radius: 10px;
-        }
+        /* Empty State */
+        .empty-state { text-align: center; padding: 40px 20px; color: #999; }
+        .empty-state i { font-size: 3em; margin-bottom: 15px; opacity: 0.5; }
 
         /* Footer */
         .main-footer {
             background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white;
-            text-align: center;
-            padding: 25px;
-            margin-top: 40px;
-            font-size: 0.9em;
-            box-shadow: var(--shadow-lg);
+            color: white; text-align: center; padding: 25px; margin-top: 40px; font-size: 0.9em; box-shadow: var(--shadow-lg);
+        }
+        .main-footer p { margin: 8px 0; opacity: 0.95; }
+
+        /* --- 3. Responsive Media Queries --- */
+        @media (max-width: 992px) {
+            .nav-link span { display: none; } /* Tablet: Show icons only */
+            .nav-link i { font-size: 1.3rem; margin: 0; }
+            .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
+            .user-profile-pic { width: 100%; height: 100%; }
         }
 
-        .main-footer p {
-            margin: 8px 0;
-            opacity: 0.95;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 3em;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .mobile-menu-toggle {
-                display: block;
-            }
+            body { padding-top: 70px; }
+            .main-header { padding: 0 15px; height: 70px; }
+            .logo-text { font-size: 1.1rem; }
+            .mobile-toggle { display: block; }
 
-            .navigation {
+            /* Mobile Menu (Slide Down) */
+            .nav-menu {
                 display: none;
-                width: 100%;
-                flex-direction: column;
+                position: absolute;
+                top: 70px; left: 0; width: 100%;
                 background: white;
-                padding: 15px;
-                border-radius: 12px;
-                margin-top: 10px;
-                box-shadow: var(--shadow-md);
-            }
-
-            .navigation.active {
-                display: flex;
-            }
-
-            .navigation button,
-            .navigation a {
-                width: 100%;
-                text-align: center;
-                justify-content: center;
-            }
-
-            .navigation span {
-                display: none !important;
-            }
-
-            .logo-text {
-                display: none;
-            }
-
-            .container {
-                padding: 20px 15px;
-                margin: 20px 10px;
-            }
-
-            h2 {
-                font-size: 1.3em;
-                padding: 15px;
-            }
-
-            .chart-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-card-row {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-card {
-                padding: 20px;
-            }
-
-            .stat-card-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 2em;
-                padding: 15px;
-            }
-
-            .stat-card-info .stat-number {
-                font-size: 2em;
-            }
-        }
-
-        @media (min-width: 769px) { /* (ปรับปรุง) */
-            .logo-text {
-                display: block;
-            }
-
-            .navigation span {
-                display: block;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .logo-container img {
-                height: 45px;
-            }
-
-            button, a, a.btn { /* (ปรับปรุง) */
-                padding: 8px 15px;
-                font-size: 0.9em;
-            }
-
-            h2 {
-                font-size: 1.1em;
-            }
-
-            .stat-card {
                 flex-direction: column;
-                text-align: center;
+                align-items: stretch;
+                padding: 15px;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+                border-top: 1px solid #f0f0f0;
             }
+            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
+            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-            .stat-card-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 1.8em;
+            .nav-link {
+                width: 100%; border-radius: 12px;
+                padding: 12px 15px; margin-bottom: 5px;
+                justify-content: flex-start;
             }
+            .nav-link span { display: inline; } /* Mobile: Show text again */
+            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
 
-            .chart-container {
-                padding: 20px 15px;
-            }
-        }
-
-        /* Smooth Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--light-gray);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--bma-green);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--bma-green-hover);
-        }
-
-        html {
-            scroll-behavior: smooth;
+            /* Content Adjustments */
+            .container { padding: 0 15px; margin: 20px auto; }
+            h2 { font-size: 1.3em; padding: 15px; }
+            .chart-grid, .stat-card-row { grid-template-columns: 1fr; }
+            .stat-card { padding: 20px; }
+            .stat-card-icon { width: 60px; height: 60px; font-size: 2em; padding: 15px; }
         }
     </style>
 </head>
 <body>
     
     <header class="main-header">
-        <div class="header-container">
-            <div class="logo-container">
-                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-            </div>
-            
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-            
-            <div class="navigation" id="mainNavigation">
-                {% if session.get('logged_in') %}
-                    <span class="user-greeting">สวัสดี, {{ session.name }}!</span>
-                    
-                    <a href="{{ url_for('home') }}" class="btn btn-home">🏠 กลับหน้าหลัก</a>
-                    
-                    {% if session.get('level') == 'Admin' %}
-                    <a href="{{ url_for('admin_panel') }}" class="btn btn-admin">👑 Admin Panel</a>
-                    {% endif %}
-                    
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">🖥️ Dashboard</a>
-                    <a href="{{ url_for('feedback_page') }}" class="btn btn-feedback">📝 ส่ง Feedback</a>
-                    <a href="{{ url_for('profile_page') }}" class="btn btn-profile">👤 ข้อมูลส่วนตัว</a>
-                    <a href="{{ url_for('logout') }}" class="btn btn-logout">🚪 ออกจากระบบ</a>
-                {% else %}
-                    <a href="{{ url_for('login_page') }}" class="btn btn-home">🏠 กลับหน้าหลัก</a>
-                {% endif %}
-            </div>
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+        </a>
+
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
         </div>
+        
+        <nav class="nav-menu" id="navMenu">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+                
+                {% if session.get('level') == 'Admin' %}
+                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
+                {% endif %}
+                
+                <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                
+                <a href="{{ url_for('analytics_page') }}" class="nav-link active-nav" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+                
+                <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link" title="โปรไฟล์">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                    <span>{{ session.name }}</span>
+                </a>
+                
+                <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
+                    <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
+                </a>
+            {% else %}
+                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;">
+                    <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
+                </a>
+            {% endif %}
+        </nav>
     </header>
     
     <div class="container">
@@ -692,24 +452,22 @@
     </footer>
 
     <script>
-        // Toggle Mobile Menu Function
-        function toggleMobileMenu() {
-            const nav = document.getElementById('mainNavigation');
-            nav.classList.toggle('active');
+        // --- 1. Mobile Menu Logic (Updated to match Dashboard) ---
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
         }
 
         // Close mobile menu when clicking outside
-        document.addEventListener('DOMContentLoaded', () => {
-            document.addEventListener('click', (e) => {
-                const nav = document.getElementById('mainNavigation');
-                const toggle = document.querySelector('.mobile-menu-toggle');
-                if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
-                    nav.classList.remove('active');
-                }
-            });
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-toggle');
+            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+            }
         });
 
-        // Chart.js Code
+        // --- 2. Chart.js Code (Existing) ---
         const chartData = {{ chart_data | tojson }};
         const bmaGreen = 'rgba(0, 150, 60, 0.7)';
         const bmaBlue = 'rgba(0, 123, 255, 0.7)';
@@ -748,13 +506,7 @@
                 options: { 
                     responsive: true, 
                     plugins: { 
-                        legend: { 
-                            position: 'top',
-                            labels: {
-                                padding: 15,
-                                font: { size: 12 }
-                            }
-                        } 
+                        legend: { position: 'top', labels: { padding: 15, font: { size: 12 } } } 
                     } 
                 }
             });
@@ -779,14 +531,8 @@
                     responsive: true,
                     plugins: { legend: { display: false } },
                     scales: { 
-                        y: { 
-                            beginAtZero: true, 
-                            ticks: { precision: 0 },
-                            grid: { color: 'rgba(0,0,0,0.05)' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
+                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
@@ -817,14 +563,8 @@
                     responsive: true,
                     plugins: { legend: { display: false } },
                     scales: { 
-                        y: { 
-                            beginAtZero: true, 
-                            ticks: { precision: 0 },
-                            grid: { color: 'rgba(0,0,0,0.05)' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
+                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
@@ -843,26 +583,21 @@
                     timerProgressBar: true,
                 });
                 messages.forEach(([category, message]) => {
-                    Toast.fire({
-                        icon: category,
-                        title: message
-                    });
+                    Toast.fire({ icon: category, title: message });
                 });
             {% endif %}
         {% endwith %}
     </script>
-    <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
 </body>
 </html>

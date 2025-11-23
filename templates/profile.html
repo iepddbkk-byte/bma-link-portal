@@ -2,233 +2,246 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ข้อมูลส่วนตัว - BMA Link Registry</title>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
-            --button-red: #dc3545;
-            --button-red-hover: #c82333;
-            --button-blue: #007bff;
-            --button-blue-hover: #0056b3;
-            --button-yellow: #ffc107;
-            --button-yellow-hover: #e0a800;
-            --button-gray: #6c757d;
-            --light-gray: #f4f4f4;
-            --text-color: #333;
             --bma-green-light: #e8f5e9;
+            --button-red: #dc3545;
+            --button-blue: #007bff;
+            --button-yellow: #ffc107;
+            --button-gray: #6c757d;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --bg-grad-start: #f5f7fa;
+            --bg-grad-end: #c3cfe2;
+            
+            --header-height: 80px;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
-            margin: 0; padding: 0;
-            background-color: var(--light-gray); 
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
+            min-height: 100vh;
+            padding-top: var(--header-height);
         }
-        
-        /* --- Header Style (ปรับปรุงให้เหมือน Dashboard) --- */
+
+        /* --- Header & Navigation (Standardized) --- */
         .main-header {
             background: white;
-            padding: 15px 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-bottom: 4px solid var(--bma-green);
-            position: sticky;
-            top: 0;
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
-        }
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
+            height: var(--header-height);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            justify-content: space-between;
+            transition: all 0.3s ease;
         }
-        .logo-container { display: flex; align-items: center; gap: 15px; }
-        .logo-container img { height: 60px; }
-        .logo-text { font-size: 1.5rem; font-weight: 600; color: var(--bma-green); }
-        .navigation { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .user-greeting {
-            font-size: 0.95rem; color: var(--text-color); font-weight: 500;
-            padding: 8px 16px; background: var(--bma-green-light);
-            border-radius: 20px; white-space: nowrap;
-        }
-        .mobile-menu-toggle {
-            display: none; background: var(--bma-green); color: white;
-            border: none; padding: 10px 15px; border-radius: 8px;
-            cursor: pointer; font-size: 1.2rem;
-        }
-        
-        /* --- Button Styles (เหมือน Dashboard) --- */
-        button, .btn, a.btn { 
-            font-family: 'Kanit', Arial, sans-serif; 
-            color: white; border: none; padding: 10px 16px; border-radius: 8px; 
-            cursor: pointer; font-size: 0.95rem; transition: all 0.3s ease;
-            white-space: nowrap; font-weight: 500; 
-            text-decoration: none !important; display: inline-block;
-        }
-        button:hover, .btn:hover { transform: translateY(-2px); }
-        .btn-home { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
-        .btn-analytics { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
-        .btn-admin { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
-        .btn-feedback { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
-        .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
-        .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
-        .btn-profile { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
-        /* --- (จบ) Header Styles --- */
 
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
+        .logo-container img:hover { transform: scale(1.05); }
+        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
+
+        /* Desktop Menu */
+        .nav-menu { display: flex; align-items: center; gap: 8px; }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
+        
+        /* Active State */
+        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
+        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
+        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
+
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        /* Mobile Hamburger */
+        .mobile-toggle {
+            display: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 10px;
+        }
 
         /* --- Profile Styles --- */
-        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-        
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
         .profile-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            position: relative;
         }
         
         .profile-cover {
-            height: 150px;
-            width: 100%;
+            height: 160px; width: 100%;
             background: linear-gradient(135deg, var(--bma-green), #005a24);
         }
         
         .profile-avatar {
-            width: 140px;
-            height: 140px;
+            width: 150px; height: 150px;
             border-radius: 50%;
             border: 5px solid white;
             background-color: #fff;
-            margin-top: -70px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-top: -75px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             overflow: hidden;
             position: relative;
         }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         
         .profile-info { padding: 20px 40px 40px 40px; width: 100%; box-sizing: border-box; }
-        .profile-name { font-size: 1.8em; font-weight: 600; margin: 10px 0 5px 0; color: var(--text-color); }
-        .profile-username { color: var(--button-gray); font-size: 1.1em; margin-bottom: 20px; }
+        .profile-name { font-size: 1.8em; font-weight: 700; margin: 10px 0 5px 0; color: var(--text-color); }
+        .profile-username { color: var(--button-gray); font-size: 1.1em; margin-bottom: 20px; font-weight: 300; }
         
         .profile-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 500;
-            margin-bottom: 20px;
+            display: inline-block; padding: 6px 18px; border-radius: 30px;
+            font-size: 0.9em; font-weight: 500; margin-bottom: 25px;
         }
-        .badge-admin { background-color: var(--button-yellow); color: #212529; }
-        .badge-user { background-color: var(--bma-green); color: white; }
+        .badge-admin { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-user { background-color: var(--bma-green-light); color: var(--bma-green); border: 1px solid #c3e6cb; }
+
+        /* Info List */
+        .info-list { width: 100%; max-width: 650px; margin: 0 auto; }
+        .info-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 0; border-bottom: 1px solid #f0f0f0;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .info-label { font-weight: 500; color: #666; display: flex; align-items: center; gap: 10px; }
+        .info-label i { color: var(--bma-green); width: 20px; }
+        .info-data { font-weight: 500; color: var(--text-color); text-align: right; }
 
         /* Stats Grid */
         .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            width: 100%;
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 30px;
+            display: grid; grid-template-columns: 1fr; gap: 20px;
+            width: 100%; margin-top: 30px; border-top: 1px solid #eee; padding-top: 30px;
         }
         .stat-item {
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            border: 1px solid #eee;
+            padding: 20px; background-color: #f8f9fa;
+            border-radius: 15px; border: 1px solid #eee; transition: 0.3s;
         }
-        .stat-value { font-size: 1.5em; font-weight: 600; color: var(--bma-green); }
-        .stat-label { color: var(--button-gray); font-size: 0.9em; margin-top: 5px; }
-        
-        .info-list {
-            text-align: left;
-            margin-top: 30px;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            flex-wrap: wrap; 
-            gap: 5px;
-        }
-        .info-item:last-child { border-bottom: none; }
-        .info-label { font-weight: 500; color: var(--button-gray); }
-        .info-data { font-weight: 500; color: var(--text-color); text-align: right; }
+        .stat-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .stat-value { font-size: 2em; font-weight: 700; color: var(--bma-green); line-height: 1; }
+        .stat-label { color: #777; font-size: 0.9em; margin-top: 5px; }
 
-        .footer { text-align: center; margin-top: 40px; color: var(--button-gray); font-size: 0.9em; }
+        .btn-edit-profile {
+            background-color: white; border: 1px solid #ddd; color: #555;
+            width: 100%; font-size: 1.05em; padding: 12px; border-radius: 10px;
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn-edit-profile:hover { background: #f8f9fa; border-color: #ccc; color: #333; }
+
+        .footer { text-align: center; margin-top: 40px; color: #888; font-size: 0.9em; }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .mobile-menu-toggle { display: block; }
-            .navigation {
-                display: none; width: 100%; flex-direction: column;
-                background: white; padding: 15px; border-radius: 12px;
-                margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            }
-            .navigation.active { display: flex; }
-            .navigation button, .navigation a { width: 100%; justify-content: center; }
-            .user-greeting { display: none !important; }
-            .logo-text { display: none; }
-            .profile-info { padding: 20px; }
-            .info-item { flex-direction: column; align-items: flex-start; }
-            .info-data { text-align: left; }
+        @media (max-width: 992px) {
+            .nav-link span { display: none; }
+            .nav-link i { font-size: 1.3rem; margin: 0; }
+            .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
+            .user-profile-pic { width: 100%; height: 100%; }
         }
-        @media (min-width: 769px) {
-            .logo-text { display: block; }
-            .user-greeting { display: block; }
+
+        @media (max-width: 768px) {
+            body { padding-top: 70px; }
+            .main-header { padding: 0 15px; height: 70px; }
+            .logo-text { font-size: 1.1rem; }
+            .mobile-toggle { display: block; }
+
+            .nav-menu {
+                display: none; position: absolute; top: 70px; left: 0; width: 100%;
+                background: white; flex-direction: column; align-items: stretch;
+                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
+            }
+            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
+            
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; }
+            .nav-link span { display: inline; }
+            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+
+            .profile-info { padding: 25px 20px; }
+            .info-item { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .info-data { text-align: left; }
         }
     </style>
 </head>
 <body>
 
     <header class="main-header">
-        <div class="header-container">
-            <div class="logo-container">
-                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-                <div class="logo-text">ข้อมูลส่วนตัว</div>
-            </div>
-            
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+            <div class="logo-text">ข้อมูลส่วนตัว</div>
+        </a>
         
-            <div class="navigation" id="mainNavigation">
-                {% if session.get('logged_in') %}
-                    <span class="user-greeting">สวัสดี, {{ session.name }}!</span>
-                    
-                    <a href="{{ url_for('home') }}" class="btn btn-home">🏠 กลับหน้าหลัก</a>
-                    
-                    {% if session.get('level') == 'Admin' %}
-                    <a href="{{ url_for('admin_panel') }}" class="btn btn-admin">👑 Admin Panel</a>
-                    {% endif %}
-                    
-                    <a href="{{ url_for('analytics_page') }}" class="btn btn-analytics">📊 Analytics</a>
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-dashboard">🖥️ Dashboard</a>
-                    <a href="{{ url_for('feedback_page') }}" class="btn btn-feedback">📝 ส่ง Feedback</a>
-                    
-                    {% if not is_own_profile %} 
-                    <a href="{{ url_for('profile_page') }}" class="btn btn-profile">👤 กลับโปรไฟล์ฉัน</a>
-                    {% endif %}
-
-                    <a href="{{ url_for('logout') }}" class="btn btn-logout">🚪 ออกจากระบบ</a>
-                {% else %}
-                    <a href="{{ url_for('login_page') }}" class="btn btn-home">🏠 กลับหน้าหลัก</a>
-                {% endif %}
-            </div>
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
         </div>
+    
+        <nav class="nav-menu" id="navMenu">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+                
+                {% if session.get('level') == 'Admin' %}
+                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
+                {% endif %}
+                
+                <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+                <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link active-nav" title="โปรไฟล์">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                    <span>{{ session.name }}</span>
+                </a>
+                
+                <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
+                    <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
+                </a>
+            {% else %}
+                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;">
+                    <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
+                </a>
+            {% endif %}
+        </nav>
     </header>
 
     <div class="container">
@@ -244,9 +257,9 @@
                 <p class="profile-username">@{{ user['Username'] }}</p>
                 
                 {% if user['Level'] == 'Admin' %}
-                    <span class="profile-badge badge-admin">👑 ผู้ดูแลระบบ (Admin)</span>
+                    <span class="profile-badge badge-admin"><i class="fas fa-crown"></i> ผู้ดูแลระบบ (Admin)</span>
                 {% else %}
-                    <span class="profile-badge badge-user">👤 เจ้าหน้าที่ (User)</span>
+                    <span class="profile-badge badge-user"><i class="fas fa-user"></i> เจ้าหน้าที่ (User)</span>
                 {% endif %}
 
                 <div class="info-list">
@@ -256,7 +269,7 @@
                     </div>
                     
                     <div class="info-item">
-                        <span class="info-label"><i class="fas fa-users"></i> กลุ่มงาน/ฝ่าย/กอง</span>
+                        <span class="info-label"><i class="fas fa-sitemap"></i> กลุ่มงาน/ฝ่าย/กอง</span>
                         <span class="info-data">{{ user['หน่วยงาน'] }}</span>
                     </div>
                     
@@ -282,15 +295,15 @@
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-value">{{ links_count }}</div>
-                        <div class="stat-label"><i class="fas fa-link"></i> ลิงค์ที่สร้าง</div>
+                        <div class="stat-label"><i class="fas fa-link"></i> ลิงค์ที่สร้างทั้งหมด</div>
                     </div>
                 </div>
                 
                 {% if is_own_profile %}
                 <div style="margin-top: 30px;">
-                    <a href="{{ url_for('edit_profile_page') }}">
-                        <button class="btn" style="background-color: var(--button-gray); width: 100%; font-size: 1.1em; padding: 12px;">
-                            <i class="fas fa-edit"></i> แก้ไขข้อมูลส่วนตัว
+                    <a href="{{ url_for('edit_profile_page') }}" style="text-decoration:none;">
+                        <button class="btn-edit-profile">
+                            <i class="fas fa-user-edit"></i> แก้ไขข้อมูลส่วนตัว
                         </button>
                     </a>
                 </div>
@@ -305,53 +318,42 @@
     
     <script>
         // Toggle Mobile Menu
-        function toggleMobileMenu() {
-            const nav = document.getElementById('mainNavigation');
-            nav.classList.toggle('active');
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
         }
 
-        // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
-            const nav = document.getElementById('mainNavigation');
-            const toggle = document.querySelector('.mobile-menu-toggle');
+            const nav = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-toggle');
             if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
                 nav.classList.remove('active');
             }
         });
-    </script>
-    
-    <script>
+
+        // Flash Messages
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 const messages = {{ messages | tojson }};
                 const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
+                    toast: true, position: 'top', showConfirmButton: false, timer: 3000, timerProgressBar: true
                 });
                 messages.forEach(([category, message]) => {
-                    Toast.fire({
-                        icon: category,
-                        title: message
-                    });
+                    Toast.fire({ icon: category, title: message });
                 });
             {% endif %}
         {% endwith %}
     </script>
-  <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->	
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
 </body>
 </html>
