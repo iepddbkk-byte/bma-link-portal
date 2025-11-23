@@ -79,27 +79,14 @@
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* --- Mobile Header Elements (New) --- */
-        .mobile-controls { display: none; align-items: center; gap: 12px; }
-        
-        .mobile-profile-btn {
-            display: flex; align-items: center; text-decoration: none; gap: 8px;
-            padding: 5px 10px; border-radius: 20px; transition: background 0.2s;
+        /* --- Mobile Header Elements --- */
+        .mobile-toggle { 
+            display: none; 
+            font-size: 1.8rem; 
+            cursor: pointer; 
+            color: var(--text-color); 
+            padding: 10px; 
         }
-        .mobile-profile-btn:hover { background-color: #f8f9fa; }
-        
-        .mobile-user-name {
-            font-size: 0.9rem; font-weight: 500; color: var(--bma-green);
-            display: block; white-space: nowrap;
-        }
-        
-        .mobile-profile-btn img {
-            width: 36px; height: 36px; border-radius: 50%; 
-            border: 2px solid var(--bma-green); object-fit: cover;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; margin-left: 5px; }
 
         /* --- Container --- */
         .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; animation: fadeIn 0.5s ease; }
@@ -194,8 +181,7 @@
             .main-header { padding: 0 15px; height: 70px; }
             .logo-text { font-size: 1.1rem; }
             
-            /* Mobile Controls Display */
-            .mobile-controls { display: flex; }
+            /* Mobile Header: Only Show Hamburger */
             .mobile-toggle { display: block; }
 
             .nav-menu {
@@ -210,8 +196,8 @@
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
 
-            /* ซ่อน Profile ใน Dropdown บนมือถือ เพราะย้ายไปข้างบนแล้ว */
-            .nav-link.profile-item { display: none; }
+            /* Reset Profile pic size in dropdown */
+            .user-profile-pic { width: 32px; height: 32px; margin-right: 10px; border-radius: 50%; object-fit: cover; }
 
             .container { padding: 0 15px; margin: 20px auto; }
             h2 { font-size: 1.3em; padding: 15px; }
@@ -229,16 +215,8 @@
             <div class="logo-text">ทะเบียนลิงค์ BMA</div>
         </a>
 
-        <div class="mobile-controls">
-            {% if session.get('logged_in') %}
-                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
-                    <span class="mobile-user-name">สวัสดี, {{ session.name }}</span>
-                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
-                </a>
-            {% endif %}
-            <div class="mobile-toggle" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </div>
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
         </div>
         
         <nav class="nav-menu" id="navMenu">
@@ -255,7 +233,7 @@
                 
                 <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
                 
-                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
+                <a href="{{ url_for('profile_page') }}" class="nav-link" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
                     <span>สวัสดี, {{ session.name }}</span>
                 </a>
