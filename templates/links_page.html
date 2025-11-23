@@ -253,17 +253,25 @@
 </head>
 <body>
     
-    <header class="main-header">
-        <a href="{{ url_for('home') }}" class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-        </a>
+<header class="main-header">
+    <a href="{{ url_for('home') }}" class="logo-container">
+        <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+        <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+    </a>
 
+    <div class="mobile-controls">
+        {% if session.get('logged_in') %}
+            <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
+                <span class="mobile-user-name">สวัสดี, {{ session.name }}</span>
+            </a>
+        {% endif %}
         <div class="mobile-toggle" onclick="toggleMenu()">
             <i class="fas fa-bars"></i>
         </div>
-
-        <nav class="nav-menu" id="navMenu">
+    </div>
+    
+    <nav class="nav-menu" id="navMenu">
+        </nav>
             <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
 
             {% if session.get('logged_in') %}
