@@ -9,107 +9,100 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
+            /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
-            --button-red-hover: #c82333;
             --button-blue: #007bff;
-            --button-blue-hover: #0056b3;
             --button-yellow: #ffc107;
-            --button-yellow-hover: #e0a800;
             --button-gray: #6c757d;
-            --light-gray: #f8f9fa;
             --text-color: #2c3e50;
             --border-color: #e0e0e0;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --bg-grad-start: #f5f7fa;
+            --bg-grad-end: #c3cfe2;
+            
+            --header-height: 80px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
+            padding-top: var(--header-height); /* เว้นที่ให้ Header */
             padding-bottom: 60px;
-            padding-top: 80px; /* (สำคัญ!) เผื่อพื้นที่ให้ Header ใหม่ */
         }
 
-        /* --- Header (Modern Navbar - สไตล์เดียวกับ Index) --- */
+        /* --- 1. Header & Navigation (Standardized) --- */
         .main-header {
             background: white;
-            padding: 15px 30px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 1000;
-            height: 80px;
+            height: var(--header-height);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: all 0.3s ease;
         }
 
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             text-decoration: none;
         }
+        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
+        .logo-container img:hover { transform: scale(1.05); }
+        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        .logo-container img { height: 50px; }
-        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--bma-green); }
-
-        /* เมนู Desktop */
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        /* Desktop Menu */
+        .nav-menu { display: flex; align-items: center; gap: 8px; }
 
         .nav-link {
             text-decoration: none;
             color: var(--text-color);
             font-weight: 500;
-            padding: 8px 15px;
-            border-radius: 20px;
-            transition: 0.3s;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.95rem;
+            white-space: nowrap;
         }
-        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
+        .nav-link i { font-size: 1.1em; }
         
-        .btn-login-nav {
-            background: var(--bma-green);
-            color: white !important;
-            padding: 10px 25px;
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0, 150, 60, 0.3);
-        }
-        .btn-login-nav:hover { background: var(--bma-green-hover); transform: translateY(-2px); }
+        /* Active State */
+        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
+        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
+        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
-        .user-profile-pic { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--bma-green); }
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* Toggle Hamburger (Mobile) */
+        /* Mobile Hamburger */
         .mobile-toggle {
             display: none;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             cursor: pointer;
             color: var(--text-color);
+            padding: 10px;
         }
 
-        /* --- Container --- */
+        /* --- Container & Content --- */
         .container {
             max-width: 1400px;
             margin: 30px auto; 
@@ -119,117 +112,46 @@
             box-shadow: var(--shadow-lg);
             animation: fadeIn 0.5s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Title */
         h1 { 
             color: var(--bma-green);
-            font-size: 2em;
-            font-weight: 600;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            font-size: 1.8rem; font-weight: 600;
+            margin-bottom: 25px; padding-bottom: 15px;
             border-bottom: 3px solid var(--bma-green-light);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
         }
 
-        /* Search Container */
-        .search-container {
-            margin: 25px 0;
-            position: relative;
-        }
-
+        /* Search */
+        .search-container { margin: 25px 0; position: relative; }
         #searchInput {
-            width: 100%;
-            padding: 15px 20px 15px 50px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1em;
-            border: 2px solid var(--border-color);
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            background: var(--light-gray);
+            width: 100%; padding: 15px 20px 15px 50px;
+            font-family: 'Kanit', sans-serif; font-size: 1rem;
+            border: 1px solid var(--border-color); border-radius: 50px;
+            transition: all 0.3s ease; background: #f8f9fa;
         }
-
-        #searchInput:focus {
-            outline: none;
-            border-color: var(--bma-green);
-            background: white;
-            box-shadow: 0 0 0 4px var(--bma-green-light);
-        }
-
+        #searchInput:focus { outline: none; border-color: var(--bma-green); background: white; box-shadow: 0 0 0 4px var(--bma-green-light); }
         .search-container::before {
-            content: "🔍";
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.2em;
+            content: "\f002"; font-family: "Font Awesome 5 Free"; font-weight: 900;
+            position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+            font-size: 1.1rem; color: #999;
         }
 
-        /* Table Styles */
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            margin-top: 20px;
-        }
-
-        table { 
-            width: 100%; 
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 0.95em;
-            background: white;
-        }
-
-        th, td { 
-            padding: 16px; 
-            text-align: left; 
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap; 
+        /* Table */
+        .table-wrapper { overflow-x: auto; border-radius: 12px; box-shadow: var(--shadow-sm); margin-top: 20px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95em; background: white; }
+        th, td { padding: 16px; text-align: left; border-bottom: 1px solid #eee; white-space: nowrap; }
+        td:nth-child(2) { white-space: normal; min-width: 200px; } /* รายละเอียด */
+        
+        th { 
+            background: var(--bma-green); color: white; text-align: center; font-weight: 500;
+            position: sticky; top: 0; z-index: 10;
         }
         
-        td:nth-child(2) { 
-             white-space: normal; 
-             min-width: 200px;
-        }
-
-        th { 
-            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white; 
-            text-align: center;
-            font-weight: 500;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            text-transform: uppercase;
-            font-size: 0.85em;
-            letter-spacing: 0.5px;
-        }
-
-        th:first-child { border-top-left-radius: 12px; }
-        th:last-child { border-top-right-radius: 12px; }
-
-        tbody tr { transition: all 0.3s ease; }
-        tbody tr:hover {
-            background: var(--bma-green-light);
-            transform: scale(1.01);
-            box-shadow: var(--shadow-sm);
-        }
-        tbody tr:nth-child(even) { background-color: #fafafa; }
-        tbody tr:nth-child(even):hover { background-color: var(--bma-green-light); }
-
-        table tbody td:nth-child(3),
-        table tbody td:nth-child(4) {
-            text-align: center;
-        }
-
-        a { color: var(--bma-green); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+        tbody tr { transition: all 0.2s ease; }
+        tbody tr:hover { background: #f8fff9; }
+        
+        a { color: var(--bma-green); text-decoration: none; font-weight: 500; transition: all 0.2s; }
         a:hover { color: var(--bma-green-hover); text-decoration: underline; }
 
         /* Sort Buttons */
@@ -241,99 +163,72 @@
         }
         .sort-buttons button:hover { background-color: rgba(255,255,255,0.3); transform: none; }
 
-        /* ปุ่มแชร์ (Teal Circle) */
+        /* Share Button */
         .btn-share {
-            background: linear-gradient(135deg, #17a2b8, #138496);
-            color: white; padding: 0; width: 36px; height: 36px;
+            background: #17a2b8; color: white; padding: 0; width: 36px; height: 36px;
             border-radius: 50%; border: none; cursor: pointer;
             display: inline-flex; align-items: center; justify-content: center;
-            transition: all 0.3s; box-shadow: 0 2px 5px rgba(23, 162, 184, 0.3);
+            transition: all 0.3s;
         }
-        .btn-share:hover { transform: translateY(-3px) scale(1.1); background: linear-gradient(135deg, #138496, #117a8b); }
-        .btn-share i { font-size: 1rem; }
+        .btn-share:hover { transform: scale(1.1); background: #138496; }
+
+        /* Badges */
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
+        .status-ok { background: #d4edda; color: #155724; }
+        .status-blocked { background: #e3f2fd; color: #1976d2; }
+        .status-error { background: #ffebee; color: #c62828; }
+        .status-pending { background: #fff3e0; color: #ef6c00; }
+        .status-unknown { background: #f5f5f5; color: #666; }
 
         /* Pagination */
         .pagination-controls {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 0; margin-top: 25px; border-top: 2px solid var(--border-color);
+            padding: 20px 0; margin-top: 25px; border-top: 1px solid #eee;
             flex-wrap: wrap; gap: 15px;
         }
-        .pagination-items { display: flex; align-items: center; gap: 10px; }
-        .pagination-items select {
-            font-family: 'Kanit', sans-serif; padding: 8px 15px;
-            border: 2px solid var(--border-color); border-radius: 20px;
-            background: white; cursor: pointer; transition: all 0.3s ease;
+        .pagination-items select { padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; }
+        .pagination-nav button { 
+            background: white; border: 1px solid #ddd; color: #333; 
+            border-radius: 8px; padding: 8px 12px; min-width: 36px; cursor: pointer; transition: 0.2s;
         }
-        .pagination-items select:focus { outline: none; border-color: var(--bma-green); }
-        .pagination-nav { display: flex; align-items: center; gap: 8px; }
-        .pagination-nav button { background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; border: none; border-radius: 8px; padding: 8px 15px; min-width: 40px; cursor: pointer; }
-        .pagination-nav button:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; opacity: 0.6; transform: none; }
-        .pagination-nav button:disabled:hover { transform: none; box-shadow: var(--shadow-sm); }
-        .pagination-nav span { margin: 0 10px; font-weight: 500; color: var(--text-color); }
+        .pagination-nav button:hover:not(:disabled) { background: var(--bma-green); color: white; border-color: var(--bma-green); }
+        .pagination-nav button:disabled { opacity: 0.5; cursor: default; }
 
         /* Footer */
         .main-footer {
-            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white;
-            text-align: center;
-            padding: 25px;
-            margin-top: 40px;
-            font-size: 0.9em;
-            box-shadow: var(--shadow-lg);
+            background: white; color: #666; text-align: center; padding: 30px;
+            margin-top: 60px; border-top: 1px solid #eee;
         }
-        .main-footer p { margin: 8px 0; }
 
-        /* Status Badges */
-        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
-        .status-ok { background: #e8f5e9; color: #2e7d32; }
-        .status-blocked { background: #e3f2fd; color: #1976d2; }
-        .status-error { background: #ffebee; color: #c62828; }
-        .status-pending { background: #fff3e0; color: #ef6c00; }
-
-        /* Popup Styles */
-        .qr-popup-container { text-align: center; padding: 10px; }
-        .qr-title { font-size: 1.2rem; color: var(--bma-green); font-weight: 600; margin-bottom: 5px; }
-        .qr-link-text {
-            font-size: 0.85rem; color: #666; margin-bottom: 15px; word-break: break-all;
-            background: #f8f9fa; padding: 8px; border-radius: 8px; border: 1px dashed #ddd;
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .nav-link span { display: none; }
+            .nav-link i { font-size: 1.3rem; margin: 0; }
+            .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
+            .user-profile-pic { width: 100%; height: 100%; }
         }
-        .qr-img-wrapper {
-            background: white; padding: 15px; border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            display: inline-block; margin-bottom: 20px;
-            border: 1px solid #eee;
-        }
-        .qr-img { width: 200px; height: 200px; display: block; }
-        .share-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .btn-popup-copy { background-color: var(--button-blue); width: 100%; justify-content: center; padding: 12px; font-size: 1rem; color: white; border: none; border-radius: 8px; cursor: pointer; }
-        .btn-popup-download { background-color: var(--bma-green); width: 100%; justify-content: center; padding: 12px; font-size: 1rem; color: white; border-radius: 8px; display: inline-flex; align-items: center; text-decoration: none; }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
-            /* Mobile Menu */
+            body { padding-top: 70px; }
+            .main-header { padding: 0 15px; height: 70px; }
+            .logo-text { font-size: 1.1rem; }
             .mobile-toggle { display: block; }
-            .nav-menu {
-                display: none; /* ซ่อนเริ่มต้น */
-                position: absolute;
-                top: 80px; left: 0; width: 100%;
-                background: white;
-                flex-direction: column;
-                padding: 20px;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-                border-top: 1px solid #eee;
-            }
-            .nav-menu.active { display: flex; }
-            .nav-link { width: 100%; padding: 15px; border-radius: 10px; }
-            .btn-login-nav { width: 100%; text-align: center; }
 
-            /* Table */
-            .container { padding: 15px; margin: 15px 10px; border-radius: 15px; }
-            h1 { font-size: 1.3em; }
-            table { font-size: 0.85em; }
-            th, td { padding: 12px 8px; }
-            button { padding: 8px 15px; font-size: 0.9em; }
-            .pagination-controls { flex-direction: column; align-items: stretch; }
-            .pagination-items, .pagination-nav { justify-content: center; }
+            /* Mobile Menu */
+            .nav-menu {
+                display: none; position: absolute; top: 70px; left: 0; width: 100%;
+                background: white; flex-direction: column; align-items: stretch;
+                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
+            }
+            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
+            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; }
+            .nav-link span { display: inline; }
+            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+
+            .container { padding: 15px; margin: 15px auto; }
+            h1 { font-size: 1.4em; }
             
             /* Hide columns on mobile */
             th:nth-child(2), td:nth-child(2),
@@ -341,30 +236,16 @@
             th:nth-child(7), td:nth-child(7),
             th:nth-child(8), td:nth-child(8),
             th:nth-child(10), td:nth-child(10) { display: none; }
+            
+            .pagination-controls { justify-content: center; }
         }
-
-        @media (min-width: 769px) { .logo-text { display: block; } }
-        @media (max-width: 480px) {
-            .logo-container img { height: 45px; }
-            h1 { font-size: 1.1em; }
-            #searchInput { padding: 12px 15px 12px 45px; font-size: 0.9em; }
-            table { font-size: 0.75em; }
-            th, td { padding: 10px 6px; }
-            .sort-buttons { flex-direction: column; }
-            .sort-buttons button { width: 100%; }
-        }
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: var(--light-gray); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: var(--bma-green); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--bma-green-hover); }
-        html { scroll-behavior: smooth; }
     </style>
 </head>
 <body>
     
     <header class="main-header">
         <a href="{{ url_for('home') }}" class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="Logo">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
             <div class="logo-text">ทะเบียนลิงค์ BMA</div>
         </a>
 
@@ -373,26 +254,28 @@
         </div>
 
         <nav class="nav-menu" id="navMenu">
-            <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> หน้าหลัก</a>
+            <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
 
             {% if session.get('logged_in') %}
-                <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-columns"></i> Dashboard</a>
-                
                 {% if session.get('level') == 'Admin' %}
-                <a href="{{ url_for('admin_panel') }}" class="nav-link"><i class="fas fa-crown"></i> Admin</a>
+                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
                 {% endif %}
                 
-                <a href="{{ url_for('profile_page') }}" class="nav-link">
+                <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+                <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
-                    {{ session.name }}
+                    <span>{{ session.name }}</span>
                 </a>
                 
-                <a href="{{ url_for('logout') }}" class="nav-link" style="color: #dc3545;">
-                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
+                    <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
                 </a>
             {% else %}
-                <a href="{{ url_for('login_page') }}" class="nav-link btn-login-nav">
-                    <i class="fas fa-user-lock"></i> เจ้าหน้าที่เข้าสู่ระบบ
+                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;">
+                    <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
                 </a>
             {% endif %}
         </nav>
@@ -421,16 +304,16 @@
                         <th>
                             🔗 ชื่อลิงค์
                             <div class="sort-buttons">
-                                <button onclick="sortTable(0, 'asc')">A-Z (ก-ฮ)</button>
-                                <button onclick="sortTable(0, 'desc')">Z-A (ฮ-ก)</button>
+                                <button onclick="sortTable(0, 'asc')">A-Z</button>
+                                <button onclick="sortTable(0, 'desc')">Z-A</button>
                             </div>
                         </th>
                         <th>📄 รายละเอียด</th> 
                         <th>🚦 สถานะลิงค์</th>
                         <th>📊 สถานะการใช้งาน</th>
                         <th>📂 ประเภท</th>
-                        <th>🏢 หน่วยงาน (กลุ่ม/ฝ่าย/กอง)</th> 
-                        <th>🏛️ ส่วนราชการ (สำนัก/เขต)</th> 
+                        <th>🏢 หน่วยงาน</th> 
+                        <th>🏛️ ส่วนราชการ</th> 
                         <th>📞 เบอร์ติดต่อ</th>
                         <th>👤 ผู้สร้าง</th>
                         <th>🗓️ วันที่อัปเดต</th>
@@ -449,11 +332,11 @@
                             {% if link['LinkStatus'] == 'OK' %}
                                 <span class="status-badge status-ok">🟢 ปกติ</span>
                             {% elif link['LinkStatus'] == '403 Blocked' %}
-                                <span class="status-badge status-blocked">🔵 ถูกบล็อก</span>
+                                <span class="status-badge status-blocked">🔵 Blocked</span>
                             {% elif link['LinkStatus'] %}
                                 <span class="status-badge status-error">🔴 {{ link['LinkStatus'] }}</span>
                             {% else %}
-                                <span class="status-badge" style="background: #f5f5f5; color: #666;">⚪ (ยังไม่ตรวจสอบ)</span>
+                                <span class="status-badge status-unknown">⚪ รอตรวจ</span>
                             {% endif %}
                         </td>
 
@@ -515,7 +398,6 @@
                     <option value="100">100</option>
                     <option value="99999">ทั้งหมด</option>
                 </select>
-                <span> รายการ</span>
             </div>
             <div class="pagination-nav">
                     <button id="btnFirst" title="หน้าแรก">«</button>
@@ -536,11 +418,20 @@
     </footer>
 
     <script>
-        // Toggle Mobile Menu Function
+        // Toggle Mobile Menu
         function toggleMenu() {
             const nav = document.getElementById('navMenu');
             nav.classList.toggle('active');
         }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-toggle');
+            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+            }
+        });
 
         // Pagination and Search Functions
         let allTableRows = []; 
@@ -622,15 +513,6 @@
             searchInput.addEventListener('keyup', () => displayPage(1)); 
             
             displayPage(1);
-
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', (e) => {
-                const nav = document.getElementById('mainNavigation');
-                const toggle = document.querySelector('.mobile-menu-toggle');
-                if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
-                    nav.classList.remove('active');
-				}
-            });
         });
 
         // ฟังก์ชัน Share QR Code
@@ -640,37 +522,26 @@
 
             Swal.fire({
                 html: `
-                    <div class="qr-popup-container">
-                        <div class="qr-title">📤 แชร์ลิงค์: ${title}</div>
-                        <div class="qr-link-text">${permanentLink}</div>
-                        
-                        <div class="qr-img-wrapper">
-                            <img src="${qrImageUrl}" class="qr-img" alt="QR Code">
+                    <div style="text-align:center;">
+                        <h3 style="color:var(--bma-green); margin-bottom:10px;">📲 แชร์ลิงค์</h3>
+                        <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9rem; word-break:break-all;">
+                            ${permanentLink}
                         </div>
-                        
-                        <div class="share-actions">
-                            <button onclick="copyToClipboard('${permanentLink}')" class="btn btn-popup-copy">
-                                <i class="fas fa-copy"></i> คัดลอกลิงค์
+                        <img src="${qrImageUrl}" style="width:200px; border:1px solid #eee; padding:10px; border-radius:10px; margin-bottom:15px;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <button onclick="navigator.clipboard.writeText('${permanentLink}'); Swal.showValidationMessage('คัดลอกแล้ว!')" 
+                                style="background:#007bff; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">
+                                <i class="fas fa-copy"></i> คัดลอก
                             </button>
-                            <a href="${qrImageUrl}" download="QR-${title}.png" class="btn btn-popup-download">
-                                <i class="fas fa-download"></i> ดาวน์โหลด QR
+                            <a href="${qrImageUrl}" download="QR-${linkId}.png" 
+                                style="background:#28a745; color:white; text-decoration:none; padding:10px; border-radius:5px; display:inline-block;">
+                                <i class="fas fa-download"></i> บันทึก QR
                             </a>
                         </div>
                     </div>
                 `,
                 showConfirmButton: false,
-                showCloseButton: true,
-                width: 450,
-                padding: '20px'
-            });
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const Toast = Swal.mixin({
-                    toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, timerProgressBar: true
-                });
-                Toast.fire({ icon: 'success', title: 'คัดลอกลิงค์แล้ว!' });
+                showCloseButton: true
             });
         }
     </script>
