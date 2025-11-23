@@ -30,14 +30,15 @@
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-/* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
-        body, button, input, select, textarea, optgroup {
+
+        /* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element รวมถึงปุ่มและตาราง --- */
+        body, button, input, select, textarea, optgroup, table, th, td {
             font-family: 'Kanit', sans-serif;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body { 
-            font-family: 'Kanit', Arial, sans-serif; 
             background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
@@ -126,9 +127,9 @@
         .search-container { margin: 25px 0; position: relative; }
         #searchInput {
             width: 100%; padding: 15px 20px 15px 50px;
-            font-family: 'Kanit', sans-serif; font-size: 1rem;
             border: 1px solid var(--border-color); border-radius: 50px;
             transition: all 0.3s ease; background: #f8f9fa;
+            font-size: 1rem;
         }
         #searchInput:focus { outline: none; border-color: var(--bma-green); background: white; box-shadow: 0 0 0 4px var(--bma-green-light); }
         .search-container::before {
@@ -314,19 +315,19 @@
                 <thead>
                     <tr>
                         <th>
-                            🔗 ชื่อลิงก์
+                            ชื่อลิงก์
                             <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7; margin-left:5px;">↕</span>
                         </th>
                         <th>📄 รายละเอียด</th> 
-                        <th style="text-align: center;">🚦 สถานะ</th>
-                        <th style="text-align: center;">📊 การใช้งาน</th>
-                        <th>📂 ประเภท</th>
-                        <th>🏢 หน่วยงาน</th> 
-                        <th>🏛️ ส่วนราชการ</th> 
-                        <th>📞 เบอร์ติดต่อ</th>
-                        <th>👤 ผู้สร้าง</th>
-                        <th>🗓️ วันที่อัปเดต</th>
-                        <th style="text-align: center;">📤 แชร์</th>
+                        <th style="text-align: center;">สถานะ</th>
+                        <th style="text-align: center;">การใช้งาน</th>
+                        <th>ประเภท</th>
+                        <th>หน่วยงาน</th> 
+                        <th>ส่วนราชการ</th> 
+                        <th>เบอร์ติดต่อ</th>
+                        <th>ผู้สร้าง</th>
+                        <th>วันที่อัปเดต</th>
+                        <th style="text-align: center;">แชร์</th>
                     </tr>
                 </thead>
                 <tbody id="linkTableBody">
@@ -365,7 +366,8 @@
                         <td>{{ link['ประเภท'] }}</td>
                         <td>{{ link['หน่วยงาน'] }}</td> 
                         <td>{{ link['ส่วนราชการ'] }}</td> 
-                        <td>{{ link['เบอร์โทรติดต่อ'] }}</td>
+                        
+                        <td>{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}</td>
                         
                         <td>
                             {% if link['CreatorUsername'] %}

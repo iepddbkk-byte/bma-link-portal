@@ -30,7 +30,7 @@
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-/* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+        /* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
         body, button, input, select, textarea, optgroup {
             font-family: 'Kanit', sans-serif;
         }
@@ -253,7 +253,7 @@
             .search-container { flex-direction: column; gap: 10px; }
             .search-input-wrapper, .filter-wrapper { min-width: 100%; }
 
-            /* Table Mobile Optimization: Hide less important columns */
+            /* Table Mobile Optimization */
             th:nth-child(2), td:nth-child(2), /* รายละเอียด */
             th:nth-child(7), td:nth-child(7), /* ส่วนราชการ */
             th:nth-child(8), td:nth-child(8), /* เบอร์ */
@@ -341,21 +341,21 @@
                 <table>
                     <thead>
                         <tr>
-                        <th>
-                            🔗 ชื่อลิงก์
-                            <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7; margin-left:5px;">↕</span>
-                        </th>
-                        <th>📄 รายละเอียด</th> 
-                        <th style="text-align: center;">🚦 สถานะ</th>
-                        <th style="text-align: center;">📊 การใช้งาน</th>
-                        <th>📂 ประเภท</th>
-                        <th>🏢 หน่วยงาน</th> 
-                        <th>🏛️ ส่วนราชการ</th> 
-                        <th>📞 เบอร์ติดต่อ</th>
-                        <th>👤 ผู้สร้าง</th>
-                        <th>🗓️ วันที่อัปเดต</th>
-                        <th style="text-align: center;">📤 แชร์</th>
-                            <th style="text-align: center;">⚙️ จัดการ</th>
+                            <th>
+                                ชื่อลิงก์ 
+                                <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7;">↕</span>
+                            </th>
+                            <th>รายละเอียด</th> 
+                            <th style="text-align:center;">สถานะลิงค์</th> 
+                            <th style="text-align:center;">การใช้งาน</th>
+                            <th>ประเภท</th>
+                            <th>หน่วยงาน</th> 
+                            <th>ส่วนราชการ</th> 
+                            <th>เบอร์ติดต่อ</th>
+                            <th>ผู้สร้าง</th>
+                            <th>วันที่</th>
+							<th style="text-align: center;">แชร์</th>
+                            <th style="text-align: center;">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="linkTableBody">
@@ -397,7 +397,8 @@
                             <td>{{ link['ประเภท'] }}</td>
                             <td>{{ link['หน่วยงาน'] }}</td>
                             <td>{{ link['ส่วนราชการ'] }}</td>
-                            <td>{{ link['เบอร์โทรติดต่อ'] }}</td>
+                            
+                            <td>{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}</td>
                             
                             <td>
                                 <a href="{{ url_for('view_profile', username=link['CreatorUsername']) }}" style="color: var(--text-color);">
