@@ -10,7 +10,7 @@
     
     <style>
         :root {
-            /* Theme Colors (Consistent with Dashboard) */
+            /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
@@ -28,88 +28,74 @@
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-        /* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+        
+        /* FIX FONT */
         body, button, input, select, textarea, optgroup {
             font-family: 'Kanit', sans-serif;
         }
-        body {
-            font-family: 'Kanit', Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
-            padding-top: var(--header-height); /* เผื่อพื้นที่ให้ Header */
+            min-height: 100vh;
+            padding-top: var(--header-height);
         }
 
-        /* --- 1. Header & Navigation (Modern Style) --- */
+        /* --- Header & Navigation --- */
         .main-header {
             background: white;
             padding: 0 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             transition: all 0.3s ease;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        /* Desktop Menu */
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .nav-menu { display: flex; align-items: center; gap: 8px; }
 
         .nav-link {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 50px; /* Pill Shape */
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            white-space: nowrap;
+            text-decoration: none; color: var(--text-color); font-weight: 500;
+            padding: 8px 16px; border-radius: 50px; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;
         }
         .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
         .nav-link i { font-size: 1.1em; }
         
-        /* Active State */
         .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
         .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
         .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
-        /* FIX: Reset profile pic size for mobile list */
-            .user-profile-pic { 
-                width: 32px; height: 32px; 
-                border-radius: 50%; 
-                margin-right: 10px; 
-                object-fit: cover; 
-            }
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* Mobile Hamburger */
-        .mobile-toggle {
-            display: none;
-            font-size: 1.6rem;
-            cursor: pointer;
-            color: var(--text-color);
-            padding: 10px;
+        /* --- Mobile Header Elements (New) --- */
+        .mobile-controls { display: none; align-items: center; gap: 12px; }
+        
+        .mobile-profile-btn {
+            display: flex; align-items: center; text-decoration: none; gap: 8px;
+            padding: 5px 10px; border-radius: 20px; transition: background 0.2s;
         }
+        .mobile-profile-btn:hover { background-color: #f8f9fa; }
+        
+        .mobile-user-name {
+            font-size: 0.9rem; font-weight: 500; color: var(--bma-green);
+            display: block; white-space: nowrap;
+        }
+        
+        .mobile-profile-btn img {
+            width: 36px; height: 36px; border-radius: 50%; 
+            border: 2px solid var(--bma-green); object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; margin-left: 5px; }
 
         /* --- Container & Stats --- */
         .container {
@@ -247,7 +233,37 @@
             text-align: center; padding: 30px;
             margin-top: 60px; border-top: 1px solid #eee;
         }
+		/* --- Mobile Header Elements (เพิ่มใหม่เพื่อให้เหมือน Analytics) --- */
+	.mobile-controls { display: none; align-items: center; gap: 12px; }
 
+	.mobile-profile-btn {
+    display: flex; align-items: center; text-decoration: none; gap: 8px;
+    padding: 5px 10px; border-radius: 20px; transition: background 0.2s;
+	}
+	.mobile-profile-btn:hover { background-color: #f8f9fa; }
+
+	.mobile-user-name {
+    font-size: 0.9rem; font-weight: 500; color: var(--bma-green);
+    display: block; white-space: nowrap;
+	}
+
+	.mobile-profile-btn img {
+    width: 36px; height: 36px; border-radius: 50%; 
+    border: 2px solid var(--bma-green); object-fit: cover;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	}
+
+/* ปรับ Mobile Toggle เดิมเล็กน้อย */
+	.mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; margin-left: 5px; }
+
+/* --- แก้ไข Media Query (ส่วนมือถือ) --- */
+@media (max-width: 768px) {
+    /* แสดงปุ่มควบคุมบนมือถือ */
+    .mobile-controls { display: flex; }
+    .mobile-toggle { display: block; }
+    
+    /* ซ่อนเมนูโปรไฟล์ใน Dropdown (เพราะย้ายไปข้างบนแล้ว) */
+    .nav-link.profile-item { display: none; }
         /* --- Responsive Media Queries --- */
         @media (max-width: 992px) {
             .nav-link span { display: none; }

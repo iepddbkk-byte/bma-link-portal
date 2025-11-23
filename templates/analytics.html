@@ -14,6 +14,7 @@
     
     <style>
         :root {
+            /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
@@ -31,16 +32,19 @@
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-
-        body, button, input, select, textarea, optgroup { font-family: 'Kanit', sans-serif; }
+        
+        /* FIX FONT */
+        body, button, input, select, textarea, optgroup {
+            font-family: 'Kanit', sans-serif;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
+        body { 
             background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
             padding-top: var(--header-height);
-            padding-bottom: 60px;
         }
 
         /* --- Header & Navigation --- */
@@ -75,19 +79,27 @@
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* --- Mobile Elements --- */
-        .mobile-controls { display: none; align-items: center; gap: 15px; }
+        /* --- Mobile Header Elements (New) --- */
+        .mobile-controls { display: none; align-items: center; gap: 12px; }
         
         .mobile-profile-btn {
-            display: flex; align-items: center; text-decoration: none;
+            display: flex; align-items: center; text-decoration: none; gap: 8px;
+            padding: 5px 10px; border-radius: 20px; transition: background 0.2s;
         }
+        .mobile-profile-btn:hover { background-color: #f8f9fa; }
+        
+        .mobile-user-name {
+            font-size: 0.9rem; font-weight: 500; color: var(--bma-green);
+            display: block; white-space: nowrap;
+        }
+        
         .mobile-profile-btn img {
-            width: 40px; height: 40px; border-radius: 50%; 
+            width: 36px; height: 36px; border-radius: 50%; 
             border: 2px solid var(--bma-green); object-fit: cover;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; }
+        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; margin-left: 5px; }
 
         /* --- Container --- */
         .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; animation: fadeIn 0.5s ease; }
@@ -182,7 +194,7 @@
             .main-header { padding: 0 15px; height: 70px; }
             .logo-text { font-size: 1.1rem; }
             
-            /* Mobile Controls (Profile + Hamburger) */
+            /* Mobile Controls Display */
             .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
 
@@ -198,7 +210,7 @@
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
 
-            /* ซ่อน Profile ในเมนู Dropdown บนมือถือ (เพราะย้ายไปข้างบนแล้ว) */
+            /* ซ่อน Profile ใน Dropdown บนมือถือ เพราะย้ายไปข้างบนแล้ว */
             .nav-link.profile-item { display: none; }
 
             .container { padding: 0 15px; margin: 20px auto; }
@@ -220,6 +232,7 @@
         <div class="mobile-controls">
             {% if session.get('logged_in') %}
                 <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
+                    <span class="mobile-user-name">สวัสดี, {{ session.name }}</span>
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
                 </a>
             {% endif %}
@@ -244,7 +257,7 @@
                 
                 <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
-                    <span>{{ session.name }}</span>
+                    <span>สวัสดี, {{ session.name }}</span>
                 </a>
                 
                 <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
