@@ -504,32 +504,53 @@
             const val = document.getElementById('agencySelect').value;
             if(val) window.location.href = "{{ url_for('links_page') }}?agency=" + encodeURIComponent(val);
         });
-
-        // --- Real-time Online User Counter Logic ---
+    </script>
+    <script>
         function updateOnlineCount() {
+            // ดึง CSRF Token จาก meta tag หรือตัวแปร Jinja (ถ้ามี)
+            // เราจะลองส่งไปใน Header เพื่อผ่านระบบความปลอดภัยของ Flask
+            
             fetch("{{ url_for('heartbeat') }}", { 
                 method: "POST",
-                headers: { "Content-Type": "application/json" }
+                headers: { 
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}" 
+                }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP error " + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 if(data.online_count !== undefined) {
                     const el = document.getElementById('onlineCount');
-                    if(el) el.textContent = data.online_count;
+                    if(el) {
+                        el.textContent = data.online_count;
+                        // ถ้าตัวเลขขึ้นแล้ว ให้เปลี่ยนสีให้รู้ว่าทำงาน (Visual Debug)
+                        el.style.color = "var(--bma-green)"; 
+                    }
                 }
             })
-            .catch(err => console.error("Heartbeat error:", err));
+            .catch(err => {
+                console.error("Heartbeat error:", err);
+                // ถ้ายังไม่ได้ ให้ลองเปลี่ยนเป็น "-" เหมือนเดิม
+                const el = document.getElementById('onlineCount');
+                if(el) el.textContent = "-";
+            });
         }
 
-        // 1. เรียกทันทีเมื่อเปิดหน้า
+        // เรียกทำงานทันทีและวนซ้ำ
         updateOnlineCount();
-
-        // 2. เรียกซ้ำทุกๆ 10 วินาที
         setInterval(updateOnlineCount, 10000);
 
-        // 3. ส่งสัญญาณปิดเมื่อออกจากหน้าเว็บ (Beacon)
         window.addEventListener('beforeunload', function() {
-            navigator.sendBeacon("{{ url_for('offline') }}");
+            // ใช้ Beacon ซึ่งเสถียรกว่าสำหรับการปิดหน้าเว็บ
+            const data = new FormData();
+            const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
+            data.append('csrf_token', csrfToken);
+            navigator.sendBeacon("{{ url_for('offline') }}", data);
         });
     </script>
     
