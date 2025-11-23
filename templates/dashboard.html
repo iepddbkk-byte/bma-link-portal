@@ -110,6 +110,39 @@
             background: linear-gradient(135deg, var(--button-red), var(--button-red-hover));
             padding: 6px 12px; font-size: 0.85rem;
         }
+		/* เพิ่มใน <style> */
+	.btn-share {
+    background: linear-gradient(135deg, #17a2b8, #138496); /* สีฟ้า Teal */
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+	}
+	.btn-share:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+	}
+/* จัดรูปแบบใน SweetAlert */
+	.qr-container {
+    text-align: center;
+    margin: 10px 0;
+}
+	.qr-img {
+    width: 200px;
+    height: 200px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    padding: 10px;
+	}
+	.share-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+	}
 
         /* --- Container & Card --- */
         .container { max-width: 1400px; margin: 30px auto; padding: 20px; }
@@ -385,6 +418,7 @@
                             <th>📞 เบอร์ติดต่อ</th>
                             <th>👤 ผู้สร้าง</th>
                             <th>🗓️ วันที่อัปเดต</th>
+							<th>📤 แชร์</th>
                             <th>⚙️ จัดการ</th>
                         </tr>
                     </thead>
@@ -435,9 +469,14 @@
                             {{ link['CreatorUsername'] }}
                         </a>
                     </td>
-
                     <td>{{ link['วันที่อัปเดต_สั้น'] }}</td>
-                    
+                    <td style="text-align: center;">
+						<button type="button" 
+						class="btn-share" 
+						onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}')">
+						<i class="fas fa-share-alt"></i>
+						</button>
+					</td>
                     <td>
                         <div class="action-buttons">
                         {% if session.level == 'Admin' or (session.level == 'Users' and link['CreatorUsername'] == session.username) %}
@@ -624,6 +663,45 @@
                 });
             });
         });
+	// เพิ่มฟังก์ชันนี้ลงใน <script> ท้ายไฟล์ dashboard.html
+
+	function showShareModal(title, url) {
+    // สร้าง URL สำหรับรูป QR Code โดยเรียกไปที่ Python Route ของเรา
+    // encodeURIComponent จำเป็นมาก เพื่อป้องกัน URL พัง
+    const qrImageUrl = "{{ url_for('generate_qr_code') }}?url=" + encodeURIComponent(url);
+
+    Swal.fire({
+        title: '📤 แชร์ลิงค์',
+        html: `
+            <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">${title}</p>
+            <div class="qr-container">
+                <img src="${qrImageUrl}" class="qr-img" alt="QR Code">
+            </div>
+            <div class="share-actions">
+                <button onclick="copyToClipboard('${url}')" class="swal2-confirm swal2-styled" style="background-color: #007bff;">
+                    <i class="fas fa-copy"></i> คัดลอกลิงค์
+                </button>
+                <a href="${qrImageUrl}" download="QR-${title}.png" class="swal2-confirm swal2-styled" style="background-color: #28a745; text-decoration: none; display: inline-block;">
+                    <i class="fas fa-download"></i> โหลด QR
+                </a>
+            </div>
+        `,
+        showConfirmButton: false, // ซ่อนปุ่ม OK เดิม
+        showCloseButton: true,
+        width: 400
+    });
+	}
+
+	function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        const Toast = Swal.mixin({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 2000
+        });
+        Toast.fire({ icon: 'success', title: 'คัดลอกลิงค์แล้ว!' });
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
+	}
     </script>
 
     <script>

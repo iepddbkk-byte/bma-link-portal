@@ -6,3 +6,5 @@ itsdangerous
 Werkzeug
 requests
 gunicorn
+qrcode
+Pillow
