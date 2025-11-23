@@ -33,7 +33,11 @@
             --info-color: #004085;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Kanit', Arial, sans-serif;
@@ -44,188 +48,306 @@
         }
 
         .container {
-            max-width: 900px; margin: 0 auto; padding: 40px;
-            background: white; border-radius: 20px;
-            box-shadow: var(--shadow-lg); animation: fadeIn 0.5s ease;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* Back Button */
         .btn-back {
-            display: inline-flex; align-items: center; gap: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
-            color: white; border: none; padding: 10px 20px;
-            border-radius: 25px; cursor: pointer; font-size: 0.95em; font-weight: 500;
-            transition: all 0.3s ease; box-shadow: var(--shadow-sm);
-            text-decoration: none; margin-bottom: 25px;
-        }
-        .btn-back:hover { background: linear-gradient(135deg, #5a6268 0%, #495057 100%); transform: translateY(-2px); }
-
-        h2 {
-            color: var(--bma-green); font-size: 1.8em; font-weight: 600;
-            margin-bottom: 25px; padding-bottom: 15px;
-            border-bottom: 3px solid var(--bma-green-light);
-            display: flex; align-items: center; gap: 10px;
-        }
-        h2::before { content: "➕"; font-size: 1.2em; }
-
-        form { display: flex; flex-direction: column; gap: 20px; }
-        form label {
-            font-weight: 600; margin-bottom: 8px; color: var(--text-color);
-            font-size: 0.95em; display: flex; align-items: center; gap: 5px;
-        }
-        form label::before { content: "📌"; font-size: 0.9em; }
-
-        /* Inputs */
-        form input[type="text"], form input[type="url"], form input[type="email"],
-        form input[type="tel"], form textarea, form select {
-            width: 100%; padding: 12px 15px;
-            border: 2px solid var(--border-color); border-radius: 10px;
-            font-family: 'Kanit', Arial, sans-serif; font-size: 1em;
-            background-color: var(--light-gray); transition: all 0.3s ease;
-            color: var(--text-color);
-        }
-        form input:focus, form select:focus, form textarea:focus {
-            outline: none; border-color: var(--bma-green); background-color: white;
-            box-shadow: 0 0 0 4px var(--bma-green-light); transform: translateY(-2px);
-        }
-        form input[readonly] {
-            background-color: #e9ecef; color: #6c757d; cursor: not-allowed; font-weight: 500;
-        }
-
-        form textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
-        form select {
-            cursor: pointer; appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px;
-        }
-        form optgroup { font-weight: 600; color: var(--bma-green); }
-
-        /* (ปรับปรุง) Shortener Box */
-        .shortener-section {
-            border: 1px solid #dce1e6;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-top: 5px;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .shortener-toggle {
-            background-color: #f8f9fa;
-            color: var(--button-blue);
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: 500;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s;
-            border-bottom: 1px solid transparent;
-        }
-        
-        .shortener-toggle:hover {
-            background-color: #e9ecef;
-        }
-
-        .shortener-toggle.active {
-            background-color: var(--button-blue);
             color: white;
-            border-bottom: 1px solid #ccc;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            margin-bottom: 30px;
         }
 
-        .shortener-content {
-            display: none;
-            height: 500px;
-            position: relative;
-            background-color: #fff;
+        .btn-back:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
-        .shortener-content.show { display: block; }
-
-        iframe { width: 100%; height: 100%; border: none; }
-
-        .shortener-fallback {
-            padding: 15px; text-align: center; font-size: 0.9em;
-            background: #fff3cd; color: #856404; border-top: 1px solid #ffeeba;
-        }
-
-        /* (ใหม่!) Toggle Switch สำหรับเลือก Auto QR */
-        .option-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #f1f8e9; /* เขียวอ่อนจางๆ */
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 1px solid #c5e1a5;
-            margin-bottom: 10px;
-        }
-        
-        .option-label {
+        /* Title */
+        h2 {
+            color: var(--bma-green);
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--bma-green-light);
             display: flex;
             align-items: center;
             gap: 10px;
-            font-weight: 500;
-            color: #2e7d32;
         }
 
-        /* Switch CSS */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
+        h2::before {
+            content: "➕";
+            font-size: 1.2em;
         }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
+
+        /* Flash Messages */
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
         }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
+
+        .flashes li {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .flashes .success { background-color: var(--success-bg); color: var(--success-color); border-left: 4px solid #28a745; }
+        .flashes .error { background-color: var(--error-bg); color: var(--error-color); border-left: 4px solid #dc3545; }
+        .flashes .info { background-color: var(--info-bg); color: var(--info-color); border-left: 4px solid #17a2b8; }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        form div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        form label::before {
+            content: "📌";
+            font-size: 0.9em;
+        }
+
+        /* Input Fields */
+        form input[type="text"],
+        form input[type="url"],
+        form input[type="email"],
+        form input[type="tel"],
+        form textarea,
+        form select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Kanit', Arial, sans-serif;
+            font-size: 1em;
+            background-color: var(--light-gray);
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        form input:focus,
+        form input[type="url"]:focus,
+        form input[type="email"]:focus,
+        form input[type="tel"]:focus,
+        form textarea:focus,
+        form select:focus {
+            outline: none;
+            border-color: var(--bma-green);
             background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--bma-green-light);
+            transform: translateY(-2px);
         }
-        input:checked + .slider { background-color: var(--bma-green); }
-        input:focus + .slider { box-shadow: 0 0 1px var(--bma-green); }
-        input:checked + .slider:before { transform: translateX(24px); }
+
+        form input::placeholder,
+        form textarea::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Readonly Field */
+        form input[readonly] {
+            background-color: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            font-weight: 500;
+        }
+        form input[readonly]:focus {
+            box-shadow: none; transform: none; border-color: var(--border-color);
+        }
+
+        /* Textarea & Select */
+        form textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+        form select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 45px;
+        }
+        form optgroup { font-weight: 600; color: var(--bma-green); }
+
+        /* Input Group Row สำหรับปุ่มย่อลิงค์ */
+        .input-group-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch; 
+        }
+        
+        .input-group-row input {
+            flex-grow: 1;
+        }
+
+        /* ปุ่มเครื่องมือ */
+        .btn-tool {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-tool:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* (ปรับปรุง!) Shortener Box (กล่องย่อลิงค์) */
+        .shortener-box {
+            /* เปลี่ยนจาก dashed เป็น solid และปรับสี */
+            border: 1px solid #d0d7de; 
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* เพิ่มเงาเบาๆ */
+            transition: all 0.3s ease;
+        }
+        
+        .shortener-header {
+            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
+            color: white;
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .shortener-header:hover {
+            filter: brightness(1.1);
+        }
+        
+        .shortener-content {
+            display: none; 
+            padding: 0;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        .shortener-content.active {
+            display: block; 
+        }
+
+        iframe {
+            width: 100%;
+            height: 500px; 
+            border: none;
+            display: block;
+        }
+        
+        .fallback-link {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.95em;
+            color: #666;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
 
         /* Submit Button */
         button[type="submit"] {
             font-family: 'Kanit', Arial, sans-serif;
             background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white; border: none; padding: 15px 30px;
-            border-radius: 30px; cursor: pointer; font-size: 1.1em;
-            font-weight: 600; transition: all 0.3s ease;
-            box-shadow: var(--shadow-md); margin-top: 15px; width: 100%;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
         }
+
         button[type="submit"]:hover {
             background: linear-gradient(135deg, #007a30 0%, #006428 100%);
-            transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 150, 60, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4);
         }
 
         /* Required Indicator */
         form label:has(+ input[required])::after,
+        form label:has(+ .input-group-row input[required])::after,
         form label:has(+ select[required])::after,
         form label:has(+ textarea[required])::after {
             content: "*"; color: #dc3545; margin-left: 4px; font-weight: bold;
         }
         .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
 
+        /* Responsive */
         @media (max-width: 768px) {
             .container { padding: 25px 20px; }
+            .input-group-row { flex-direction: column; gap: 5px; } 
+            .btn-tool { padding: 12px; justify-content: center; width: 100%; }
         }
     </style>
 </head>
@@ -238,6 +360,16 @@
 
         <h2>เพิ่มลิงค์ใหม่</h2>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
         <form action="{{ url_for('add_link_action') }}" method="POST">
             <div>
                 <label for="ชื่อลิงก์">ชื่อลิงค์ (จำเป็น)</label>
@@ -245,34 +377,29 @@
             </div>
 
             <div>
-                <label for="URL">URL ปลายทาง (จำเป็น)</label>
-                
-                <div class="option-row">
-                    <div class="option-label">
-                        <i class="fas fa-qrcode"></i> สร้าง QR Code และ Short Link อัตโนมัติ
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" name="auto_qr_enabled" checked>
-                        <span class="slider round"></span>
-                    </label>
+                <label for="URL">URL (จำเป็น)</label>
+                <div class="input-group-row">
+                    <input type="url" id="URL" name="URL" placeholder="https://example.com" required>
                 </div>
-
-                <input type="url" id="URL" name="URL" placeholder="วางลิงค์ยาวๆ หรือลิงค์ต้นทางที่นี่..." required>
                 
-                <div class="shortener-section">
-                    <div class="shortener-toggle" onclick="toggleShortenerFrame()">
-                        <span><i class="fas fa-external-link-alt"></i> หรือเลือกใช้เครื่องมือ u.bangkok.go.th (คลิก)</span>
-                        <i class="fas fa-chevron-down" id="toggleIcon"></i>
+                <div class="shortener-box">
+                    <div class="shortener-header" onclick="toggleShortener()">
+                        <span><i class="fas fa-cut"></i> เครื่องมือย่อลิงค์ กทม. (คลิกเพื่อใช้งาน)</span>
+                        <i class="fas fa-chevron-down" id="shortenerIcon"></i>
                     </div>
-                    
-                    <div class="shortener-content" id="iframeContent">
-                        <iframe src="https://u.bangkok.go.th/index.php" title="BMA URL Shortener"></iframe>
+                    <div class="shortener-content" id="shortenerContent">
+                        <iframe src="https://u.bangkok.go.th/index.php" title="BMA Shortener"></iframe>
                         
-                        <div class="shortener-fallback">
-                            ⚠️ หากหน้าจอขาว (ไม่แสดงผล) กรุณา <a href="https://u.bangkok.go.th/index.php" target="_blank" style="text-decoration: underline; font-weight: bold;">คลิกที่นี่</a> เพื่อเปิดในหน้าต่างใหม่
+                        <div class="fallback-link">
+                            ⚠️ Credit: สำนักดิจิทัล กรุงเทพมหานคร <br>
+                            <a href="https://u.bangkok.go.th/index.php" target="_blank" style="color: var(--button-blue); font-weight: bold; text-decoration: none;">
+                                <i class="fas fa-external-link-alt"></i> คลิกที่นี่เพื่อเปิดในหน้าต่างใหม่
+                            </a>
                         </div>
                     </div>
                 </div>
+                
+                <span class="info-text">💡 ก๊อปปี้ลิงค์สั้นจากเครื่องมือด้านบน แล้วนำมาวางในช่อง URL</span>
             </div>
             
             <div>
@@ -316,6 +443,7 @@
             <div>
                 <label for="ส่วนราชการ">ส่วนราชการ (สำนัก/เขต) (ล็อคอัตโนมัติ)</label>
                 <input type="text" id="ส่วนราชการ" name="ส่วนราชการ" value="{{ locked_agency }}" readonly>
+                <span class="info-text">💡 ข้อมูลนี้จะถูกดึงจากโปรไฟล์ของคุณโดยอัตโนมัติ</span>
             </div>
 
             <div>
@@ -350,20 +478,17 @@
     </div>
 
     <script>
-        // ฟังก์ชันเปิด/ปิด Iframe
-        function toggleShortenerFrame() {
-            const content = document.getElementById('iframeContent');
-            const toggleBtn = document.querySelector('.shortener-toggle');
-            const icon = document.getElementById('toggleIcon');
+        // ฟังก์ชันเปิด/ปิด ส่วนย่อลิงค์
+        function toggleShortener() {
+            const content = document.getElementById('shortenerContent');
+            const icon = document.getElementById('shortenerIcon');
             
-            if (content.classList.contains('show')) {
-                content.classList.remove('show');
-                toggleBtn.classList.remove('active');
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
                 icon.classList.remove('fa-chevron-up');
                 icon.classList.add('fa-chevron-down');
             } else {
-                content.classList.add('show');
-                toggleBtn.classList.add('active');
+                content.classList.add('active');
                 icon.classList.remove('fa-chevron-down');
                 icon.classList.add('fa-chevron-up');
             }
@@ -373,18 +498,27 @@
     <script>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
+                // ตรวจสอบว่า Swal โหลดมาหรือไม่
                 if (typeof Swal !== 'undefined') {
                     const Toast = Swal.mixin({
-                        toast: true, position: 'top', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
                         didOpen: (toast) => {
                             toast.addEventListener('mouseenter', Swal.stopTimer)
                             toast.addEventListener('mouseleave', Swal.resumeTimer)
                         }
                     });
                     {% for category, message in messages %}
-                        Toast.fire({ icon: '{{ category }}', title: '{{ message }}' });
+                        Toast.fire({
+                            icon: '{{ category }}',
+                            title: '{{ message }}'
+                        });
                     {% endfor %}
                 } else {
+                    // Fallback
                     {% for category, message in messages %}
                         alert('{{ message }}');
                     {% endfor %}
