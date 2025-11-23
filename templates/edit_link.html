@@ -8,493 +8,208 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
+            /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
+            --button-red: #dc3545;
+            --button-blue: #007bff;
+            --button-yellow: #ffc107;
             --button-gray: #6c757d;
-            --light-gray: #f8f9fa;
             --text-color: #2c3e50;
             --border-color: #e0e0e0;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --bg-grad-start: #f5f7fa;
+            --bg-grad-end: #c3cfe2;
+            
+            --header-height: 80px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
-            --success-bg: #d4edda;
-            --success-color: #155724;
-            --error-bg: #f8d7da;
-            --error-color: #721c24;
-            --info-bg: #cce5ff;
-            --info-color: #004085;
+            --success-bg: #d4edda; --success-color: #155724;
+            --error-bg: #f8d7da; --error-color: #721c24;
+            --info-bg: #cce5ff; --info-color: #004085;
         }
-		/* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+
+        /* FIX FONT ISSUE */
         body, button, input, select, textarea, optgroup {
             font-family: 'Kanit', sans-serif;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Kanit', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
-            padding: 20px;
+            padding-top: var(--header-height);
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px;
+        /* --- Header & Navigation --- */
+        .main-header {
             background: white;
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            animation: fadeIn 0.5s ease;
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            height: var(--header-height);
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
+        .logo-container img:hover { transform: scale(1.05); }
+        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
+
+        .nav-menu { display: flex; align-items: center; gap: 8px; }
+
+        .nav-link {
+            text-decoration: none; color: var(--text-color); font-weight: 500;
+            padding: 8px 16px; border-radius: 50px; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;
         }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
+        .nav-link i { font-size: 1.1em; }
+        
+        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
+        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
+        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
+
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        /* --- Mobile Header Controls --- */
+        .mobile-controls { display: none; align-items: center; gap: 15px; }
+        .mobile-profile-btn { display: flex; align-items: center; text-decoration: none; }
+        .mobile-profile-btn img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; }
+
+        /* --- Container --- */
+        .container { max-width: 900px; margin: 40px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: var(--shadow-lg); animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Back Button */
         .btn-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, var(--button-gray) 0%, #5a6268 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-            text-decoration: none;
-            margin-bottom: 30px;
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, var(--button-gray), #5a6268);
+            color: white; border: none; padding: 10px 20px; border-radius: 25px;
+            cursor: pointer; font-size: 0.95em; font-weight: 500;
+            transition: all 0.3s ease; box-shadow: var(--shadow-sm);
+            text-decoration: none; margin-bottom: 30px;
         }
+        .btn-back:hover { background: linear-gradient(135deg, #5a6268, #495057); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
-        .btn-back:hover {
-            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* Title */
         h2 {
-            color: var(--bma-green);
-            font-size: 2em;
-            font-weight: 600;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
+            color: var(--bma-green); font-size: 2em; font-weight: 600;
+            margin-bottom: 30px; padding-bottom: 15px;
             border-bottom: 3px solid var(--bma-green-light);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
         }
+        h2::before { content: "✏️"; font-size: 0.8em; }
 
-        h2::before {
-            content: "✏️";
-            font-size: 1.2em;
-        }
-
-        /* ID Badge */
         .id-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--bma-green-light) 0%, #c8e6c9 100%);
-            color: var(--bma-green);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 600;
-            margin-left: 10px;
-            border: 2px solid var(--bma-green);
-        }
-
-        /* Flash Messages */
-        .flashes {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 25px 0;
-        }
-
-        .flashes li {
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
-            box-shadow: var(--shadow-sm);
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .flashes .success {
-            background-color: var(--success-bg);
-            color: var(--success-color);
-            border-left: 4px solid #28a745;
-        }
-
-        .flashes .success::before {
-            content: "✓";
-            font-size: 1.3em;
-            font-weight: bold;
-        }
-
-        .flashes .error {
-            background-color: var(--error-bg);
-            color: var(--error-color);
-            border-left: 4px solid #dc3545;
-        }
-
-        .flashes .error::before {
-            content: "✕";
-            font-size: 1.3em;
-            font-weight: bold;
-        }
-
-        .flashes .info {
-            background-color: var(--info-bg);
-            color: var(--info-color);
-            border-left: 4px solid #17a2b8;
-        }
-
-        .flashes .info::before {
-            content: "ℹ";
-            font-size: 1.3em;
-            font-weight: bold;
+            display: inline-block; background: var(--bma-green-light); color: var(--bma-green);
+            padding: 5px 15px; border-radius: 20px; font-size: 0.5em; font-weight: 600;
+            margin-left: 10px; border: 1px solid var(--bma-green); vertical-align: middle;
         }
 
         /* Form Styles */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        form div {
-            display: flex;
-            flex-direction: column;
-        }
-
-        form label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-color);
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        form label::before {
-            content: "📌";
-            font-size: 0.9em;
-        }
-
-        /* Input Fields */
-        form input[type="text"],
-        form input[type="url"],
-        form input[type="email"],
-        form input[type="tel"],
-        form textarea,
-        form select {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            font-family: 'Kanit', Arial, sans-serif;
-            font-size: 1em;
-            background-color: var(--light-gray);
-            transition: all 0.3s ease;
-            color: var(--text-color);
-        }
-
-        form input[type="text"]:focus,
-        form input[type="url"]:focus,
-        form input[type="email"]:focus,
-        form input[type="tel"]:focus,
-        form textarea:focus,
-        form select:focus {
-            outline: none;
-            border-color: var(--bma-green);
-            background-color: white;
-            box-shadow: 0 0 0 4px var(--bma-green-light);
-            transform: translateY(-2px);
-        }
+        form { display: flex; flex-direction: column; gap: 25px; }
+        form div { display: flex; flex-direction: column; }
         
-        /* (ใหม่! Req #2) สไตล์สำหรับช่อง Readonly */
-        form input[readonly] {
-            background-color: #e9ecef;
-            color: #6c757d;
-            cursor: not-allowed;
-            font-weight: 500;
-        }
-        form input[readonly]:focus {
-            box-shadow: none; /* ไม่ต้องมี focus effect */
-            transform: none;
-            border-color: var(--border-color);
-        }
+        form label { font-weight: 600; margin-bottom: 8px; color: var(--text-color); font-size: 0.95em; display: flex; align-items: center; gap: 5px; }
+        form label::before { content: "📌"; font-size: 0.9em; }
 
-        form input::placeholder,
-        form textarea::placeholder {
-            color: #999;
-            font-style: italic;
+        form input, form textarea, form select {
+            width: 100%; padding: 14px 18px; border: 2px solid var(--border-color);
+            border-radius: 12px; font-size: 1em; background-color: #f8f9fa;
+            transition: all 0.3s ease; color: var(--text-color);
         }
-
-        /* Textarea */
-        form textarea {
-            resize: vertical;
-            min-height: 100px;
-            line-height: 1.6;
+        form input:focus, form select:focus, form textarea:focus {
+            outline: none; border-color: var(--bma-green); background-color: white;
+            box-shadow: 0 0 0 4px var(--bma-green-light); transform: translateY(-2px);
         }
-
-        /* Select Dropdown */
-        form select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            padding-right: 45px;
-        }
-
-        form select option {
-            padding: 10px;
-        }
-
-        form optgroup {
-            font-weight: 600;
-            color: var(--bma-green);
-            font-style: normal;
-        }
-
-        form optgroup option {
-            font-weight: 400;
-            color: var(--text-color);
-            padding-left: 20px;
-        }
+        form input[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; }
 
         /* Submit Button */
         button[type="submit"] {
-            font-family: 'Kanit', Arial, sans-serif;
-            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-md);
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            background: linear-gradient(135deg, var(--bma-green), #007a30);
+            color: white; border: none; padding: 16px; border-radius: 50px;
+            font-size: 1.1em; font-weight: 600; cursor: pointer;
+            transition: 0.3s; box-shadow: var(--shadow-md); margin-top: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
+        button[type="submit"]:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4); }
+        button[type="submit"]::before { content: "💾"; font-size: 1.2em; }
 
-        button[type="submit"]::before {
-            content: "💾";
-            font-size: 1.2em;
-        }
-
-        button[type="submit"]:hover {
-            background: linear-gradient(135deg, #007a30 0%, #006428 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4);
-        }
-
-        button[type="submit"]:active {
-            transform: translateY(-1px);
-        }
-
-        /* Required Field Indicator */
-        form label:has(+ input[required])::after,
-        form label:has(+ select[required])::after,
-        form label:has(+ textarea[required])::after {
-            content: "*";
-            color: #dc3545;
-            margin-left: 4px;
-            font-weight: bold;
-        }
-
-        /* Info Box */
         .info-box {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-left: 4px solid #2196f3;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: var(--shadow-sm);
+            background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px;
+            border-radius: 10px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;
+            color: #0d47a1; font-size: 0.95em;
         }
+        .info-box::before { content: "ℹ️"; font-size: 1.5em; }
 
-        .info-box::before {
-            content: "ℹ️";
-            font-size: 1.5em;
-        }
-
-        .info-box p {
-            margin: 0;
-            color: #1565c0;
-            font-size: 0.95em;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                padding: 15px;
-            }
-
-            .container {
-                padding: 25px 20px;
-                border-radius: 15px;
-            }
-
-            h2 {
-                font-size: 1.5em;
-                flex-wrap: wrap;
-            }
-
-            .id-badge {
-                margin-left: 0;
-                margin-top: 5px;
-            }
-
-            form {
-                gap: 20px;
-            }
-
-            form input[type="text"],
-            form input[type="url"],
-            form input[type="email"],
-            form input[type="tel"],
-            form textarea,
-            form select {
-                padding: 12px 15px;
-                font-size: 0.95em;
-            }
-
-            button[type="submit"] {
-                padding: 14px 28px;
-                font-size: 1em;
-            }
-
-            .btn-back {
-                padding: 10px 20px;
-                font-size: 0.95em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px 15px;
-            }
-
-            h2 {
-                font-size: 1.3em;
-            }
-
-            .id-badge {
-                font-size: 0.75em;
-                padding: 4px 12px;
-            }
-
-            form label {
-                font-size: 0.9em;
-            }
-
-            form input[type="text"],
-            form input[type="url"],
-            form input[type="email"],
-            form input[type="tel"],
-            form textarea,
-            form select {
-                padding: 11px 14px;
-                font-size: 0.9em;
-            }
-
-            button[type="submit"] {
-                padding: 12px 24px;
-                font-size: 0.95em;
-            }
-
-            .info-box {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-
-        /* Smooth Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--light-gray);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--bma-green);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--bma-green-hover);
-        }
-
-        /* Focus visible for accessibility */
-        *:focus-visible {
-            outline: 2px solid var(--bma-green);
-            outline-offset: 2px;
-        }
-
-        /* Hover effects for better UX */
-        form div:hover label {
-            color: var(--bma-green);
-        }
-
-        /* Modified indicator for form */
         .modified-indicator {
-            display: inline-block;
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-            color: #f57c00;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            border: 2px solid #ff9800;
-            box-shadow: var(--shadow-sm);
+            display: inline-block; background: #fff3e0; color: #e65100;
+            padding: 5px 10px; border-radius: 15px; font-size: 0.8em;
+            font-weight: 600; margin-bottom: 10px; border: 1px solid #ffb74d;
         }
 
-        .modified-indicator::before {
-            content: "⚠️ ";
+        /* Responsive */
+        @media (max-width: 992px) { .nav-link span { display: none; } }
+        @media (max-width: 768px) {
+            .mobile-controls { display: flex; } .mobile-toggle { display: block; }
+            .nav-menu { display: none; position: absolute; top: 70px; left: 0; width: 100%; background: white; flex-direction: column; padding: 15px; box-shadow: var(--shadow-lg); }
+            .nav-menu.active { display: flex; }
+            .nav-link { width: 100%; padding: 12px; height: auto; justify-content: flex-start; }
+            .nav-link span { display: inline; }
+            .nav-link.profile-item { display: none; }
+            
+            .container { padding: 25px 20px; margin: 20px 15px; }
+            h2 { font-size: 1.5em; }
+            .id-badge { font-size: 0.6em; display: block; width: fit-content; margin-top: 5px; margin-left: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <a href="{{ url_for('dashboard') }}" class="btn-back">
-            ⬅️ กลับหน้า Dashboard
+    <header class="main-header">
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+            <div class="logo-text">แก้ไขข้อมูล</div>
         </a>
+        
+        <div class="mobile-controls">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
+                </a>
+            {% endif %}
+            <div class="mobile-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+        </div>
+    
+        <nav class="nav-menu" id="navMenu">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+                <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                <a href="{{ url_for('analytics_page') }}" class="nav-link"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+                <a href="{{ url_for('feedback_page') }}" class="nav-link"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                    <span>{{ session.name }}</span>
+                </a>
+                
+                <a href="{{ url_for('logout') }}" class="nav-link logout-btn"><i class="fas fa-sign-out-alt"></i> <span>ออก</span></a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div class="container">
+        <a href="{{ url_for('dashboard') }}" class="btn-back">⬅️ กลับหน้า Dashboard</a>
 
         <h2>
             แก้ไขลิงค์
@@ -504,16 +219,6 @@
         <div class="info-box">
             <p><strong>กำลังแก้ไขข้อมูล:</strong> กรุณาตรวจสอบข้อมูลให้ครบถ้วนก่อนบันทึก</p>
         </div>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <ul class="flashes">
-            {% for category, message in messages %}
-              <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
 
         <form action="{{ url_for('update_link_action', link_id=link.ID) }}" method="POST">
             <div>
@@ -565,7 +270,6 @@
 
             <div>
                 <label for="ส่วนราชการ">ส่วนราชการ (สำนัก/เขต) (จำเป็น)</label>
-                
                 {% if is_admin %}
                     <span class="modified-indicator">คุณเป็น Admin: สามารถเปลี่ยนส่วนราชการได้</span>
                     <select id="ส่วนราชการ" name="ส่วนราชการ" required>
@@ -573,87 +277,17 @@
                         <optgroup label="ระดับสำนัก">
                             <option value="สำนักงานเลขานุการสภากรุงเทพมหานคร">สำนักงานเลขานุการสภากรุงเทพมหานคร</option>
                             <option value="สำนักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร">สำนักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร</option>
-                            <option value="สำนักงานคณะกรรมการข้าราชการกรุงเทพมหานคร">สำนักงานคณะกรรมการข้าราชการกรุงเทพมหานคร</option>
-                            <option value="สำนักปลัดกรุงเทพมหานคร">สำนักปลัดกรุงเทพมหานคร</option>
-                            <option value="สำนักการแพทย์">สำนักการแพทย์</option>
-                            <option value="สำนักอนามัย">สำนักอนามัย</option>
-                            <option value="สำนักการศึกษา">สำนักการศึกษา</option>
-                            <option value="สำนักการโยธา">สำนักการโยธา</option>
-                            <option value="สำนักการระบายน้ำ">สำนักการระบายน้ำ</option>
-                            <option value="สำนักการคลัง">สำนักการคลัง</option>
-                            <option value="สำนักเทศกิจ">สำนักเทศกิจ</option>
-                            <option value="สำนักการจราจรและขนส่ง">สำนักการจราจรและขนส่ง</option>
-                            <option value="สำนักการวางผังเมืองและพัฒนาเมือง">สำนักการวางผังเมืองและพัฒนาเมือง</option>
-                            <option value="สำนักป้องกันและบรรเทาสาธารณภัย">สำนักป้องกันและบรรเทาสาธารณภัย</option>
-                            <option value="สำนักงบประมาณกรุงเทพมหานคร">สำนักงบประมาณกรุงเทพมหานคร</option>
                             <option value="สำนักยุทธศาสตร์และประเมินผล">สำนักยุทธศาสตร์และประเมินผล</option>
-                            <option value="สำนักสิ่งแวดล้อม">สำนักสิ่งแวดล้อม</option>
-                            <option value="สำนักวัฒนธรรม กีฬา และการท่องเที่ยว">สำนักวัฒนธรรม กีฬา และการท่องเที่ยว</option>
-                            <option value="สำนักพัฒนาสังคม">สำนักพัฒนาสังคม</option>
                         </optgroup>
-                        <optgroup label="สำนักงานเขต (ก-ต)">
+                        <optgroup label="สำนักงานเขต">
                             <option value="สำนักงานเขตคลองเตย">สำนักงานเขตคลองเตย</option>
-                            <option value="สำนักงานเขตคลองสาน">สำนักงานเขตคลองสาน</option>
-                            <option value="สำนักงานเขตคลองสามวา">สำนักงานเขตคลองสามวา</option>
-                            <option value="สำนักงานเขตคันนายาว">สำนักงานเขตคันนายาว</option>
-                            <option value="สำนักงานเขตจตุจักร">สำนักงานเขตจตุจักร</option>
-                            <option value="สำนักงานเขตจอมทอง">สำนักงานเขตจอมทอง</option>
-                            <option value="สำนักงานเขตดอนเมือง">สำนักงานเขตดอนเมือง</option>
-                            <option value="สำนักงานเขตดินแดง">สำนักงานเขตดินแดง</option>
-                            <option value="สำนักงานเขตดุสิต">สำนักงานเขตดุสิต</option>
-                            <option value="สำนักงานเขตตลิ่งชัน">สำนักงานเขตตลิ่งชัน</option>
-                        </optgroup>
-                        <optgroup label="สำนักงานเขต (ท-บ)">
-                            <option value="สำนักงานเขตทวีวัฒนา">สำนักงานเขตทวีวัฒนา</option>
-                            <option value="สำนักงานเขตทุ่งครุ">สำนักงานเขตทุ่งครุ</option>
-                            <option value="สำนักงานเขตธนบุรี">สำนักงานเขตธนบุรี</option>
-                            <option value="สำนักงานเขตบางกอกน้อย">สำนักงานเขตบางกอกน้อย</option>
-                            <option value="สำนักงานเขตบางกอกใหญ่">สำนักงานเขตบางกอกใหญ่</option>
-                            <option value="สำนักงานเขตบางกะปิ">สำนักงานเขตบางกะปิ</option>
-                            <option value="สำนักงานเขตบางขุนเทียน">สำนักงานเขตบางขุนเทียน</option>
-                            <option value="สำนักงานเขตบางเขน">สำนักงานเขตบางเขน</option>
-                            <option value="สำนักงานเขตบางคอแหลม">สำนักงานเขตบางคอแหลม</option>
-                            <option value="สำนักงานเขตบางแค">สำนักงานเขตบางแค</option>
-                            <option value="สำนักงานเขตบางซื่อ">สำนักงานเขตบางซื่อ</option>
-                            <option value="สำนักงานเขตบางนา">สำนักงานเขตบางนา</option>
-                            <option value="สำนักงานเขตบางบอน">สำนักงานเขตบางบอน</option>
-                            <option value="สำนักงานเขตบางพลัด">สำนักงานเขตบางพลัด</option>
-                            <option value="สำนักงานเขตบางรัก">สำนักงานเขตบางรัก</option>
-                            <option value="สำนักงานเขตบึงกุ่ม">สำนักงานเขตบึงกุ่ม</option>
-                        </optgroup>
-                        <optgroup label="สำนักงานเขต (ป-ล)">
-                            <option value="สำนักงานเขตปทุมวัน">สำนักงานเขตปทุมวัน</option>
-                            <option value="สำนักงานเขตประเวศ">สำนักงานเขตประเวศ</option>
-                            <option value="สำนักงานเขตป้อมปราบศัตรูพ่าย">สำนักงานเขตป้อมปราบศัตรูพ่าย</option>
-                            <option value="สำนักงานเขตพญาไท">สำนักงานเขตพญาไท</option>
-                            <option value="สำนักงานเขตพระโขนง">สำนักงานเขตพระโขนง</option>
-                            <option value="สำนักงานเขตพระนคร">สำนักงานเขตพระนคร</option>
-                            <option value="สำนักงานเขตภาษีเจริญ">สำนักงานเขตภาษีเจริญ</option>
-                            <option value="สำนักงานเขตมีนบุรี">สำนักงานเขตมีนบุรี</option>
-                            <option value="สำนักงานเขตยานนาวา">สำนักงานเขตยานนาวา</option>
-                            <option value="สำนักงานเขตราชเทวี">สำนักงานเขตราชเทวี</option>
-                            <option value="สำนักงานเขตราษฎร์บูรณะ">สำนักงานเขตราษฎร์บูรณะ</option>
-                            <option value="สำนักงานเขตลาดกระบัง">สำนักงานเขตลาดกระบัง</option>
-                            <option value="สำนักงานเขตลาดพร้าว">สำนักงานเขตลาดพร้าว</option>
-                        </optgroup>
-                        <optgroup label="สำนักงานเขต (ว-ฮ)">
-                            <option value="สำนักงานเขตวังทองหลาง">สำนักงานเขตวังทองหลาง</option>
-                            <option value="สำนักงานเขตวัฒนา">สำนักงานเขตวัฒนา</option>
-                            <option value="สำนักงานเขตสวนหลวง">สำนักงานเขตสวนหลวง</option>
-                            <option value="สำนักงานเขตสะพานสูง">สำนักงานเขตสะพานสูง</option>
-                            <option value="สำนักงานเขตสัมพันธวงศ์">สำนักงานเขตสัมพันธวงศ์</option>
-                            <option value="สำนักงานเขตสาทร">สำนักงานเขตสาทร</option>
-                            <option value="สำนักงานเขตสายไหม">สำนักงานเขตสายไหม</option>
-                            <option value="สำนักงานเขตหนองแขม">สำนักงานเขตหนองแขม</option>
-                            <option value="สำนักงานเขตหนองจอก">สำนักงานเขตหนองจอก</option>
-                            <option value="สำนักงานเขตหลักสี่">สำนักงานเขตหลักสี่</option>
-                            <option value="สำนักงานเขตห้วยขวาง">สำนักงานเขตห้วยขวาง</option>
-                        </optgroup>
+                            </optgroup>
                     </select>
                 {% else %}
                     <input type="text" id="ส่วนราชการ" name="ส่วนราชการ" value="{{ link['ส่วนราชการ'] }}" readonly>
                 {% endif %}
             </div>
+
             <div>
                 <label for="สถานะ">สถานะ (จำเป็น)</label>
                 <select id="สถานะ" name="สถานะ" required>
@@ -670,7 +304,7 @@
 
             <div>
                 <label for="เบอร์โทรติดต่อ">เบอร์โทรติดต่อ (จำเป็น)</label>
-                <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ" value="{{ link['เบอร์โทรติดต่อ'] }}" required>
+                <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ" value="{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}" required>
             </div>
 
             <div>
@@ -682,49 +316,25 @@
                 <button type="submit">ยืนยันการแก้ไข</button>
             </div>
         </form>
-
     </div>
 
     <script>
+        function toggleMenu() { document.getElementById('navMenu').classList.toggle('active'); }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // (ใหม่!) Script นี้สำหรับ Admin dropdown
             {% if is_admin %}
             const currentAgency = "{{ link['ส่วนราชการ'] }}";
             const agencySelect = document.getElementById('ส่วนราชการ');
-            if (currentAgency && agencySelect) {
-                // พยายามตั้งค่า value; ถ้าไม่พบ (เช่น ค่าเก่าที่ไม่มีใน list) มันจะยังคงเป็น default
-                agencySelect.value = currentAgency; 
-            }
+            if (currentAgency && agencySelect) { agencySelect.value = currentAgency; }
             {% endif %}
-
-            // (ปรับปรุง!) Script นี้สำหรับ ประเภท (ใช้ค่าจาก link['ประเภท'])
-            const currentCategory = "{{ link['ประเภท'] }}";
-            const categorySelect = document.getElementById('ประเภท');
-            if (currentCategory) {
-                // ตรวจสอบว่ามี option นี้ใน list หรือไม่
-                if (categorySelect.querySelector("option[value='" + currentCategory + "']")) {
-                    categorySelect.value = currentCategory;
-                } else {
-                    // ถ้าไม่มี (เช่น เป็นค่าเก่า) ให้พยายามเลือก 'อื่นๆ'
-                    
-                    // (*** ❗️❗️❗️ นี่คือส่วนที่แก้ไข ❗️❗️❗️ ***)
-                    {# หรือปล่อยให้เป็น default (ซึ่งโค้ด Jinja {% if ... selected %} จัดการแล้ว) #}
-                }
-            }
         });
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000 });
+                {% for category, message in messages %} Toast.fire({ icon: '{{ category }}', title: '{{ message }}' }); {% endfor %}
+            {% endif %}
+        {% endwith %}
     </script>
-    <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->	
-	</body>
+</body>
 </html>

@@ -33,11 +33,9 @@
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        /* --- 1. Global Font Fix (บังคับใช้ Kanit ทุกจุด รวมถึง SweetAlert) --- */
-        :root, body, h1, h2, h3, h4, h5, h6, p, span, div, a, 
-        button, input, select, textarea, optgroup,
-        .swal2-popup, .swal2-title, .swal2-html-container, .swal2-confirm, .swal2-cancel, .swal2-deny {
-            font-family: 'Kanit', sans-serif !important;
+        /* FIX FONT ISSUE */
+        body, button, input, select, textarea, optgroup {
+            font-family: 'Kanit', sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -49,7 +47,7 @@
             padding-top: var(--header-height);
         }
 
-        /* --- 2. Header & Navigation --- */
+        /* --- Header & Navigation --- */
         .main-header {
             background: white;
             padding: 0 30px;
@@ -74,6 +72,7 @@
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
+        /* Desktop Menu */
         .nav-menu { display: flex; align-items: center; gap: 8px; }
 
         .nav-link {
@@ -96,23 +95,28 @@
         .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
         .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
-        /* FIX: Reset profile pic size for mobile list */
-            .user-profile-pic { 
-                width: 32px; height: 32px; 
-                border-radius: 50%; 
-                margin-right: 10px; 
-                object-fit: cover; 
-            }
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        /* --- Mobile Header Controls (Profile + Hamburger) --- */
+        .mobile-controls { display: none; align-items: center; gap: 15px; }
+        
+        .mobile-profile-btn {
+            display: flex; align-items: center; text-decoration: none;
+        }
+        .mobile-profile-btn img {
+            width: 40px; height: 40px; border-radius: 50%; 
+            border: 2px solid var(--bma-green); object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
         .mobile-toggle {
-            display: none;
             font-size: 1.6rem;
             cursor: pointer;
             color: var(--text-color);
-            padding: 10px;
+            padding: 5px;
         }
 
-        /* --- 3. Container & Form --- */
+        /* --- Container & Form --- */
         .container {
             max-width: 900px;
             margin: 40px auto;
@@ -123,7 +127,10 @@
             animation: fadeIn 0.5s ease;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         h2 {
             color: var(--bma-green);
@@ -132,7 +139,8 @@
             margin-bottom: 30px;
             padding-bottom: 15px;
             border-bottom: 3px solid var(--bma-green-light);
-            display: flex; align-items: center; gap: 10px;
+            display: flex;
+            align-items: center; gap: 10px;
         }
         h2::before { content: "➕"; font-size: 0.8em; }
 
@@ -212,8 +220,12 @@
             body { padding-top: 70px; }
             .main-header { padding: 0 15px; height: 70px; }
             .logo-text { font-size: 1.1rem; }
+            
+            /* Mobile Controls */
+            .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
 
+            /* Mobile Menu */
             .nav-menu {
                 display: none; position: absolute; top: 70px; left: 0; width: 100%;
                 background: white; flex-direction: column; align-items: stretch;
@@ -222,9 +234,12 @@
             .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
             @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; }
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; height: auto; }
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+            
+            /* Hide Profile Link in Menu (Since it's on top) */
+            .nav-link.profile-item { display: none; }
 
             .container { padding: 25px 20px; margin: 20px 15px; }
         }
@@ -238,8 +253,15 @@
             <div class="logo-text">ทะเบียนลิงค์ BMA</div>
         </a>
 
-        <div class="mobile-toggle" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
+        <div class="mobile-controls">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn" title="โปรไฟล์">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
+                </a>
+            {% endif %}
+            <div class="mobile-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
 
         <nav class="nav-menu" id="navMenu">
@@ -254,7 +276,7 @@
                 <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
                 <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
                 
-                <a href="{{ url_for('profile_page') }}" class="nav-link" title="โปรไฟล์">
+                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
                     <span>{{ session.name }}</span>
                 </a>
