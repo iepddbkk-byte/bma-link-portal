@@ -13,6 +13,7 @@
     
     <style>
         :root {
+            /* Theme Colors based on Index & Dashboard merged */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
@@ -23,9 +24,11 @@
             --button-yellow: #ffc107;
             --button-yellow-hover: #e0a800;
             --button-gray: #6c757d;
-            --light-gray: #f8f9fa;
             --text-color: #2c3e50;
             --border-color: #e0e0e0;
+            --bg-grad-start: #f5f7fa;
+            --bg-grad-end: #c3cfe2;
+            
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 8px 16px rgba(0,0,0,0.12);
@@ -39,48 +42,76 @@
 
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
             line-height: 1.6;
+            padding-top: 80px; /* เพิ่มพื้นที่สำหรับ Fixed Header */
         }
 
-        /* --- Header Styles --- */
+        /* --- Header (Modern Navbar form Index.html) --- */
         .main-header {
             background: white;
-            padding: 15px 20px;
-            box-shadow: var(--shadow-md);
-            border-bottom: 4px solid var(--bma-green);
-            position: sticky;
-            top: 0;
+            padding: 15px 30px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
-        }
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
+            height: 80px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--bma-green); /* คงเอกลักษณ์ Dashboard ไว้เล็กน้อย */
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
             gap: 15px;
+            text-decoration: none;
         }
-        .logo-container { display: flex; align-items: center; gap: 15px; }
-        .logo-container img { height: 60px; transition: transform 0.3s; }
+
+        .logo-container img { height: 50px; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
-        .logo-text { font-size: 1.5rem; font-weight: 600; color: var(--bma-green); }
-        .navigation { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .user-greeting {
-            font-size: 0.95rem; color: var(--text-color); font-weight: 500;
-            padding: 8px 16px; background: var(--bma-green-light);
-            border-radius: 20px; white-space: nowrap;
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--bma-green); }
+
+        /* เมนู Desktop Style ใหม่ */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .mobile-menu-toggle {
-            display: none; background: var(--bma-green); color: white;
-            border: none; padding: 10px 15px; border-radius: 8px;
-            cursor: pointer; font-size: 1.2rem;
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
         }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); }
+        .nav-link i { font-size: 1.1em; }
+
+        /* Specific link styles */
+        .nav-link.admin-link { color: #d35400; }
+        .nav-link.admin-link:hover { background-color: #fff3e0; }
         
-        /* --- Button Styles --- */
+        .user-profile-pic { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        /* Toggle Hamburger (Mobile) */
+        .mobile-toggle {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        /* --- ปุ่มและการจัดการในหน้า Dashboard (Original Logic) --- */
         button, .btn, a.btn-edit { 
             font-family: 'Kanit', Arial, sans-serif; 
             color: white; border: none; padding: 10px 16px; border-radius: 8px; 
@@ -89,18 +120,11 @@
             text-decoration: none !important; display: inline-block;
         }
         button:hover, .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        button:active { transform: translateY(0); }
+        
         .btn-add { 
             background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
             font-size: 1.05rem; padding: 12px 24px; margin-bottom: 15px;
         }
-        .btn-home { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
-        .btn-analytics { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
-        .btn-admin { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
-        .btn-feedback { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
-        .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
-        .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
-        .btn-profile { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
         .action-buttons { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
         .btn-edit { 
             background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); 
@@ -111,21 +135,13 @@
             padding: 6px 12px; font-size: 0.85rem;
         }
 
-        /* (*** ❗️ ปรับปรุงดีไซน์ปุ่มแชร์ใหม่ ❗️ ***) */
+        /* ปุ่มแชร์ */
         .btn-share {
-            background: linear-gradient(135deg, #17a2b8, #138496); /* สีฟ้า Teal */
-            color: white;
-            padding: 0; /* เอา padding ออกเพื่อให้เป็นวงกลมสมบูรณ์ */
-            width: 36px; 
-            height: 36px;
-            font-size: 1rem;
-            border-radius: 50%; /* ทรงกลม */
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* เด้งดึ๋ง */
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white; padding: 0; width: 36px; height: 36px;
+            font-size: 1rem; border-radius: 50%; border: none;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 2px 5px rgba(23, 162, 184, 0.3);
         }
         .btn-share:hover {
@@ -133,70 +149,16 @@
             box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
             background: linear-gradient(135deg, #138496, #117a8b);
         }
-        .btn-share i {
-            margin-left: 1px; /* ปรับตำแหน่งไอคอนนิดหน่อย */
-        }
 
-        /* (*** ❗️ ปรับปรุงดีไซน์ Popup ❗️ ***) */
-        .qr-popup-container {
-            text-align: center;
-            padding: 10px;
-        }
-        .qr-title {
-            font-size: 1.2rem;
-            color: var(--bma-green);
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        .qr-link-text {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 15px;
-            word-break: break-all;
-            background: #f8f9fa;
-            padding: 8px;
-            border-radius: 8px;
-            border: 1px dashed #ddd;
-        }
-        .qr-img-wrapper {
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            display: inline-block;
-            margin-bottom: 20px;
-            border: 1px solid #eee;
-        }
-        .qr-img {
-            width: 200px;
-            height: 200px;
-            display: block;
-        }
-        .share-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .btn-popup-copy {
-            background-color: var(--button-blue);
-            color: white;
-            width: 100%;
-            justify-content: center;
-            padding: 12px;
-            font-size: 1rem;
-        }
-        .btn-popup-download {
-            background-color: var(--bma-green);
-            color: white;
-            width: 100%;
-            justify-content: center;
-            padding: 12px;
-            font-size: 1rem;
-            display: inline-flex; /* แก้ไขให้ปุ่ม a แสดงผลเหมือนปุ่ม button */
-            align-items: center;
-            text-decoration: none;
-        }
+        /* QR Popup */
+        .qr-popup-container { text-align: center; padding: 10px; }
+        .qr-title { font-size: 1.2rem; color: var(--bma-green); font-weight: 600; margin-bottom: 5px; }
+        .qr-link-text { font-size: 0.85rem; color: #666; margin-bottom: 15px; word-break: break-all; background: #f8f9fa; padding: 8px; border-radius: 8px; border: 1px dashed #ddd; }
+        .qr-img-wrapper { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: inline-block; margin-bottom: 20px; border: 1px solid #eee; }
+        .qr-img { width: 200px; height: 200px; display: block; }
+        .share-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn-popup-copy { background-color: var(--button-blue); color: white; width: 100%; justify-content: center; padding: 12px; font-size: 1rem; }
+        .btn-popup-download { background-color: var(--bma-green); color: white; width: 100%; justify-content: center; padding: 12px; font-size: 1rem; display: inline-flex; align-items: center; text-decoration: none; }
 
         /* --- Container & Card --- */
         .container { max-width: 1400px; margin: 30px auto; padding: 20px; }
@@ -213,75 +175,32 @@
         }
 
         /* --- Search & Table --- */
-        .search-container { 
-            margin: 25px 0; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-        
-        .search-input-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
+        .search-container { margin: 25px 0; display: flex; flex-direction: column; gap: 15px; }
+        .search-input-wrapper { position: relative; width: 100%; }
         #searchInput {
             width: 100%; padding: 15px 20px 15px 50px;
             font-family: 'Kanit', sans-serif; font-size: 1rem;
             border: 2px solid var(--border-color); border-radius: 12px;
             transition: all 0.3s; background: white;
         }
-        #searchInput:focus {
-            outline: none; border-color: var(--bma-green);
-            box-shadow: 0 0 0 4px var(--bma-green-light);
-        }
-        .search-icon {
-            position: absolute; left: 18px; top: 50%;
-            transform: translateY(-50%); color: var(--button-gray);
-            font-size: 1.2rem;
-        }
-
-        .filter-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        #searchInput:focus { outline: none; border-color: var(--bma-green); box-shadow: 0 0 0 4px var(--bma-green-light); }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--button-gray); font-size: 1.2rem; }
+        .filter-wrapper { display: flex; align-items: center; gap: 10px; }
         #agencyFilter {
-            width: 100%;
-            padding: 12px 15px;
-            font-family: 'Kanit', sans-serif;
-            font-size: 1rem;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            cursor: pointer;
-            background-color: white;
-            appearance: none;
+            width: 100%; padding: 12px 15px; font-family: 'Kanit', sans-serif; font-size: 1rem;
+            border: 2px solid var(--border-color); border-radius: 12px; cursor: pointer;
+            background-color: white; appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            padding-right: 40px;
+            background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px;
         }
-        #agencyFilter:focus {
-            outline: none; border-color: var(--bma-green);
-            box-shadow: 0 0 0 4px var(--bma-green-light);
-        }
+        #agencyFilter:focus { outline: none; border-color: var(--bma-green); box-shadow: 0 0 0 4px var(--bma-green-light); }
         optgroup { font-weight: 600; color: var(--bma-green); }
 
-        .table-container {
-            overflow-x: auto; border-radius: 12px;
-            box-shadow: var(--shadow-sm); margin-top: 20px;
-        }
-        table { 
-            width: 100%; border-collapse: separate; border-spacing: 0;
-            font-size: 0.9rem; background: white;
-        }
-        th, td { 
-            padding: 14px 12px; text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap; 
-        }
+        /* Table */
+        .table-container { overflow-x: auto; border-radius: 12px; box-shadow: var(--shadow-sm); margin-top: 20px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.9rem; background: white; }
+        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
         td:nth-child(2) { white-space: normal; min-width: 150px; }
-        
         th { 
             background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
             color: white; font-weight: 600; text-align: center;
@@ -291,18 +210,12 @@
         th:last-child { border-top-right-radius: 12px; }
         tbody tr { transition: all 0.3s; }
         tbody tr:hover { background: var(--bma-green-light); transform: scale(1.01); }
-        tbody tr:last-child td { border-bottom: none; }
-        table tbody td:nth-child(3),
-        table tbody td:nth-child(4) { text-align: center; }
+        table tbody td:nth-child(3), table tbody td:nth-child(4) { text-align: center; }
         a { color: var(--bma-green); text-decoration: none; font-weight: 500; transition: all 0.3s; }
         a:hover { color: var(--bma-green-hover); text-decoration: underline; }
 
-        /* --- Status Badges --- */
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 6px 12px; border-radius: 20px;
-            font-size: 0.85rem; font-weight: 500;
-        }
+        /* Badges */
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
         .status-ok { background: #d4edda; color: #155724; }
         .status-blocked { background: #cce5ff; color: #004085; }
         .status-error { background: #f8d7da; color: #721c24; }
@@ -311,37 +224,19 @@
         .status-updating { background: #fff3cd; color: #856404; }
         .status-inactive { background: #f8d7da; color: #721c24; }
 
-        /* --- Sort & Pagination --- */
-        .sort-buttons {
-            margin-top: 8px; display: flex; gap: 5px;
-            justify-content: center; flex-wrap: wrap;
-        }
-        .sort-buttons button {
-            font-size: 0.75rem; padding: 4px 8px;
-            background: rgba(255, 255, 255, 0.2); color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-        }
-        .sort-buttons button:hover { background: rgba(255, 255, 255, 0.3); transform: none; }
-        .pagination-controls {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 0; margin-top: 25px; border-top: 2px solid var(--border-color);
-            flex-wrap: wrap; gap: 15px;
-        }
+        /* Sort & Pagination */
+        .sort-buttons { margin-top: 8px; display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+        .sort-buttons button { font-size: 0.75rem; padding: 4px 8px; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); }
+        .sort-buttons button:hover { background: rgba(255, 255, 255, 0.3); transform: none; box-shadow: none; }
+        .pagination-controls { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-top: 25px; border-top: 2px solid var(--border-color); flex-wrap: wrap; gap: 15px; }
         .pagination-items { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .pagination-items select {
-            font-family: 'Kanit', sans-serif; padding: 8px 12px;
-            border: 2px solid var(--border-color); border-radius: 8px;
-            font-size: 0.95rem; cursor: pointer; transition: all 0.3s;
-        }
-        .pagination-items select:focus { outline: none; border-color: var(--bma-green); }
+        .pagination-items select { font-family: 'Kanit', sans-serif; padding: 8px 12px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.3s; }
         .pagination-nav { display: flex; align-items: center; gap: 8px; }
         .pagination-nav button { background: var(--button-gray); min-width: 40px; padding: 8px 12px; }
         .pagination-nav button:hover { background: #5a6268; }
         .pagination-nav button:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
-        .pagination-nav span { font-weight: 500; padding: 0 10px; white-space: nowrap; }
 
-        /* --- Footer --- */
+        /* Footer */
         .main-footer {
             background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
             color: white; text-align: center; padding: 30px 20px;
@@ -350,70 +245,76 @@
         .main-footer p { margin: 8px 0; font-size: 0.95rem; }
 
         /* --- Responsive --- */
-        @media (max-width: 768px) {
-            .mobile-menu-toggle { display: block; }
-            .navigation {
-                display: none; width: 100%; flex-direction: column;
-                background: white; padding: 15px; border-radius: 12px;
-                margin-top: 10px; box-shadow: var(--shadow-md);
+        @media (max-width: 900px) {
+            .mobile-toggle { display: block; }
+            .nav-menu {
+                display: none; /* ซ่อนเริ่มต้น */
+                position: absolute;
+                top: 80px; left: 0; width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                border-top: 1px solid #eee;
+                align-items: stretch; /* ให้ปุ่มเต็มความกว้าง */
             }
-            .navigation.active { display: flex; }
-            .navigation button, .navigation a { width: 100%; justify-content: center; }
-            .user-greeting { display: none !important; }
-            .logo-text { display: none; }
-            h1, h2 { font-size: 1.5rem; }
-            .content-card { padding: 20px 15px; }
-            table { font-size: 0.85rem; }
-            th, td { padding: 10px 8px; }
-            .pagination-controls { justify-content: center; }
-            .pagination-items, .pagination-nav { width: 100%; justify-content: center; }
-
+            .nav-menu.active { display: flex; }
+            .nav-link { width: 100%; padding: 15px; border-radius: 10px; justify-content: flex-start; }
+            .logo-text { font-size: 1.2rem; }
+            .main-header { padding: 15px 20px; }
+            
+            /* Hide non-essential columns on mobile */
             th:nth-child(2), td:nth-child(2), /* รายละเอียด */
             th:nth-child(7), td:nth-child(7), /* ส่วนราชการ */
             th:nth-child(8), td:nth-child(8), /* เบอร์ติดต่อ */
             th:nth-child(10), td:nth-child(10) /* วันที่อัปเดต */
-            {
-                display: none;
-            }
-
+            { display: none; }
+            
+            .content-card { padding: 20px 15px; }
+            .pagination-controls { justify-content: center; }
+            .pagination-items, .pagination-nav { width: 100%; justify-content: center; }
             .action-buttons { flex-direction: column; gap: 5px; }
             .btn-edit, .btn-delete { width: 100%; text-align: center; }
         }
-        @media (min-width: 769px) {
-            .logo-text { display: block; }
-            .user-greeting { display: block; }
-        }
-        html { scroll-behavior: smooth; }
     </style>
 </head>
 <body>
     
     <header class="main-header">
-        <div class="header-container">
-            <div class="logo-container">
-                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-            </div>
-			
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
-        
-            <div class="navigation" id="mainNavigation">
-                {% if session.get('logged_in') %}
-                    <span class="user-greeting">สวัสดี, {{ session.name }}!</span>
-                    
-                    {% if session.get('level') == 'Admin' %}
-                    <a href="{{ url_for('admin_panel') }}" class="btn btn-admin">👑 Admin Panel</a>
-                    {% endif %}
-					<a href="{{ url_for('home') }}" class="btn btn-home">🏠 กลับหน้าหลัก</a>
-                    <a href="{{ url_for('analytics_page') }}" class="btn btn-analytics">📊 Analytics</a>
-                    <a href="{{ url_for('feedback_page') }}" class="btn btn-feedback">📝 ส่ง Feedback</a>
-                    <a href="{{ url_for('profile_page') }}" class="btn btn-profile">👤 ข้อมูลส่วนตัว</a>
-                    <a href="{{ url_for('logout') }}" class="btn btn-logout">🚪 ออกจากระบบ</a>
-                {% else %}
-                    <a href="{{ url_for('login_page') }}"><button>สำหรับเจ้าหน้าที่</button></a>
-                {% endif %}
-            </div>
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+        </a>
+
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
         </div>
+        
+        <nav class="nav-menu" id="navMenu">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> หน้าหลัก</a>
+                
+                {% if session.get('level') == 'Admin' %}
+                <a href="{{ url_for('admin_panel') }}" class="nav-link admin-link"><i class="fas fa-crown"></i> Admin Panel</a>
+                {% endif %}
+                
+                <a href="{{ url_for('analytics_page') }}" class="nav-link"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="{{ url_for('feedback_page') }}" class="nav-link"><i class="fas fa-comment-alt"></i> Feedback</a>
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                    {{ session.name }}
+                </a>
+                
+                <a href="{{ url_for('logout') }}" class="nav-link" style="color: #dc3545;">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </a>
+            {% else %}
+                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white; border-radius: 30px; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.3);">
+                    <i class="fas fa-user-lock"></i> เจ้าหน้าที่เข้าสู่ระบบ
+                </a>
+            {% endif %}
+        </nav>
     </header>
     
     <div class="container">
@@ -579,6 +480,21 @@
     </footer>
 
     <script>
+        // Toggle Mobile Menu (Logic ใหม่ให้เข้ากับโครงสร้างแบบ Index)
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-toggle');
+            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+            }
+        });
+
         // 1. ส่วนจัดการตารางและการค้นหา
         let allTableRows = []; 
         let currentPage = 1;
@@ -587,11 +503,6 @@
         const noDataRow = document.getElementById("noDataRow");
         const searchInput = document.getElementById("searchInput");
         const agencyFilter = document.getElementById("agencyFilter");
-
-        function toggleMobileMenu() {
-            const nav = document.getElementById('mainNavigation');
-            nav.classList.toggle('active');
-        }
 
         function sortTable(columnIndex, direction) {
             const collator = new Intl.Collator('th', { sensitivity: 'base' });
@@ -671,15 +582,6 @@
             agencyFilter.addEventListener('change', () => displayPage(1)); 
 
             displayPage(1);
-
-            // Close mobile menu
-            document.addEventListener('click', (e) => {
-                const nav = document.getElementById('mainNavigation');
-                const toggle = document.querySelector('.mobile-menu-toggle');
-                if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
-                    nav.classList.remove('active');
-                }
-            });
         });
 
         // 2. ส่วนจัดการการลบข้อมูล (เหมือนเดิม)
@@ -707,7 +609,7 @@
             });
         });
 
-    // 3. ฟังก์ชัน Share QR Code (ปรับปรุงดีไซน์)
+    // 3. ฟังก์ชัน Share QR Code (เหมือนเดิม แต่ CSS ดีขึ้น)
 	function showShareModal(title, originalUrl, linkId) {
         // ใช้ลิงค์ถาวร /go/<ID>
         const permanentLink = `${window.location.origin}/go/${linkId}`;
@@ -738,7 +640,7 @@
             width: 450,
             padding: '20px',
             customClass: {
-                popup: 'rounded-popup' // เพิ่มคลาสถ้าต้องการปรับแต่ง popup เพิ่มเติม
+                popup: 'rounded-popup'
             }
         });
 	}

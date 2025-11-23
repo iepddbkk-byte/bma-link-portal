@@ -31,7 +31,11 @@
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
@@ -39,96 +43,202 @@
             color: var(--text-color);
             min-height: 100vh;
             padding-bottom: 60px;
+            padding-top: 80px; /* (สำคัญ!) เผื่อพื้นที่ให้ Header ใหม่ */
         }
 
-        /* --- Header Styles --- */
+        /* --- Header (Modern Navbar - สไตล์เดียวกับ Index) --- */
         .main-header {
-            background: white; padding: 15px 20px;
-            box-shadow: var(--shadow-md);
-            border-bottom: 4px solid var(--bma-green);
-            position: sticky; top: 0; z-index: 1000;
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .header-container {
-            max-width: 1400px; margin: 0 auto;
-            display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 15px;
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
         }
-        .logo-container { display: flex; align-items: center; gap: 15px; }
-        .logo-container img { height: 60px; transition: transform 0.3s ease; }
-        .logo-container img:hover { transform: scale(1.05); }
-        .logo-text { font-size: 1.5rem; font-weight: 600; color: var(--bma-green); }
-        .mobile-menu-toggle {
-            display: none; background: var(--bma-green); color: white;
-            border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 1.2rem;
+
+        .logo-container img { height: 50px; }
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--bma-green); }
+
+        /* เมนู Desktop */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        .navigation { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); }
         
-        /* Buttons */
-        button, a.btn { 
-            font-family: 'Kanit', Arial, sans-serif; 
-            color: white; border: none; padding: 10px 16px; border-radius: 8px;
-            cursor: pointer; font-size: 0.95rem; transition: all 0.3s ease;
-            white-space: nowrap; font-weight: 500; box-shadow: var(--shadow-sm);
-            text-decoration: none; display: inline-block;
+        .btn-login-nav {
+            background: var(--bma-green);
+            color: white !important;
+            padding: 10px 25px;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0, 150, 60, 0.3);
         }
-        button:hover, a.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        .btn-dashboard { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
-        .btn-analytics { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
-        .btn-admin { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
-        .btn-feedback { background: linear-gradient(135deg, var(--button-gray), #5a6268); }
-        .btn-profile { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
-        .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
-        .btn-login { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
-        .btn-portal { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+        .btn-login-nav:hover { background: var(--bma-green-hover); transform: translateY(-2px); }
 
-        /* Container */
-        .container { max-width: 1400px; margin: 30px auto; padding: 30px; background: white; border-radius: 20px; box-shadow: var(--shadow-lg); animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .user-profile-pic { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--bma-green); }
 
+        /* Toggle Hamburger (Mobile) */
+        .mobile-toggle {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        /* --- Container --- */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto; 
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Title */
         h1 { 
-            color: var(--bma-green); font-size: 2em; font-weight: 600;
-            margin-bottom: 25px; padding-bottom: 15px;
+            color: var(--bma-green);
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
             border-bottom: 3px solid var(--bma-green-light);
-            display: flex; align-items: center; gap: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* Search */
-        .search-container { margin: 25px 0; position: relative; }
+        /* Search Container */
+        .search-container {
+            margin: 25px 0;
+            position: relative;
+        }
+
         #searchInput {
-            width: 100%; padding: 15px 20px 15px 50px;
-            font-family: 'Kanit', sans-serif; font-size: 1em;
-            border: 2px solid var(--border-color); border-radius: 50px;
-            transition: all 0.3s ease; background: var(--light-gray);
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1em;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            background: var(--light-gray);
         }
-        #searchInput:focus { outline: none; border-color: var(--bma-green); background: white; box-shadow: 0 0 0 4px var(--bma-green-light); }
-        .search-container::before { content: "🔍"; position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2em; }
 
-        /* Table */
-        .table-wrapper { overflow-x: auto; border-radius: 12px; box-shadow: var(--shadow-sm); margin-top: 20px; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.95em; background: white; }
-        th, td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
-        td:nth-child(2) { white-space: normal; min-width: 200px; } /* รายละเอียด */
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--bma-green);
+            background: white;
+            box-shadow: 0 0 0 4px var(--bma-green-light);
+        }
+
+        .search-container::before {
+            content: "🔍";
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+        }
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-top: 20px;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.95em;
+            background: white;
+        }
+
+        th, td { 
+            padding: 16px; 
+            text-align: left; 
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap; 
+        }
         
+        td:nth-child(2) { 
+             white-space: normal; 
+             min-width: 200px;
+        }
+
         th { 
             background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white; text-align: center; font-weight: 500;
-            position: sticky; top: 0; z-index: 10;
+            color: white; 
+            text-align: center;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
         }
+
         th:first-child { border-top-left-radius: 12px; }
         th:last-child { border-top-right-radius: 12px; }
-        
+
         tbody tr { transition: all 0.3s ease; }
-        tbody tr:hover { background: var(--bma-green-light); transform: scale(1.01); box-shadow: var(--shadow-sm); }
+        tbody tr:hover {
+            background: var(--bma-green-light);
+            transform: scale(1.01);
+            box-shadow: var(--shadow-sm);
+        }
         tbody tr:nth-child(even) { background-color: #fafafa; }
         tbody tr:nth-child(even):hover { background-color: var(--bma-green-light); }
-        
-        table tbody td:nth-child(3), table tbody td:nth-child(4) { text-align: center; }
+
+        table tbody td:nth-child(3),
+        table tbody td:nth-child(4) {
+            text-align: center;
+        }
+
         a { color: var(--bma-green); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
         a:hover { color: var(--bma-green-hover); text-decoration: underline; }
 
         /* Sort Buttons */
         .sort-buttons { margin-top: 8px; display: flex; gap: 5px; justify-content: center; }
-        .sort-buttons button { font-size: 0.75rem; padding: 4px 8px; background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); }
+        .sort-buttons button {
+            font-size: 0.75rem; padding: 4px 8px; background-color: rgba(255,255,255,0.2);
+            color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);
+            border-radius: 4px; cursor: pointer;
+        }
         .sort-buttons button:hover { background-color: rgba(255,255,255,0.3); transform: none; }
 
         /* ปุ่มแชร์ (Teal Circle) */
@@ -143,18 +253,34 @@
         .btn-share i { font-size: 1rem; }
 
         /* Pagination */
-        .pagination-controls { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-top: 25px; border-top: 2px solid var(--border-color); flex-wrap: wrap; gap: 15px; }
+        .pagination-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 0; margin-top: 25px; border-top: 2px solid var(--border-color);
+            flex-wrap: wrap; gap: 15px;
+        }
         .pagination-items { display: flex; align-items: center; gap: 10px; }
-        .pagination-items select { font-family: 'Kanit', sans-serif; padding: 8px 15px; border: 2px solid var(--border-color); border-radius: 20px; background: white; cursor: pointer; transition: all 0.3s ease; }
+        .pagination-items select {
+            font-family: 'Kanit', sans-serif; padding: 8px 15px;
+            border: 2px solid var(--border-color); border-radius: 20px;
+            background: white; cursor: pointer; transition: all 0.3s ease;
+        }
         .pagination-items select:focus { outline: none; border-color: var(--bma-green); }
         .pagination-nav { display: flex; align-items: center; gap: 8px; }
-        .pagination-nav button { background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); padding: 8px 15px; min-width: 40px; }
+        .pagination-nav button { background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; border: none; border-radius: 8px; padding: 8px 15px; min-width: 40px; cursor: pointer; }
         .pagination-nav button:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; opacity: 0.6; transform: none; }
         .pagination-nav button:disabled:hover { transform: none; box-shadow: var(--shadow-sm); }
         .pagination-nav span { margin: 0 10px; font-weight: 500; color: var(--text-color); }
 
         /* Footer */
-        .main-footer { background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%); color: white; text-align: center; padding: 25px; margin-top: 40px; font-size: 0.9em; box-shadow: var(--shadow-lg); }
+        .main-footer {
+            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            font-size: 0.9em;
+            box-shadow: var(--shadow-lg);
+        }
         .main-footer p { margin: 8px 0; }
 
         /* Status Badges */
@@ -167,22 +293,47 @@
         /* Popup Styles */
         .qr-popup-container { text-align: center; padding: 10px; }
         .qr-title { font-size: 1.2rem; color: var(--bma-green); font-weight: 600; margin-bottom: 5px; }
-        .qr-link-text { font-size: 0.85rem; color: #666; margin-bottom: 15px; word-break: break-all; background: #f8f9fa; padding: 8px; border-radius: 8px; border: 1px dashed #ddd; }
-        .qr-img-wrapper { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: inline-block; margin-bottom: 20px; border: 1px solid #eee; }
+        .qr-link-text {
+            font-size: 0.85rem; color: #666; margin-bottom: 15px; word-break: break-all;
+            background: #f8f9fa; padding: 8px; border-radius: 8px; border: 1px dashed #ddd;
+        }
+        .qr-img-wrapper {
+            background: white; padding: 15px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: inline-block; margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
         .qr-img { width: 200px; height: 200px; display: block; }
         .share-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .btn-popup-copy { background-color: var(--button-blue); width: 100%; justify-content: center; padding: 12px; font-size: 1rem; }
-        .btn-popup-download { background-color: var(--bma-green); width: 100%; justify-content: center; padding: 12px; font-size: 1rem; display: inline-flex; align-items: center; text-decoration: none; }
+        .btn-popup-copy { background-color: var(--button-blue); width: 100%; justify-content: center; padding: 12px; font-size: 1rem; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-popup-download { background-color: var(--bma-green); width: 100%; justify-content: center; padding: 12px; font-size: 1rem; color: white; border-radius: 8px; display: inline-flex; align-items: center; text-decoration: none; }
 
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .mobile-menu-toggle { display: block; }
-            .navigation { display: none; width: 100%; flex-direction: column; background: white; padding: 15px; border-radius: 12px; margin-top: 10px; box-shadow: var(--shadow-md); }
-            .navigation.active { display: flex; }
-            .navigation button, .navigation a { width: 100%; text-align: center; justify-content: center; }
+            /* Mobile Menu */
+            .mobile-toggle { display: block; }
+            .nav-menu {
+                display: none; /* ซ่อนเริ่มต้น */
+                position: absolute;
+                top: 80px; left: 0; width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                border-top: 1px solid #eee;
+            }
+            .nav-menu.active { display: flex; }
+            .nav-link { width: 100%; padding: 15px; border-radius: 10px; }
+            .btn-login-nav { width: 100%; text-align: center; }
+
+            /* Table */
             .container { padding: 15px; margin: 15px 10px; border-radius: 15px; }
             h1 { font-size: 1.3em; }
             table { font-size: 0.85em; }
             th, td { padding: 12px 8px; }
+            button { padding: 8px 15px; font-size: 0.9em; }
+            .pagination-controls { flex-direction: column; align-items: stretch; }
+            .pagination-items, .pagination-nav { justify-content: center; }
             
             /* Hide columns on mobile */
             th:nth-child(2), td:nth-child(2),
@@ -191,7 +342,7 @@
             th:nth-child(8), td:nth-child(8),
             th:nth-child(10), td:nth-child(10) { display: none; }
         }
-        
+
         @media (min-width: 769px) { .logo-text { display: block; } }
         @media (max-width: 480px) {
             .logo-container img { height: 45px; }
@@ -200,71 +351,64 @@
             table { font-size: 0.75em; }
             th, td { padding: 10px 6px; }
             .sort-buttons { flex-direction: column; }
+            .sort-buttons button { width: 100%; }
         }
         ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: var(--light-gray); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: var(--bma-green); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--bma-green-hover); }
+        html { scroll-behavior: smooth; }
     </style>
 </head>
 <body>
     
     <header class="main-header">
-        <div class="header-container">
-            <div class="logo-container">
-                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-            </div>
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="Logo">
+            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+        </a>
 
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
 
-            <div class="navigation" id="mainNavigation">
-                <a href="{{ url_for('home') }}">
-                    <button type="button" class="btn-portal">🏠 กลับหน้าหลัก</button>
+        <nav class="nav-menu" id="navMenu">
+            <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> หน้าหลัก</a>
+
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-columns"></i> Dashboard</a>
+                
+                {% if session.get('level') == 'Admin' %}
+                <a href="{{ url_for('admin_panel') }}" class="nav-link"><i class="fas fa-crown"></i> Admin</a>
+                {% endif %}
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                    {{ session.name }}
                 </a>
                 
-                {% if session.get('logged_in') %}
-                    <span>สวัสดี, {{ session.name }}!</span>
-                    
-                    {% if session.get('level') == 'Admin' %}
-                    <a href="{{ url_for('admin_panel') }}">
-                        <button type="button" class="btn-admin">👑 Admin Panel</button>
-                    </a>
-                    {% endif %}
-                    <a href="{{ url_for('analytics_page') }}">
-                        <button type="button" class="btn-analytics">📊 Analytics</button>
-                    </a>
-                    <a href="{{ url_for('dashboard') }}">
-                        <button type="button" class="btn-dashboard">🖥️ Dashboard</button>
-                    </a>
-                    <a href="{{ url_for('feedback_page') }}">
-                        <button type="button" class="btn-feedback">📝 ส่ง Feedback</button>
-                    </a>
-                    <a href="{{ url_for('profile_page') }}">
-                        <button type="button" class="btn-profile">👤 ข้อมูลส่วนตัว</button>
-                    </a>
-                    <a href="{{ url_for('logout') }}">
-                        <button type="button" class="btn-logout">🚪 ออกจากระบบ</button>
-                    </a>
-                {% else %}
-                    <a href="{{ url_for('login_page') }}"><button type="button" class="btn-login">สำหรับเจ้าหน้าที่</button></a>
-                {% endif %}
-            </div>
-        </div>
+                <a href="{{ url_for('logout') }}" class="nav-link" style="color: #dc3545;">
+                    <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                </a>
+            {% else %}
+                <a href="{{ url_for('login_page') }}" class="nav-link btn-login-nav">
+                    <i class="fas fa-user-lock"></i> เจ้าหน้าที่เข้าสู่ระบบ
+                </a>
+            {% endif %}
+        </nav>
     </header>
     
     <div class="container">
 
         {% if error %}
-            <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #c62828; text-align: center;">
+            <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #c62828;">
                 <strong>⚠️ เกิดข้อผิดพลาด:</strong> {{ error }}
             </div>
-            <h1 style="text-align: center; color: #999;">ไม่พบข้อมูล</h1>
-        {% else %}
-            <h1><i class="fas fa-link" style="color: var(--bma-green);"></i> 
-                {{ agency_name }}
-            </h1>
         {% endif %}
+
+        <h1><i class="fas fa-link" style="color: var(--bma-green);"></i> 
+            {{ agency_name }}
+        </h1>
 
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="ค้นหา (ชื่อ, สถานะ, ประเภท, ส่วนราชการ, ผู้สร้าง)...">
@@ -298,7 +442,7 @@
                     {% for link in links %}
                     <tr>
                         <td>
-                            <a href="{{ link['URL'] }}" target="_blank">{{ link['ชื่อลิงก์'] }}</a>
+                            <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green);">{{ link['ชื่อลิงก์'] }}</a>
                         </td>
                         <td>{{ link['รายละเอียด'] }}</td> 
                         <td>
@@ -331,7 +475,7 @@
                         
                         <td>
                             {% if link['CreatorUsername'] %}
-                                <a href="{{ url_for('view_profile', username=link['CreatorUsername']) }}" target="_blank" style="font-weight: 500;">
+                                <a href="{{ url_for('view_profile', username=link['CreatorUsername']) }}" target="_blank" style="font-weight: 500; color: #333;">
                                     {{ link['CreatorUsername'] }}
                                 </a>
                             {% else %}
@@ -393,8 +537,8 @@
 
     <script>
         // Toggle Mobile Menu Function
-        function toggleMobileMenu() {
-            const nav = document.getElementById('mainNavigation');
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
             nav.classList.toggle('active');
         }
 
@@ -431,11 +575,11 @@
             const filteredRows = allTableRows.filter(row => {
                 const cells = row.getElementsByTagName("td");
                 
-                const name = (cells[0].textContent || cells[0].innerText).toLowerCase();
-                const status = (cells[3].textContent || cells[3].innerText).toLowerCase();
-                const type = (cells[4].textContent || cells[4].innerText).toLowerCase();
-                const main_agency = (cells[6].textContent || cells[6].innerText).toLowerCase();
-                const creator = (cells[8].textContent || cells[8].innerText).toLowerCase();
+                const name = (cells[0].textContent || cells[0].innerText).toLowerCase(); 
+                const status = (cells[3].textContent || cells[3].innerText).toLowerCase(); 
+                const type = (cells[4].textContent || cells[4].innerText).toLowerCase(); 
+                const main_agency = (cells[6].textContent || cells[6].innerText).toLowerCase(); 
+                const creator = (cells[8].textContent || cells[8].innerText).toLowerCase(); 
                 
                 const combinedText = name + " " + status + " " + type + " " + main_agency + " " + creator;
                 return combinedText.includes(filter);
@@ -479,7 +623,7 @@
             
             displayPage(1);
 
-            // Close mobile menu
+            // Close mobile menu when clicking outside
             document.addEventListener('click', (e) => {
                 const nav = document.getElementById('mainNavigation');
                 const toggle = document.querySelector('.mobile-menu-toggle');
@@ -489,9 +633,8 @@
             });
         });
 
-        // (ใหม่!) ฟังก์ชัน Share QR Code
+        // ฟังก์ชัน Share QR Code
         function showShareModal(title, originalUrl, linkId) {
-            // ใช้ลิงค์ถาวร /go/<ID>
             const permanentLink = `${window.location.origin}/go/${linkId}`;
             const qrImageUrl = `{{ url_for('generate_qr_code') }}?url=${encodeURIComponent(permanentLink)}`;
 
@@ -558,5 +701,5 @@
     s0.parentNode.insertBefore(s1,s0);
     })();
     </script>
-    </body>
+</body>
 </html>
