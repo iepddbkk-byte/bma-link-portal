@@ -9,7 +9,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
@@ -110,39 +110,93 @@
             background: linear-gradient(135deg, var(--button-red), var(--button-red-hover));
             padding: 6px 12px; font-size: 0.85rem;
         }
-		/* เพิ่มใน <style> */
-	.btn-share {
-    background: linear-gradient(135deg, #17a2b8, #138496); /* สีฟ้า Teal */
-    color: white;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-	}
-	.btn-share:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-	}
-/* จัดรูปแบบใน SweetAlert */
-	.qr-container {
-    text-align: center;
-    margin: 10px 0;
-}
-	.qr-img {
-    width: 200px;
-    height: 200px;
-    border: 2px solid #eee;
-    border-radius: 10px;
-    padding: 10px;
-	}
-	.share-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 15px;
-	}
+
+        /* (*** ❗️ ปรับปรุงดีไซน์ปุ่มแชร์ใหม่ ❗️ ***) */
+        .btn-share {
+            background: linear-gradient(135deg, #17a2b8, #138496); /* สีฟ้า Teal */
+            color: white;
+            padding: 0; /* เอา padding ออกเพื่อให้เป็นวงกลมสมบูรณ์ */
+            width: 36px; 
+            height: 36px;
+            font-size: 1rem;
+            border-radius: 50%; /* ทรงกลม */
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* เด้งดึ๋ง */
+            box-shadow: 0 2px 5px rgba(23, 162, 184, 0.3);
+        }
+        .btn-share:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+            background: linear-gradient(135deg, #138496, #117a8b);
+        }
+        .btn-share i {
+            margin-left: 1px; /* ปรับตำแหน่งไอคอนนิดหน่อย */
+        }
+
+        /* (*** ❗️ ปรับปรุงดีไซน์ Popup ❗️ ***) */
+        .qr-popup-container {
+            text-align: center;
+            padding: 10px;
+        }
+        .qr-title {
+            font-size: 1.2rem;
+            color: var(--bma-green);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .qr-link-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 15px;
+            word-break: break-all;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px dashed #ddd;
+        }
+        .qr-img-wrapper {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: inline-block;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+        .qr-img {
+            width: 200px;
+            height: 200px;
+            display: block;
+        }
+        .share-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-popup-copy {
+            background-color: var(--button-blue);
+            color: white;
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+            font-size: 1rem;
+        }
+        .btn-popup-download {
+            background-color: var(--bma-green);
+            color: white;
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+            font-size: 1rem;
+            display: inline-flex; /* แก้ไขให้ปุ่ม a แสดงผลเหมือนปุ่ม button */
+            align-items: center;
+            text-decoration: none;
+        }
 
         /* --- Container & Card --- */
         .container { max-width: 1400px; margin: 30px auto; padding: 20px; }
@@ -187,15 +241,10 @@
             font-size: 1.2rem;
         }
 
-        /* (*** ❗️ ใหม่ ❗️ สไตล์สำหรับ Dropdown Filter ***) */
         .filter-wrapper {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        .filter-label {
-            font-weight: 500;
-            white-space: nowrap;
         }
         #agencyFilter {
             width: 100%;
@@ -206,7 +255,6 @@
             border-radius: 12px;
             cursor: pointer;
             background-color: white;
-            /* Custom Arrow */
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300963C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
@@ -418,17 +466,17 @@
                             <th>📞 เบอร์ติดต่อ</th>
                             <th>👤 ผู้สร้าง</th>
                             <th>🗓️ วันที่อัปเดต</th>
-							<th>📤 แชร์</th>
+							<th style="text-align: center;">📤 แชร์</th>
                             <th>⚙️ จัดการ</th>
                         </tr>
                     </thead>
-<tbody id="linkTableBody">
+            <tbody id="linkTableBody">
                 
                 {% for link in links %}
                 <tr>
                     <td>
                         {% if link['สถานะ'] == 'ใช้งาน' %}
-                            <a href="{{ link['URL'] }}" target="_blank">{{ link['ชื่อลิงก์'] }}</a>
+                            <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green);">{{ link['ชื่อลิงก์'] }}</a>
                         {% else %}
                             {{ link['ชื่อลิงก์'] }}
                         {% endif %}
@@ -471,19 +519,20 @@
                     </td>
                     <td>{{ link['วันที่อัปเดต_สั้น'] }}</td>
                     <td style="text-align: center;">
-						<button type="button" 
+                        <button type="button" 
 						class="btn-share" 
-						onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}')">
-						<i class="fas fa-share-alt"></i>
+                        title="แชร์ QR Code"
+						onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')">
+						<i class="fas fa-qrcode"></i>
 						</button>
 					</td>
                     <td>
                         <div class="action-buttons">
                         {% if session.level == 'Admin' or (session.level == 'Users' and link['CreatorUsername'] == session.username) %}
                             <form action="{{ url_for('delete_link_action', link_id=link['ID']) }}" method="POST" class="delete-form">
-                                <button type="submit" class="btn-delete">🅾️ ลบ</button>
+                                <button type="submit" class="btn-delete" title="ลบข้อมูล">🅾️</button>
                             </form>
-                            <a href="{{ url_for('edit_link_page', link_id=link['ID']) }}" class="btn-edit">✏️ แก้ไข</a>
+                            <a href="{{ url_for('edit_link_page', link_id=link['ID']) }}" class="btn-edit" title="แก้ไขข้อมูล">✏️</a>
                         {% else %}
                             <i style="font-size: 0.9em; color: #6c757d;">(ไม่มีสิทธิ์)</i>
                         {% endif %}
@@ -492,7 +541,7 @@
                 </tr>
                 {% else %}
                 <tr id="noDataRow">
-                    <td colspan="11" style="text-align: center;">ไม่พบข้อมูลลิงค์</td>
+                    <td colspan="12" style="text-align: center;">ไม่พบข้อมูลลิงค์</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -537,7 +586,6 @@
         const tbody = document.getElementById("linkTableBody");
         const noDataRow = document.getElementById("noDataRow");
         const searchInput = document.getElementById("searchInput");
-        // (*** ❗️ ใหม่ ❗️ รับค่าจาก Dropdown ***)
         const agencyFilter = document.getElementById("agencyFilter");
 
         function toggleMobileMenu() {
@@ -567,19 +615,15 @@
             currentPage = page;
             const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
             const filterText = searchInput.value.toLowerCase();
-            const selectedAgency = agencyFilter.value; // (*** ❗️ ใหม่ ❗️ ***)
+            const selectedAgency = agencyFilter.value;
 
-            // (*** ❗️ แก้ไข Logic การกรอง ❗️ ***)
             const filteredRows = allTableRows.filter(row => {
-                // 1. กรองด้วยข้อความค้นหา
                 const cells = row.getElementsByTagName("td");
                 const textContent = Array.from(cells).map(cell => 
                     (cell.textContent || cell.innerText).toLowerCase()
                 ).join(" ");
                 const matchesText = textContent.includes(filterText);
 
-                // 2. กรองด้วยส่วนราชการ (Dropdown)
-                // ส่วนราชการอยู่คอลัมน์ที่ 7 (index 6)
                 const agencyCell = cells[6].textContent.trim();
                 const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);
 
@@ -623,7 +667,6 @@
             document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
             document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
             
-            // (*** ❗️ เพิ่ม Event Listeners ❗️ ***)
             searchInput.addEventListener('keyup', () => displayPage(1)); 
             agencyFilter.addEventListener('change', () => displayPage(1)); 
 
@@ -663,44 +706,52 @@
                 });
             });
         });
-	// เพิ่มฟังก์ชันนี้ลงใน <script> ท้ายไฟล์ dashboard.html
 
-	function showShareModal(title, url) {
-    // สร้าง URL สำหรับรูป QR Code โดยเรียกไปที่ Python Route ของเรา
-    // encodeURIComponent จำเป็นมาก เพื่อป้องกัน URL พัง
-    const qrImageUrl = "{{ url_for('generate_qr_code') }}?url=" + encodeURIComponent(url);
+    // 3. ฟังก์ชัน Share QR Code (ปรับปรุงดีไซน์)
+	function showShareModal(title, originalUrl, linkId) {
+        // ใช้ลิงค์ถาวร /go/<ID>
+        const permanentLink = `${window.location.origin}/go/${linkId}`;
+        const qrImageUrl = `{{ url_for('generate_qr_code') }}?url=${encodeURIComponent(permanentLink)}`;
 
-    Swal.fire({
-        title: '📤 แชร์ลิงค์',
-        html: `
-            <p style="color: #666; font-size: 0.9em; margin-bottom: 10px;">${title}</p>
-            <div class="qr-container">
-                <img src="${qrImageUrl}" class="qr-img" alt="QR Code">
-            </div>
-            <div class="share-actions">
-                <button onclick="copyToClipboard('${url}')" class="swal2-confirm swal2-styled" style="background-color: #007bff;">
-                    <i class="fas fa-copy"></i> คัดลอกลิงค์
-                </button>
-                <a href="${qrImageUrl}" download="QR-${title}.png" class="swal2-confirm swal2-styled" style="background-color: #28a745; text-decoration: none; display: inline-block;">
-                    <i class="fas fa-download"></i> โหลด QR
-                </a>
-            </div>
-        `,
-        showConfirmButton: false, // ซ่อนปุ่ม OK เดิม
-        showCloseButton: true,
-        width: 400
-    });
+        Swal.fire({
+            html: `
+                <div class="qr-popup-container">
+                    <div class="qr-title">📤 แชร์ลิงค์: ${title}</div>
+                    <div class="qr-link-text">${permanentLink}</div>
+                    
+                    <div class="qr-img-wrapper">
+                        <img src="${qrImageUrl}" class="qr-img" alt="QR Code">
+                    </div>
+                    
+                    <div class="share-actions">
+                        <button onclick="copyToClipboard('${permanentLink}')" class="btn btn-popup-copy">
+                            <i class="fas fa-copy"></i> คัดลอกลิงค์
+                        </button>
+                        <a href="${qrImageUrl}" download="QR-${title}.png" class="btn btn-popup-download">
+                            <i class="fas fa-download"></i> ดาวน์โหลด QR
+                        </a>
+                    </div>
+                </div>
+            `,
+            showConfirmButton: false,
+            showCloseButton: true,
+            width: 450,
+            padding: '20px',
+            customClass: {
+                popup: 'rounded-popup' // เพิ่มคลาสถ้าต้องการปรับแต่ง popup เพิ่มเติม
+            }
+        });
 	}
 
 	function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        const Toast = Swal.mixin({
-            toast: true, position: 'top-end', showConfirmButton: false, timer: 2000
+        navigator.clipboard.writeText(text).then(() => {
+            const Toast = Swal.mixin({
+                toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, timerProgressBar: true
+            });
+            Toast.fire({ icon: 'success', title: 'คัดลอกลิงค์แล้ว!' });
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
         });
-        Toast.fire({ icon: 'success', title: 'คัดลอกลิงค์แล้ว!' });
-    }).catch(err => {
-        console.error('Failed to copy: ', err);
-    });
 	}
     </script>
 
@@ -728,8 +779,7 @@
             {% endif %}
         {% endwith %}
     </script>
-    <!--Start of Tawk.to Script-->
-<script type="text/javascript">
+    <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
@@ -740,6 +790,5 @@ s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
-<!--End of Tawk.to Script-->
 </body>
 </html>

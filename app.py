@@ -1,9 +1,9 @@
 ﻿import gspread
-import qrcode # <--- เพิ่ม import
-from io import BytesIO # <--- เพิ่ม import
+import qrcode
+from io import BytesIO
 from flask import (
     Flask, jsonify, request, render_template, 
-    session, redirect, url_for, flash, send_file # <--- เพิ่ม send_file
+    session, redirect, url_for, flash, send_file
 )
 from oauth2client.service_account import ServiceAccountCredentials
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -15,6 +15,7 @@ import json
 import requests
 from collections import Counter
 from threading import Thread 
+from PIL import Image # (สำคัญ!) สำหรับจัดการ Logo
 
 # Import Flask-Mail และ itsdangerous
 from flask_mail import Mail, Message
@@ -70,7 +71,7 @@ try:
 except Exception as e:
     print(f"❌ เกิดข้อผิดพลาดในการเชื่อมต่อ Sheet: {e}")
 
-# --- 3.5. ข้อมูลคงที่สำหรับ Dropdown และหน้าแรก ---
+# --- 3.5. ข้อมูลคงที่ ---
 bureaus_list = [
     "สำนักงานเลขานุการสภากรุงเทพมหานคร", "สำนักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร",
     "สำนักงานคณะกรรมการข้าราชการกรุงเทพมหานคร", "สำนักปลัดกรุงเทพมหานคร", "สำนักการแพทย์",
@@ -96,18 +97,15 @@ districts_list = [
     "สำนักงานเขตหลักสี่", "สำนักงานเขตห้วยขวาง"
 ]
 
-# (*** ใหม่! ***) กำหนด Headers ของชีท Database (A-M)
 DB_HEADERS = [
     "ID", "ประเภท", "หน่วยงาน", "ส่วนราชการ", "อีเมลผู้รับผิดชอบ", "เบอร์โทรติดต่อ",
     "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus"
 ]
 
-# (*** ใหม่! ***) กำหนด Headers ของชีท StaffList (A-K)
 STAFF_HEADERS = [
     "Username", "PasswordHash", "Level", "ชื่อ", "ตำแหน่ง", 
     "หน่วยงาน", "ส่วนราชการ", "เบอร์โทร", "Email", "CreatedAt", "UpdatedAt"
 ]
-
 
 # --- 4. ฟังก์ชันตัวช่วย ---
 def generate_new_id():
@@ -122,10 +120,11 @@ def generate_invite_code():
     return f"INVITE-{code}"
 
 def records_to_dict(records_list, headers):
-    """ แปลง list of lists (ที่ได้จาก get_all_values) เป็น list of dicts และ .strip() ข้อมูล"""
+    """ แปลงข้อมูลและตัดช่องว่าง (Strip) พร้อมกรองแถวว่าง """
     records_dict = []
     for row in records_list[1:]:
-        if row and row[0]: 
+        # (สำคัญ!) กรองแถวว่าง: ต้องมี ID (คอลัมน์ 0)
+        if row and len(row) > 0 and row[0].strip(): 
             record = {}
             for i, header in enumerate(headers):
                 if i < len(row):
@@ -156,25 +155,20 @@ def send_reset_email(username, recipient_email):
         msg = Message("คำขอรีเซ็ตรหัสผ่าน - BMA Link Registry", recipients=[recipient_email])
         msg.body = f"""สวัสดีครับ,\nเราได้รับคำขอรีเซ็ตรหัสผ่านสำหรับ Username: {username}\nคลิกลิงค์เพื่อตั้งรหัสผ่านใหม่: {reset_url}\n(ลิงค์หมดอายุใน 1 ชั่วโมง)"""
         mail.send(msg)
-        print(f"✅ ส่งอีเมลสำเร็จไปยัง: {recipient_email}")
         return True
     except Exception as e:
-        print(f"❌ ส่งอีเมลล้มเหลว: {e}")
+        print(f"Mail Error: {e}")
         return False
 
-
-# --- 5. API (Check Username/Invite/Checker) ---
+# --- 5. API ---
 @app.route('/check_username', methods=['POST'])
 def check_username():
     if staff_sheet is None: return jsonify({'available': False, 'message': 'DB Error'})
     try:
         data = request.get_json()
         username = data.get('username')
-        if not username: return jsonify({'available': False})
-        
         all_staff = get_staff_records() 
         all_usernames = [u['Username'] for u in all_staff]
-        
         is_available = username.lower() not in [u.lower() for u in all_usernames]
         return jsonify({'available': is_available})
     except: return jsonify({'available': False})
@@ -198,94 +192,116 @@ def run_link_checker():
     secret_key = os.environ.get('CHECKER_SECRET', 'my_super_secret_checker_key')
     if key != secret_key: return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
     if db_sheet is None: return jsonify({'status': 'error', 'message': 'Database not connected'}), 500
-    print("🚀 (CHECKER) เริ่มตรวจสอบลิงค์...")
     try:
         records = get_db_records()
         updates = []
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-
+        headers = {'User-Agent': 'Mozilla/5.0'}
         for i, record in enumerate(records[:30]): 
-            row_index = i + 2 # +2 เพราะ index เริ่มที่ 0 และแถวแรกคือ Header
+            row_index = i + 2 
             url = record.get('URL')
-            if not url: continue
-            if not url.startswith('http'): url = 'http://' + url
             status_msg = "Unknown"
-            try:
-                resp = requests.get(url, headers=headers, timeout=3)
-                if 200 <= resp.status_code < 300: status_msg = "OK"
-                elif resp.status_code == 403: status_msg = "OK"
-                else: status_msg = f"{resp.status_code} Error"
-            except:
-                status_msg = "Error/Timeout"
+            if url and url.startswith('http'):
+                try:
+                    resp = requests.get(url, headers=headers, timeout=3)
+                    status_msg = "OK" if 200 <= resp.status_code < 300 or resp.status_code == 403 else f"{resp.status_code} Error"
+                except:
+                    status_msg = "Error/Timeout"
             
             updates.append({'range': f'M{row_index}', 'values': [[status_msg]]})
         
         if updates:
             db_sheet.batch_update(updates, value_input_option='RAW')
-            return jsonify({'status': 'success', 'message': f'Checked {len(updates)} links successfully'})
+            return jsonify({'status': 'success', 'message': f'Checked {len(updates)} links'})
             
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
     return jsonify({'status': 'success', 'message': 'No links checked'})
 
-# --- (ใหม่!) QR CODE GENERATION & REDIRECTION ---
-
-# (ใหม่!) Route สำหรับสร้าง QR Code Image (On-the-fly)
+# --- QR CODE GENERATION (WITH LOGO) ---
 @app.route('/generate_qr')
 def generate_qr_code():
-    # รับ URL ที่เป็นลิงค์ถาวร (/go/...) จาก Frontend
     url_to_encode = request.args.get('url')
     if not url_to_encode:
         return "No URL provided", 400
     
-    # สร้าง QR Code
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(url_to_encode)
-    qr.make(fit=True)
+    try:
+        # สร้าง QR Code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H, # H = High Error Correction (จำเป็นสำหรับใส่ Logo)
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(url_to_encode)
+        qr.make(fit=True)
 
-    # สร้างรูปภาพ
-    img = qr.make_image(fill_color="black", back_color="white")
-    
-    # บันทึกลง Memory (RAM) แทนการบันทึกลงไฟล์
-    img_io = BytesIO()
-    img.save(img_io, 'PNG')
-    img_io.seek(0)
-    
-    return send_file(img_io, mimetype='image/png', as_attachment=False)
+        # สร้างรูปภาพ QR (ต้องแปลงเป็น RGBA เพื่อรองรับความโปร่งใสของ Logo)
+        img = qr.make_image(fill_color="black", back_color="white").convert('RGBA')
+        
+        # (ใหม่!) ฝังโลโก้
+        logo_path = os.path.join(app.root_path, 'pictures', 'qr_logo.png')
+        
+        if os.path.exists(logo_path):
+            logo = Image.open(logo_path).convert('RGBA')
+            
+            # คำนวณขนาดโลโก้ (เช่น 25% ของ QR Code)
+            qr_width, qr_height = img.size
+            logo_size = int(qr_width * 0.25) 
+            
+            # ปรับขนาดโลโก้
+            logo = logo.resize((logo_size, logo_size), Image.LANCZOS)
+            
+            # คำนวณตำแหน่งวาง (ตรงกลาง)
+            pos = ((qr_width - logo_size) // 2, (qr_height - logo_size) // 2)
+            
+            # วางโลโก้ลงไป (ใช้ logo เป็น mask ด้วยเพื่อความคมชัดของขอบใส)
+            img.paste(logo, pos, logo)
+        
+        # บันทึกลง Memory
+        img_io = BytesIO()
+        img.save(img_io, 'PNG')
+        img_io.seek(0)
+        
+        return send_file(img_io, mimetype='image/png', as_attachment=False)
 
+    except Exception as e:
+        print(f"QR Error: {e}")
+        return f"QR Generation Error: {e}", 500
 
-# (ใหม่!) Route สำหรับ Redirection ถาวร (Indirection Layer)
+# Indirection Layer
 @app.route('/go/<link_id>')
 def go_to_link(link_id):
     try:
         all_links = get_db_records()
-        # ค้นหาลิงค์ที่ตรงกับ ID
         link = next((l for l in all_links if l.get('ID', '').strip() == link_id.strip()), None)
         
         if link and link.get('URL'):
-            # (*** นวัตกรรม! ***) Redirect ไปยัง URL ปัจจุบันใน Sheet
             return redirect(link['URL']) 
-        
-        # ถ้าไม่พบลิงค์ หรือ URL ว่าง
-        return render_template('error.html', message="ไม่พบลิงค์ที่คุณค้นหา หรือลิงค์ถูกลบไปแล้ว") 
-        
+        return render_template('error.html', message="ไม่พบลิงค์ที่คุณค้นหา") 
     except Exception as e:
-        print(f"[ERROR] Go-to-link error: {e}")
-        return render_template('error.html', message="เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล") 
-
+        print(f"Go Error: {e}")
+        return render_template('error.html', message="Error connecting to database") 
 
 # --- 6. Routes (General) ---
 @app.route('/')
 def home():
-    return render_template('index.html', 
-                           session=session,
-                           bureaus=bureaus_list,
-                           districts=districts_list)
+    if db_sheet is None: 
+        return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=[], error="Sheet Error")
+    try:
+        all_records = get_db_records()
+        links_for_home = [link for link in all_records if link.get('สถานะ') == 'ใช้งาน']
+        for link in links_for_home:
+            date_str = link.get('วันที่อัปเดต')
+            link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
+
+        return render_template('index.html', 
+                               session=session,
+                               bureaus=bureaus_list,
+                               districts=districts_list,
+                               links=links_for_home, 
+                               error=None)
+    except Exception as e: 
+        return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=[], error=str(e))
 
 @app.route('/links')
 def links_page():
@@ -296,27 +312,25 @@ def links_page():
         all_records = get_db_records()
         
         if agency_filter:
-            links_to_display = [
-                link for link in all_records 
-                if link.get('สถานะ') == 'ใช้งาน' and link.get('ส่วนราชการ') == agency_filter
-            ]
+            links_to_display = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน' and l.get('ส่วนราชการ') == agency_filter]
             page_title = agency_filter
         else:
-            links_to_display = [
-                link for link in all_records 
-                if link.get('สถานะ') == 'ใช้งาน'
-            ]
+            links_to_display = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน']
             page_title = "ลิงค์ทั้งหมด"
+        
+        for link in links_to_display:
+            date_str = link.get('วันที่อัปเดต')
+            link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
 
         return render_template('links_page.html', 
                                links=links_to_display, 
                                error=None, 
                                session=session,
-                               agency_name=page_title)
-        
+                               agency_name=page_title,
+                               bureaus=bureaus_list,
+                               districts=districts_list)
     except Exception as e: 
         return render_template('links_page.html', links=[], error=str(e), session=session, agency_name="Error")
-
 
 # --- 7. Routes (Auth) ---
 @app.route('/login')
@@ -336,11 +350,10 @@ def login_action():
         if user_found and check_password_hash(user_found['PasswordHash'], password):
             session['logged_in'] = True
             session['username'] = user_found['Username']
-            session['level'] = user_found['Level']       
+            session['level'] = user_found['Level'] 
             session['name'] = user_found['ชื่อ']
             session['email'] = user_found['Email']
             session['main_agency'] = user_found.get('ส่วนราชการ', 'N/A') 
-            
             flash('เข้าสู่ระบบสำเร็จ!', 'success') 
             return redirect(url_for('dashboard'))
         else:
@@ -370,9 +383,7 @@ def register_action():
         fullname = request.form.get('fullname')
         email = request.form.get('email')
         phone = request.form.get('phone')
-        
-        if phone and not phone.startswith("'"):
-            phone = "'" + phone # (Fix) Format phone for Sheet
+        if phone and not phone.startswith("'"): phone = "'" + phone
             
         invite_code = request.form.get('invite_code')
         position = request.form.get('position') 
@@ -380,8 +391,7 @@ def register_action():
         main_agency = request.form.get('main_agency') 
 
         all_staff = get_staff_records()
-        all_usernames = [u['Username'] for u in all_staff]
-        if username.lower() in [u.lower() for u in all_usernames]:
+        if username.lower() in [u['Username'].lower() for u in all_staff]:
             flash('Username ซ้ำ', 'error'); return redirect(url_for('register_page'))
         
         code_cell = invite_sheet.find(invite_code)
@@ -392,19 +402,9 @@ def register_action():
         current_time = get_current_timestamp()
         
         new_row_final = [
-            username,           # A
-            hashed_password,    # B
-            'Users',            # C
-            fullname,           # D
-            position,           # E
-            division,           # F
-            main_agency,        # G
-            phone,              # H
-            email,              # I
-            current_time,       # J
-            current_time        # K
+            username, hashed_password, 'Users', fullname, position, division, 
+            main_agency, phone, email, current_time, current_time
         ]
-
         staff_sheet.append_row(new_row_final, value_input_option='USER_ENTERED')
         
         invite_sheet.update_cell(code_cell.row, 2, "Used")
@@ -426,10 +426,7 @@ def forgot_password():
             all_staff = get_staff_records() 
             user_found = next((u for u in all_staff if u['Username'].lower() == username_input.lower()), None)
             if user_found:
-                success = send_reset_email(user_found['Username'], user_found['Email'])
-                if not success:
-                     flash('เกิดข้อผิดพลาดในการส่งอีเมล', 'error')
-                     return redirect(url_for('forgot_password'))
+                send_reset_email(user_found['Username'], user_found['Email'])
             flash('หากพบข้อมูล ระบบได้ส่งอีเมลไปแล้ว', 'info')
             return redirect(url_for('login_page'))
         except Exception as e:
@@ -451,13 +448,12 @@ def reset_password_page(token):
             new_hash = generate_password_hash(password)
             cell = staff_sheet.find(username)
             if cell:
-                staff_sheet.update_cell(cell.row, 2, new_hash) # Col B: PasswordHash
-                staff_sheet.update_cell(cell.row, 11, get_current_timestamp()) # Col K: UpdatedAt
+                staff_sheet.update_cell(cell.row, 2, new_hash) 
+                staff_sheet.update_cell(cell.row, 11, get_current_timestamp())
                 flash('เปลี่ยนรหัสผ่านสำเร็จ', 'success')
                 return redirect(url_for('login_page'))
         except: flash('Error updating password', 'error')
     return render_template('reset_password.html', token=token)
-
 
 # --- 8. Routes (Profile & Edit) ---
 @app.route('/profile')
@@ -495,9 +491,7 @@ def edit_profile_action():
         fullname = request.form.get('fullname')
         email = request.form.get('email')
         phone = request.form.get('phone')
-        
-        if phone and not phone.startswith("'"):
-            phone = "'" + phone # (Fix) Format phone for Sheet
+        if phone and not phone.startswith("'"): phone = "'" + phone
 
         position = request.form.get('position')
         division = request.form.get('division') 
@@ -516,13 +510,11 @@ def edit_profile_action():
             session['name'] = fullname
             session['email'] = email
             session['main_agency'] = main_agency
-            
             flash('บันทึกเรียบร้อย', 'success')
             return redirect(url_for('profile_page'))
     except Exception as e:
         flash(f'Error: {e}', 'error')
         return redirect(url_for('edit_profile_page'))
-
 
 # --- 9. Routes (Dashboard & Links) ---
 @app.route('/dashboard')
@@ -531,26 +523,13 @@ def dashboard():
     if db_sheet is None: return render_template('dashboard.html', session=session, links=[])
     try: 
         all_links = get_db_records() 
-        
-        # ประมวลผลวันที่ล่วงหน้า
         for link in all_links:
             date_str = link.get('วันที่อัปเดต')
-            if date_str:
-                try:
-                    link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0]
-                except:
-                    link['วันที่อัปเดต_สั้น'] = date_str 
-            else:
-                link['วันที่อัปเดต_สั้น'] = ''
+            link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
 
-        return render_template('dashboard.html', 
-                               session=session, 
-                               links=all_links,
-                               bureaus=bureaus_list,      
-                               districts=districts_list)  
-
+        return render_template('dashboard.html', session=session, links=all_links, bureaus=bureaus_list, districts=districts_list)  
     except Exception as e: 
-        print(f"Dashboard Error: {e}") 
+        print(f"Dashboard Error: {e}")
         return redirect(url_for('home'))
 
 @app.route('/add')
@@ -563,30 +542,15 @@ def add_link_page():
 def add_link_action():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        data = {k: request.form.get(k) for k in [
-            'ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ',
-            'ชื่อลิงก์', 'URL', 'รายละเอียด', 'สถานะ'
-        ]}
-        
-        # (ใหม่!) บังคับให้เบอร์โทรเป็น Text
-        if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"):
-            data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
-            
+        data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'รายละเอียด', 'สถานะ']}
+        if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         main_agency = session.get('main_agency', 'N/A') 
         
         new_row = [
-            generate_new_id(),  # A
-            data['ประเภท'],       # B
-            data['หน่วยงาน'],     # C
-            main_agency,        # D
-            data['อีเมลผู้รับผิดชอบ'], # E
-            data['เบอร์โทรติดต่อ'], # F (With quote)
-            data['ชื่อลิงก์'],    # G
-            data['URL'],        # H
-            data['สถานะ'],      # I
-            data['รายละเอียด'],   # J
-            get_current_timestamp(), # K
-            session.get('username') # L
+            generate_new_id(), data['ประเภท'], data['หน่วยงาน'], main_agency, 
+            data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
+            data['URL'], data['สถานะ'], data['รายละเอียด'], 
+            get_current_timestamp(), session.get('username'), ''
         ]
         db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
         flash('เพิ่มลิงค์สำเร็จ', 'success'); return redirect(url_for('dashboard'))
@@ -597,13 +561,12 @@ def add_link_action():
 def delete_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        cell = db_sheet.find(link_id) 
+        cell = db_sheet.find(link_id)
         if not cell: return redirect(url_for('dashboard'))
         
         row_data = db_sheet.row_values(cell.row)
         creator = row_data[11].strip() 
-        
-        if session.get('level', '').strip() == 'Admin' or creator.strip() == session.get('username', '').strip():
+        if session.get('level', '').strip() == 'Admin' or creator == session.get('username', '').strip():
             db_sheet.delete_rows(cell.row)
             flash('ลบสำเร็จ', 'success')
         else:
@@ -613,18 +576,10 @@ def delete_link_action(link_id):
 
 @app.route('/edit/<link_id>')
 def edit_link_page(link_id):
-    if not session.get('logged_in'): 
-        return redirect(url_for('login_page'))
-    
+    if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
         all_links = get_db_records()
-        
-        link = None
-        for l in all_links:
-            if l.get('ID', '').strip() == link_id.strip(): 
-                link = l
-                break
-        
+        link = next((l for l in all_links if l.get('ID', '').strip() == link_id.strip()), None)
         if not link: 
             flash(f'ไม่พบลิงค์ ID: {link_id}', 'error')
             return redirect(url_for('dashboard'))
@@ -634,21 +589,12 @@ def edit_link_page(link_id):
         is_admin = (session.get('level', '').strip() == 'Admin')
         
         if not is_admin and creator != username:
-            print(f'[ERROR] ไม่มีสิทธิ์แก้ไข - Creator: "{creator}" vs User: "{username}"')
             flash('คุณไม่มีสิทธิ์แก้ไขลิงก์นี้', 'error')
             return redirect(url_for('dashboard'))
         
-        return render_template('edit_link.html', 
-                               session=session, 
-                               link=link,
-                               locked_agency=link.get('ส่วนราชการ', 'N/A'),
-                               is_admin=is_admin)
-    
+        return render_template('edit_link.html', session=session, link=link, locked_agency=link.get('ส่วนราชการ', 'N/A'), is_admin=is_admin)
     except Exception as e: 
         print(f'[ERROR] Edit Page Error: {str(e)}')
-        import traceback
-        traceback.print_exc()
-        flash(f'เกิดข้อผิดพลาด: {str(e)}', 'error')
         return redirect(url_for('dashboard'))
 
 @app.route('/update_action/<link_id>', methods=['POST'])
@@ -664,39 +610,21 @@ def update_link_action(link_id):
         if session.get('level', '').strip() != 'Admin' and creator != session.get('username', '').strip():
              flash('ไม่มีสิทธิ์', 'error'); return redirect(url_for('dashboard'))
         
-        data = {k: request.form.get(k) for k in [
-            'ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ',
-            'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด'
-        ]}
-        
-        # (ใหม่!) บังคับให้เบอร์โทรเป็น Text
-        if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"):
-            data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
-        
-        if session.get('level', '').strip() == 'Admin':
-            main_agency = request.form.get('ส่วนราชการ')
-        else:
-            main_agency = row_vals[3] 
+        data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด']}
+        if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
+
+        main_agency = request.form.get('ส่วนราชการ') if session.get('level', '').strip() == 'Admin' else row_vals[3]
         
         new_vals = [
-            link_id,            # A
-            data['ประเภท'],       # B
-            data['หน่วยงาน'],     # C
-            main_agency,        # D
-            data['อีเมลผู้รับผิดชอบ'], # E
-            data['เบอร์โทรติดต่อ'], # F (With quote)
-            data['ชื่อลิงก์'],    # G
-            data['URL'],        # H
-            data['สถานะ'],      # I
-            data['รายละเอียด'],   # J
-            get_current_timestamp(), # K
-            creator             # L
+            link_id, data['ประเภท'], data['หน่วยงาน'], main_agency, 
+            data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
+            data['URL'], data['สถานะ'], data['รายละเอียด'], 
+            get_current_timestamp(), creator, row_vals[12] if len(row_vals) > 12 else ''
         ]
-        range_name = f"A{cell.row}:L{cell.row}"
+        range_name = f"A{cell.row}:M{cell.row}"
         db_sheet.update(range_name, [new_vals])
         flash('แก้ไขสำเร็จ', 'success'); return redirect(url_for('dashboard'))
     except: return redirect(url_for('dashboard'))
-
 
 # --- 10. Routes (Admin & Analytics & Feedback) ---
 @app.route('/analytics')
@@ -720,14 +648,10 @@ def analytics_page():
                 except: pass
         sorted_m = sorted(monthly.items())
         
-        sat, ease, comments, features = [], [], [], []
-        for f in feedback:
-            try: sat.append(int(f['SatisfactionScore']))
-            except: pass
-            try: ease.append(int(f['EaseOfUseScore']))
-            except: pass
-            if f.get('Comments'): comments.append({'user': f['Username'], 'text': f['Comments']})
-            if f.get('FeatureRequest'): features.append({'user': f['Username'], 'text': f['FeatureRequest']})
+        sat = [int(f['SatisfactionScore']) for f in feedback if f.get('SatisfactionScore')]
+        ease = [int(f['EaseOfUseScore']) for f in feedback if f.get('EaseOfUseScore')]
+        comments = [{'user': f['Username'], 'text': f['Comments']} for f in feedback if f.get('Comments')]
+        features = [{'user': f['Username'], 'text': f['FeatureRequest']} for f in feedback if f.get('FeatureRequest')]
 
         chart_data = {
             "total_links": len(links), "total_users": len(users), 
@@ -747,12 +671,10 @@ def analytics_page():
 def admin_panel():
     if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': return redirect(url_for('dashboard'))
     try:
-        return render_template('admin_panel.html', 
-                               session=session, 
-                               staff_list=get_staff_records(), 
-                               invite_codes=invite_sheet.get_all_records())
+        return render_template('admin_panel.html', session=session, staff_list=get_staff_records(), invite_codes=invite_sheet.get_all_records())
     except: return redirect(url_for('dashboard'))
 
+# ... (Admin Actions - change_level, delete_user, generate_code, delete_code ... เหมือนเดิม) ...
 @app.route('/admin/change_level', methods=['POST'])
 def change_user_level():
     if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': return redirect(url_for('login_page'))
@@ -760,9 +682,7 @@ def change_user_level():
         user, level = request.form.get('username'), request.form.get('level')
         if user == session.get('username'): flash('เปลี่ยนระดับตัวเองไม่ได้', 'error'); return redirect(url_for('admin_panel'))
         cell = staff_sheet.find(user)
-        if cell: 
-            staff_sheet.update_cell(cell.row, 3, level) # C (Level)
-            flash('สำเร็จ', 'success')
+        if cell: staff_sheet.update_cell(cell.row, 3, level); flash('สำเร็จ', 'success')
     except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
 
@@ -813,8 +733,7 @@ def feedback_action():
 
 @app.route('/get_links', methods=['GET'])
 def get_all_links():
-    try: 
-        return jsonify({"status": "success", "data": get_db_records()})
+    try: return jsonify({"status": "success", "data": get_db_records()})
     except: return jsonify({"status": "error"}), 500
 
 if __name__ == '__main__':
