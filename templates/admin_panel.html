@@ -115,6 +115,51 @@
             color: var(--text-color);
             padding: 5px;
         }
+		/* --- เพิ่มส่วนนี้ใน <style> --- */
+
+        /* จัดกลุ่ม Logo กับ Stats ให้อยู่ทางซ้าย */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px; 
+        }
+
+        /* กล่องแสดงจำนวนคนออนไลน์ */
+        .header-online-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--bma-green-light);
+            color: var(--bma-green);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--bma-green);
+            white-space: nowrap;
+        }
+
+        /* Mobile Responsive: ซ่อนคำว่า 'ออนไลน์' บนมือถือเพื่อประหยัดพื้นที่ */
+        @media (max-width: 768px) {
+            .header-online-count span:last-child { display: none; }
+        }
+
+        /* Animation จุดสีเขียวกระพริบ */
+        .pulsating-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
 
         /* --- Admin Grid Layout --- */
         .container {
@@ -250,11 +295,19 @@
 </head>
 <body>
     
-    <header class="main-header">
-        <a href="{{ url_for('home') }}" class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-        </a>
+		<header class="main-header">
+        <div class="header-left">
+            <a href="{{ url_for('home') }}" class="logo-container">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            </a>
+            
+            <div class="header-online-count" title="ผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
+                <span class="pulsating-dot"></span>
+                <span id="onlineCount">-</span>
+                <span>ออนไลน์</span>
+            </div>
+        </div>
 
         <div class="mobile-controls">
             {% if session.get('logged_in') %}
@@ -487,6 +540,56 @@
             {% endif %}
         {% endwith %}
     </script>
+	
+	<script>
+        function updateOnlineCount() {
+            // ดึง CSRF Token จาก meta tag หรือตัวแปร Jinja (ถ้ามี)
+            // เราจะลองส่งไปใน Header เพื่อผ่านระบบความปลอดภัยของ Flask
+            
+            fetch("{{ url_for('heartbeat') }}", { 
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}" 
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP error " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if(data.online_count !== undefined) {
+                    const el = document.getElementById('onlineCount');
+                    if(el) {
+                        el.textContent = data.online_count;
+                        // ถ้าตัวเลขขึ้นแล้ว ให้เปลี่ยนสีให้รู้ว่าทำงาน (Visual Debug)
+                        el.style.color = "var(--bma-green)"; 
+                    }
+                }
+            })
+            .catch(err => {
+                console.error("Heartbeat error:", err);
+                // ถ้ายังไม่ได้ ให้ลองเปลี่ยนเป็น "-" เหมือนเดิม
+                const el = document.getElementById('onlineCount');
+                if(el) el.textContent = "-";
+            });
+        }
+
+        // เรียกทำงานทันทีและวนซ้ำ
+        updateOnlineCount();
+        setInterval(updateOnlineCount, 10000);
+
+        window.addEventListener('beforeunload', function() {
+            // ใช้ Beacon ซึ่งเสถียรกว่าสำหรับการปิดหน้าเว็บ
+            const data = new FormData();
+            const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
+            data.append('csrf_token', csrfToken);
+            navigator.sendBeacon("{{ url_for('offline') }}", data);
+        });
+    </script>
+	
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
