@@ -131,7 +131,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* (ปรับปรุง!) Title */
+        /* Title */
         h1 { 
             color: var(--bma-green);
             font-size: 2em;
@@ -197,10 +197,9 @@
             padding: 16px; 
             text-align: left; 
             border-bottom: 1px solid var(--border-color);
-            white-space: nowrap; /* (ปรับปรุง) กันข้อความตกบรรทัด */
+            white-space: nowrap; 
         }
         
-        /* (ปรับปรุง!) ทำให้คอลัมน์รายละเอียดขยายได้ */
         td:nth-child(2) { 
              white-space: normal; 
              min-width: 200px;
@@ -265,11 +264,44 @@
         .btn-profile { background: linear-gradient(135deg, var(--button-yellow), var(--button-yellow-hover)); color: #212529 !important; }
         .btn-logout { background: linear-gradient(135deg, var(--button-red), var(--button-red-hover)); }
         .btn-login { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); }
-        
-        /* (ใหม่) ปุ่มกลับหน้าแรก (Portal) */
-        .btn-portal {
-             background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
+        .btn-portal { background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover)); }
+
+        /* (*** ❗️ ใหม่ ❗️ ดีไซน์ปุ่มแชร์ ***) */
+        .btn-share {
+            background: linear-gradient(135deg, #17a2b8, #138496); /* สีฟ้า Teal */
+            color: white;
+            padding: 0; /* เอา padding ออกเพื่อให้เป็นวงกลม */
+            width: 36px; height: 36px;
+            border-radius: 50%; /* ทรงกลม */
+            border: none;
+            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 2px 5px rgba(23, 162, 184, 0.3);
         }
+        .btn-share:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+            background: linear-gradient(135deg, #138496, #117a8b);
+        }
+        .btn-share i { font-size: 1rem; }
+
+        /* (*** ❗️ ใหม่ ❗️ ดีไซน์ Popup Share ***) */
+        .qr-popup-container { text-align: center; padding: 10px; }
+        .qr-title { font-size: 1.2rem; color: var(--bma-green); font-weight: 600; margin-bottom: 5px; }
+        .qr-link-text {
+            font-size: 0.85rem; color: #666; margin-bottom: 15px; word-break: break-all;
+            background: #f8f9fa; padding: 8px; border-radius: 8px; border: 1px dashed #ddd;
+        }
+        .qr-img-wrapper {
+            background: white; padding: 15px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: inline-block;
+            margin-bottom: 20px; border: 1px solid #eee;
+        }
+        .qr-img { width: 200px; height: 200px; display: block; }
+        .share-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn-popup-copy { background-color: var(--button-blue); width: 100%; justify-content: center; padding: 12px; font-size: 1rem; }
+        .btn-popup-download { background-color: var(--bma-green); width: 100%; justify-content: center; padding: 12px; font-size: 1rem; display: inline-flex; align-items: center; text-decoration: none; }
 
         /* Pagination */
         .pagination-controls {
@@ -324,6 +356,13 @@
             button { padding: 8px 15px; font-size: 0.9em; }
             .pagination-controls { flex-direction: column; align-items: stretch; }
             .pagination-items, .pagination-nav { justify-content: center; }
+            
+            /* Hide columns on mobile */
+            th:nth-child(2), td:nth-child(2),
+            th:nth-child(5), td:nth-child(5),
+            th:nth-child(7), td:nth-child(7),
+            th:nth-child(8), td:nth-child(8),
+            th:nth-child(10), td:nth-child(10) { display: none; }
         }
 
         /* (ที่เหลือเหมือนเดิม) */
@@ -420,22 +459,26 @@
                                 <button onclick="sortTable(0, 'desc')">Z-A (ฮ-ก)</button>
                             </div>
                         </th>
-                        <th>📄 รายละเอียด</th> <th>🚦 สถานะลิงค์</th>
+                        <th>📄 รายละเอียด</th> 
+                        <th>🚦 สถานะลิงค์</th>
                         <th>📊 สถานะการใช้งาน</th>
                         <th>📂 ประเภท</th>
-                        <th>🏢 หน่วยงาน (กลุ่ม/ฝ่าย/กอง)</th> <th>🏛️ ส่วนราชการ (สำนัก/เขต)</th> <th>📞 เบอร์ติดต่อ</th>
+                        <th>🏢 หน่วยงาน (กลุ่ม/ฝ่าย/กอง)</th> 
+                        <th>🏛️ ส่วนราชการ (สำนัก/เขต)</th> 
+                        <th>📞 เบอร์ติดต่อ</th>
                         <th>👤 ผู้สร้าง</th>
                         <th>🗓️ วันที่อัปเดต</th>
-                    </tr>
+                        <th style="text-align: center;">📤 แชร์</th> </tr>
                 </thead>
                 <tbody id="linkTableBody">
                     
                     {% for link in links %}
                     <tr>
                         <td>
-                            <a href="{{ link.URL }}" target="_blank">{{ link.ชื่อลิงก์ }}</a>
+                            <a href="{{ link.URL }}" target="_blank" style="font-weight: 500; color: var(--bma-green);">{{ link.ชื่อลิงก์ }}</a>
                         </td>
-                        <td>{{ link.รายละเอียด }}</td> <td>
+                        <td>{{ link.รายละเอียด }}</td> 
+                        <td>
                             {% if link.LinkStatus == 'OK' %}
                                 <span class="status-badge status-ok">🟢 ปกติ</span>
                             {% elif link.LinkStatus == '403 Blocked' %}
@@ -459,19 +502,30 @@
                             {% endif %}
                         </td>
                         <td>{{ link.ประเภท }}</td>
-                        <td>{{ link.หน่วยงาน }}</td> <td>{{ link.ส่วนราชการ }}</td> <td>{{ link.เบอร์โทรติดต่อ }}</td>
+                        <td>{{ link.หน่วยงาน }}</td> 
+                        <td>{{ link.ส่วนราชการ }}</td> 
+                        <td>{{ link.เบอร์โทรติดต่อ }}</td>
                         
                         <td>
-                            <a href="{{ url_for('view_profile', username=link.CreatorUsername) }}" target="_blank" style="font-weight: 500;">
+                            <a href="{{ url_for('view_profile', username=link.CreatorUsername) }}" target="_blank" style="font-weight: 500; color: #333;">
                                 {{ link.CreatorUsername }}
                             </a>
                         </td>
 
                         <td>{{ link.วันที่อัปเดต.split(' ')[0] }}</td>
+                        
+                        <td style="text-align: center;">
+                            <button type="button" 
+                                    class="btn-share" 
+                                    title="แชร์ QR Code"
+                                    onclick="showShareModal('{{ link.ชื่อลิงก์ }}', '{{ link.URL }}', '{{ link.ID }}')">
+                                <i class="fas fa-qrcode"></i>
+                            </button>
+                        </td>
                     </tr>
                     {% else %}
                     <tr id="noDataRow">
-                        <td colspan="10" style="text-align: center; padding: 30px; color: #999;">
+                        <td colspan="11" style="text-align: center; padding: 30px; color: #999;">
                             🔭 ไม่พบข้อมูลลิงค์สำหรับ {{ agency_name }}
                         </td>
                     </tr>
@@ -550,12 +604,11 @@
             const filteredRows = allTableRows.filter(row => {
                 const cells = row.getElementsByTagName("td");
                 
-                // (ปรับปรุง!) อัปเดตการค้นหาให้ตรงคอลัมน์
-                const name = (cells[0].textContent || cells[0].innerText).toLowerCase(); // ชื่อลิงค์
-                const status = (cells[3].textContent || cells[3].innerText).toLowerCase(); // สถานะใช้งาน
-                const type = (cells[4].textContent || cells[4].innerText).toLowerCase(); // ประเภท
-                const main_agency = (cells[6].textContent || cells[6].innerText).toLowerCase(); // ส่วนราชการ
-                const creator = (cells[8].textContent || cells[8].innerText).toLowerCase(); // ผู้สร้าง
+                const name = (cells[0].textContent || cells[0].innerText).toLowerCase(); 
+                const status = (cells[3].textContent || cells[3].innerText).toLowerCase(); 
+                const type = (cells[4].textContent || cells[4].innerText).toLowerCase(); 
+                const main_agency = (cells[6].textContent || cells[6].innerText).toLowerCase(); 
+                const creator = (cells[8].textContent || cells[8].innerText).toLowerCase(); 
                 
                 const combinedText = name + " " + status + " " + type + " " + main_agency + " " + creator;
                 return combinedText.includes(filter);
@@ -608,6 +661,53 @@
 				}
             });
         });
+
+        // (*** ❗️ เพิ่มฟังก์ชัน Share QR Code ❗️ ***)
+        function showShareModal(title, originalUrl, linkId) {
+            // ใช้ลิงค์ถาวร /go/<ID>
+            const permanentLink = `${window.location.origin}/go/${linkId}`;
+            const qrImageUrl = `{{ url_for('generate_qr_code') }}?url=${encodeURIComponent(permanentLink)}`;
+
+            Swal.fire({
+                html: `
+                    <div class="qr-popup-container">
+                        <div class="qr-title">📤 แชร์ลิงค์: ${title}</div>
+                        <div class="qr-link-text">${permanentLink}</div>
+                        
+                        <div class="qr-img-wrapper">
+                            <img src="${qrImageUrl}" class="qr-img" alt="QR Code">
+                        </div>
+                        
+                        <div class="share-actions">
+                            <button onclick="copyToClipboard('${permanentLink}')" class="btn btn-popup-copy">
+                                <i class="fas fa-copy"></i> คัดลอกลิงค์
+                            </button>
+                            <a href="${qrImageUrl}" download="QR-${title}.png" class="btn btn-popup-download">
+                                <i class="fas fa-download"></i> ดาวน์โหลด QR
+                            </a>
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true,
+                width: 450,
+                padding: '20px'
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const Toast = Swal.mixin({
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+                Toast.fire({ icon: 'success', title: 'คัดลอกลิงค์แล้ว!' });
+            });
+        }
     </script>
 		
     <script>
@@ -624,18 +724,17 @@
             {% endif %}
         {% endwith %}
     </script>
-	  <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->	
-</body>
+    
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    </body>
 </html>
