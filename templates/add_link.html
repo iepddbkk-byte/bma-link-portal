@@ -267,7 +267,7 @@
     <div class="container">
         <h2>เพิ่มลิงค์ใหม่</h2>
 
-        <form action="{{ url_for('add_link_action') }}" method="POST">
+        <form id="addLinkForm" action="{{ url_for('add_link_action') }}" method="POST">
             <div>
                 <label for="ชื่อลิงก์">ชื่อลิงค์ (จำเป็น)</label>
                 <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" placeholder="ระบุชื่อลิงค์ที่ต้องการ..." required>
@@ -400,28 +400,30 @@
             }
         }
 
-        // --- Phone Number Cleaning Script ---
+        // --- Phone Number Cleaning Script (FIXED & ROBUST) ---
+        
+        // 1. ดักจับตอน Submit (สำคัญที่สุด: ล้างก่อนส่งแน่นอน)
+        document.getElementById('addLinkForm').addEventListener('submit', function(e) {
+            const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
+            if (phoneInput) {
+                // ลบเครื่องหมาย ' ทั้งหมดออกจากข้อความ (ไม่ว่าอยู่ตรงไหน) และตัดช่องว่างหน้าหลัง
+                phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
+            }
+        });
+
+        // 2. ดักจับตอนพิมพ์หรือ Paste (เพื่อความสวยงามแบบ Real-time)
         const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
         if(phoneInput) {
-            // Function to clean input
-            function cleanPhoneInput(input) {
+            function cleanRealTime(input) {
                 let val = input.value;
-                // ลบ ' ที่ขึ้นต้น (เช่น '02...)
-                if (val.startsWith("'")) {
-                    input.value = val.replace(/^'+/, '');
+                if (val.includes("'")) {
+                    input.value = val.replace(/'/g, ''); // ลบ ' ทันทีที่เห็น
                 }
             }
 
-            // ตรวจจับตอนพิมพ์
-            phoneInput.addEventListener('input', function(e) {
-                cleanPhoneInput(e.target);
-            });
-            
-            // ตรวจจับตอน Paste (รอเสี้ยววินาทีเพื่อให้ค่าลงไปก่อน)
+            phoneInput.addEventListener('input', function(e) { cleanRealTime(e.target); });
             phoneInput.addEventListener('paste', function(e) {
-                setTimeout(() => {
-                    cleanPhoneInput(e.target);
-                }, 10);
+                setTimeout(() => { cleanRealTime(e.target); }, 10);
             });
         }
     </script>
