@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-                :root {
+        :root {
             /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
@@ -28,15 +28,14 @@
             
             --header-height: 80px;
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-        
-        /* FIX FONT */
-        body, button, input, select, textarea, optgroup {
+
+        /* FIX FONT ISSUE */
+        body, button, input, select, textarea, optgroup, table, th, td {
             font-family: 'Kanit', sans-serif;
         }
-        
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body { 
@@ -44,6 +43,7 @@
             color: var(--text-color);
             min-height: 100vh;
             padding-top: var(--header-height);
+            padding-bottom: 60px;
         }
 
         /* --- Header & Navigation --- */
@@ -51,23 +51,41 @@
             background: white;
             padding: 0 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
             height: var(--header-height);
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             transition: all 0.3s ease;
         }
 
-        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
+        /* Desktop Menu */
         .nav-menu { display: flex; align-items: center; gap: 8px; }
 
         .nav-link {
-            text-decoration: none; color: var(--text-color); font-weight: 500;
-            padding: 8px 16px; border-radius: 50px; transition: all 0.2s ease;
-            display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            white-space: nowrap;
         }
         .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
         .nav-link i { font-size: 1.1em; }
@@ -78,27 +96,24 @@
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* --- Mobile Header Elements (New) --- */
-        .mobile-controls { display: none; align-items: center; gap: 12px; }
+        /* --- Mobile Header Controls (Profile + Hamburger) --- */
+        .mobile-controls { display: none; align-items: center; gap: 15px; }
         
         .mobile-profile-btn {
-            display: flex; align-items: center; text-decoration: none; gap: 8px;
-            padding: 5px 10px; border-radius: 20px; transition: background 0.2s;
+            display: flex; align-items: center; text-decoration: none;
         }
-        .mobile-profile-btn:hover { background-color: #f8f9fa; }
-        
-        .mobile-user-name {
-            font-size: 0.9rem; font-weight: 500; color: var(--bma-green);
-            display: block; white-space: nowrap;
-        }
-        
         .mobile-profile-btn img {
-            width: 36px; height: 36px; border-radius: 50%; 
+            width: 40px; height: 40px; border-radius: 50%; 
             border: 2px solid var(--bma-green); object-fit: cover;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; margin-left: 5px; }
+        .mobile-toggle {
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 5px;
+        }
 
         /* --- Container & Content --- */
         .container {
@@ -135,7 +150,7 @@
             font-size: 1.1rem; color: #999;
         }
 
-        /* --- Table Styling (Dashboard Style) --- */
+        /* --- Table Styling --- */
         .table-responsive {
             overflow-x: auto;
             border-radius: 12px;
@@ -220,6 +235,9 @@
             body { padding-top: 70px; }
             .main-header { padding: 0 15px; height: 70px; }
             .logo-text { font-size: 1.1rem; }
+            
+            /* Mobile Controls */
+            .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
 
             /* Mobile Menu */
@@ -231,9 +249,12 @@
             .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
             @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; }
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; height: auto; }
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+            
+            /* Hide Profile Link in Menu (Since it's on top) */
+            .nav-link.profile-item { display: none; }
 
             .container { padding: 15px; margin: 15px auto; }
             h1 { font-size: 1.4em; }
@@ -253,25 +274,24 @@
 </head>
 <body>
     
-<header class="main-header">
-    <a href="{{ url_for('home') }}" class="logo-container">
-        <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-        <div class="logo-text">ทะเบียนลิงค์ BMA</div>
-    </a>
+    <header class="main-header">
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+        </a>
 
-    <div class="mobile-controls">
-        {% if session.get('logged_in') %}
-            <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
-                <span class="mobile-user-name">สวัสดี, {{ session.name }}</span>
-            </a>
-        {% endif %}
-        <div class="mobile-toggle" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
+        <div class="mobile-controls">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn" title="โปรไฟล์">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
+                </a>
+            {% endif %}
+            <div class="mobile-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
-    </div>
-    
-    <nav class="nav-menu" id="navMenu">
-        </nav>
+
+        <nav class="nav-menu" id="navMenu">
             <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
 
             {% if session.get('logged_in') %}
@@ -283,7 +303,7 @@
                 <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
                 <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
                 
-                <a href="{{ url_for('profile_page') }}" class="nav-link" title="โปรไฟล์">
+                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
                     <span>{{ session.name }}</span>
                 </a>
@@ -320,19 +340,19 @@
                 <thead>
                     <tr>
                         <th>
-                            ชื่อลิงก์
+                            🔗 ชื่อลิงก์
                             <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7; margin-left:5px;">↕</span>
                         </th>
                         <th>📄 รายละเอียด</th> 
-                        <th style="text-align: center;">สถานะ</th>
-                        <th style="text-align: center;">การใช้งาน</th>
-                        <th>ประเภท</th>
-                        <th>หน่วยงาน</th> 
-                        <th>ส่วนราชการ</th> 
-                        <th>เบอร์ติดต่อ</th>
-                        <th>ผู้สร้าง</th>
-                        <th>วันที่อัปเดต</th>
-                        <th style="text-align: center;">แชร์</th>
+                        <th style="text-align: center;">🚦 สถานะ</th>
+                        <th style="text-align: center;">📊 การใช้งาน</th>
+                        <th>📂 ประเภท</th>
+                        <th>🏢 หน่วยงาน</th> 
+                        <th>🏛️ ส่วนราชการ</th> 
+                        <th>📞 เบอร์ติดต่อ</th>
+                        <th>👤 ผู้สร้าง</th>
+                        <th>🗓️ วันที่อัปเดต</th>
+                        <th style="text-align: center;">📤 แชร์</th>
                     </tr>
                 </thead>
                 <tbody id="linkTableBody">

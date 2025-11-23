@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ข้อมูลส่วนตัว - BMA Link Registry</title>
     
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
+            /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
@@ -26,42 +27,37 @@
             --bg-grad-end: #c3cfe2;
             
             --header-height: 80px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-/* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+        
+        /* FIX FONT ISSUE */
         body, button, input, select, textarea, optgroup {
             font-family: 'Kanit', sans-serif;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body { 
-            font-family: 'Kanit', Arial, sans-serif; 
             background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
             padding-top: var(--header-height);
         }
 
-        /* --- Header & Navigation (Standardized) --- */
+        /* --- Header & Navigation --- */
         .main-header {
             background: white;
             padding: 0 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             transition: all 0.3s ease;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
@@ -70,91 +66,62 @@
         .nav-menu { display: flex; align-items: center; gap: 8px; }
 
         .nav-link {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            white-space: nowrap;
+            text-decoration: none; color: var(--text-color); font-weight: 500;
+            padding: 8px 16px; border-radius: 50px; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;
         }
         .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
+        .nav-link i { font-size: 1.1em; }
         
-        /* Active State */
         .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
         .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
         .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
-        /* FIX: Reset profile pic size for mobile list */
-            .user-profile-pic { 
-                width: 32px; height: 32px; 
-                border-radius: 50%; 
-                margin-right: 10px; 
-                object-fit: cover; 
-            }
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* Mobile Hamburger */
-        .mobile-toggle {
-            display: none;
-            font-size: 1.6rem;
-            cursor: pointer;
-            color: var(--text-color);
-            padding: 10px;
+        /* --- Mobile Header Controls (Profile + Hamburger) --- */
+        .mobile-controls { display: none; align-items: center; gap: 15px; }
+        
+        .mobile-profile-btn {
+            display: flex; align-items: center; text-decoration: none;
+        }
+        .mobile-profile-btn img {
+            width: 40px; height: 40px; border-radius: 50%; 
+            border: 2px solid var(--bma-green); object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- Profile Styles --- */
+        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; }
+
+        /* --- Container & Profile Card --- */
         .container { max-width: 900px; margin: 40px auto; padding: 0 20px; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .profile-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
+            background: white; border-radius: 20px; box-shadow: var(--shadow-lg);
+            overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center;
         }
         
-        .profile-cover {
-            height: 160px; width: 100%;
-            background: linear-gradient(135deg, var(--bma-green), #005a24);
-        }
+        .profile-cover { height: 160px; width: 100%; background: linear-gradient(135deg, var(--bma-green), #005a24); }
         
-        .profile-avatar {
-            width: 150px; height: 150px;
-            border-radius: 50%;
-            border: 5px solid white;
-            background-color: #fff;
-            margin-top: -75px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            overflow: hidden;
-            position: relative;
+        .profile-avatar { 
+            width: 150px; height: 150px; border-radius: 50%; border: 5px solid white; 
+            background: #fff; margin: -75px auto 0; box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
+            overflow: hidden; position: relative;
         }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         
-        .profile-info { padding: 20px 40px 40px 40px; width: 100%; box-sizing: border-box; }
-        .profile-name { font-size: 1.8em; font-weight: 700; margin: 10px 0 5px 0; color: var(--text-color); }
+        .profile-info { padding: 20px 40px 40px; width: 100%; }
+        .profile-name { font-size: 1.8em; font-weight: 700; margin: 10px 0 5px; color: var(--text-color); }
         .profile-username { color: var(--button-gray); font-size: 1.1em; margin-bottom: 20px; font-weight: 300; }
         
-        .profile-badge {
-            display: inline-block; padding: 6px 18px; border-radius: 30px;
-            font-size: 0.9em; font-weight: 500; margin-bottom: 25px;
-        }
-        .badge-admin { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .badge-user { background-color: var(--bma-green-light); color: var(--bma-green); border: 1px solid #c3e6cb; }
+        .profile-badge { display: inline-block; padding: 6px 18px; border-radius: 30px; font-size: 0.9em; font-weight: 500; margin-bottom: 25px; }
+        .badge-admin { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-user { background: var(--bma-green-light); color: var(--bma-green); border: 1px solid #c3e6cb; }
 
         /* Info List */
-        .info-list { width: 100%; max-width: 650px; margin: 0 auto; }
-        .info-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 0; border-bottom: 1px solid #f0f0f0;
-        }
+        .info-list { width: 100%; max-width: 650px; margin: 0 auto; text-align: left; }
+        .info-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
         .info-item:last-child { border-bottom: none; }
         .info-label { font-weight: 500; color: #666; display: flex; align-items: center; gap: 10px; }
         .info-label i { color: var(--bma-green); width: 20px; }
@@ -166,23 +133,23 @@
             width: 100%; margin-top: 30px; border-top: 1px solid #eee; padding-top: 30px;
         }
         .stat-item {
-            padding: 20px; background-color: #f8f9fa;
-            border-radius: 15px; border: 1px solid #eee; transition: 0.3s;
+            padding: 20px; background-color: #f8f9fa; border-radius: 15px; 
+            border: 1px solid #eee; transition: 0.3s;
         }
-        .stat-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .stat-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
         .stat-value { font-size: 2em; font-weight: 700; color: var(--bma-green); line-height: 1; }
         .stat-label { color: #777; font-size: 0.9em; margin-top: 5px; }
 
         .btn-edit-profile {
             background-color: white; border: 1px solid #ddd; color: #555;
             width: 100%; font-size: 1.05em; padding: 12px; border-radius: 10px;
-            cursor: pointer; transition: 0.3s;
+            cursor: pointer; transition: 0.3s; margin-top: 30px;
         }
         .btn-edit-profile:hover { background: #f8f9fa; border-color: #ccc; color: #333; }
 
         .footer { text-align: center; margin-top: 40px; color: #888; font-size: 0.9em; }
 
-        /* Responsive */
+        /* --- Responsive --- */
         @media (max-width: 992px) {
             .nav-link span { display: none; }
             .nav-link i { font-size: 1.3rem; margin: 0; }
@@ -194,6 +161,9 @@
             body { padding-top: 70px; }
             .main-header { padding: 0 15px; height: 70px; }
             .logo-text { font-size: 1.1rem; }
+            
+            /* Mobile Controls */
+            .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
 
             .nav-menu {
@@ -202,10 +172,14 @@
                 padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
             }
             .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
-            
-            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; }
+            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; height: auto; }
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+            
+            /* Hide Desktop Profile Item (since it's on top) */
+            .nav-link.profile-item { display: none; }
 
             .profile-info { padding: 25px 20px; }
             .info-item { flex-direction: column; align-items: flex-start; gap: 5px; }
@@ -221,8 +195,15 @@
             <div class="logo-text">ข้อมูลส่วนตัว</div>
         </a>
         
-        <div class="mobile-toggle" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
+        <div class="mobile-controls">
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn" title="โปรไฟล์">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
+                </a>
+            {% endif %}
+            <div class="mobile-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
     
         <nav class="nav-menu" id="navMenu">
@@ -237,7 +218,7 @@
                 <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
                 <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
                 
-                <a href="{{ url_for('profile_page') }}" class="nav-link active-nav" title="โปรไฟล์">
+                <a href="{{ url_for('profile_page') }}" class="nav-link active-nav profile-item" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
                     <span>{{ session.name }}</span>
                 </a>
@@ -276,17 +257,14 @@
                         <span class="info-label"><i class="fas fa-briefcase"></i> ตำแหน่ง</span>
                         <span class="info-data">{{ user['ตำแหน่ง'] }}</span>
                     </div>
-                    
                     <div class="info-item">
                         <span class="info-label"><i class="fas fa-sitemap"></i> กลุ่มงาน/ฝ่าย/กอง</span>
                         <span class="info-data">{{ user['หน่วยงาน'] }}</span>
                     </div>
-                    
                     <div class="info-item">
                         <span class="info-label"><i class="fas fa-building"></i> ส่วนราชการ</span>
                         <span class="info-data">{{ user['ส่วนราชการ'] }}</span>
                     </div>
-                    
                     <div class="info-item">
                         <span class="info-label"><i class="fas fa-envelope"></i> อีเมล</span>
                         <span class="info-data">{{ user['Email'] }}</span>
@@ -309,13 +287,11 @@
                 </div>
                 
                 {% if is_own_profile %}
-                <div style="margin-top: 30px;">
-                    <a href="{{ url_for('edit_profile_page') }}" style="text-decoration:none;">
-                        <button class="btn-edit-profile">
-                            <i class="fas fa-user-edit"></i> แก้ไขข้อมูลส่วนตัว
-                        </button>
-                    </a>
-                </div>
+                <a href="{{ url_for('edit_profile_page') }}" style="text-decoration:none;">
+                    <button class="btn-edit-profile">
+                        <i class="fas fa-user-edit"></i> แก้ไขข้อมูลส่วนตัว
+                    </button>
+                </a>
                 {% endif %}
             </div>
         </div>
