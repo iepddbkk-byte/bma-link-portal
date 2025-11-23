@@ -33,7 +33,10 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
+		/* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+        body, button, input, select, textarea, optgroup {
+            font-family: 'Kanit', sans-serif;
+        }
         body { 
             font-family: 'Kanit', Arial, sans-serif; 
             background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);

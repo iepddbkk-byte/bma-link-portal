@@ -30,7 +30,10 @@
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-
+/* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+        body, button, input, select, textarea, optgroup {
+            font-family: 'Kanit', sans-serif;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body { 
