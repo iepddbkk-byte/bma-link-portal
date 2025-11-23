@@ -626,6 +626,21 @@ def analytics_page():
         links = get_db_records()
         users = get_staff_records()
         feedback = feedback_sheet.get_all_records()
+        
+        # --- คำนวณ Top 10 Links ---
+        # แปลง Clicks เป็น int และเรียงลำดับจากมากไปน้อย
+        for l in links:
+            try: l['Clicks'] = int(l.get('Clicks', 0))
+            except: l['Clicks'] = 0
+        top_10 = sorted(links, key=lambda x: x['Clicks'], reverse=True)[:10]
+
+        # --- ดึงยอดวิวรวม ---
+        total_views = 0
+        if stats_sheet:
+            try: total_views = int(stats_sheet.cell(1, 2).value or 0)
+            except: pass
+
+        # --- ส่วนเดิม (กราฟและสถิติอื่นๆ) ---
         cat_counts = Counter(l['ประเภท'] for l in links if l.get('ประเภท'))
         dept_counts = Counter(l['ส่วนราชการ'] for l in links if l.get('ส่วนราชการ')).most_common(5)
         monthly = {}
@@ -644,8 +659,13 @@ def analytics_page():
             except: pass
             if f.get('Comments'): comments.append({'user': f['Username'], 'text': f['Comments']})
             if f.get('FeatureRequest'): features.append({'user': f['Username'], 'text': f['FeatureRequest']})
+        
+        # --- รวมข้อมูลทั้งหมดส่งไป HTML ---
         chart_data = {
-            "total_links": len(links), "total_users": len(users), 
+            "total_views": total_views,          # <--- เพิ่มตัวนี้
+            "top_10_links": top_10,              # <--- เพิ่มตัวนี้
+            "total_links": len(links), 
+            "total_users": len(users), 
             "active_links": sum(1 for l in links if l.get('สถานะ') == 'ใช้งาน'),
             "total_responses": len(feedback),
             "category_labels": list(cat_counts.keys()), "category_data": list(cat_counts.values()),
@@ -656,7 +676,9 @@ def analytics_page():
             "recent_comments": comments[-5:][::-1], "recent_features": features[-5:][::-1]
         }
         return render_template('analytics.html', session=session, chart_data=chart_data)
-    except: return redirect(url_for('dashboard'))
+    except Exception as e: 
+        print(f"Analytics Error: {e}")
+        return redirect(url_for('dashboard')))
 
 @app.route('/admin')
 def admin_panel():

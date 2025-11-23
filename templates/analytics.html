@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Dashboard - BMA</title>
     
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -14,7 +14,7 @@
     
     <style>
         :root {
-            /* Theme Colors (Matches Dashboard) */
+            /* Theme Colors (Standardized) */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
@@ -32,121 +32,73 @@
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-		/* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+
+        /* --- FIX FONT ISSUE --- */
         body, button, input, select, textarea, optgroup {
             font-family: 'Kanit', sans-serif;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Kanit', Arial, sans-serif;
             background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
-            padding-top: var(--header-height); /* เว้นที่ให้ Header */
+            padding-top: var(--header-height);
             padding-bottom: 60px;
         }
 
-        /* --- 1. Header & Navigation (New Style) --- */
+        /* --- 1. Header & Navigation --- */
         .main-header {
             background: white;
             padding: 0 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
             height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             transition: all 0.3s ease;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        /* Desktop Menu */
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .nav-menu { display: flex; align-items: center; gap: 8px; }
 
         .nav-link {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            white-space: nowrap;
+            text-decoration: none; color: var(--text-color); font-weight: 500;
+            padding: 8px 16px; border-radius: 50px; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;
         }
         .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
         .nav-link i { font-size: 1.1em; }
         
-        /* Active State for Analytics Page */
         .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
-        
         .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
         .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* Mobile Hamburger */
-        .mobile-toggle {
-            display: none;
-            font-size: 1.6rem;
-            cursor: pointer;
-            color: var(--text-color);
-            padding: 10px;
-        }
+        .mobile-toggle { display: none; font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 10px; }
 
         /* --- 2. Container & Content --- */
         .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-            animation: fadeIn 0.5s ease;
+            max-width: 1400px; margin: 30px auto; padding: 0 20px; animation: fadeIn 0.5s ease;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         h2 {
-            color: var(--bma-green);
-            font-size: 2em;
-            font-weight: 600;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
+            color: var(--bma-green); font-size: 2em; font-weight: 600;
+            margin-bottom: 30px; padding-bottom: 15px;
             border-bottom: 3px solid var(--bma-green-light);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: var(--shadow-md);
+            display: flex; align-items: center; gap: 10px;
+            background: white; padding: 20px; border-radius: 15px; box-shadow: var(--shadow-md);
         }
 
-        /* --- New Top Stats Section (Same as Dashboard) --- */
+        /* --- Top Statistics Section (NEW) --- */
         .stats-grid-top {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-            margin-bottom: 30px;
+            display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 30px;
         }
 
         .top-card {
@@ -158,23 +110,24 @@
         /* Total Views Card */
         .total-views-card {
             background: linear-gradient(135deg, var(--bma-green), #005a24);
-            color: white;
-            align-items: center; justify-content: center; text-align: center;
+            color: white; align-items: center; justify-content: center; text-align: center;
         }
         .total-views-card i { font-size: 4rem; opacity: 0.8; margin-bottom: 10px; }
         .total-views-number { font-size: 3.5rem; font-weight: 800; line-height: 1; margin: 10px 0; }
         .total-views-label { font-size: 1.1rem; opacity: 0.9; }
 
-        /* Top 10 Ranking List */
-        .ranking-list {
-            list-style: none; padding: 0; margin: 0;
-            max-height: 250px; overflow-y: auto;
+        /* Top 10 List Card */
+        .top-links-card h3 { 
+            font-size: 1.3rem; margin-bottom: 15px; color: var(--text-color); 
+            display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;
         }
+        .ranking-list { list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
         .ranking-item {
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px 10px; border-bottom: 1px solid #f5f5f5; transition: 0.2s;
         }
         .ranking-item:hover { background-color: #f9fffb; }
+        
         .rank-badge {
             width: 28px; height: 28px; background: var(--bma-green-light); color: var(--bma-green);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -189,39 +142,17 @@
         .link-info a:hover { color: var(--bma-green); }
         .click-count { font-size: 0.9rem; color: #888; display: flex; align-items: center; gap: 5px; }
 
-        /* Custom Scrollbar */
-        .ranking-list::-webkit-scrollbar { width: 6px; }
-        .ranking-list::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-        .ranking-list::-webkit-scrollbar-thumb:hover { background: var(--bma-green); }
-
-
-        /* Stat Cards (Original Row) */
+        /* --- Mini Stat Cards --- */
         .stat-card-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 30px;
         }
-
         .stat-card-mini {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: var(--shadow-lg);
-            border-left: 5px solid;
-            transition: all 0.3s ease;
-            animation: slideIn 0.5s ease;
+            display: flex; align-items: center; gap: 20px; background: white;
+            padding: 25px; border-radius: 15px; box-shadow: var(--shadow-lg);
+            border-left: 5px solid; transition: all 0.3s ease; animation: slideIn 0.5s ease;
         }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
         .stat-card-mini:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 
         .stat-card-mini.card-blue { border-left-color: var(--button-blue); }
         .stat-card-mini.card-green { border-left-color: var(--bma-green); }
@@ -229,18 +160,10 @@
         .stat-card-mini.card-gray { border-left-color: var(--button-gray); }
 
         .stat-card-icon {
-            font-size: 2.5em;
-            padding: 20px;
-            border-radius: 15px;
-            color: #fff;
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 2.5em; padding: 20px; border-radius: 15px; color: #fff;
+            width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;
             box-shadow: var(--shadow-md);
         }
-
         .icon-links { background: linear-gradient(135deg, var(--button-blue) 0%, #0056b3 100%); }
         .icon-active { background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%); }
         .icon-users { background: linear-gradient(135deg, var(--button-yellow) 0%, #e0a800 100%); }
@@ -252,46 +175,32 @@
         .stat-card-info .stat-number { font-size: 2.5em; font-weight: 600; color: var(--text-color); line-height: 1; }
         .stat-card-info .stat-number .unit { font-size: 0.5em; color: var(--button-gray); font-weight: 400; }
 
-        /* Chart Grid */
-        .chart-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin-top: 30px;
-        }
-
+        /* --- Chart Grid --- */
+        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 30px; }
         .chart-container {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: var(--shadow-lg);
-            transition: all 0.3s ease;
+            background: white; padding: 25px; border-radius: 15px;
+            box-shadow: var(--shadow-lg); transition: all 0.3s ease;
         }
         .chart-container:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
         .chart-container-full { grid-column: 1 / -1; }
-
         .chart-container h3 {
-            text-align: center;
-            margin: 0 0 20px 0;
-            font-weight: 600;
-            color: var(--text-color);
-            font-size: 1.2em;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f8f9fa;
+            text-align: center; margin: 0 0 20px 0; font-weight: 600; color: var(--text-color);
+            font-size: 1.2em; padding-bottom: 15px; border-bottom: 2px solid #f8f9fa;
         }
-        .chart-container h3 i { color: var(--bma-green); margin-right: 8px; }
 
-        /* Feedback List */
+        /* Feedback List & Empty State */
         .feedback-list { list-style: none; padding: 0; margin: 0; max-height: 350px; overflow-y: auto; }
-        .feedback-list li { border-bottom: 1px solid #f0f0f0; padding: 15px 10px; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 5px; }
+        .feedback-list li { border-bottom: 1px solid #f0f0f0; padding: 15px 10px; transition: 0.3s; border-radius: 8px; margin-bottom: 5px; }
         .feedback-list li:hover { background: var(--bma-green-light); transform: translateX(5px); }
-        .feedback-list li:last-child { border-bottom: none; }
-        .feedback-list p { margin: 0 0 8px 0; font-size: 1em; line-height: 1.5; color: var(--text-color); }
+        .feedback-list p { margin: 0 0 8px 0; font-size: 1em; line-height: 1.5; }
         .feedback-list .user { font-size: 0.85em; font-weight: 500; color: var(--button-gray); font-style: italic; }
-        
-        /* Empty State */
         .empty-state { text-align: center; padding: 40px 20px; color: #999; }
         .empty-state i { font-size: 3em; margin-bottom: 15px; opacity: 0.5; }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--bma-green); }
 
         /* Footer */
         .main-footer {
@@ -300,9 +209,9 @@
         }
         .main-footer p { margin: 8px 0; opacity: 0.95; }
 
-        /* --- 3. Responsive Media Queries --- */
+        /* --- Responsive --- */
         @media (max-width: 992px) {
-            .nav-link span { display: none; } /* Tablet: Show icons only */
+            .nav-link span { display: none; }
             .nav-link i { font-size: 1.3rem; margin: 0; }
             .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
             .user-profile-pic { width: 100%; height: 100%; }
@@ -314,30 +223,18 @@
             .logo-text { font-size: 1.1rem; }
             .mobile-toggle { display: block; }
 
-            /* Mobile Menu (Slide Down) */
             .nav-menu {
-                display: none;
-                position: absolute;
-                top: 70px; left: 0; width: 100%;
-                background: white;
-                flex-direction: column;
-                align-items: stretch;
-                padding: 15px;
-                box-shadow: 0 10px 15px rgba(0,0,0,0.05);
-                border-top: 1px solid #f0f0f0;
+                display: none; position: absolute; top: 70px; left: 0; width: 100%;
+                background: white; flex-direction: column; align-items: stretch;
+                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
             }
             .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
             @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-            .nav-link {
-                width: 100%; border-radius: 12px;
-                padding: 12px 15px; margin-bottom: 5px;
-                justify-content: flex-start;
-            }
-            .nav-link span { display: inline; } /* Mobile: Show text again */
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; }
+            .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
 
-            /* Content Adjustments */
             .container { padding: 0 15px; margin: 20px auto; }
             h2 { font-size: 1.3em; padding: 15px; }
             .chart-grid, .stat-card-row, .stats-grid-top { grid-template-columns: 1fr; }
@@ -394,24 +291,27 @@
         <div class="stats-grid-top">
             <div class="top-card total-views-card">
                 <i class="fas fa-users"></i>
-                <div class="total-views-number">{{ "{:,}".format(total_views|default(0)) }}</div>
+                <div class="total-views-number">{{ "{:,}".format(chart_data.total_views|default(0)) }}</div>
                 <div class="total-views-label">ผู้เข้าชมเว็บไซต์ทั้งหมด</div>
             </div>
 
             <div class="top-card top-links-card">
                 <h3><i class="fas fa-trophy" style="color: #ffc107;"></i> 10 อันดับลิงค์ยอดนิยม</h3>
                 <ul class="ranking-list">
-                    {% for link in top_10_links|default([]) %}
+                    {% for link in chart_data.top_10_links|default([]) %}
                     <li class="ranking-item">
                         <div class="rank-badge {% if loop.index <= 3 %}rank-{{ loop.index }}{% endif %}">{{ loop.index }}</div>
                         <div class="link-info">
                             <a href="{{ link['URL'] }}" target="_blank" title="{{ link['ชื่อลิงก์'] }}">{{ link['ชื่อลิงก์'] }}</a>
                         </div>
-                        <div class="click-count"><i class="fas fa-eye"></i> {{ link['Clicks'] }}</div>
+                        <div class="click-count"><i class="fas fa-eye"></i> {{ "{:,}".format(link['Clicks']) }}</div>
                     </li>
                     {% else %}
                     <li class="ranking-item" style="justify-content: center; color: #999;">
-                        ยังไม่มีข้อมูลสถิติ
+                        <div class="empty-state" style="padding: 20px;">
+                            <i class="fas fa-chart-bar" style="font-size: 2em; margin-bottom: 10px;"></i><br>
+                            กำลังประมวลผลข้อมูล
+                        </div>
                     </li>
                     {% endfor %}
                 </ul>
@@ -531,13 +431,11 @@
     </footer>
 
     <script>
-        // --- 1. Mobile Menu Logic (Updated to match Dashboard) ---
+        // --- Mobile Menu ---
         function toggleMenu() {
             const menu = document.getElementById('navMenu');
             menu.classList.toggle('active');
         }
-
-        // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
             const nav = document.getElementById('navMenu');
             const toggle = document.querySelector('.mobile-toggle');
@@ -546,22 +444,14 @@
             }
         });
 
-        // --- 2. Chart.js Code (Existing) ---
+        // --- Chart.js Config ---
         const chartData = {{ chart_data | tojson }};
         const bmaGreen = 'rgba(0, 150, 60, 0.7)';
-        const bmaBlue = 'rgba(0, 123, 255, 0.7)';
-        const bmaYellow = 'rgba(255, 193, 7, 0.7)';
-        const bmaRed = 'rgba(220, 53, 69, 0.7)';
-        const bmaGray = 'rgba(108, 117, 125, 0.7)';
-        const bmaOrange = 'rgba(253, 126, 20, 0.7)';
-        const bmaTeal = 'rgba(32, 201, 151, 0.7)';
-        const colorPalette = [bmaGreen, bmaBlue, bmaYellow, bmaRed, bmaGray, bmaOrange, bmaTeal];
+        const colorPalette = [bmaGreen, 'rgba(0, 123, 255, 0.7)', 'rgba(255, 193, 7, 0.7)', 'rgba(220, 53, 69, 0.7)', 'rgba(108, 117, 125, 0.7)', 'rgba(253, 126, 20, 0.7)', 'rgba(32, 201, 151, 0.7)'];
         
         function getBmaColors(count) {
             const colors = [];
-            for (let i = 0; i < count; i++) {
-                colors.push(colorPalette[i % colorPalette.length]);
-            }
+            for (let i = 0; i < count; i++) { colors.push(colorPalette[i % colorPalette.length]); }
             return colors;
         }
         
@@ -569,83 +459,35 @@
         Chart.defaults.font.size = 14;
 
         if (chartData.category_labels && chartData.category_data) {
-            const ctx1 = document.getElementById('categoryPieChart').getContext('2d');
-            new Chart(ctx1, {
+            new Chart(document.getElementById('categoryPieChart').getContext('2d'), {
                 type: 'pie',
                 data: {
                     labels: chartData.category_labels,
-                    datasets: [{
-                        label: 'จำนวนลิงค์',
-                        data: chartData.category_data,
-                        backgroundColor: getBmaColors(chartData.category_data.length),
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
+                    datasets: [{ data: chartData.category_data, backgroundColor: getBmaColors(chartData.category_data.length), borderWidth: 2, borderColor: '#fff' }]
                 },
-                options: { 
-                    responsive: true, 
-                    plugins: { 
-                        legend: { position: 'top', labels: { padding: 15, font: { size: 12 } } } 
-                    } 
-                }
+                options: { responsive: true, plugins: { legend: { position: 'top' } } }
             });
         }
         
         if (chartData.dept_labels && chartData.dept_data) {
-            const ctx2 = document.getElementById('departmentBarChart').getContext('2d');
-            new Chart(ctx2, {
+            new Chart(document.getElementById('departmentBarChart').getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: chartData.dept_labels,
-                    datasets: [{
-                        label: 'จำนวนลิงค์',
-                        data: chartData.dept_data,
-                        backgroundColor: getBmaColors(chartData.dept_data.length),
-                        borderColor: '#fff',
-                        borderWidth: 2,
-                        borderRadius: 8
-                    }]
+                    datasets: [{ label: 'จำนวนลิงค์', data: chartData.dept_data, backgroundColor: getBmaColors(chartData.dept_data.length), borderRadius: 8 }]
                 },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                        x: { grid: { display: false } }
-                    }
-                }
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
         }
         
         if (chartData.month_labels && chartData.month_data) {
-            const ctx3 = document.getElementById('monthlyLineChart').getContext('2d');
-            new Chart(ctx3, {
+            new Chart(document.getElementById('monthlyLineChart').getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: chartData.month_labels,
-                    datasets: [{
-                        label: 'จำนวนลิงค์ที่เพิ่ม',
-                        data: chartData.month_data,
-                        backgroundColor: 'rgba(0, 150, 60, 0.1)',
-                        borderColor: 'rgba(0, 150, 60, 1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: 'rgba(0, 150, 60, 1)',
-                        pointBorderWidth: 2
-                    }]
+                    datasets: [{ label: 'จำนวนลิงค์ที่เพิ่ม', data: chartData.month_data, backgroundColor: 'rgba(0, 150, 60, 0.1)', borderColor: 'rgba(0, 150, 60, 1)', borderWidth: 3, fill: true, tension: 0.4 }]
                 },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                        x: { grid: { display: false } }
-                    }
-                }
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
         }
     </script>
@@ -654,16 +496,8 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 const messages = {{ messages | tojson }};
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                });
-                messages.forEach(([category, message]) => {
-                    Toast.fire({ icon: category, title: message });
-                });
+                const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000, timerProgressBar: true });
+                messages.forEach(([category, message]) => { Toast.fire({ icon: category, title: message }); });
             {% endif %}
         {% endwith %}
     </script>
