@@ -89,7 +89,13 @@
         .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
         .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
-        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+        /* FIX: Reset profile pic size for mobile list */
+            .user-profile-pic { 
+                width: 32px; height: 32px; 
+                border-radius: 50%; 
+                margin-right: 10px; 
+                object-fit: cover; 
+            }
 
         /* Mobile Hamburger */
         .mobile-toggle {
