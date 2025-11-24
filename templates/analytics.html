@@ -58,6 +58,12 @@
             transition: all 0.3s ease;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px; 
+        }
+
         .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
@@ -92,14 +98,6 @@
         }
 
         .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; }
-/* --- เพิ่มส่วนนี้ใน <style> --- */
-
-        /* จัดกลุ่ม Logo กับ Stats ให้อยู่ทางซ้าย */
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px; 
-        }
 
         /* กล่องแสดงจำนวนคนออนไลน์ */
         .header-online-count {
@@ -114,11 +112,6 @@
             font-weight: 600;
             border: 1px solid var(--bma-green);
             white-space: nowrap;
-        }
-
-        /* Mobile Responsive: ซ่อนคำว่า 'ออนไลน์' บนมือถือเพื่อประหยัดพื้นที่ */
-        @media (max-width: 768px) {
-            .header-online-count span:last-child { display: none; }
         }
 
         /* Animation จุดสีเขียวกระพริบ */
@@ -137,6 +130,7 @@
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
+
         /* --- Container --- */
         .container {
             max-width: 1400px; margin: 30px auto; padding: 0 20px; animation: fadeIn 0.6s ease;
@@ -325,6 +319,9 @@
             /* Mobile Controls */
             .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
+
+            /* [NEW] ซ่อนส่วนแสดงคนออนไลน์ทั้งหมดในมือถือ */
+            .header-online-count { display: none; }
 
             /* Mobile Menu (Slide Down) */
             .nav-menu {

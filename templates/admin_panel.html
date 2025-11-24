@@ -115,8 +115,7 @@
             color: var(--text-color);
             padding: 5px;
         }
-		/* --- เพิ่มส่วนนี้ใน <style> --- */
-
+		
         /* จัดกลุ่ม Logo กับ Stats ให้อยู่ทางซ้าย */
         .header-left {
             display: flex;
@@ -137,11 +136,6 @@
             font-weight: 600;
             border: 1px solid var(--bma-green);
             white-space: nowrap;
-        }
-
-        /* Mobile Responsive: ซ่อนคำว่า 'ออนไลน์' บนมือถือเพื่อประหยัดพื้นที่ */
-        @media (max-width: 768px) {
-            .header-online-count span:last-child { display: none; }
         }
 
         /* Animation จุดสีเขียวกระพริบ */
@@ -270,6 +264,9 @@
             /* Mobile Controls */
             .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
+            
+            /* [NEW] ซ่อนส่วนแสดงคนออนไลน์ทั้งหมดในมือถือ */
+            .header-online-count { display: none; }
 
             /* Mobile Menu */
             .nav-menu {
