@@ -115,6 +115,27 @@ STAFF_HEADERS = [
     "หน่วยงาน", "ส่วนราชการ", "เบอร์โทร", "Email", "CreatedAt", "UpdatedAt"
 ]
 
+# ==========================================
+# [NEW] ส่วนระบบ Caching (แก้ปัญหา API 429)
+# ==========================================
+CACHE_TIMEOUT = 300  # ระยะเวลาจำข้อมูล (วินาที) -> 300 คือ 5 นาที
+_app_cache = {
+    'db_records': {'data': None, 'time': None},
+    'staff_records': {'data': None, 'time': None}
+}
+
+def clear_db_cache():
+    """สั่งล้าง Cache ข้อมูลลิงค์ (ใช้เมื่อมีการ เพิ่ม/ลบ/แก้ไข ลิงค์)"""
+    global _app_cache
+    _app_cache['db_records'] = {'data': None, 'time': None}
+    print("🧹 DB Cache Cleared (Force Refresh Next Time)")
+
+def clear_staff_cache():
+    """สั่งล้าง Cache ข้อมูลเจ้าหน้าที่ (ใช้เมื่อมีการ สมัคร/แก้ไขโปรไฟล์)"""
+    global _app_cache
+    _app_cache['staff_records'] = {'data': None, 'time': None}
+    print("🧹 Staff Cache Cleared")
+
 # --- 4. ฟังก์ชันตัวช่วย ---
 def generate_new_id():
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
@@ -129,6 +150,10 @@ def generate_invite_code():
 
 def records_to_dict(records_list, headers):
     records_dict = []
+    # ตรวจสอบว่ามีข้อมูลหรือไม่ (ป้องกัน Index Error)
+    if not records_list or len(records_list) < 2:
+        return []
+        
     for row in records_list[1:]:
         if row and len(row) > 0 and row[0].strip(): 
             record = {}
@@ -144,15 +169,56 @@ def records_to_dict(records_list, headers):
             records_dict.append(record)
     return records_dict
 
-def get_db_records():
+def get_db_records(force_refresh=False):
+    """ดึงข้อมูลลิงค์ แบบมี Caching"""
+    global _app_cache
     if db_sheet is None: return []
-    all_values = db_sheet.get_all_values()
-    return records_to_dict(all_values, DB_HEADERS)
 
-def get_staff_records():
+    now = datetime.datetime.now()
+    cache = _app_cache['db_records']
+
+    # 1. ตรวจสอบว่ามี Cache และยังไม่หมดอายุหรือไม่
+    if not force_refresh and cache['data'] is not None and cache['time'] is not None:
+        if (now - cache['time']).total_seconds() < CACHE_TIMEOUT:
+            return cache['data']
+
+    # 2. ถ้าไม่มี Cache หรือหมดอายุ ให้ดึงจาก Google Sheets
+    try:
+        print("zzz Fetching DB from Google Sheets... (API Call)")
+        all_values = db_sheet.get_all_values()
+        data = records_to_dict(all_values, DB_HEADERS)
+        
+        # 3. บันทึกลง Cache
+        cache['data'] = data
+        cache['time'] = now
+        return data
+    except Exception as e:
+        print(f"❌ Error fetching DB: {e}")
+        return []
+
+def get_staff_records(force_refresh=False):
+    """ดึงข้อมูลเจ้าหน้าที่ แบบมี Caching"""
+    global _app_cache
     if staff_sheet is None: return []
-    all_values = staff_sheet.get_all_values()
-    return records_to_dict(all_values, STAFF_HEADERS)
+
+    now = datetime.datetime.now()
+    cache = _app_cache['staff_records']
+
+    if not force_refresh and cache['data'] is not None and cache['time'] is not None:
+        if (now - cache['time']).total_seconds() < CACHE_TIMEOUT:
+            return cache['data']
+
+    try:
+        print("zzz Fetching Staff from Google Sheets... (API Call)")
+        all_values = staff_sheet.get_all_values()
+        data = records_to_dict(all_values, STAFF_HEADERS)
+        
+        cache['data'] = data
+        cache['time'] = now
+        return data
+    except Exception as e:
+        print(f"❌ Error fetching Staff: {e}")
+        return []
 
 def send_reset_email(username, recipient_email):
     try:
@@ -224,6 +290,8 @@ def run_link_checker():
             updates.append({'range': f'M{row_index}', 'values': [[status_msg]]})
         if updates:
             db_sheet.batch_update(updates, value_input_option='RAW')
+            # [CACHE] Clear cache after batch update
+            clear_db_cache()
             return jsonify({'status': 'success', 'message': f'Checked {len(updates)} links'})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
@@ -259,6 +327,7 @@ def generate_qr_code():
 @app.route('/go/<link_id>')
 def go_to_link(link_id):
     try:
+        # Note: find() calls API, but for specific row lookup it's acceptable
         cell = db_sheet.find(link_id)
         if cell:
             row_values = db_sheet.row_values(cell.row)
@@ -425,6 +494,9 @@ def register_action():
         new_row_final = [username, hashed_password, 'Users', fullname, position, division, main_agency, phone, email, current_time, current_time]
         staff_sheet.append_row(new_row_final, value_input_option='USER_ENTERED')
         
+        # [CACHE] Clear cache after registration
+        clear_staff_cache()
+        
         invite_sheet.update_cell(code_cell.row, 2, "Used")
         invite_sheet.update_cell(code_cell.row, 3, username)
         invite_sheet.update_cell(code_cell.row, 4, current_time)
@@ -467,6 +539,10 @@ def reset_password_page(token):
             if cell:
                 staff_sheet.update_cell(cell.row, 2, new_hash) 
                 staff_sheet.update_cell(cell.row, 11, get_current_timestamp())
+                
+                # [CACHE] Clear cache after password reset
+                clear_staff_cache()
+                
                 flash('เปลี่ยนรหัสผ่านสำเร็จ', 'success')
                 return redirect(url_for('login_page'))
         except: flash('Error updating password', 'error')
@@ -521,6 +597,9 @@ def edit_profile_action():
             staff_sheet.update_cell(cell.row, 8, phone)       
             staff_sheet.update_cell(cell.row, 9, email)       
             staff_sheet.update_cell(cell.row, 11, get_current_timestamp()) 
+            
+            # [CACHE] Clear cache after profile update
+            clear_staff_cache()
             
             session['name'] = fullname
             session['email'] = email
@@ -600,6 +679,10 @@ def add_link_action():
             get_current_timestamp(), session.get('username'), '', 0 
         ]
         db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
+        
+        # [CACHE] Clear cache after adding link
+        clear_db_cache()
+
         flash('เพิ่มลิงค์สำเร็จ', 'success'); return redirect(url_for('dashboard'))
     except Exception as e: 
         flash(f'Error: {e}', 'error'); return redirect(url_for('add_link_page'))
@@ -614,6 +697,10 @@ def delete_link_action(link_id):
         creator = row_data[11].strip() 
         if session.get('level', '').strip() == 'Admin' or creator.strip() == session.get('username', '').strip():
             db_sheet.delete_rows(cell.row)
+            
+            # [CACHE] Clear cache after deletion
+            clear_db_cache()
+
             flash('ลบสำเร็จ', 'success')
         else:
             flash('ไม่มีสิทธิ์', 'error')
@@ -662,6 +749,10 @@ def update_link_action(link_id):
         ]
         range_name = f"A{cell.row}:N{cell.row}" 
         db_sheet.update(range_name, [new_vals])
+        
+        # [CACHE] Clear cache after update
+        clear_db_cache()
+
         flash('แก้ไขสำเร็จ', 'success'); return redirect(url_for('dashboard'))
     except: return redirect(url_for('dashboard'))
 
@@ -737,7 +828,11 @@ def change_user_level():
         user, level = request.form.get('username'), request.form.get('level')
         if user == session.get('username'): flash('เปลี่ยนระดับตัวเองไม่ได้', 'error'); return redirect(url_for('admin_panel'))
         cell = staff_sheet.find(user)
-        if cell: staff_sheet.update_cell(cell.row, 3, level); flash('สำเร็จ', 'success')
+        if cell: 
+            staff_sheet.update_cell(cell.row, 3, level)
+            # [CACHE] Clear cache after level change
+            clear_staff_cache()
+            flash('สำเร็จ', 'success')
     except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
 
@@ -748,7 +843,11 @@ def delete_user():
         user = request.form.get('username')
         if user == session.get('username'): flash('ลบตัวเองไม่ได้', 'error'); return redirect(url_for('admin_panel'))
         cell = staff_sheet.find(user)
-        if cell: staff_sheet.delete_rows(cell.row); flash('สำเร็จ', 'success')
+        if cell: 
+            staff_sheet.delete_rows(cell.row)
+            # [CACHE] Clear cache after user deletion
+            clear_staff_cache()
+            flash('สำเร็จ', 'success')
     except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
 
