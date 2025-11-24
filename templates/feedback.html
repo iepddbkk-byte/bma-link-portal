@@ -119,8 +119,7 @@
             color: var(--text-color);
             padding: 5px;
         }
-/* --- เพิ่มส่วนนี้ใน <style> --- */
-
+		
         /* จัดกลุ่ม Logo กับ Stats ให้อยู่ทางซ้าย */
         .header-left {
             display: flex;
@@ -143,11 +142,6 @@
             white-space: nowrap;
         }
 
-        /* Mobile Responsive: ซ่อนคำว่า 'ออนไลน์' บนมือถือเพื่อประหยัดพื้นที่ */
-        @media (max-width: 768px) {
-            .header-online-count span:last-child { display: none; }
-        }
-
         /* Animation จุดสีเขียวกระพริบ */
         .pulsating-dot {
             width: 10px;
@@ -164,6 +158,7 @@
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
+        
         /* --- Container --- */
         .container {
             max-width: 800px; /* Narrower for form */
@@ -267,6 +262,9 @@
             /* Show Mobile Controls */
             .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
+            
+            /* [NEW] ซ่อนส่วนแสดงคนออนไลน์ทั้งหมดในมือถือ */
+            .header-online-count { display: none; }
 
             /* Mobile Menu */
             .nav-menu {

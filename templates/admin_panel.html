@@ -120,7 +120,9 @@
         .header-left {
             display: flex;
             align-items: center;
-            gap: 15px; 
+            gap: 15px;
+            flex: 1; /* ให้ยืดหยุ่นในมือถือ */
+            min-width: 0; /* ป้องกันการดันจนล้น */
         }
 
         /* กล่องแสดงจำนวนคนออนไลน์ */
@@ -185,6 +187,7 @@
             padding: 25px;
             box-shadow: var(--shadow-lg);
             border: 1px solid #f0f0f0;
+            display: flex; flex-direction: column;
         }
 
         .admin-card h3 {
@@ -197,9 +200,14 @@
         }
 
         /* --- Table Styles --- */
-        .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid #eee; }
+        .table-wrapper { 
+            overflow-x: auto; 
+            border-radius: 12px; 
+            border: 1px solid #eee; 
+            width: 100%;
+        }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.9em; background: white; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; background: white; white-space: nowrap; /* บังคับให้ไม่ตัดบรรทัดเพื่อให้อ่านง่ายและ Scroll เอา */ }
 
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
 
@@ -284,9 +292,17 @@
             /* Hide Profile Item in Menu (Since it's on top) */
             .nav-link.profile-item { display: none; }
             
-            .admin-grid { grid-template-columns: 1fr; }
-            th, td { padding: 10px; font-size: 0.85em; }
-            h2 { font-size: 1.5em; }
+            /* [NEW] Layout Adjustments for Mobile */
+            .container { padding: 0 10px; margin: 20px auto; } /* ลด padding ซ้ายขวา */
+            .admin-grid { grid-template-columns: 1fr; gap: 15px; } /* เรียงเป็นคอลัมน์เดียว */
+            .admin-card { padding: 15px; } /* ลด padding ในการ์ด */
+            
+            h2 { font-size: 1.5em; margin-bottom: 15px; }
+            .admin-card h3 { font-size: 1.1em; }
+            
+            /* Table Adjustments */
+            th, td { padding: 10px 8px; font-size: 0.85em; }
+            select { padding: 4px 2px; }
         }
     </style>
 </head>
@@ -346,7 +362,7 @@
     </header>
     
     <div class="container">
-        <h2>👑 Admin Control Panel <span style="font-size:0.6em; color: #777; font-weight:400; margin-left:10px;">(ระบบจัดการผู้ดูแล)</span></h2>
+        <h2>👑 Admin Control Panel <span style="font-size:0.6em; color: #777; font-weight:400; margin-left:10px; display:inline-block;">(ระบบจัดการผู้ดูแล)</span></h2>
 
         <div class="admin-grid">
             
