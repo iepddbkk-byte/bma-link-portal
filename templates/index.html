@@ -44,7 +44,7 @@
         /* --- 1. Header & Navigation --- */
         .main-header {
             background: white;
-            padding: 0 30px;
+            padding: 0 20px; /* ลด Padding ด้านข้างเล็กน้อยเพื่อให้มีพื้นที่มากขึ้นในจอเล็ก */
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -52,14 +52,17 @@
             height: var(--header-height);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: space-between; /* ดันซ้ายสุดและขวาสุดแยกออกจากกัน */
             transition: all 0.3s ease;
         }
 
+        /* ส่วนซ้าย (โลโก้ + สถิติ) */
         .header-left {
             display: flex;
             align-items: center;
-            gap: 15px; /* ปรับระยะห่าง */
+            gap: 15px;
+            flex: 1; /* ให้ยืดหยุ่น */
+            min-width: 0; /* ป้องกันการดันส่วนอื่นตกขอบ */
         }
 
         .logo-container {
@@ -67,6 +70,7 @@
             align-items: center;
             gap: 12px;
             text-decoration: none;
+            flex-shrink: 0;
         }
 
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
@@ -78,6 +82,8 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-shrink: 1; /* ยอมให้หดได้ถ้าที่แคบ */
+            overflow: hidden;
         }
 
         .header-visitor-count {
@@ -157,23 +163,45 @@
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* --- Mobile Header Controls --- */
-        .mobile-controls { display: none; align-items: center; gap: 15px; }
+        /* --- Mobile Header Controls (แก้ไขใหม่) --- */
+        .mobile-controls { 
+            display: none; 
+            align-items: center; 
+            gap: 12px; /* ระยะห่างระหว่างรูปโปรไฟล์กับปุ่มเมนู */
+            flex-shrink: 0; /* ห้ามหดตัว */
+            margin-left: 10px;
+        }
         
         .mobile-profile-btn {
-            display: flex; align-items: center; text-decoration: none;
+            display: flex; 
+            align-items: center; 
+            text-decoration: none;
+            /* ป้องกันรูปถูกบีบ */
+            flex-shrink: 0;
         }
         .mobile-profile-btn img {
-            width: 40px; height: 40px; border-radius: 50%; 
-            border: 2px solid var(--bma-green); object-fit: cover;
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            border: 2px solid var(--bma-green); 
+            object-fit: cover;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: block; /* แก้ไขปัญหาการวางตำแหน่ง */
         }
 
         .mobile-toggle {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             cursor: pointer;
             color: var(--text-color);
-            padding: 5px;
+            padding: 8px; /* เพิ่มพื้นที่กด */
+            background: #f8f9fa;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .mobile-toggle:hover {
+            background: #e9ecef; color: var(--bma-green);
         }
 
         /* --- Container --- */
@@ -192,9 +220,8 @@
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: var(--shadow-lg); /* เพิ่มเงาให้เด่นขึ้น */
+            box-shadow: var(--shadow-lg);
             border: 1px solid #f0f0f0;
-            /* max-width: 800px; margin: 0 auto;  <-- ถ้าอยากให้ไม่กว้างเต็มจอก็เปิดอันนี้ */ 
         }
         .card-header {
             display: flex; justify-content: space-between; align-items: center;
@@ -210,10 +237,15 @@
         }
         .link-item:hover { transform: translateX(5px); border-color: var(--bma-green-light); box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
         
+        /* --- [FIX] แก้ไข Rank Badge ไม่ให้เบี้ยว --- */
         .rank-badge {
-            width: 35px; height: 35px; border-radius: 50%;
+            width: 35px; 
+            height: 35px; 
+            min-width: 35px; /* บังคับความกว้างขั้นต่ำ */
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: 800; margin-right: 15px; font-size: 1rem;
+            flex-shrink: 0; /* ห้ามหดตัวเมื่อหน้าจอแคบ */
         }
         .rank-1 { background: #fff8e1; color: #f1c40f; border: 2px solid #f1c40f; }
         .rank-2 { background: #f5f5f5; color: #95a5a6; border: 2px solid #95a5a6; }
@@ -222,7 +254,7 @@
 
         .link-info { display: flex; align-items: center; overflow: hidden; flex-grow: 1; }
         .link-name { font-weight: 600; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.1rem; }
-        .link-clicks { font-size: 0.95rem; color: #888; display: flex; align-items: center; gap: 5px; margin-left: 15px; background: #f8f9fa; padding: 5px 10px; border-radius: 15px; }
+        .link-clicks { font-size: 0.95rem; color: #888; display: flex; align-items: center; gap: 5px; margin-left: 15px; background: #f8f9fa; padding: 5px 10px; border-radius: 15px; white-space: nowrap; }
 
         /* --- Hero Search --- */
         .hero-section { text-align: center; margin-bottom: 40px; }
@@ -244,6 +276,7 @@
             padding: 12px 30px; border-radius: 40px; font-size: 1rem; 
             cursor: pointer; transition: 0.3s; 
             font-family: 'Kanit', sans-serif; font-weight: 500;
+            white-space: nowrap;
         }
         .search-btn:hover { background: var(--bma-green-hover); transform: scale(1.05); }
 
@@ -299,22 +332,27 @@
         @media (max-width: 768px) {
             body { padding-top: 70px; }
             .main-header { padding: 0 15px; height: 70px; }
-            .logo-text { font-size: 1.1rem; }
             
-            /* Mobile Controls */
-            .mobile-controls { display: flex; }
-            .mobile-toggle { display: block; }
+            /* ปรับขนาดโลโก้ในมือถือ */
+            .logo-text { font-size: 1rem; } 
+            .logo-container img { height: 35px; }
 
-            /* Stats on Mobile */
-            .header-visitor-count span { display: none; } /* ซ่อนคำว่าผู้เข้าชมเหลือแต่ไอคอน */
-            .header-visitor-count { padding: 6px; border-radius: 50%; width: 32px; height: 32px; justify-content: center; }
-            .header-online-count span:last-child { display: none; } /* ซ่อนคำว่า ออนไลน์ เหลือแต่ตัวเลข */
+            /* Mobile Controls: แสดงผลแบบ Flex */
+            .mobile-controls { display: flex; }
             
+            /* Stats on Mobile - ซ่อนคำพูดให้เหลือแต่ไอคอนเพื่อประหยัดที่ */
+            .header-visitor-count span { display: none; } 
+            .header-visitor-count { padding: 0; width: 32px; height: 32px; justify-content: center; border-radius: 50%; }
+            
+            .header-online-count span:last-child { display: none; } /* ซ่อนคำว่า ออนไลน์ */
+            .header-online-count { padding: 4px 10px; }
+
             /* Mobile Menu */
             .nav-menu {
                 display: none; position: absolute; top: 70px; left: 0; width: 100%;
                 background: white; flex-direction: column; align-items: stretch;
                 padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
+                box-sizing: border-box; /* สำคัญ */
             }
             .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
             @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -323,7 +361,7 @@
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
             
-            /* Hide Profile Link in Menu (Since it's on top) */
+            /* Hide Profile Link in Dropdown (Since it's on top bar now) */
             .nav-link.profile-item { display: none; }
 
             .quick-search { flex-direction: column; border-radius: 20px; padding: 15px; }
@@ -411,7 +449,7 @@
                         <div class="rank-badge {% if loop.index <= 3 %}rank-{{ loop.index }}{% else %}rank-other{% endif %}">
                             {{ loop.index }}
                         </div>
-                        <a href="{{ url_for('go_to_link', link_id=link['ID']) }}" target="_blank" style="text-decoration: none; color: inherit;">
+                        <a href="{{ url_for('go_to_link', link_id=link['ID']) }}" target="_blank" style="text-decoration: none; color: inherit; width: 100%;">
                             <div class="link-name">{{ link['ชื่อลิงก์'] }}</div>
                         </a>
                     </div>
