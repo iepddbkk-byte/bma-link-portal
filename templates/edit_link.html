@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แก้ไขลิงค์ - BMA</title>
+    <title>BMA ทะเบียนลิงค์ - แก้ไขลิงค์</title>
     
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
@@ -19,6 +19,7 @@
             --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
             --button-blue: #007bff;
+            --button-blue-hover: #0056b3;
             --button-yellow: #ffc107;
             --button-gray: #6c757d;
             --text-color: #2c3e50;
@@ -30,9 +31,6 @@
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
-            --success-bg: #d4edda; --success-color: #155724;
-            --error-bg: #f8d7da; --error-color: #721c24;
-            --info-bg: #cce5ff; --info-color: #004085;
         }
 
         /* FIX FONT ISSUE */
@@ -134,6 +132,22 @@
         }
         form input[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; }
 
+        /* Shortener Box */
+        .shortener-box {
+            border: 1px solid #d0d7de; background-color: #ffffff;
+            border-radius: 12px; overflow: hidden; margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .shortener-header {
+            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
+            color: white; padding: 12px 20px; font-weight: 500; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .shortener-content { display: none; background: white; border-top: 1px solid #eee; }
+        .shortener-content.active { display: block; }
+        iframe { width: 100%; height: 500px; border: none; display: block; }
+        .fallback-link { padding: 15px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; }
+
         /* Submit Button */
         button[type="submit"] {
             background: linear-gradient(135deg, var(--bma-green), #007a30);
@@ -157,6 +171,8 @@
             padding: 5px 10px; border-radius: 15px; font-size: 0.8em;
             font-weight: 600; margin-bottom: 10px; border: 1px solid #ffb74d;
         }
+        
+        .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
 
         /* Responsive */
         @media (max-width: 992px) { .nav-link span { display: none; } }
@@ -220,7 +236,7 @@
             <p><strong>กำลังแก้ไขข้อมูล:</strong> กรุณาตรวจสอบข้อมูลให้ครบถ้วนก่อนบันทึก</p>
         </div>
 
-        <form action="{{ url_for('update_link_action', link_id=link.ID) }}" method="POST">
+        <form id="editLinkForm" action="{{ url_for('update_link_action', link_id=link.ID) }}" method="POST">
             <div>
                 <label for="ชื่อลิงก์">ชื่อลิงค์ (จำเป็น)</label>
                 <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" value="{{ link['ชื่อลิงก์'] }}" required>
@@ -229,37 +245,39 @@
             <div>
                 <label for="URL">URL (จำเป็น)</label>
                 <input type="url" id="URL" name="URL" value="{{ link.URL }}" placeholder="https://..." required>
+
+                <div class="shortener-box">
+                    <div class="shortener-header" onclick="toggleShortener()">
+                        <span><i class="fas fa-cut"></i> เครื่องมือย่อลิงค์ กทม. (คลิกเพื่อใช้งาน)</span>
+                        <i class="fas fa-chevron-down" id="shortenerIcon"></i>
+                    </div>
+                    <div class="shortener-content" id="shortenerContent">
+                        <iframe src="https://u.bangkok.go.th/index.php" title="BMA Shortener"></iframe>
+                        <div class="fallback-link">
+                            ⚠️ Credit: สำนักดิจิทัล กรุงเทพมหานคร <br>
+                            <a href="https://u.bangkok.go.th/index.php" target="_blank" style="color:var(--button-blue); font-weight:bold; text-decoration:none;">
+                                <i class="fas fa-external-link-alt"></i> คลิกที่นี่เพื่อเปิดในหน้าต่างใหม่
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <span class="info-text">💡 ก๊อปปี้ลิงค์สั้นจากเครื่องมือด้านบน แล้วนำมาวางในช่อง URL</span>
             </div>
             
             <div>
                 <label for="ประเภท">ประเภท (จำเป็น)</label>
                 <select id="ประเภท" name="ประเภท" required>
-                    <optgroup label="ด้านโครงสร้างพื้นฐาน">
-                        <option value="การจราจรและขนส่ง" {% if link['ประเภท'] == 'การจราจรและขนส่ง' %}selected{% endif %}>การจราจรและขนส่ง</option>
-                        <option value="การโยธาและก่อสร้าง" {% if link['ประเภท'] == 'การโยธาและก่อสร้าง' %}selected{% endif %}>การโยธาและก่อสร้าง</option>
-                        <option value="การระบายน้ำและป้องกันน้ำท่วม" {% if link['ประเภท'] == 'การระบายน้ำและป้องกันน้ำท่วม' %}selected{% endif %}>การระบายน้ำและป้องกันน้ำท่วม</option>
-                        <option value="ผังเมือง" {% if link['ประเภท'] == 'ผังเมือง' %}selected{% endif %}>ผังเมือง</option>
-                    </optgroup>
-                    <optgroup label="ด้านคุณภาพชีวิต">
-                        <option value="สิ่งแวดล้อมและความสะอาด" {% if link['ประเภท'] == 'สิ่งแวดล้อมและความสะอาด' %}selected{% endif %}>สิ่งแวดล้อมและความสะอาด</option>
-                        <option value="อนามัยและสาธารณสุข" {% if link['ประเภท'] == 'อนามัยและสาธารณสุข' %}selected{% endif %}>อนามัยและสาธารณสุข</option>
-                        <option value="การแพทย์ (โรงพยาบาล)" {% if link['ประเภท'] == 'การแพทย์ (โรงพยาบาล)' %}selected{% endif %}>การแพทย์ (โรงพยาบาล)</option>
-                    </optgroup>
-                    <optgroup label="ด้านการศึกษาและสังคม">
-                        <option value="การศึกษา (โรงเรียน)" {% if link['ประเภท'] == 'การศึกษา (โรงเรียน)' %}selected{% endif %}>การศึกษา (โรงเรียน)</option>
-                        <option value="วัฒนธรรม กีฬา และการท่องเที่ยว" {% if link['ประเภท'] == 'วัฒนธรรม กีฬา และการท่องเที่ยว' %}selected{% endif %}>วัฒนธรรม กีฬา และการท่องเที่ยว</option>
-                        <option value="พัฒนาสังคม" {% if link['ประเภท'] == 'พัฒนาสังคม' %}selected{% endif %}>พัฒนาสังคม</option>
-                    </optgroup>
-                    <optgroup label="ด้านความปลอดภัย">
-                        <option value="ป้องกันและบรรเทาสาธารณภัย" {% if link['ประเภท'] == 'ป้องกันและบรรเทาสาธารณภัย' %}selected{% endif %}>ป้องกันและบรรเทาสาธารณภัย</option>
-                        <option value="เทศกิจ" {% if link['ประเภท'] == 'เทศกิจ' %}selected{% endif %}>เทศกิจ</option>
-                    </optgroup>
-                    <optgroup label="ด้านการบริหารและทะเบียน">
-                        <option value="การคลังและงบประมาณ" {% if link['ประเภท'] == 'การคลังและงบประมาณ' %}selected{% endif %}>การคลังและงบประมาณ</option>
-                        <option value="การทะเบียน (สำนักงานเขต)" {% if link['ประเภท'] == 'การทะเบียน (สำนักงานเขต)' %}selected{% endif %}>การทะเบียน (สำนักงานเขต)</option>
-                        <option value="บริหารทั่วไป/สำนักงาน" {% if link['ประเภท'] == 'บริหารทั่วไป/สำนักงาน' %}selected{% endif %}>บริหารทั่วไป/สำนักงาน</option>
-                    </optgroup>
-                    <option value="อื่นๆ" {% if link['ประเภท'] == 'อื่นๆ' %}selected{% endif %}>--- อื่นๆ ---</option>
+                    <option value="" disabled>--- เลือกประเภท (9 ด้าน 9 ดี) ---</option>
+                    <option value="เดินทางดี" {% if link['ประเภท'] == 'เดินทางดี' %}selected{% endif %}>1. เดินทางดี</option>
+                    <option value="ปลอดภัยดี" {% if link['ประเภท'] == 'ปลอดภัยดี' %}selected{% endif %}>2. ปลอดภัยดี</option>
+                    <option value="โปร่งใสดี" {% if link['ประเภท'] == 'โปร่งใสดี' %}selected{% endif %}>3. โปร่งใสดี</option>
+                    <option value="สิ่งแวดล้อมดี" {% if link['ประเภท'] == 'สิ่งแวดล้อมดี' %}selected{% endif %}>4. สิ่งแวดล้อมดี</option>
+                    <option value="สุขภาพดี" {% if link['ประเภท'] == 'สุขภาพดี' %}selected{% endif %}>5. สุขภาพดี</option>
+                    <option value="เรียนดี" {% if link['ประเภท'] == 'เรียนดี' %}selected{% endif %}>6. เรียนดี</option>
+                    <option value="เศรษฐกิจดี" {% if link['ประเภท'] == 'เศรษฐกิจดี' %}selected{% endif %}>7. เศรษฐกิจดี</option>
+                    <option value="สังคมดี" {% if link['ประเภท'] == 'สังคมดี' %}selected{% endif %}>8. สังคมดี</option>
+                    <option value="บริหารจัดการดี" {% if link['ประเภท'] == 'บริหารจัดการดี' %}selected{% endif %}>9. บริหารจัดการดี</option>
+                    <option value="อื่นๆ" {% if link['ประเภท'] == 'อื่นๆ' %}selected{% endif %}>อื่นๆ</option>
                 </select>
             </div>
 
@@ -281,7 +299,7 @@
                         </optgroup>
                         <optgroup label="สำนักงานเขต">
                             <option value="สำนักงานเขตคลองเตย">สำนักงานเขตคลองเตย</option>
-                            </optgroup>
+                        </optgroup>
                     </select>
                 {% else %}
                     <input type="text" id="ส่วนราชการ" name="ส่วนราชการ" value="{{ link['ส่วนราชการ'] }}" readonly>
@@ -305,6 +323,7 @@
             <div>
                 <label for="เบอร์โทรติดต่อ">เบอร์โทรติดต่อ (จำเป็น)</label>
                 <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ" value="{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}" required>
+                <span class="info-text">💡 ระบบจะลบเครื่องหมาย ' (ฝนทอง) ให้อัตโนมัติ</span>
             </div>
 
             <div>
@@ -321,6 +340,21 @@
     <script>
         function toggleMenu() { document.getElementById('navMenu').classList.toggle('active'); }
 
+        // Toggle Shortener Box
+        function toggleShortener() {
+            const content = document.getElementById('shortenerContent');
+            const icon = document.getElementById('shortenerIcon');
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                content.classList.add('active');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             {% if is_admin %}
             const currentAgency = "{{ link['ส่วนราชการ'] }}";
@@ -328,6 +362,30 @@
             if (currentAgency && agencySelect) { agencySelect.value = currentAgency; }
             {% endif %}
         });
+
+        // --- Phone Number Cleaning Script (Consistent with Add Link) ---
+        // 1. ดักจับตอน Submit
+        document.getElementById('editLinkForm').addEventListener('submit', function(e) {
+            const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
+            if (phoneInput) {
+                phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
+            }
+        });
+
+        // 2. ดักจับตอนพิมพ์หรือ Paste
+        const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
+        if(phoneInput) {
+            function cleanRealTime(input) {
+                let val = input.value;
+                if (val.includes("'")) {
+                    input.value = val.replace(/'/g, '');
+                }
+            }
+            phoneInput.addEventListener('input', function(e) { cleanRealTime(e.target); });
+            phoneInput.addEventListener('paste', function(e) {
+                setTimeout(() => { cleanRealTime(e.target); }, 10);
+            });
+        }
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}

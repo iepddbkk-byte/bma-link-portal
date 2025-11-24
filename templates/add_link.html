@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เพิ่มลิงค์ใหม่ - BMA</title>
+    <title>BMA ทะเบียนลิงค์ - เพิ่มลิงค์ใหม่</title>
     
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
@@ -250,7 +250,7 @@
     <header class="main-header">
         <a href="{{ url_for('home') }}" class="logo-container">
             <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-            <div class="logo-text">ทะเบียนลิงค์ BMA</div>
+            <div class="logo-text">BMA ทะเบียนลิงค์</div>
         </a>
 
         <div class="mobile-controls">
@@ -326,33 +326,17 @@
             <div>
                 <label for="ประเภท">ประเภท (จำเป็น)</label>
                 <select id="ประเภท" name="ประเภท" required>
-                    <option value="" disabled selected>--- เลือกประเภทงาน ---</option>
-                    <optgroup label="ด้านโครงสร้างพื้นฐาน">
-                        <option value="การจราจรและขนส่ง">การจราจรและขนส่ง</option>
-                        <option value="การโยธาและก่อสร้าง">การโยธาและก่อสร้าง</option>
-                        <option value="การระบายน้ำและป้องกันน้ำท่วม">การระบายน้ำและป้องกันน้ำท่วม</option>
-                        <option value="ผังเมือง">ผังเมือง</option>
-                    </optgroup>
-                    <optgroup label="ด้านคุณภาพชีวิต">
-                        <option value="สิ่งแวดล้อมและความสะอาด">สิ่งแวดล้อมและความสะอาด</option>
-                        <option value="อนามัยและสาธารณสุข">อนามัยและสาธารณสุข</option>
-                        <option value="การแพทย์ (โรงพยาบาล)">การแพทย์ (โรงพยาบาล)</option>
-                    </optgroup>
-                    <optgroup label="ด้านการศึกษาและสังคม">
-                        <option value="การศึกษา (โรงเรียน)">การศึกษา (โรงเรียน)</option>
-                        <option value="วัฒนธรรม กีฬา และการท่องเที่ยว">วัฒนธรรม กีฬา และการท่องเที่ยว</option>
-                        <option value="พัฒนาสังคม">พัฒนาสังคม</option>
-                    </optgroup>
-                    <optgroup label="ด้านความปลอดภัย">
-                        <option value="ป้องกันและบรรเทาสาธารณภัย">ป้องกันและบรรเทาสาธารณภัย</option>
-                        <option value="เทศกิจ">เทศกิจ</option>
-                    </optgroup>
-                    <optgroup label="ด้านการบริหารและทะเบียน">
-                        <option value="การคลังและงบประมาณ">การคลังและงบประมาณ</option>
-                        <option value="การทะเบียน (สำนักงานเขต)">การทะเบียน (สำนักงานเขต)</option>
-                        <option value="บริหารทั่วไป/สำนักงาน">บริหารทั่วไป/สำนักงาน</option>
-                    </optgroup>
-                    <option value="อื่นๆ">--- อื่นๆ ---</option>
+                    <option value="" disabled selected>--- เลือกประเภท (9 ด้าน 9 ดี) ---</option>
+                    <option value="เดินทางดี">1. เดินทางดี</option>
+                    <option value="ปลอดภัยดี">2. ปลอดภัยดี</option>
+                    <option value="โปร่งใสดี">3. โปร่งใสดี</option>
+                    <option value="สิ่งแวดล้อมดี">4. สิ่งแวดล้อมดี</option>
+                    <option value="สุขภาพดี">5. สุขภาพดี</option>
+                    <option value="เรียนดี">6. เรียนดี</option>
+                    <option value="เศรษฐกิจดี">7. เศรษฐกิจดี</option>
+                    <option value="สังคมดี">8. สังคมดี</option>
+                    <option value="บริหารจัดการดี">9. บริหารจัดการดี</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
                 </select>
             </div>
 
