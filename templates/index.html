@@ -44,7 +44,7 @@
         /* --- 1. Header & Navigation --- */
         .main-header {
             background: white;
-            padding: 0 20px; /* ลด Padding ด้านข้างเล็กน้อยเพื่อให้มีพื้นที่มากขึ้นในจอเล็ก */
+            padding: 0 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -52,7 +52,7 @@
             height: var(--header-height);
             display: flex;
             align-items: center;
-            justify-content: space-between; /* ดันซ้ายสุดและขวาสุดแยกออกจากกัน */
+            justify-content: space-between;
             transition: all 0.3s ease;
         }
 
@@ -61,8 +61,8 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            flex: 1; /* ให้ยืดหยุ่น */
-            min-width: 0; /* ป้องกันการดันส่วนอื่นตกขอบ */
+            flex: 1;
+            min-width: 0;
         }
 
         .logo-container {
@@ -82,7 +82,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
-            flex-shrink: 1; /* ยอมให้หดได้ถ้าที่แคบ */
+            flex-shrink: 1;
             overflow: hidden;
         }
 
@@ -163,12 +163,12 @@
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* --- Mobile Header Controls (แก้ไขใหม่) --- */
+        /* --- Mobile Header Controls --- */
         .mobile-controls { 
             display: none; 
             align-items: center; 
-            gap: 12px; /* ระยะห่างระหว่างรูปโปรไฟล์กับปุ่มเมนู */
-            flex-shrink: 0; /* ห้ามหดตัว */
+            gap: 12px;
+            flex-shrink: 0;
             margin-left: 10px;
         }
         
@@ -176,7 +176,6 @@
             display: flex; 
             align-items: center; 
             text-decoration: none;
-            /* ป้องกันรูปถูกบีบ */
             flex-shrink: 0;
         }
         .mobile-profile-btn img {
@@ -186,14 +185,14 @@
             border: 2px solid var(--bma-green); 
             object-fit: cover;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: block; /* แก้ไขปัญหาการวางตำแหน่ง */
+            display: block;
         }
 
         .mobile-toggle {
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--text-color);
-            padding: 8px; /* เพิ่มพื้นที่กด */
+            padding: 8px;
             background: #f8f9fa;
             border-radius: 50%;
             width: 40px; height: 40px;
@@ -211,7 +210,7 @@
             padding: 0 20px;
         }
 
-        /* --- Top Links Card (Updated) --- */
+        /* --- Top Links Card --- */
         .top-links-section {
             margin-bottom: 50px;
         }
@@ -237,15 +236,15 @@
         }
         .link-item:hover { transform: translateX(5px); border-color: var(--bma-green-light); box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
         
-        /* --- [FIX] แก้ไข Rank Badge ไม่ให้เบี้ยว --- */
+        /* [FIX] Rank Badge */
         .rank-badge {
             width: 35px; 
             height: 35px; 
-            min-width: 35px; /* บังคับความกว้างขั้นต่ำ */
+            min-width: 35px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: 800; margin-right: 15px; font-size: 1rem;
-            flex-shrink: 0; /* ห้ามหดตัวเมื่อหน้าจอแคบ */
+            flex-shrink: 0;
         }
         .rank-1 { background: #fff8e1; color: #f1c40f; border: 2px solid #f1c40f; }
         .rank-2 { background: #f5f5f5; color: #95a5a6; border: 2px solid #95a5a6; }
@@ -333,26 +332,21 @@
             body { padding-top: 70px; }
             .main-header { padding: 0 15px; height: 70px; }
             
-            /* ปรับขนาดโลโก้ในมือถือ */
             .logo-text { font-size: 1rem; } 
             .logo-container img { height: 35px; }
 
-            /* Mobile Controls: แสดงผลแบบ Flex */
+            /* Mobile Controls: แสดงผล */
             .mobile-controls { display: flex; }
             
-            /* Stats on Mobile - ซ่อนคำพูดให้เหลือแต่ไอคอนเพื่อประหยัดที่ */
-            .header-visitor-count span { display: none; } 
-            .header-visitor-count { padding: 0; width: 32px; height: 32px; justify-content: center; border-radius: 50%; }
-            
-            .header-online-count span:last-child { display: none; } /* ซ่อนคำว่า ออนไลน์ */
-            .header-online-count { padding: 4px 10px; }
+            /* [NEW] ซ่อนส่วนแสดงสถิติ (Online/Visitor) ทั้งหมดในมือถือ */
+            .header-stats-group { display: none; }
 
             /* Mobile Menu */
             .nav-menu {
                 display: none; position: absolute; top: 70px; left: 0; width: 100%;
                 background: white; flex-direction: column; align-items: stretch;
                 padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
-                box-sizing: border-box; /* สำคัญ */
+                box-sizing: border-box;
             }
             .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
             @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -361,7 +355,6 @@
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
             
-            /* Hide Profile Link in Dropdown (Since it's on top bar now) */
             .nav-link.profile-item { display: none; }
 
             .quick-search { flex-direction: column; border-radius: 20px; padding: 15px; }
@@ -545,9 +538,6 @@
     </script>
     <script>
         function updateOnlineCount() {
-            // ดึง CSRF Token จาก meta tag หรือตัวแปร Jinja (ถ้ามี)
-            // เราจะลองส่งไปใน Header เพื่อผ่านระบบความปลอดภัยของ Flask
-            
             fetch("{{ url_for('heartbeat') }}", { 
                 method: "POST",
                 headers: { 
@@ -566,25 +556,21 @@
                     const el = document.getElementById('onlineCount');
                     if(el) {
                         el.textContent = data.online_count;
-                        // ถ้าตัวเลขขึ้นแล้ว ให้เปลี่ยนสีให้รู้ว่าทำงาน (Visual Debug)
                         el.style.color = "var(--bma-green)"; 
                     }
                 }
             })
             .catch(err => {
                 console.error("Heartbeat error:", err);
-                // ถ้ายังไม่ได้ ให้ลองเปลี่ยนเป็น "-" เหมือนเดิม
                 const el = document.getElementById('onlineCount');
                 if(el) el.textContent = "-";
             });
         }
 
-        // เรียกทำงานทันทีและวนซ้ำ
         updateOnlineCount();
         setInterval(updateOnlineCount, 10000);
 
         window.addEventListener('beforeunload', function() {
-            // ใช้ Beacon ซึ่งเสถียรกว่าสำหรับการปิดหน้าเว็บ
             const data = new FormData();
             const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
             data.append('csrf_token', csrfToken);
