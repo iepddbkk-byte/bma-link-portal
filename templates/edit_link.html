@@ -19,7 +19,6 @@
             --bma-green-light: #e8f5e9;
             --button-red: #dc3545;
             --button-blue: #007bff;
-            --button-blue-hover: #0056b3;
             --button-yellow: #ffc107;
             --button-gray: #6c757d;
             --text-color: #2c3e50;
@@ -132,22 +131,6 @@
         }
         form input[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; }
 
-        /* Shortener Box */
-        .shortener-box {
-            border: 1px solid #d0d7de; background-color: #ffffff;
-            border-radius: 12px; overflow: hidden; margin-top: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .shortener-header {
-            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
-            color: white; padding: 12px 20px; font-weight: 500; cursor: pointer;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .shortener-content { display: none; background: white; border-top: 1px solid #eee; }
-        .shortener-content.active { display: block; }
-        iframe { width: 100%; height: 500px; border: none; display: block; }
-        .fallback-link { padding: 15px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; }
-
         /* Submit Button */
         button[type="submit"] {
             background: linear-gradient(135deg, var(--bma-green), #007a30);
@@ -173,6 +156,15 @@
         }
         
         .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
+        
+        /* Shortener Box */
+        .shortener-box { border: 1px solid #d0d7de; background-color: #ffffff; border-radius: 12px; overflow: hidden; margin-top: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .shortener-header { background: linear-gradient(135deg, var(--button-blue), #0056b3); color: white; padding: 12px 20px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .shortener-content { display: none; background: white; border-top: 1px solid #eee; }
+        .shortener-content.active { display: block; }
+        iframe { width: 100%; height: 500px; border: none; display: block; }
+        .fallback-link { padding: 15px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; }
+
 
         /* Responsive */
         @media (max-width: 992px) { .nav-link span { display: none; } }
@@ -314,15 +306,16 @@
                     <option value="เลิกใช้งาน" {% if link['สถานะ'] == 'เลิกใช้งาน' %}selected{% endif %}>เลิกใช้งาน</option>
                 </select>
             </div>
-			
-			<div>
-				<label for="ความเป็นส่วนตัว">ระดับความเป็นส่วนตัว</label>
-				<select id="ความเป็นส่วนตัว" name="ความเป็นส่วนตัว" required>
-				<option value="สาธารณะ" selected>🌐 สาธารณะ (ทุกคนมองเห็น)</option>
-				<option value="เฉพาะหน่วยงาน">🏢 เฉพาะหน่วยงาน (เห็นเฉพาะเจ้าหน้าที่ในหน่วยงานเดียวกัน)</option>
-				<option value="ส่วนตัว">🔒 ส่วนตัว (เห็นเฉพาะฉัน)</option>
-				</select>
-			</div>
+
+            <div>
+                <label for="ความเป็นส่วนตัว">ระดับความเป็นส่วนตัว</label>
+                {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
+                <select id="ความเป็นส่วนตัว" name="ความเป็นส่วนตัว" required>
+                    <option value="สาธารณะ" {% if privacy == 'สาธารณะ' %}selected{% endif %}>🌐 สาธารณะ (ทุกคนมองเห็น)</option>
+                    <option value="เฉพาะหน่วยงาน" {% if privacy == 'เฉพาะหน่วยงาน' %}selected{% endif %}>🏢 เฉพาะหน่วยงาน (เห็นเฉพาะเจ้าหน้าที่ในหน่วยงานเดียวกัน)</option>
+                    <option value="ส่วนตัว" {% if privacy == 'ส่วนตัว' %}selected{% endif %}>🔒 ส่วนตัว (เห็นเฉพาะฉัน)</option>
+                </select>
+            </div>
 
             <div>
                 <label for="อีเมลผู้รับผิดชอบ">อีเมลผู้รับผิดชอบ (จำเป็น)</label>
@@ -372,16 +365,13 @@
             {% endif %}
         });
 
-        // --- Phone Number Cleaning Script (Consistent with Add Link) ---
-        // 1. ดักจับตอน Submit
+        // Phone cleaning script
         document.getElementById('editLinkForm').addEventListener('submit', function(e) {
             const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
             if (phoneInput) {
                 phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
             }
         });
-
-        // 2. ดักจับตอนพิมพ์หรือ Paste
         const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
         if(phoneInput) {
             function cleanRealTime(input) {
@@ -402,6 +392,17 @@
                 {% for category, message in messages %} Toast.fire({ icon: '{{ category }}', title: '{{ message }}' }); {% endfor %}
             {% endif %}
         {% endwith %}
+    </script>
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
     </script>
 </body>
 </html>

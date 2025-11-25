@@ -763,15 +763,13 @@ def update_link_action(link_id):
         if session.get('level', '').strip() != 'Admin' and creator != session.get('username', '').strip():
              flash('ไม่มีสิทธิ์', 'error'); return redirect(url_for('dashboard'))
              
-        # [UPDATE] รับค่าความเป็นส่วนตัว
+        # รับค่าความเป็นส่วนตัว
         data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         main_agency = request.form.get('ส่วนราชการ') if session.get('level', '').strip() == 'Admin' else row_vals[3]
         
-        # Clicks is column 15 now
         current_clicks = row_vals[14] if len(row_vals) > 14 else 0
         
-        # [UPDATE] อัปเดตแถวข้อมูล (เพิ่ม privacy)
         new_vals = [
             link_id, data['ประเภท'], data['หน่วยงาน'], main_agency, 
             data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
@@ -780,12 +778,14 @@ def update_link_action(link_id):
             data.get('ความเป็นส่วนตัว', 'สาธารณะ'),
             current_clicks 
         ]
-        range_name = f"A{cell.row}:O{cell.row}"  # ขยาย Range ถึง O
+        range_name = f"A{cell.row}:O{cell.row}" 
         db_sheet.update(range_name, [new_vals])
         
         clear_db_cache()
 
-        flash('แก้ไขสำเร็จ', 'success'); return redirect(url_for('dashboard'))
+        flash('แก้ไขสำเร็จ', 'success')
+        # [UPDATE] เปลี่ยนให้ Redirect ไปหน้า links_page แทน dashboard
+        return redirect(url_for('links_page')) 
     except: return redirect(url_for('dashboard'))
 
 @app.route('/analytics')
