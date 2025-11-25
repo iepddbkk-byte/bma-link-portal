@@ -42,7 +42,7 @@
             background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
             color: var(--text-color);
             min-height: 100vh;
-            padding-top: var(--header-height); /* เว้นที่ให้ Header */
+            padding-top: var(--header-height);
         }
 
         /* --- 1. Header & Navigation --- */
@@ -229,6 +229,11 @@
         .status-error { background: #f8d7da; color: #721c24; }
         .status-blocked { background: #cce5ff; color: #004085; }
         .status-unknown { background: #e2e3e5; color: #383d41; }
+        
+        /* Privacy Badges */
+        .privacy-public { background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
+        .privacy-agency { background: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; }
+        .privacy-private { background: #f3e5f5; color: #7b1fa2; border: 1px solid #e1bee7; }
 
         .action-buttons { display: flex; gap: 8px; justify-content: center; }
         .btn-icon {
@@ -320,9 +325,10 @@
 
             /* Table Mobile Optimization: Hide less important columns */
             th:nth-child(2), td:nth-child(2), /* รายละเอียด */
-            th:nth-child(7), td:nth-child(7), /* ส่วนราชการ */
-            th:nth-child(8), td:nth-child(8), /* เบอร์ */
-            th:nth-child(10), td:nth-child(10) /* วันที่ */
+            th:nth-child(3), td:nth-child(3), /* ระดับ (Privacy) - อาจจะซ่อนหรือไม่ซ่อนก็ได้ */
+            th:nth-child(8), td:nth-child(8), /* ส่วนราชการ */
+            th:nth-child(9), td:nth-child(9), /* เบอร์ */
+            th:nth-child(11), td:nth-child(11) /* วันที่ */
             { display: none; }
             
             .pagination-controls { justify-content: center; }
@@ -336,7 +342,7 @@
         <div class="header-left">
             <a href="{{ url_for('home') }}" class="logo-container">
                 <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-                <div class="logo-text">BMA ทะเบียนลิงค์</div>
+                <div class="logo-text">ทะเบียนลิงค์ BMA</div>
             </a>
             
             <div class="header-stats-group">
@@ -427,8 +433,8 @@
                                 ชื่อลิงก์ 
                                 <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7;">↕</span>
                             </th>
-                            <th>รายละเอียด</th> 
-                            <th style="text-align:center;">สถานะลิงค์</th> 
+                            <th>รายละเอียด</th>
+                            <th style="text-align:center;">ระดับ</th> <th style="text-align:center;">สถานะลิงค์</th> 
                             <th style="text-align:center;">การใช้งาน</th>
                             <th>ประเภท</th>
                             <th>หน่วยงาน</th> 
@@ -454,6 +460,16 @@
                             </td>
                             <td>{{ link['รายละเอียด'] }}</td>
                             
+                            <td style="text-align: center;">
+                                {% if link['ความเป็นส่วนตัว'] == 'สาธารณะ' or not link['ความเป็นส่วนตัว'] %}
+                                    <span class="status-badge privacy-public"><i class="fas fa-globe"></i> สาธารณะ</span>
+                                {% elif link['ความเป็นส่วนตัว'] == 'เฉพาะหน่วยงาน' %}
+                                    <span class="status-badge privacy-agency"><i class="fas fa-building"></i> ภายใน</span>
+                                {% elif link['ความเป็นส่วนตัว'] == 'ส่วนตัว' %}
+                                    <span class="status-badge privacy-private"><i class="fas fa-lock"></i> ส่วนตัว</span>
+                                {% endif %}
+                            </td>
+
                             <td style="text-align: center;">
                                 {% if link['LinkStatus'] == 'OK' %}
                                     <span class="status-badge status-ok"><i class="fas fa-check-circle"></i> ปกติ</span>
@@ -514,7 +530,7 @@
                         </tr>
                         {% else %}
                         <tr id="noDataRow">
-                            <td colspan="12" style="text-align: center; padding: 30px; color: #999;">
+                            <td colspan="13" style="text-align: center; padding: 30px; color: #999;">
                                 <i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
                                 ไม่พบข้อมูลลิงค์
                             </td>
@@ -597,7 +613,8 @@
             // กรองข้อมูล
             const filteredRows = allTableRows.filter(row => {
                 const textContent = row.innerText.toLowerCase();
-                const agencyCell = row.children[6].innerText.trim(); 
+                // Agency Cell is at index 7 now because of new column
+                const agencyCell = row.children[7].innerText.trim(); 
                 
                 const matchesText = textContent.includes(filterText);
                 const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);

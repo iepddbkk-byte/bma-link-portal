@@ -314,6 +314,15 @@
                     <option value="เลิกใช้งาน" {% if link['สถานะ'] == 'เลิกใช้งาน' %}selected{% endif %}>เลิกใช้งาน</option>
                 </select>
             </div>
+			
+			<div>
+				<label for="ความเป็นส่วนตัว">ระดับความเป็นส่วนตัว</label>
+				<select id="ความเป็นส่วนตัว" name="ความเป็นส่วนตัว" required>
+				<option value="สาธารณะ" selected>🌐 สาธารณะ (ทุกคนมองเห็น)</option>
+				<option value="เฉพาะหน่วยงาน">🏢 เฉพาะหน่วยงาน (เห็นเฉพาะเจ้าหน้าที่ในหน่วยงานเดียวกัน)</option>
+				<option value="ส่วนตัว">🔒 ส่วนตัว (เห็นเฉพาะฉัน)</option>
+				</select>
+			</div>
 
             <div>
                 <label for="อีเมลผู้รับผิดชอบ">อีเมลผู้รับผิดชอบ (จำเป็น)</label>

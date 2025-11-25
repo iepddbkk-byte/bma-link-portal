@@ -18,8 +18,6 @@ import uuid
 from collections import Counter
 from threading import Thread 
 from PIL import Image
-
-# Import Flask-Mail และ itsdangerous
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
 
@@ -105,9 +103,10 @@ districts_list = [
     "สำนักงานเขตหลักสี่", "สำนักงานเขตห้วยขวาง"
 ]
 
+# [UPDATE] เพิ่ม "ความเป็นส่วนตัว" เข้าไปใน Headers (Index 13)
 DB_HEADERS = [
     "ID", "ประเภท", "หน่วยงาน", "ส่วนราชการ", "อีเมลผู้รับผิดชอบ", "เบอร์โทรติดต่อ",
-    "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "Clicks"
+    "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "ความเป็นส่วนตัว", "Clicks"
 ]
 
 STAFF_HEADERS = [
@@ -116,22 +115,20 @@ STAFF_HEADERS = [
 ]
 
 # ==========================================
-# [NEW] ส่วนระบบ Caching (แก้ปัญหา API 429)
+# ส่วนระบบ Caching
 # ==========================================
-CACHE_TIMEOUT = 300  # ระยะเวลาจำข้อมูล (วินาที) -> 300 คือ 5 นาที
+CACHE_TIMEOUT = 300 
 _app_cache = {
     'db_records': {'data': None, 'time': None},
     'staff_records': {'data': None, 'time': None}
 }
 
 def clear_db_cache():
-    """สั่งล้าง Cache ข้อมูลลิงค์ (ใช้เมื่อมีการ เพิ่ม/ลบ/แก้ไข ลิงค์)"""
     global _app_cache
     _app_cache['db_records'] = {'data': None, 'time': None}
-    print("🧹 DB Cache Cleared (Force Refresh Next Time)")
+    print("🧹 DB Cache Cleared")
 
 def clear_staff_cache():
-    """สั่งล้าง Cache ข้อมูลเจ้าหน้าที่ (ใช้เมื่อมีการ สมัคร/แก้ไขโปรไฟล์)"""
     global _app_cache
     _app_cache['staff_records'] = {'data': None, 'time': None}
     print("🧹 Staff Cache Cleared")
@@ -150,7 +147,6 @@ def generate_invite_code():
 
 def records_to_dict(records_list, headers):
     records_dict = []
-    # ตรวจสอบว่ามีข้อมูลหรือไม่ (ป้องกัน Index Error)
     if not records_list or len(records_list) < 2:
         return []
         
@@ -170,25 +166,21 @@ def records_to_dict(records_list, headers):
     return records_dict
 
 def get_db_records(force_refresh=False):
-    """ดึงข้อมูลลิงค์ แบบมี Caching"""
     global _app_cache
     if db_sheet is None: return []
 
     now = datetime.datetime.now()
     cache = _app_cache['db_records']
 
-    # 1. ตรวจสอบว่ามี Cache และยังไม่หมดอายุหรือไม่
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
         if (now - cache['time']).total_seconds() < CACHE_TIMEOUT:
             return cache['data']
 
-    # 2. ถ้าไม่มี Cache หรือหมดอายุ ให้ดึงจาก Google Sheets
     try:
         print("zzz Fetching DB from Google Sheets... (API Call)")
         all_values = db_sheet.get_all_values()
         data = records_to_dict(all_values, DB_HEADERS)
         
-        # 3. บันทึกลง Cache
         cache['data'] = data
         cache['time'] = now
         return data
@@ -197,7 +189,6 @@ def get_db_records(force_refresh=False):
         return []
 
 def get_staff_records(force_refresh=False):
-    """ดึงข้อมูลเจ้าหน้าที่ แบบมี Caching"""
     global _app_cache
     if staff_sheet is None: return []
 
@@ -239,6 +230,36 @@ def increment_site_views():
             stats_sheet.update_cell(1, 2, current_views + 1)
         except Exception as e:
             print(f"Error incrementing views: {e}")
+
+# [NEW] ฟังก์ชันตรวจสอบสิทธิ์การเข้าถึงลิงค์
+def check_link_permission(link, user_session):
+    privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') # Default เป็นสาธารณะ
+    
+    # 1. ลิงค์สาธารณะ (ใครก็เห็นได้)
+    if privacy == 'สาธารณะ' or not privacy:
+        return True
+        
+    # กรณีอื่นๆ ต้อง Login ก่อน
+    if not user_session.get('logged_in'):
+        return False
+        
+    user_role = user_session.get('level', '')
+    user_agency = user_session.get('main_agency', '')
+    username = user_session.get('username', '')
+    
+    # Admin เห็นทุกอย่าง
+    if user_role == 'Admin':
+        return True
+        
+    # 2. เฉพาะเจ้าหน้าที่ในหน่วยงานเดียวกัน
+    if privacy == 'เฉพาะหน่วยงาน':
+        return link.get('ส่วนราชการ') == user_agency
+        
+    # 3. เห็นเฉพาะตนเอง (ส่วนตัว)
+    if privacy == 'ส่วนตัว':
+        return link.get('CreatorUsername') == username
+        
+    return False
 
 # --- 5. API ---
 @app.route('/check_username', methods=['POST'])
@@ -287,10 +308,10 @@ def run_link_checker():
                     status_msg = "OK" if 200 <= resp.status_code < 300 or resp.status_code == 403 else f"{resp.status_code} Error"
                 except:
                     status_msg = "Error/Timeout"
+            # อัปเดตที่คอลัมน์ M (LinkStatus)
             updates.append({'range': f'M{row_index}', 'values': [[status_msg]]})
         if updates:
             db_sheet.batch_update(updates, value_input_option='RAW')
-            # [CACHE] Clear cache after batch update
             clear_db_cache()
             return jsonify({'status': 'success', 'message': f'Checked {len(updates)} links'})
     except Exception as e:
@@ -327,7 +348,6 @@ def generate_qr_code():
 @app.route('/go/<link_id>')
 def go_to_link(link_id):
     try:
-        # Note: find() calls API, but for specific row lookup it's acceptable
         cell = db_sheet.find(link_id)
         if cell:
             row_values = db_sheet.row_values(cell.row)
@@ -335,9 +355,10 @@ def go_to_link(link_id):
             
             def update_click_count(row_num):
                 try:
-                    current_clicks = db_sheet.cell(row_num, 14).value
+                    # [UPDATE] Clicks ขยับไปเป็นคอลัมน์ที่ 15 (O) เพราะเพิ่ม Privacy เข้ามาแทรก
+                    current_clicks = db_sheet.cell(row_num, 15).value
                     if not current_clicks: current_clicks = 0
-                    db_sheet.update_cell(row_num, 14, int(current_clicks) + 1)
+                    db_sheet.update_cell(row_num, 15, int(current_clicks) + 1)
                 except: pass
             Thread(target=update_click_count, args=(cell.row,)).start()
 
@@ -353,12 +374,10 @@ def home():
     if db_sheet is None: 
         return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=[], error="Sheet Error")
     try:
-        # --- LOGIC การนับแบบ UNIQUE VIEW ---
         if not session.get('visited_home'):
             Thread(target=increment_site_views).start()
             session['visited_home'] = True
         
-        # --- สร้าง Visitor ID สำหรับนับคนออนไลน์ ถ้ายังไม่มี ---
         if not session.get('visitor_id'):
             session['visitor_id'] = str(uuid.uuid4())
 
@@ -368,14 +387,17 @@ def home():
             except: pass
 
         all_records = get_db_records()
-        for l in all_records:
+        
+        # [UPDATE] กรองลิงค์ตามสิทธิ์การเข้าถึง (Privacy)
+        visible_links = [link for link in all_records if link.get('สถานะ') == 'ใช้งาน' and check_link_permission(link, session)]
+        
+        for l in visible_links:
             try: l['Clicks'] = int(l.get('Clicks', 0))
             except: l['Clicks'] = 0
         
-        top_5_links = sorted(all_records, key=lambda x: x['Clicks'], reverse=True)[:5]
+        top_5_links = sorted(visible_links, key=lambda x: x['Clicks'], reverse=True)[:5]
 
-        links_for_home = [link for link in all_records if link.get('สถานะ') == 'ใช้งาน']
-        for link in links_for_home:
+        for link in visible_links:
             date_str = link.get('วันที่อัปเดต')
             link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
 
@@ -383,7 +405,7 @@ def home():
                                session=session,
                                bureaus=bureaus_list,
                                districts=districts_list,
-                               links=links_for_home, 
+                               links=visible_links, 
                                top_links=top_5_links, 
                                total_views=total_views, 
                                error=None)
@@ -395,18 +417,24 @@ def links_page():
     if db_sheet is None: 
         return render_template('links_page.html', links=[], error="Sheet Error", session=session, agency_name="Error")
     try:
-        # --- สร้าง Visitor ID สำหรับนับคนออนไลน์ ถ้ายังไม่มี ---
         if not session.get('visitor_id'):
             session['visitor_id'] = str(uuid.uuid4())
 
         agency_filter = request.args.get('agency') 
+        category_filter = request.args.get('category')
         all_records = get_db_records()
         
+        # [UPDATE] กรองลิงค์ตามสิทธิ์การเข้าถึง (Privacy) ก่อนกรองหมวดหมู่
+        valid_links = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน' and check_link_permission(l, session)]
+
         if agency_filter:
-            links_to_display = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน' and l.get('ส่วนราชการ') == agency_filter]
+            links_to_display = [l for l in valid_links if l.get('ส่วนราชการ') == agency_filter]
             page_title = agency_filter
+        elif category_filter:
+            links_to_display = [l for l in valid_links if l.get('ประเภท') == category_filter]
+            page_title = category_filter
         else:
-            links_to_display = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน']
+            links_to_display = valid_links
             page_title = "ลิงค์ทั้งหมด"
         
         for link in links_to_display:
@@ -494,7 +522,6 @@ def register_action():
         new_row_final = [username, hashed_password, 'Users', fullname, position, division, main_agency, phone, email, current_time, current_time]
         staff_sheet.append_row(new_row_final, value_input_option='USER_ENTERED')
         
-        # [CACHE] Clear cache after registration
         clear_staff_cache()
         
         invite_sheet.update_cell(code_cell.row, 2, "Used")
@@ -540,7 +567,6 @@ def reset_password_page(token):
                 staff_sheet.update_cell(cell.row, 2, new_hash) 
                 staff_sheet.update_cell(cell.row, 11, get_current_timestamp())
                 
-                # [CACHE] Clear cache after password reset
                 clear_staff_cache()
                 
                 flash('เปลี่ยนรหัสผ่านสำเร็จ', 'success')
@@ -598,7 +624,6 @@ def edit_profile_action():
             staff_sheet.update_cell(cell.row, 9, email)       
             staff_sheet.update_cell(cell.row, 11, get_current_timestamp()) 
             
-            # [CACHE] Clear cache after profile update
             clear_staff_cache()
             
             session['name'] = fullname
@@ -616,39 +641,41 @@ def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     if db_sheet is None: return render_template('dashboard.html', session=session, links=[])
     try: 
-        # --- สร้าง Visitor ID ถ้าไม่มี ---
         if not session.get('visitor_id'):
             session['visitor_id'] = str(uuid.uuid4())
 
-        all_links = get_db_records() 
+        # Admin เห็นทั้งหมด, User เห็นเฉพาะของตัวเอง
+        all_links = get_db_records()
+        user_links = []
+        if session.get('level') == 'Admin':
+            user_links = all_links
+        else:
+            user_links = [l for l in all_links if l.get('CreatorUsername') == session.get('username')]
         
-        # --- คำนวณ Top 10 Links และ Clicks ---
-        for l in all_links:
+        for l in user_links:
             try: l['Clicks'] = int(l.get('Clicks', 0))
             except: l['Clicks'] = 0
             date_str = l.get('วันที่อัปเดต')
             l['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
             
-        top_10 = sorted(all_links, key=lambda x: x['Clicks'], reverse=True)[:10]
+        top_10 = sorted(user_links, key=lambda x: x['Clicks'], reverse=True)[:10]
         
-        # --- ดึงยอดวิวรวม ---
         total_views = 0
         if stats_sheet:
             try: total_views = int(stats_sheet.cell(1, 2).value or 0)
             except: pass
             
-        # --- ส่งข้อมูลไปยัง template ---
         chart_data = {
             "total_views": total_views,
             "top_10_links": top_10,
-            "total_links": len(all_links),
-            "active_links": sum(1 for l in all_links if l.get('สถานะ') == 'ใช้งาน'),
-            "total_users": len(get_staff_records()) # Estimate
+            "total_links": len(user_links),
+            "active_links": sum(1 for l in user_links if l.get('สถานะ') == 'ใช้งาน'),
+            "total_users": len(get_staff_records()) 
         }
 
         return render_template('dashboard.html', 
                                session=session, 
-                               links=all_links, 
+                               links=user_links, 
                                bureaus=bureaus_list, 
                                districts=districts_list,
                                chart_data=chart_data,
@@ -668,19 +695,21 @@ def add_link_page():
 def add_link_action():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'รายละเอียด', 'สถานะ']}
+        # [UPDATE] รับค่า "ความเป็นส่วนตัว" จากฟอร์ม
+        data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'รายละเอียด', 'สถานะ', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         main_agency = session.get('main_agency', 'N/A') 
         
+        # [UPDATE] บันทึกลง Sheet (เพิ่ม privacy ก่อน clicks)
         new_row = [
             generate_new_id(), data['ประเภท'], data['หน่วยงาน'], main_agency, 
             data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
             data['URL'], data['สถานะ'], data['รายละเอียด'], 
-            get_current_timestamp(), session.get('username'), '', 0 
+            get_current_timestamp(), session.get('username'), '', 
+            data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0 
         ]
         db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
         
-        # [CACHE] Clear cache after adding link
         clear_db_cache()
 
         flash('เพิ่มลิงค์สำเร็จ', 'success'); return redirect(url_for('dashboard'))
@@ -697,10 +726,7 @@ def delete_link_action(link_id):
         creator = row_data[11].strip() 
         if session.get('level', '').strip() == 'Admin' or creator.strip() == session.get('username', '').strip():
             db_sheet.delete_rows(cell.row)
-            
-            # [CACHE] Clear cache after deletion
             clear_db_cache()
-
             flash('ลบสำเร็จ', 'success')
         else:
             flash('ไม่มีสิทธิ์', 'error')
@@ -736,21 +762,27 @@ def update_link_action(link_id):
         creator = row_vals[11].strip() 
         if session.get('level', '').strip() != 'Admin' and creator != session.get('username', '').strip():
              flash('ไม่มีสิทธิ์', 'error'); return redirect(url_for('dashboard'))
-        data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด']}
+             
+        # [UPDATE] รับค่าความเป็นส่วนตัว
+        data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         main_agency = request.form.get('ส่วนราชการ') if session.get('level', '').strip() == 'Admin' else row_vals[3]
-        current_clicks = row_vals[13] if len(row_vals) > 13 else 0
+        
+        # Clicks is column 15 now
+        current_clicks = row_vals[14] if len(row_vals) > 14 else 0
+        
+        # [UPDATE] อัปเดตแถวข้อมูล (เพิ่ม privacy)
         new_vals = [
             link_id, data['ประเภท'], data['หน่วยงาน'], main_agency, 
             data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
             data['URL'], data['สถานะ'], data['รายละเอียด'], 
             get_current_timestamp(), creator, row_vals[12] if len(row_vals) > 12 else '',
+            data.get('ความเป็นส่วนตัว', 'สาธารณะ'),
             current_clicks 
         ]
-        range_name = f"A{cell.row}:N{cell.row}" 
+        range_name = f"A{cell.row}:O{cell.row}"  # ขยาย Range ถึง O
         db_sheet.update(range_name, [new_vals])
         
-        # [CACHE] Clear cache after update
         clear_db_cache()
 
         flash('แก้ไขสำเร็จ', 'success'); return redirect(url_for('dashboard'))
@@ -765,13 +797,11 @@ def analytics_page():
         users = get_staff_records()
         feedback = feedback_sheet.get_all_records()
         
-        # --- คำนวณ Top 10 Links ---
         for l in links:
             try: l['Clicks'] = int(l.get('Clicks', 0))
             except: l['Clicks'] = 0
         top_10 = sorted(links, key=lambda x: x['Clicks'], reverse=True)[:10]
 
-        # --- ดึงยอดวิวรวม ---
         total_views = 0
         if stats_sheet:
             try: total_views = int(stats_sheet.cell(1, 2).value or 0)
@@ -830,7 +860,6 @@ def change_user_level():
         cell = staff_sheet.find(user)
         if cell: 
             staff_sheet.update_cell(cell.row, 3, level)
-            # [CACHE] Clear cache after level change
             clear_staff_cache()
             flash('สำเร็จ', 'success')
     except: flash('Error', 'error')
@@ -845,7 +874,6 @@ def delete_user():
         cell = staff_sheet.find(user)
         if cell: 
             staff_sheet.delete_rows(cell.row)
-            # [CACHE] Clear cache after user deletion
             clear_staff_cache()
             flash('สำเร็จ', 'success')
     except: flash('Error', 'error')
@@ -891,67 +919,42 @@ def get_all_links():
 
 # --- Real-time Online Counter System ---
 
-# ตัวแปร Global สำหรับเก็บ session_id ที่กำลัง active
-# รูปแบบ: {'session_id_or_username': datetime_object}
 online_users = {}
 
 def cleanup_online_users():
-    """เคลียร์ User ที่ไม่ได้ส่ง Heartbeat มาเกิน 1 นาที"""
     global online_users
     now = datetime.datetime.now()
-    # เก็บเฉพาะคนที่ Active ภายใน 30 วินาทีที่ผ่านมา (ปรับให้สั้นลงเพื่อให้ตัวเลขลดเร็วขึ้นเมื่อปิดจอ)
     online_users = {k: v for k, v in online_users.items() if now - v < timedelta(seconds=30)}
 
 @app.route('/heartbeat', methods=['POST'])
 def heartbeat():
-    """Endpoint สำหรับรับสัญญาณชีพจากหน้าเว็บ และส่งจำนวนคนออนไลน์กลับไป"""
     global online_users
-    
-    # ใช้วิธีระบุตัวตน 2 แบบ: 
-    # 1. ถ้า Login แล้วใช้ Username 
-    # 2. ถ้ายังไม่ Login ให้ใช้ visitor_id จาก session
-    
     if session.get('logged_in'):
         user_key = f"user:{session.get('username')}"
     else:
-        # ถ้าไม่มี visitor_id ให้สร้างใหม่ (กรณีเพิ่งเข้าครั้งแรกผ่าน API นี้)
         if not session.get('visitor_id'):
             session['visitor_id'] = str(uuid.uuid4())
         user_key = f"guest:{session.get('visitor_id')}"
         
-    # บันทึกเวลาล่าสุดที่ติดต่อมา
     online_users[user_key] = datetime.datetime.now()
-    
-    # ทำความสะอาดข้อมูลเก่าทุกครั้งที่มีการเรียก (หรือจะแยก Thread ก็ได้ถ้าระบบใหญ่)
     cleanup_online_users()
-    
-    return jsonify({
-        'status': 'ok',
-        'online_count': len(online_users)
-    })
+    return jsonify({'status': 'ok', 'online_count': len(online_users)})
 
 @app.route('/offline', methods=['POST'])
 def offline():
-    """Endpoint ที่จะถูกเรียกเมื่อปิดหน้าเว็บ (beacon)"""
     global online_users
-    
     try:
-        # พยายามหา user_key แบบเดียวกับ heartbeat
-        # หมายเหตุ: beacon อาจจะไม่ส่ง cookies ในบาง browser แต่ Flask session ส่วนใหญ่ใช้ cookie
         if session.get('logged_in'):
             user_key = f"user:{session.get('username')}"
         else:
             if session.get('visitor_id'):
                 user_key = f"guest:{session.get('visitor_id')}"
             else:
-                return '', 204 # ไม่มี ID ก็ทำอะไรไม่ได้
-                
+                return '', 204
         if user_key in online_users:
             del online_users[user_key]
-            
     except Exception as e:
         print(f"Offline signal error: {e}")
-
     return '', 204
 
 if __name__ == '__main__':
