@@ -178,19 +178,40 @@
             display: flex; align-items: center; gap: 10px;
         }
 
-        /* Search */
-        .search-container { margin: 25px 0; position: relative; }
-        #searchInput {
+        /* Search & Filter Section (UPDATED) */
+        .search-filter-container {
+            display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap;
+        }
+        
+        .search-input-wrapper { 
+            flex: 2; position: relative; min-width: 250px; 
+        }
+        
+        .filter-wrapper { 
+            flex: 1; min-width: 250px; 
+        }
+
+        #searchInput, #agencyFilter {
             width: 100%; padding: 15px 20px 15px 50px;
             border: 1px solid var(--border-color); border-radius: 50px;
             transition: all 0.3s ease; background: #f8f9fa;
-            font-size: 1rem;
+            font-size: 1rem; font-family: 'Kanit', sans-serif;
         }
-        #searchInput:focus { outline: none; border-color: var(--bma-green); background: white; box-shadow: 0 0 0 4px var(--bma-green-light); }
-        .search-container::before {
-            content: "\f002"; font-family: "Font Awesome 5 Free"; font-weight: 900;
-            position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
-            font-size: 1.1rem; color: #999;
+        
+        /* ปรับแต่ง Dropdown ให้สอดคล้องกับ Input */
+        #agencyFilter {
+            padding-left: 20px;
+            cursor: pointer;
+        }
+
+        #searchInput:focus, #agencyFilter:focus { 
+            outline: none; border-color: var(--bma-green); 
+            background: white; box-shadow: 0 0 0 4px var(--bma-green-light); 
+        }
+        
+        .search-icon {
+            position: absolute; left: 20px; top: 50%; 
+            transform: translateY(-50%); color: #999; font-size: 1.1rem;
         }
 
         /* --- Table Styling --- */
@@ -307,9 +328,13 @@
             .container { padding: 15px; margin: 15px auto; }
             h1 { font-size: 1.4em; }
             
+            /* ปรับ Layout ในมือถือให้เรียงต่อกัน */
+            .search-filter-container { flex-direction: column; gap: 10px; }
+            .search-input-wrapper, .filter-wrapper { min-width: 100%; }
+
             /* Table Mobile Optimization: Hide non-essential columns */
             th:nth-child(2), td:nth-child(2), /* รายละเอียด */
-            th:nth-child(3), td:nth-child(3), /* ระดับความเป็นส่วนตัว (ซ่อนก็ได้ ถ้าจอเล็กมาก) */
+            th:nth-child(3), td:nth-child(3), /* ระดับ (ซ่อนในมือถือถ้าที่แคบ) */
             th:nth-child(4), td:nth-child(4), /* สถานะการใช้งาน */
             th:nth-child(6), td:nth-child(6), /* หน่วยงาน */
             th:nth-child(7), td:nth-child(7), /* ส่วนราชการ */
@@ -388,8 +413,27 @@
             {{ agency_name if agency_name else 'รายชื่อลิงค์ทั้งหมด' }}
         </h1>
 
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="ค้นหา (ชื่อ, สถานะ, ประเภท, ส่วนราชการ, ผู้สร้าง)...">
+        <div class="search-filter-container">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="ค้นหา (ชื่อ, สถานะ, ประเภท, ส่วนราชการ, ผู้สร้าง)...">
+            </div>
+            
+            <div class="filter-wrapper">
+                <select id="agencyFilter">
+                    <option value="">🏢 ทุกส่วนราชการ (ทั้งหมด)</option>
+                    <optgroup label="ระดับสำนัก">
+                        {% for bureau in bureaus %}
+                        <option value="{{ bureau }}">{{ bureau }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    <optgroup label="สำนักงานเขต">
+                        {% for district in districts %}
+                        <option value="{{ district }}">{{ district }}</option>
+                        {% endfor %}
+                    </optgroup>
+                </select>
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -401,7 +445,8 @@
                             <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7; margin-left:5px;">↕</span>
                         </th>
                         <th>📄 รายละเอียด</th> 
-                        <th style="text-align: center;">ระดับ</th> <th style="text-align: center;">🚦 สถานะ</th>
+                        <th style="text-align: center;">ระดับ</th> 
+                        <th style="text-align: center;">🚦 สถานะ</th>
                         <th style="text-align: center;">📊 การใช้งาน</th>
                         <th>📂 ประเภท</th>
                         <th>🏢 หน่วยงาน</th> 
@@ -547,6 +592,7 @@
         const tbody = document.getElementById("linkTableBody");
         const noDataRow = document.getElementById("noDataRow");
         let searchInput; 
+        let agencyFilter;
 
         function sortTable(columnIndex, direction) {
             const collator = new Intl.Collator('th', { sensitivity: 'base' });
@@ -566,9 +612,17 @@
             currentPage = page;
             const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
             const filter = searchInput.value.toLowerCase(); 
+            const selectedAgency = agencyFilter.value; // รับค่าจาก Dropdown
+
             const filteredRows = allTableRows.filter(row => {
                 const textContent = row.innerText.toLowerCase();
-                return textContent.includes(filter);
+                // Agency Cell is at index 7 (column 8) because we added 'Privacy' column at index 2
+                const agencyCell = row.getElementsByTagName("td")[7].textContent.trim(); 
+                
+                const matchesText = textContent.includes(filter);
+                const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);
+                
+                return matchesText && matchesAgency;
             });
 
             tbody.innerHTML = ''; 
@@ -597,24 +651,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             allTableRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
             searchInput = document.getElementById("searchInput"); 
+            agencyFilter = document.getElementById("agencyFilter");
             
-            // [NEW] ตรวจสอบพารามิเตอร์ category หรือ agency จาก URL เพื่อกรองข้อมูลอัตโนมัติ
             const urlParams = new URLSearchParams(window.location.search);
-            const categoryParam = urlParams.get('category');
+            const searchParam = urlParams.get('search');
             const agencyParam = urlParams.get('agency');
+            const categoryParam = urlParams.get('category');
             
-            if (categoryParam) {
-                searchInput.value = categoryParam;
-            } else if (agencyParam) {
-                searchInput.value = agencyParam;
-            }
+            if (searchParam) searchInput.value = searchParam;
+            if (categoryParam) searchInput.value = categoryParam;
+            if (agencyParam) agencyFilter.value = agencyParam;
             
             document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
             document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
             document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
             document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
             document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
+            
+            // Add Event Listeners for filtering
             searchInput.addEventListener('keyup', () => displayPage(1)); 
+            agencyFilter.addEventListener('change', () => displayPage(1)); 
             
             displayPage(1);
         });

@@ -245,14 +245,32 @@
         .btn-delete { background: var(--button-red); }
         .btn-icon:hover { transform: translateY(-2px); filter: brightness(0.95); }
 
+        /* [UPDATED] Button Group Style */
+        .dashboard-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
         .btn-add { 
             background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
             color: white; border: none; padding: 12px 25px; border-radius: 50px;
             font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,150,60,0.3);
-            display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px;
+            display: inline-flex; align-items: center; gap: 8px;
             text-decoration: none; font-weight: 500; transition: 0.3s;
         }
         .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,150,60,0.4); }
+        
+        /* ปุ่มดูรายชื่อลิงค์ทั้งหมด (สไตล์เดียวกับหน้า Index) */
+        .btn-view-all {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white; border: none; padding: 12px 25px; border-radius: 50px;
+            font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            display: inline-flex; align-items: center; gap: 8px;
+            text-decoration: none; font-weight: 500; transition: 0.3s;
+        }
+        .btn-view-all:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,123,255,0.4); }
 
         .btn-share {
             width: 32px; height: 32px; border-radius: 50%;
@@ -318,7 +336,10 @@
             .container { padding: 0 15px; margin: 20px auto; }
             .content-card { padding: 20px 15px; border-radius: 15px; }
             h2 { font-size: 1.4rem; }
-            .btn-add { width: 100%; justify-content: center; }
+            
+            /* ปรับปุ่มให้เต็มความกว้างในมือถือ */
+            .dashboard-actions { flex-direction: column; gap: 10px; }
+            .btn-add, .btn-view-all { width: 100%; justify-content: center; }
             
             .search-container { flex-direction: column; gap: 10px; }
             .search-input-wrapper, .filter-wrapper { min-width: 100%; }
@@ -398,9 +419,14 @@
         <div class="content-card">
             <h2>🖥️ Dashboard จัดการลิงค์</h2>
             
-            <a href="{{ url_for('add_link_page') }}" class="btn-add">
-                <i class="fas fa-plus-circle"></i> เพิ่มลิงค์ใหม่
-            </a>
+            <div class="dashboard-actions">
+                <a href="{{ url_for('add_link_page') }}" class="btn-add">
+                    <i class="fas fa-plus-circle"></i> เพิ่มลิงค์ใหม่
+                </a>
+                <a href="{{ url_for('links_page') }}" class="btn-view-all">
+                    <i class="fas fa-list-ul"></i> ดูรายชื่อลิงค์ทั้งหมด
+                </a>
+            </div>
 
             <div class="search-container">
                 <div class="search-input-wrapper">
