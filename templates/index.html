@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMA ทะเบียนลิงค์ - หน้าหลัก</title>
+    <title>ทะเบียนลิงค์ BMA - หน้าหลัก</title>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     <script src="https://unpkg.com/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,9 +24,6 @@
             --bg-grad-end: #c3cfe2;
             
             --header-height: 80px;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
         
         /* FIX FONT ISSUE */
@@ -56,7 +53,6 @@
             transition: all 0.3s ease;
         }
 
-        /* ส่วนซ้าย (โลโก้ + สถิติ) */
         .header-left {
             display: flex;
             align-items: center;
@@ -77,7 +73,7 @@
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        /* --- Status Stats Group (Visitor + Online) --- */
+        /* --- Status Stats Group --- */
         .header-stats-group {
             display: flex;
             gap: 10px;
@@ -101,7 +97,6 @@
         }
         .header-visitor-count i { color: #666; font-size: 1em; }
 
-        /* --- Online Counter Style --- */
         .header-online-count {
             display: flex;
             align-items: center;
@@ -117,7 +112,6 @@
             position: relative;
         }
 
-        /* Pulsing Dot Animation */
         .pulsating-dot {
             width: 10px;
             height: 10px;
@@ -219,7 +213,7 @@
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             border: 1px solid #f0f0f0;
         }
         .card-header {
@@ -236,7 +230,6 @@
         }
         .link-item:hover { transform: translateX(5px); border-color: var(--bma-green-light); box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
         
-        /* Rank Badge */
         .rank-badge {
             width: 35px; 
             height: 35px; 
@@ -261,21 +254,29 @@
         .hero-desc { color: #666; font-size: 1.1rem; margin-bottom: 30px; }
         
         .quick-search { 
-            max-width: 700px; margin: 0 auto; display: flex; gap: 10px; 
-            background: white; padding: 10px; border-radius: 50px; 
-            box-shadow: var(--shadow-lg); border: 1px solid #eee;
+            max-width: 800px; margin: 0 auto; display: flex; gap: 0; 
+            background: white; padding: 5px; border-radius: 50px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #eee;
+            align-items: center; flex-wrap: wrap;
         }
+        
+        .quick-search input {
+            flex: 1.5; padding: 12px 20px; border: none; outline: none;
+            font-family: 'Kanit', sans-serif; font-size: 1rem; color: #555;
+            background: transparent; border-right: 1px solid #f0f0f0; min-width: 200px;
+        }
+        
         .quick-search select { 
-            flex: 1; padding: 12px 20px; border: none; outline: none; 
-            font-family: 'Kanit', sans-serif; 
-            font-size: 1rem; color: #555; background: transparent;
+            flex: 1; padding: 12px 15px; border: none; outline: none; 
+            font-family: 'Kanit', sans-serif; font-size: 1rem; color: #555; 
+            background: transparent; min-width: 200px; cursor: pointer;
         }
+        
         .search-btn { 
             background: var(--bma-green); color: white; border: none; 
             padding: 12px 30px; border-radius: 40px; font-size: 1rem; 
-            cursor: pointer; transition: 0.3s; 
-            font-family: 'Kanit', sans-serif; font-weight: 500;
-            white-space: nowrap;
+            cursor: pointer; transition: 0.3s; font-family: 'Kanit', sans-serif; font-weight: 500;
+            white-space: nowrap; margin: 5px;
         }
         .search-btn:hover { background: var(--bma-green-hover); transform: scale(1.05); }
 
@@ -290,11 +291,10 @@
         }
         .btn-all-links:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,123,255,0.5); }
 
-        /* --- 9 Dimensions Policy Menu (Improved Layout) --- */
+        /* --- 9 Dimensions Policy Menu (With Images) --- */
         .policy-grid {
             display: grid;
-            /* Mobile: 3 Columns Grid (3x3) */
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, 1fr); /* Mobile: 3 columns */
             gap: 10px;
             margin-bottom: 40px;
             justify-content: center;
@@ -314,7 +314,7 @@
             transition: all 0.2s ease;
             border: 1px solid #f8f9fa;
             height: 100%;
-            min-height: 110px; /* ปรับความสูงขั้นต่ำให้พอดี */
+            min-height: 120px;
         }
         
         .policy-btn:hover {
@@ -324,10 +324,17 @@
             background-color: #f9fffa;
         }
         
-        .policy-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            transition: 0.3s;
+        /* New CSS for Image Logos */
+        .policy-img {
+            width: 60px; /* ปรับขนาดโลโก้ตามความเหมาะสม */
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            transition: transform 0.3s;
+        }
+
+        .policy-btn:hover .policy-img {
+            transform: scale(1.1);
         }
         
         .policy-text {
@@ -340,38 +347,29 @@
         /* Desktop: Switch to Flexbox for Centered Layout */
         @media (min-width: 768px) {
              .policy-grid { 
-                 display: flex; /* ใช้ Flexbox เพื่อจัดกึ่งกลาง */
-                 flex-wrap: wrap; /* ให้ปัดบรรทัดเมื่อเต็ม */
-                 justify-content: center; /* จัดกึ่งกลางแนวนอน */
+                 display: flex; 
+                 flex-wrap: wrap; 
+                 justify-content: center; 
                  gap: 20px; 
-                 max-width: 900px; /* จำกัดความกว้างกลุ่มเมนูไม่ให้กว้างเกินไป */
+                 max-width: 900px; 
                  margin-left: auto;
-                 margin-right: auto;
+                 margin-right: auto; 
              }
              .policy-btn {
-                 width: 130px; /* กำหนดความกว้างคงที่ให้เท่ากันทุกปุ่ม */
-                 flex: 0 0 auto; /* ห้ามยืดหด */
-                 padding: 20px 10px;
-                 min-height: 130px;
+                 width: 130px; 
+                 flex: 0 0 auto; 
+                 padding: 20px 10px; 
+                 min-height: 140px;
              }
-             .policy-icon { font-size: 2.5rem; margin-bottom: 15px; }
+             .policy-img {
+                 width: 70px; /* ขยายขนาดในจอใหญ่ */
+                 height: 70px;
+                 margin-bottom: 12px;
+             }
              .policy-text { font-size: 0.95rem; }
         }
 
-        /* Icons Colors */
-        .policy-btn:hover .policy-icon { transform: scale(1.1); }
-        .policy-btn:nth-child(1) .policy-icon { color: #e67e22; } 
-        .policy-btn:nth-child(2) .policy-icon { color: #c0392b; } 
-        .policy-btn:nth-child(3) .policy-icon { color: #8e44ad; } 
-        .policy-btn:nth-child(4) .policy-icon { color: #27ae60; } 
-        .policy-btn:nth-child(5) .policy-icon { color: #e84393; } 
-        .policy-btn:nth-child(6) .policy-icon { color: #2980b9; } 
-        .policy-btn:nth-child(7) .policy-icon { color: #f1c40f; } 
-        .policy-btn:nth-child(8) .policy-icon { color: #16a085; } 
-        .policy-btn:nth-child(9) .policy-icon { color: #34495e; }
-
-
-        /* --- Menu Grid --- */
+        /* --- Menu Grid (Lower) --- */
         .section-title { 
             font-size: 1.6rem; font-weight: 700; margin: 50px 0 25px 0; 
             position: relative; padding-left: 20px; 
@@ -416,13 +414,9 @@
             .logo-text { font-size: 1rem; } 
             .logo-container img { height: 35px; }
 
-            /* Mobile Controls: แสดงผล */
             .mobile-controls { display: flex; }
-            
-            /* [NEW] ซ่อนส่วนแสดงสถิติ (Online/Visitor) ทั้งหมดในมือถือ */
             .header-stats-group { display: none; }
 
-            /* Mobile Menu */
             .nav-menu {
                 display: none; position: absolute; top: 70px; left: 0; width: 100%;
                 background: white; flex-direction: column; align-items: stretch;
@@ -438,8 +432,20 @@
             
             .nav-link.profile-item { display: none; }
 
-            .quick-search { flex-direction: column; border-radius: 20px; padding: 15px; }
-            .search-btn { width: 100%; margin-top: 10px; }
+            .quick-search { 
+                flex-direction: column; 
+                padding: 15px; 
+                border-radius: 20px; 
+            }
+            .quick-search input { 
+                width: 100%; 
+                border-right: none; 
+                border-bottom: 1px solid #eee; 
+                margin-bottom: 5px;
+            }
+            .quick-search select { width: 100%; margin-bottom: 10px; }
+            .search-btn { width: 100%; margin: 0; }
+            
             .link-name { max-width: 180px; }
         }
     </style>
@@ -545,8 +551,10 @@
             <div class="hero-desc">เข้าถึงข้อมูลและบริการของกรุงเทพมหานครได้สะดวกรวดเร็ว</div>
             
             <form class="quick-search" id="quickSearchForm">
+                <input type="text" id="homeSearchInput" placeholder="พิมพ์คำค้นหา (เช่น ชื่อ, ประเภท)...">
                 <select id="agencySelect">
-                    <option value="" disabled selected>--- เลือกสำนัก หรือ สำนักงานเขต ---</option>
+                    <option value="" disabled selected>--- หรือเลือกหน่วยงาน ---</option>
+                    <option value="">ทั้งหมด</option>
                     <optgroup label="สำนัก">
                         {% for bureau in bureaus %}
                         <option value="{{ bureau }}">{{ bureau }}</option>
@@ -569,39 +577,39 @@
         <div class="section-title"><i class="fas fa-star"></i> เลือกดูตามนโยบาย 9 ด้าน 9 ดี</div>
         <div class="policy-grid">
             <a href="{{ url_for('links_page', category='เดินทางดี') }}" class="policy-btn">
-                <div class="policy-icon"><i class="fas fa-route"></i></div>
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_travel.png') }}" alt="เดินทางดี" class="policy-img">
                 <div class="policy-text">เดินทางดี</div>
             </a>
             <a href="{{ url_for('links_page', category='ปลอดภัยดี') }}" class="policy-btn">
-                <div class="policy-icon"><i class="fas fa-shield-alt"></i></div>
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_safety.png') }}" alt="ปลอดภัยดี" class="policy-img">
                 <div class="policy-text">ปลอดภัยดี</div>
             </a>
             <a href="{{ url_for('links_page', category='โปร่งใสดี') }}" class="policy-btn">
-                <div class="policy-icon"><i class="fas fa-magnifying-glass"></i></div>
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_transperant.png') }}" alt="โปร่งใสดี" class="policy-img">
                 <div class="policy-text">โปร่งใสดี</div>
             </a>
             <a href="{{ url_for('links_page', category='สิ่งแวดล้อมดี') }}" class="policy-btn">
-                <div class="policy-icon"><i class="fas fa-leaf"></i></div>
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_environment.png') }}" alt="สิ่งแวดล้อมดี" class="policy-img">
                 <div class="policy-text">สิ่งแวดล้อมดี</div>
             </a>
             <a href="{{ url_for('links_page', category='สุขภาพดี') }}" class="policy-btn">
-                <div class="policy-icon"><i class="fas fa-heart-pulse"></i></div>
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_health.png') }}" alt="สุขภาพดี" class="policy-img">
                 <div class="policy-text">สุขภาพดี</div>
             </a>
             <a href="{{ url_for('links_page', category='เรียนดี') }}" class="policy-btn">
-                <div class="policy-icon"><i class="fas fa-graduation-cap"></i></div>
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_study.png') }}" alt="เรียนดี" class="policy-img">
                 <div class="policy-text">เรียนดี</div>
             </a>
             <a href="{{ url_for('links_page', category='เศรษฐกิจดี') }}" class="policy-btn">
-                <div class="policy-icon"><i class="fas fa-chart-line"></i></div>
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_economics.png') }}" alt="เศรษฐกิจดี" class="policy-img">
                 <div class="policy-text">เศรษฐกิจดี</div>
             </a>
             <a href="{{ url_for('links_page', category='สังคมดี') }}" class="policy-btn">
-                <div class="policy-icon"><i class="fas fa-users"></i></div>
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_Social.png') }}" alt="สังคมดี" class="policy-img">
                 <div class="policy-text">สังคมดี</div>
             </a>
             <a href="{{ url_for('links_page', category='บริหารจัดการดี') }}" class="policy-btn">
-                <div class="policy-icon"><i class="fas fa-cogs"></i></div>
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_manage.png') }}" alt="บริหารจัดการดี" class="policy-img">
                 <div class="policy-text">บริหารจัดการดี</div>
             </a>
         </div>
@@ -650,11 +658,20 @@
             }
         });
 
-        // Search Logic
+        // [UPDATED] Search Logic
         document.getElementById('quickSearchForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const val = document.getElementById('agencySelect').value;
-            if(val) window.location.href = "{{ url_for('links_page') }}?agency=" + encodeURIComponent(val);
+            const text = document.getElementById('homeSearchInput').value;
+            const agency = document.getElementById('agencySelect').value;
+            
+            let url = "{{ url_for('links_page') }}?";
+            let params = [];
+            
+            if(text) params.push("search=" + encodeURIComponent(text));
+            if(agency) params.push("agency=" + encodeURIComponent(agency));
+            
+            // Redirect พร้อมค่าพารามิเตอร์
+            window.location.href = url + params.join("&");
         });
     </script>
     <script>
