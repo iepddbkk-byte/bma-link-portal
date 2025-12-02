@@ -215,7 +215,7 @@ def send_reset_email(username, recipient_email):
     try:
         token = s.dumps(username, salt='password-reset-salt')
         reset_url = url_for('reset_password_page', token=token, _external=True)
-        msg = Message("คำขอรีเซ็ตรหัสผ่าน - BMA ทะเบียนลิงค์", recipients=[recipient_email])
+        msg = Message("คำขอรีเซ็ตรหัสผ่าน - BMA SMART LINKAGE", recipients=[recipient_email])
         msg.body = f"""สวัสดีครับ,\nเราได้รับคำขอรีเซ็ตรหัสผ่านสำหรับ Username: {username}\nคลิกลิงค์เพื่อตั้งรหัสผ่านใหม่: {reset_url}\n(ลิงค์หมดอายุใน 1 ชั่วโมง)"""
         mail.send(msg)
         return True
@@ -785,7 +785,7 @@ def update_link_action(link_id):
 
         flash('แก้ไขสำเร็จ', 'success')
         # [UPDATE] เปลี่ยนให้ Redirect ไปหน้า links_page แทน dashboard
-        return redirect(url_for('links_page')) 
+        return redirect(url_for('dashboard')) 
     except: return redirect(url_for('dashboard'))
 
 @app.route('/analytics')
