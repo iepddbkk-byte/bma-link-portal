@@ -117,7 +117,7 @@ STAFF_HEADERS = [
 # ==========================================
 # ส่วนระบบ Caching
 # ==========================================
-CACHE_TIMEOUT = 120 
+CACHE_TIMEOUT = 1 
 _app_cache = {
     'db_records': {'data': None, 'time': None},
     'staff_records': {'data': None, 'time': None}
@@ -454,7 +454,7 @@ def links_page():
 # --- 7. Routes (Auth) ---
 @app.route('/login')
 def login_page():
-    if session.get('logged_in'): return redirect(url_for('dashboard'))
+    if session.get('logged_in'): return redirect(url_for('links_page'))
     return render_template('login.html') 
 
 @app.route('/login_action', methods=['POST'])
