@@ -454,7 +454,7 @@ def links_page():
 # --- 7. Routes (Auth) ---
 @app.route('/login')
 def login_page():
-    if session.get('logged_in'): return redirect(url_for('links_page'))
+    if session.get('logged_in'): return redirect(url_for('dashboard'))
     return render_template('login.html') 
 
 @app.route('/login_action', methods=['POST'])
@@ -712,7 +712,7 @@ def add_link_action():
         
         clear_db_cache()
 
-        flash('เพิ่มลิงค์สำเร็จ', 'success'); return redirect(url_for('dashboard'))
+        flash('เพิ่มลิงค์สำเร็จ', 'success'); return redirect(url_for('links_page'))
     except Exception as e: 
         flash(f'Error: {e}', 'error'); return redirect(url_for('add_link_page'))
 
