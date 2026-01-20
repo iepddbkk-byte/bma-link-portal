@@ -117,10 +117,11 @@ STAFF_HEADERS = [
 # ==========================================
 # ส่วนระบบ Caching
 # ==========================================
-CACHE_TIMEOUT = 1 
+CACHE_TIMEOUT = 60 
 _app_cache = {
     'db_records': {'data': None, 'time': None},
-    'staff_records': {'data': None, 'time': None}
+    'staff_records': {'data': None, 'time': None},
+    'invite_codes': {'data': None, 'time': None} # [เพิ่ม] เพิ่ม Cache สำหรับ Invite Code
 }
 
 def clear_db_cache():
@@ -210,7 +211,36 @@ def get_staff_records(force_refresh=False):
     except Exception as e:
         print(f"❌ Error fetching Staff: {e}")
         return []
+        
+def get_invite_codes(force_refresh=False):
+    global _app_cache
+    if invite_sheet is None: return []
 
+    now = datetime.datetime.now()
+    cache = _app_cache['invite_codes']
+
+    # ถ้ามีข้อมูลใน Cache และยังไม่หมดเวลา ให้ใช้ของเดิม
+    if not force_refresh and cache['data'] is not None and cache['time'] is not None:
+        if (now - cache['time']).total_seconds() < CACHE_TIMEOUT:
+            return cache['data']
+
+    try:
+        print("zzz Fetching Invite Codes... (API Call)")
+        # ใช้ get_all_records เพื่อให้ได้ list of dicts เลย
+        data = invite_sheet.get_all_records()
+        
+        cache['data'] = data
+        cache['time'] = now
+        return data
+    except Exception as e:
+        print(f"❌ Error fetching Invite Codes: {e}")
+        return []
+
+def clear_invite_cache():
+    global _app_cache
+    _app_cache['invite_codes'] = {'data': None, 'time': None}
+    print("🧹 Invite Cache Cleared")
+    
 def send_reset_email(username, recipient_email):
     try:
         token = s.dumps(username, salt='password-reset-salt')
@@ -846,38 +876,16 @@ def analytics_page():
 
 @app.route('/admin')
 def admin_panel():
-    # 1. เช็ค Login และ Level
-    if not session.get('logged_in'):
-        return redirect(url_for('login_page'))
-    
-    if session.get('level', '').strip() != 'Admin':
-        flash('คุณไม่มีสิทธิ์เข้าถึงส่วนนี้ (ระดับของคุณคือ: ' + str(session.get('level')) + ')', 'error')
+    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': 
         return redirect(url_for('dashboard'))
-
     try:
-        # 2. เช็คการเชื่อมต่อ Database ก่อน
-        if staff_sheet is None or invite_sheet is None:
-            return "Error: ไม่สามารถเชื่อมต่อ Google Sheets ได้ (Sheet object is None)"
-
-        # 3. ลองโหลดหน้าเว็บ
+        # [แก้ไข] เปลี่ยน invite_sheet.get_all_records() เป็น get_invite_codes()
         return render_template('admin_panel.html', 
                              session=session, 
                              staff_list=get_staff_records(), 
-                             invite_codes=invite_sheet.get_all_records())
-                             
+                             invite_codes=get_invite_codes()) 
     except Exception as e:
-        # 4. ถ้ามี Error ให้โชว์ออกมาทางหน้าจอเลย (ไม่ต้อง Redirect)
-        return f"""
-        <h1>เกิดข้อผิดพลาด (Admin Route Error)</h1>
-        <p>สาเหตุ: {str(e)}</p>
-        <hr>
-        <h3>คำแนะนำเบื้องต้น:</h3>
-        <ul>
-            <li>ตรวจสอบว่ามีไฟล์ <b>templates/admin_panel.html</b> อยู่จริงหรือไม่</li>
-            <li>ตรวจสอบการเชื่อมต่อ Google Sheets</li>
-        </ul>
-        <a href="/dashboard">กลับหน้า Dashboard</a>
-        """
+        return f"Error loading admin panel: {e} <br><a href='/dashboard'>Back</a>"
 
 @app.route('/admin/change_level', methods=['POST'])
 def change_user_level():
@@ -934,6 +942,7 @@ def generate_code():
         # 4. บันทึกลง Google Sheet ทีเดียว (เร็วกว่า loop append_row มาก)
         if invite_sheet:
             invite_sheet.append_rows(new_rows, value_input_option='USER_ENTERED')
+            clear_invite_cache()
             flash(f'✅ สร้างรหัสเชิญใหม่จำนวน {amount} รหัส สำเร็จเรียบร้อย!', 'success')
         else:
             flash('ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error')
@@ -942,6 +951,18 @@ def generate_code():
         print(f"Generate Code Error: {e}")
         flash(f'เกิดข้อผิดพลาด: {e}', 'error')
         
+    return redirect(url_for('admin_panel'))
+    
+@app.route('/admin/delete_code', methods=['POST'])
+def delete_code():
+    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': return redirect(url_for('login_page'))
+    try:
+        cell = invite_sheet.find(request.form.get('code'))
+        if cell: 
+            invite_sheet.delete_rows(cell.row)
+            clear_invite_cache() # [เพิ่ม] สั่งล้าง Cache ตรงนี้ด้วย
+            flash('ลบสำเร็จ', 'success')
+    except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
 
 @app.route('/feedback')
