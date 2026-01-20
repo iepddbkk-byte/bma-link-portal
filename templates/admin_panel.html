@@ -218,17 +218,42 @@
 
         tbody tr:hover { background: #f9f9f9; }
 
-        /* --- Actions --- */
+        /* --- Actions & Form --- */
         
-        /* [แก้ไข] ปุ่มสร้าง Invite Code ให้มีสีชัดเจน */
+        /* [NEW] กล่องจัดวางฟอร์มสร้างรหัส */
+        .generate-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: stretch; /* ให้ความสูงเท่ากัน */
+        }
+
+        /* [NEW] ช่องกรอกจำนวน */
+        .qty-input {
+            width: 80px;
+            padding: 0 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 500;
+            color: var(--text-color);
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .qty-input:focus {
+            border-color: var(--button-blue);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        
+        /* [EDITED] ปุ่มสร้างรหัส - ใช้สีน้ำเงินไล่เฉดชัดเจน */
         .btn-generate { 
-            /* ใช้สีฟ้าไล่เฉดที่ชัดเจนแทนตัวแปรเดิมที่มีปัญหา */
+            flex: 1; /* ยืดเต็มพื้นที่ที่เหลือ */
             background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); 
             color: white; 
             border: none; 
             border-radius: 8px;
-            width: 100%; 
-            margin-bottom: 15px; 
             padding: 12px;
             font-size: 1em; 
             font-weight: 500;
@@ -241,7 +266,6 @@
             box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
         }
         
-        /* [เพิ่ม] Effect ตอนเอาเมาส์ชี้ */
         .btn-generate:hover { 
             transform: translateY(-2px); 
             box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3); 
@@ -293,7 +317,7 @@
             .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
             
-            /* [NEW] ซ่อนส่วนแสดงคนออนไลน์ทั้งหมดในมือถือ */
+            /* ซ่อนส่วนแสดงคนออนไลน์ทั้งหมดในมือถือ */
             .header-online-count { display: none; }
 
             /* Mobile Menu */
@@ -312,7 +336,7 @@
             /* Hide Profile Item in Menu (Since it's on top) */
             .nav-link.profile-item { display: none; }
             
-            /* [NEW] Layout Adjustments for Mobile */
+            /* Layout Adjustments for Mobile */
             .container { padding: 0 10px; margin: 20px auto; } /* ลด padding ซ้ายขวา */
             .admin-grid { grid-template-columns: 1fr; gap: 15px; } /* เรียงเป็นคอลัมน์เดียว */
             .admin-card { padding: 15px; } /* ลด padding ในการ์ด */
@@ -435,9 +459,13 @@
                 <h3><i class="fas fa-key"></i> รหัสเชิญ (Invite Codes)</h3>
                 
                 <form action="{{ url_for('generate_code') }}" method="POST">
-                    <button type="submit" class="btn-generate">
-                        <i class="fas fa-plus-circle"></i> สร้างรหัสเชิญใหม่ (Generate)
-                    </button>
+                    <div class="generate-wrapper">
+                        <input type="number" name="amount" class="qty-input" value="1" min="1" max="50" title="ระบุจำนวนที่ต้องการสร้าง">
+                        
+                        <button type="submit" class="btn-generate">
+                            <i class="fas fa-plus-circle"></i> สร้างรหัสเชิญ (Generate)
+                        </button>
+                    </div>
                 </form>
 
                 <div class="table-wrapper">
@@ -576,9 +604,6 @@
     
     <script>
         function updateOnlineCount() {
-            // ดึง CSRF Token จาก meta tag หรือตัวแปร Jinja (ถ้ามี)
-            // เราจะลองส่งไปใน Header เพื่อผ่านระบบความปลอดภัยของ Flask
-            
             fetch("{{ url_for('heartbeat') }}", { 
                 method: "POST",
                 headers: { 
@@ -597,25 +622,21 @@
                     const el = document.getElementById('onlineCount');
                     if(el) {
                         el.textContent = data.online_count;
-                        // ถ้าตัวเลขขึ้นแล้ว ให้เปลี่ยนสีให้รู้ว่าทำงาน (Visual Debug)
                         el.style.color = "var(--bma-green)"; 
                     }
                 }
             })
             .catch(err => {
                 console.error("Heartbeat error:", err);
-                // ถ้ายังไม่ได้ ให้ลองเปลี่ยนเป็น "-" เหมือนเดิม
                 const el = document.getElementById('onlineCount');
                 if(el) el.textContent = "-";
             });
         }
 
-        // เรียกทำงานทันทีและวนซ้ำ
         updateOnlineCount();
         setInterval(updateOnlineCount, 10000);
 
         window.addEventListener('beforeunload', function() {
-            // ใช้ Beacon ซึ่งเสถียรกว่าสำหรับการปิดหน้าเว็บ
             const data = new FormData();
             const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
             data.append('csrf_token', csrfToken);

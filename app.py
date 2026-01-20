@@ -881,21 +881,39 @@ def delete_user():
 
 @app.route('/admin/generate_code', methods=['POST'])
 def generate_code():
-    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': return redirect(url_for('login_page'))
+    # ตรวจสอบสิทธิ์ Admin
+    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': 
+        return redirect(url_for('login_page'))
+    
     try:
-        code = generate_invite_code()
-        invite_sheet.append_row([code, 'Available', '', ''], value_input_option='USER_ENTERED')
-        flash(f'สร้างรหัส: {code}', 'success')
-    except: flash('Error', 'error')
-    return redirect(url_for('admin_panel'))
+        # 1. รับค่าจำนวนจากฟอร์ม (ถ้ามี error ให้เป็น 1)
+        try:
+            amount = int(request.form.get('amount', 1))
+        except ValueError:
+            amount = 1
+            
+        # 2. ตรวจสอบความถูกต้อง (ขั้นต่ำ 1, สูงสุด 50 เพื่อป้องกัน Server ค้าง)
+        if amount < 1: amount = 1
+        if amount > 50: amount = 50
 
-@app.route('/admin/delete_code', methods=['POST'])
-def delete_code():
-    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': return redirect(url_for('login_page'))
-    try:
-        cell = invite_sheet.find(request.form.get('code'))
-        if cell: invite_sheet.delete_rows(cell.row); flash('ลบสำเร็จ', 'success')
-    except: flash('Error', 'error')
+        # 3. เตรียมข้อมูลสำหรับบันทึกหลายแถว
+        new_rows = []
+        for _ in range(amount):
+            code = generate_invite_code()
+            # รูปแบบข้อมูล: [Code, Status, UsedBy, UsedAt]
+            new_rows.append([code, 'Available', '', ''])
+
+        # 4. บันทึกลง Google Sheet ทีเดียว (เร็วกว่า loop append_row มาก)
+        if invite_sheet:
+            invite_sheet.append_rows(new_rows, value_input_option='USER_ENTERED')
+            flash(f'✅ สร้างรหัสเชิญใหม่จำนวน {amount} รหัส สำเร็จเรียบร้อย!', 'success')
+        else:
+            flash('ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error')
+
+    except Exception as e:
+        print(f"Generate Code Error: {e}")
+        flash(f'เกิดข้อผิดพลาด: {e}', 'error')
+        
     return redirect(url_for('admin_panel'))
 
 @app.route('/feedback')
