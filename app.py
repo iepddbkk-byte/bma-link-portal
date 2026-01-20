@@ -846,10 +846,38 @@ def analytics_page():
 
 @app.route('/admin')
 def admin_panel():
-    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': return redirect(url_for('dashboard'))
+    # 1. เช็ค Login และ Level
+    if not session.get('logged_in'):
+        return redirect(url_for('login_page'))
+    
+    if session.get('level', '').strip() != 'Admin':
+        flash('คุณไม่มีสิทธิ์เข้าถึงส่วนนี้ (ระดับของคุณคือ: ' + str(session.get('level')) + ')', 'error')
+        return redirect(url_for('dashboard'))
+
     try:
-        return render_template('admin_panel.html', session=session, staff_list=get_staff_records(), invite_codes=invite_sheet.get_all_records())
-    except: return redirect(url_for('dashboard'))
+        # 2. เช็คการเชื่อมต่อ Database ก่อน
+        if staff_sheet is None or invite_sheet is None:
+            return "Error: ไม่สามารถเชื่อมต่อ Google Sheets ได้ (Sheet object is None)"
+
+        # 3. ลองโหลดหน้าเว็บ
+        return render_template('admin_panel.html', 
+                             session=session, 
+                             staff_list=get_staff_records(), 
+                             invite_codes=invite_sheet.get_all_records())
+                             
+    except Exception as e:
+        # 4. ถ้ามี Error ให้โชว์ออกมาทางหน้าจอเลย (ไม่ต้อง Redirect)
+        return f"""
+        <h1>เกิดข้อผิดพลาด (Admin Route Error)</h1>
+        <p>สาเหตุ: {str(e)}</p>
+        <hr>
+        <h3>คำแนะนำเบื้องต้น:</h3>
+        <ul>
+            <li>ตรวจสอบว่ามีไฟล์ <b>templates/admin_panel.html</b> อยู่จริงหรือไม่</li>
+            <li>ตรวจสอบการเชื่อมต่อ Google Sheets</li>
+        </ul>
+        <a href="/dashboard">กลับหน้า Dashboard</a>
+        """
 
 @app.route('/admin/change_level', methods=['POST'])
 def change_user_level():
