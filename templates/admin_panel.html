@@ -115,7 +115,7 @@
             color: var(--text-color);
             padding: 5px;
         }
-		
+        
         /* จัดกลุ่ม Logo กับ Stats ให้อยู่ทางซ้าย */
         .header-left {
             display: flex;
@@ -219,14 +219,34 @@
         tbody tr:hover { background: #f9f9f9; }
 
         /* --- Actions --- */
+        
+        /* [แก้ไข] ปุ่มสร้าง Invite Code ให้มีสีชัดเจน */
         .btn-generate { 
-            background: linear-gradient(135deg, var(--button-blue), var(--button-blue-hover));
-            color: white; border: none; border-radius: 8px;
-            width: 100%; margin-bottom: 15px; padding: 12px;
-            font-size: 1em; display: flex; justify-content: center; align-items: center; gap: 8px;
-            cursor: pointer; transition: 0.3s;
+            /* ใช้สีฟ้าไล่เฉดที่ชัดเจนแทนตัวแปรเดิมที่มีปัญหา */
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 8px;
+            width: 100%; 
+            margin-bottom: 15px; 
+            padding: 12px;
+            font-size: 1em; 
+            font-weight: 500;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 8px;
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
         }
-        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        /* [เพิ่ม] Effect ตอนเอาเมาส์ชี้ */
+        .btn-generate:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3); 
+            background: linear-gradient(135deg, #0069d9 0%, #004494 100%);
+        }
         
         .action-form { display: flex; gap: 5px; align-items: center; }
         .action-form-inline { display: inline-block; margin: 0; }
@@ -308,7 +328,7 @@
 </head>
 <body>
     
-		<header class="main-header">
+        <header class="main-header">
         <div class="header-left">
             <a href="{{ url_for('home') }}" class="logo-container">
                 <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
@@ -553,8 +573,8 @@
             {% endif %}
         {% endwith %}
     </script>
-	
-	<script>
+    
+    <script>
         function updateOnlineCount() {
             // ดึง CSRF Token จาก meta tag หรือตัวแปร Jinja (ถ้ามี)
             // เราจะลองส่งไปใน Header เพื่อผ่านระบบความปลอดภัยของ Flask
@@ -602,7 +622,7 @@
             navigator.sendBeacon("{{ url_for('offline') }}", data);
         });
     </script>
-	
+    
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
