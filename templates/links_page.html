@@ -185,38 +185,82 @@
             vertical-align: middle;
         }
 
-        /* Search & Filter Section (UPDATED) */
+        /* --- Search & Filter Section (UPDATED) --- */
         .search-filter-container {
             display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap; align-items: stretch;
         }
         
         .search-input-wrapper { 
-            flex: 2; position: relative; min-width: 250px; 
+            flex: 1.5; position: relative; min-width: 250px; 
         }
         
-        /* เพิ่ม Wrapper สำหรับ Dropdown สองตัว */
         .filters-group {
-            display: flex; gap: 10px; flex: 2; flex-wrap: wrap;
+            display: flex; gap: 10px; flex: 2; flex-wrap: wrap; align-items: center;
         }
+        
         .filter-wrapper { 
             flex: 1; min-width: 180px; 
         }
 
-        #searchInput, #agencyFilter, #dateFilter {
+        /* Date Range Style */
+        .date-range-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 5px 15px;
+            flex-grow: 1;
+            min-width: 280px;
+        }
+        
+        .date-input {
+            border: none;
+            background: transparent;
+            font-family: 'Kanit', sans-serif;
+            color: var(--text-color);
+            padding: 8px 5px;
+            outline: none;
+            cursor: pointer;
+            width: 130px;
+        }
+        
+        .date-separator {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .btn-clear-date {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-clear-date:hover {
+            background: #ffebee;
+        }
+
+        #searchInput, #agencyFilter {
             width: 100%; padding: 15px 20px 15px 50px;
             border: 1px solid var(--border-color); border-radius: 50px;
             transition: all 0.3s ease; background: #f8f9fa;
             font-size: 1rem; font-family: 'Kanit', sans-serif;
-            height: 100%;
+            height: 50px; /* Force height match */
         }
         
-        /* ปรับแต่ง Dropdown */
-        #agencyFilter, #dateFilter {
+        #agencyFilter {
             padding-left: 20px;
             cursor: pointer;
         }
 
-        #searchInput:focus, #agencyFilter:focus, #dateFilter:focus { 
+        #searchInput:focus, #agencyFilter:focus { 
             outline: none; border-color: var(--bma-green); 
             background: white; box-shadow: 0 0 0 4px var(--bma-green-light); 
         }
@@ -361,8 +405,9 @@
             
             /* ปรับ Layout ในมือถือให้เรียงต่อกัน */
             .search-filter-container { flex-direction: column; gap: 10px; }
-            .filters-group { flex-direction: column; }
+            .filters-group { flex-direction: column; align-items: stretch; }
             .search-input-wrapper, .filter-wrapper { min-width: 100%; }
+            .date-range-wrapper { width: 100%; justify-content: space-between; }
 
             /* Table Mobile Optimization: Hide non-essential columns */
             th:nth-child(2), td:nth-child(2), /* รายละเอียด */
@@ -490,14 +535,12 @@
                     </select>
                 </div>
                 
-                <div class="filter-wrapper">
-                    <select id="dateFilter">
-                        <option value="">📅 ทุกช่วงเวลา</option>
-                        <option value="today">วันนี้</option>
-                        <option value="week">สัปดาห์นี้</option>
-                        <option value="month">เดือนนี้</option>
-                        <option value="year">ปีนี้</option>
-                    </select>
+                <div class="date-range-wrapper">
+                    <span style="color:#666; font-size:0.9em;"><i class="far fa-calendar-alt"></i> วันที่:</span>
+                    <input type="date" id="startDate" class="date-input" title="วันที่เริ่มต้น">
+                    <span class="date-separator">ถึง</span>
+                    <input type="date" id="endDate" class="date-input" title="วันที่สิ้นสุด">
+                    <button id="clearDates" class="btn-clear-date" title="ล้างวันที่"><i class="fas fa-times"></i></button>
                 </div>
             </div>
         </div>
@@ -664,7 +707,7 @@
         });
 
         // ==========================================
-        //  Sorting & Filtering Logic
+        //  Sorting & Filtering Logic (Advanced)
         // ==========================================
         let allTableRows = []; 
         let currentPage = 1;
@@ -674,7 +717,9 @@
         
         let searchInput; 
         let agencyFilter;
-        let dateFilter;
+        let startDateInput;
+        let endDateInput;
+        let clearDatesBtn;
         
         // State for sorting
         let sortState = {
@@ -688,7 +733,9 @@
             
             searchInput = document.getElementById("searchInput"); 
             agencyFilter = document.getElementById("agencyFilter");
-            dateFilter = document.getElementById("dateFilter"); // [NEW] Date Filter Element
+            startDateInput = document.getElementById("startDate");
+            endDateInput = document.getElementById("endDate");
+            clearDatesBtn = document.getElementById("clearDates");
             
             // Check URL Params
             const urlParams = new URLSearchParams(window.location.search);
@@ -710,34 +757,38 @@
             // Event Listeners for Filters
             searchInput.addEventListener('keyup', () => displayPage(1)); 
             agencyFilter.addEventListener('change', () => displayPage(1)); 
-            dateFilter.addEventListener('change', () => displayPage(1)); // [NEW]
+            
+            // Date Filter Listeners
+            startDateInput.addEventListener('change', () => displayPage(1));
+            endDateInput.addEventListener('change', () => displayPage(1));
+            clearDatesBtn.addEventListener('click', () => {
+                startDateInput.value = '';
+                endDateInput.value = '';
+                displayPage(1);
+            });
             
             displayPage(1);
         });
 
         // [NEW] Helper function to check date range
-        function checkDateFilter(dateStr, mode) {
-            if (!mode) return true; // ถ้าไม่ได้เลือก Filter ให้ผ่านหมด
-            if (!dateStr || dateStr === '-') return false; // ไม่มีวันที่
+        function checkDateRange(dateStr, start, end) {
+            // ถ้าไม่มีการระบุช่วงวันที่เลย ให้ผ่าน
+            if (!start && !end) return true;
+            // ถ้าแถวไม่มีวันที่ (เป็น - หรือว่าง) แต่มีการกรอง ให้ซ่อน
+            if (!dateStr || dateStr === '-' || dateStr === '') return false;
 
             const rowDate = new Date(dateStr);
-            const today = new Date();
-            
-            // Set time to 00:00:00 for accurate comparison
-            rowDate.setHours(0,0,0,0);
-            today.setHours(0,0,0,0);
+            rowDate.setHours(0,0,0,0); // Reset time for accurate comparison
 
-            if (mode === 'today') {
-                return rowDate.getTime() === today.getTime();
-            } else if (mode === 'week') {
-                // Find first day of current week (Sunday)
-                const firstDayOfWeek = new Date(today);
-                firstDayOfWeek.setDate(today.getDate() - today.getDay());
-                return rowDate >= firstDayOfWeek;
-            } else if (mode === 'month') {
-                return rowDate.getMonth() === today.getMonth() && rowDate.getFullYear() === today.getFullYear();
-            } else if (mode === 'year') {
-                return rowDate.getFullYear() === today.getFullYear();
+            if (start) {
+                const startDate = new Date(start);
+                startDate.setHours(0,0,0,0);
+                if (rowDate < startDate) return false;
+            }
+            if (end) {
+                const endDate = new Date(end);
+                endDate.setHours(0,0,0,0);
+                if (rowDate > endDate) return false;
             }
             return true;
         }
@@ -772,7 +823,6 @@
                 let comparison = 0;
 
                 if (type === 'number') {
-                    // ลบ comma ออกแล้วแปลงเป็น float
                     const valA = parseFloat(cellA.replace(/,/g, '')) || 0;
                     const valB = parseFloat(cellB.replace(/,/g, '')) || 0;
                     comparison = valA - valB;
@@ -787,7 +837,7 @@
                 return sortState.direction === 'asc' ? comparison : -comparison;
             });
 
-            displayPage(1); // Go back to page 1 after sort
+            displayPage(1); 
         }
 
         // [UPDATED] Display Logic
@@ -797,7 +847,8 @@
             
             const textFilter = searchInput.value.toLowerCase(); 
             const selectedAgency = agencyFilter.value; 
-            const selectedDateMode = dateFilter.value; // [NEW]
+            const startVal = startDateInput.value;
+            const endVal = endDateInput.value;
 
             const filteredRows = allTableRows.filter(row => {
                 const textContent = row.innerText.toLowerCase();
@@ -808,7 +859,7 @@
                 
                 const matchesText = textContent.includes(textFilter);
                 const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);
-                const matchesDate = checkDateFilter(dateCell, selectedDateMode); // [NEW]
+                const matchesDate = checkDateRange(dateCell, startVal, endVal); // [NEW LOGIC]
                 
                 return matchesText && matchesAgency && matchesDate;
             });
@@ -893,6 +944,9 @@
     </script>
     <script>
         function updateOnlineCount() {
+            // ดึง CSRF Token จาก meta tag หรือตัวแปร Jinja (ถ้ามี)
+            // เราจะลองส่งไปใน Header เพื่อผ่านระบบความปลอดภัยของ Flask
+            
             fetch("{{ url_for('heartbeat') }}", { 
                 method: "POST",
                 headers: { 
@@ -911,21 +965,25 @@
                     const el = document.getElementById('onlineCount');
                     if(el) {
                         el.textContent = data.online_count;
+                        // ถ้าตัวเลขขึ้นแล้ว ให้เปลี่ยนสีให้รู้ว่าทำงาน (Visual Debug)
                         el.style.color = "var(--bma-green)"; 
                     }
                 }
             })
             .catch(err => {
                 console.error("Heartbeat error:", err);
+                // ถ้ายังไม่ได้ ให้ลองเปลี่ยนเป็น "-" เหมือนเดิม
                 const el = document.getElementById('onlineCount');
                 if(el) el.textContent = "-";
             });
         }
 
+        // เรียกทำงานทันทีและวนซ้ำ
         updateOnlineCount();
         setInterval(updateOnlineCount, 10000);
 
         window.addEventListener('beforeunload', function() {
+            // ใช้ Beacon ซึ่งเสถียรกว่าสำหรับการปิดหน้าเว็บ
             const data = new FormData();
             const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
             data.append('csrf_token', csrfToken);
