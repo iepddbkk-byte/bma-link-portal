@@ -178,7 +178,6 @@
             display: flex; align-items: center; gap: 10px;
         }
         
-        /* [NEW] Style สำหรับไอคอนนโยบายใน Header */
         .policy-header-icon {
             width: 50px;
             height: 50px;
@@ -188,31 +187,36 @@
 
         /* Search & Filter Section (UPDATED) */
         .search-filter-container {
-            display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap;
+            display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap; align-items: stretch;
         }
         
         .search-input-wrapper { 
             flex: 2; position: relative; min-width: 250px; 
         }
         
+        /* เพิ่ม Wrapper สำหรับ Dropdown สองตัว */
+        .filters-group {
+            display: flex; gap: 10px; flex: 2; flex-wrap: wrap;
+        }
         .filter-wrapper { 
-            flex: 1; min-width: 250px; 
+            flex: 1; min-width: 180px; 
         }
 
-        #searchInput, #agencyFilter {
+        #searchInput, #agencyFilter, #dateFilter {
             width: 100%; padding: 15px 20px 15px 50px;
             border: 1px solid var(--border-color); border-radius: 50px;
             transition: all 0.3s ease; background: #f8f9fa;
             font-size: 1rem; font-family: 'Kanit', sans-serif;
+            height: 100%;
         }
         
-        /* ปรับแต่ง Dropdown ให้สอดคล้องกับ Input */
-        #agencyFilter {
+        /* ปรับแต่ง Dropdown */
+        #agencyFilter, #dateFilter {
             padding-left: 20px;
             cursor: pointer;
         }
 
-        #searchInput:focus, #agencyFilter:focus { 
+        #searchInput:focus, #agencyFilter:focus, #dateFilter:focus { 
             outline: none; border-color: var(--bma-green); 
             background: white; box-shadow: 0 0 0 4px var(--bma-green-light); 
         }
@@ -230,6 +234,7 @@
         }
         table { width: 100%; border-collapse: collapse; min-width: 800px; background: white; }
         
+        /* Header Sorting Style */
         th {
             background: var(--bma-green);
             color: white;
@@ -238,7 +243,26 @@
             text-align: left;
             white-space: nowrap;
             position: sticky; top: 0; z-index: 10;
+            cursor: pointer; /* ทำให้รู้ว่าคลิกได้ */
+            user-select: none;
+            transition: background 0.2s;
         }
+        th:hover {
+            background: var(--bma-green-hover);
+        }
+        
+        /* Sort Icon */
+        .sort-icon {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+        .sort-active {
+            opacity: 1;
+            color: #ffeb3b; /* Highlight active sort */
+        }
+
         td {
             padding: 15px;
             border-bottom: 1px solid #eee;
@@ -330,7 +354,6 @@
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
             
-            /* Hide Profile Link in Menu (Since it's on top) */
             .nav-link.profile-item { display: none; }
 
             .container { padding: 15px; margin: 15px auto; }
@@ -338,6 +361,7 @@
             
             /* ปรับ Layout ในมือถือให้เรียงต่อกัน */
             .search-filter-container { flex-direction: column; gap: 10px; }
+            .filters-group { flex-direction: column; }
             .search-input-wrapper, .filter-wrapper { min-width: 100%; }
 
             /* Table Mobile Optimization: Hide non-essential columns */
@@ -449,41 +473,66 @@
                 <input type="text" id="searchInput" placeholder="ค้นหา (ชื่อ, สถานะ, ประเภท, ส่วนราชการ, ผู้สร้าง)...">
             </div>
             
-            <div class="filter-wrapper">
-                <select id="agencyFilter">
-                    <option value="">🏢 ทุกส่วนราชการ (ทั้งหมด)</option>
-                    <optgroup label="ระดับสำนัก">
-                        {% for bureau in bureaus %}
-                        <option value="{{ bureau }}">{{ bureau }}</option>
-                        {% endfor %}
-                    </optgroup>
-                    <optgroup label="สำนักงานเขต">
-                        {% for district in districts %}
-                        <option value="{{ district }}">{{ district }}</option>
-                        {% endfor %}
-                    </optgroup>
-                </select>
+            <div class="filters-group">
+                <div class="filter-wrapper">
+                    <select id="agencyFilter">
+                        <option value="">🏢 ทุกส่วนราชการ (ทั้งหมด)</option>
+                        <optgroup label="ระดับสำนัก">
+                            {% for bureau in bureaus %}
+                            <option value="{{ bureau }}">{{ bureau }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="สำนักงานเขต">
+                            {% for district in districts %}
+                            <option value="{{ district }}">{{ district }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div class="filter-wrapper">
+                    <select id="dateFilter">
+                        <option value="">📅 ทุกช่วงเวลา</option>
+                        <option value="today">วันนี้</option>
+                        <option value="week">สัปดาห์นี้</option>
+                        <option value="month">เดือนนี้</option>
+                        <option value="year">ปีนี้</option>
+                    </select>
+                </div>
             </div>
         </div>
 
         <div class="table-responsive">
-            <table>
+            <table id="linksTable">
                 <thead>
                     <tr>
-                        <th>
-                            🔗 ชื่อลิงก์
-                            <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7; margin-left:5px;">↕</span>
+                        <th onclick="sortTable(0)">
+                            🔗 ชื่อลิงก์ <span id="sort-0" class="sort-icon">↕</span>
                         </th>
                         <th>📄 รายละเอียด</th> 
                         <th style="text-align: center;">ระดับ</th> 
-                        <th style="text-align: center;">🚦 สถานะ</th>
-                        <th style="text-align: center;">📊 การใช้งาน</th>
-                        <th>📂 ประเภท</th>
-                        <th>🏢 หน่วยงาน</th> 
-                        <th>🏛️ ส่วนราชการ</th> 
+                        <th style="text-align: center;" onclick="sortTable(3)">
+                            🚦 สถานะ <span id="sort-3" class="sort-icon">↕</span>
+                        </th>
+                        <th style="text-align: center;" onclick="sortTable(4, 'number')">
+                            📊 การใช้งาน <span id="sort-4" class="sort-icon">↕</span>
+                        </th>
+                        <th onclick="sortTable(5)">
+                            📂 ประเภท <span id="sort-5" class="sort-icon">↕</span>
+                        </th>
+                        <th onclick="sortTable(6)">
+                            🏢 หน่วยงาน <span id="sort-6" class="sort-icon">↕</span>
+                        </th> 
+                        <th onclick="sortTable(7)">
+                            🏛️ ส่วนราชการ <span id="sort-7" class="sort-icon">↕</span>
+                        </th> 
                         <th>📞 เบอร์ติดต่อ</th>
-                        <th>👤 ผู้สร้าง</th>
-                        <th>🗓️ วันที่อัปเดต</th>
+                        <th onclick="sortTable(9)">
+                            👤 ผู้สร้าง <span id="sort-9" class="sort-icon">↕</span>
+                        </th>
+                        <th onclick="sortTable(10, 'date')">
+                            🗓️ วันที่อัปเดต <span id="sort-10" class="sort-icon">↕</span>
+                        </th>
                         <th style="text-align: center;">📤 แชร์</th>
                     </tr>
                 </thead>
@@ -491,7 +540,7 @@
                     
                     {% for link in links %}
                     <tr>
-                        <td>
+                        <td data-value="{{ link['ชื่อลิงก์'] }}">
                             <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;">
                                 <i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}
                             </a>
@@ -508,7 +557,7 @@
                             {% endif %}
                         </td>
 
-                        <td style="text-align: center;">
+                        <td style="text-align: center;" data-value="{{ link['LinkStatus'] }}">
                             {% if link['LinkStatus'] == 'OK' %}
                                 <span class="status-badge status-ok">🟢 ปกติ</span>
                             {% elif link['LinkStatus'] == '403 Blocked' %}
@@ -547,7 +596,7 @@
                             {% endif %}
                         </td>
 
-                        <td>{{ link['วันที่อัปเดต_สั้น'] }}</td>
+                        <td data-value="{{ link['วันที่อัปเดต_สั้น'] }}">{{ link['วันที่อัปเดต_สั้น'] }}</td>
 
                         <td align="center">
                             <button type="button" 
@@ -606,7 +655,6 @@
             nav.classList.toggle('active');
         }
         
-        // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
             const nav = document.getElementById('navMenu');
             const toggle = document.querySelector('.mobile-toggle');
@@ -615,74 +663,34 @@
             }
         });
 
-        // Pagination and Search Functions
+        // ==========================================
+        //  Sorting & Filtering Logic
+        // ==========================================
         let allTableRows = []; 
         let currentPage = 1;
         let totalPages = 1;
         const tbody = document.getElementById("linkTableBody");
         const noDataRow = document.getElementById("noDataRow");
+        
         let searchInput; 
         let agencyFilter;
-
-        function sortTable(columnIndex, direction) {
-            const collator = new Intl.Collator('th', { sensitivity: 'base' });
-            allTableRows.sort((rowA, rowB) => {
-                const cellA = rowA.getElementsByTagName("td")[columnIndex].textContent.trim();
-                const cellB = rowB.getElementsByTagName("td")[columnIndex].textContent.trim();
-                if (direction === 'asc') {
-                    return collator.compare(cellA, cellB);
-                } else {
-                    return collator.compare(cellB, cellA);
-                }
-            });
-            displayPage(currentPage);
-        }
-
-        function displayPage(page) {
-            currentPage = page;
-            const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
-            const filter = searchInput.value.toLowerCase(); 
-            const selectedAgency = agencyFilter.value; // รับค่าจาก Dropdown
-
-            const filteredRows = allTableRows.filter(row => {
-                const textContent = row.innerText.toLowerCase();
-                // Agency Cell is at index 7 (column 8) because we added 'Privacy' column at index 2
-                const agencyCell = row.getElementsByTagName("td")[7].textContent.trim(); 
-                
-                const matchesText = textContent.includes(filter);
-                const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);
-                
-                return matchesText && matchesAgency;
-            });
-
-            tbody.innerHTML = ''; 
-            if (filteredRows.length === 0) {
-                if(noDataRow) { noDataRow.style.display = 'table-row'; tbody.appendChild(noDataRow); }
-                totalPages = 1;
-                currentPage = 1;
-            } else {
-                if(noDataRow) noDataRow.style.display = 'none';
-                totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-                if (page > totalPages) currentPage = totalPages;
-                if (page < 1) currentPage = 1;
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-                filteredRows.slice(startIndex, endIndex).forEach(row => tbody.appendChild(row));
-            }
-
-            document.getElementById("currentPage").textContent = currentPage;
-            document.getElementById("totalPages").textContent = totalPages;
-            document.getElementById("btnFirst").disabled = (currentPage === 1);
-            document.getElementById("btnPrev").disabled = (currentPage === 1);
-            document.getElementById("btnNext").disabled = (currentPage === totalPages);
-            document.getElementById("btnLast").disabled = (currentPage === totalPages);
-        }
+        let dateFilter;
+        
+        // State for sorting
+        let sortState = {
+            columnIndex: -1,
+            direction: 'asc' // or 'desc'
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
+            // เก็บแถวทั้งหมดไว้ใน Memory (ยกเว้นแถว No Data)
             allTableRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
+            
             searchInput = document.getElementById("searchInput"); 
             agencyFilter = document.getElementById("agencyFilter");
+            dateFilter = document.getElementById("dateFilter"); // [NEW] Date Filter Element
             
+            // Check URL Params
             const urlParams = new URLSearchParams(window.location.search);
             const searchParam = urlParams.get('search');
             const agencyParam = urlParams.get('agency');
@@ -692,18 +700,151 @@
             if (categoryParam) searchInput.value = categoryParam;
             if (agencyParam) agencyFilter.value = agencyParam;
             
+            // Event Listeners for Pagination
             document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
             document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
             document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
             document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
             document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
             
-            // Add Event Listeners for filtering
+            // Event Listeners for Filters
             searchInput.addEventListener('keyup', () => displayPage(1)); 
             agencyFilter.addEventListener('change', () => displayPage(1)); 
+            dateFilter.addEventListener('change', () => displayPage(1)); // [NEW]
             
             displayPage(1);
         });
+
+        // [NEW] Helper function to check date range
+        function checkDateFilter(dateStr, mode) {
+            if (!mode) return true; // ถ้าไม่ได้เลือก Filter ให้ผ่านหมด
+            if (!dateStr || dateStr === '-') return false; // ไม่มีวันที่
+
+            const rowDate = new Date(dateStr);
+            const today = new Date();
+            
+            // Set time to 00:00:00 for accurate comparison
+            rowDate.setHours(0,0,0,0);
+            today.setHours(0,0,0,0);
+
+            if (mode === 'today') {
+                return rowDate.getTime() === today.getTime();
+            } else if (mode === 'week') {
+                // Find first day of current week (Sunday)
+                const firstDayOfWeek = new Date(today);
+                firstDayOfWeek.setDate(today.getDate() - today.getDay());
+                return rowDate >= firstDayOfWeek;
+            } else if (mode === 'month') {
+                return rowDate.getMonth() === today.getMonth() && rowDate.getFullYear() === today.getFullYear();
+            } else if (mode === 'year') {
+                return rowDate.getFullYear() === today.getFullYear();
+            }
+            return true;
+        }
+
+        // [UPDATED] Sort Function
+        function sortTable(columnIndex, type = 'text') {
+            // Toggle Direction
+            if (sortState.columnIndex === columnIndex) {
+                sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortState.columnIndex = columnIndex;
+                sortState.direction = 'asc';
+            }
+
+            // Update Icons
+            document.querySelectorAll('.sort-icon').forEach(icon => {
+                icon.textContent = '↕';
+                icon.classList.remove('sort-active');
+            });
+            const currentIcon = document.getElementById(`sort-${columnIndex}`);
+            if (currentIcon) {
+                currentIcon.textContent = sortState.direction === 'asc' ? '▲' : '▼';
+                currentIcon.classList.add('sort-active');
+            }
+
+            const collator = new Intl.Collator('th', { sensitivity: 'base' });
+
+            allTableRows.sort((rowA, rowB) => {
+                let cellA = rowA.getElementsByTagName("td")[columnIndex].textContent.trim();
+                let cellB = rowB.getElementsByTagName("td")[columnIndex].textContent.trim();
+
+                let comparison = 0;
+
+                if (type === 'number') {
+                    // ลบ comma ออกแล้วแปลงเป็น float
+                    const valA = parseFloat(cellA.replace(/,/g, '')) || 0;
+                    const valB = parseFloat(cellB.replace(/,/g, '')) || 0;
+                    comparison = valA - valB;
+                } else if (type === 'date') {
+                    const dateA = new Date(cellA);
+                    const dateB = new Date(cellB);
+                    comparison = dateA - dateB;
+                } else {
+                    comparison = collator.compare(cellA, cellB);
+                }
+
+                return sortState.direction === 'asc' ? comparison : -comparison;
+            });
+
+            displayPage(1); // Go back to page 1 after sort
+        }
+
+        // [UPDATED] Display Logic
+        function displayPage(page) {
+            currentPage = page;
+            const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
+            
+            const textFilter = searchInput.value.toLowerCase(); 
+            const selectedAgency = agencyFilter.value; 
+            const selectedDateMode = dateFilter.value; // [NEW]
+
+            const filteredRows = allTableRows.filter(row => {
+                const textContent = row.innerText.toLowerCase();
+                // Column Indices: Name=0, Detail=1, Privacy=2, StatusBadge=3, StatusText=4, Type=5, Agency=6, Bureau=7... Date=10
+                
+                const agencyCell = row.getElementsByTagName("td")[7].textContent.trim(); // ส่วนราชการ
+                const dateCell = row.getElementsByTagName("td")[10].textContent.trim(); // วันที่
+                
+                const matchesText = textContent.includes(textFilter);
+                const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);
+                const matchesDate = checkDateFilter(dateCell, selectedDateMode); // [NEW]
+                
+                return matchesText && matchesAgency && matchesDate;
+            });
+
+            tbody.innerHTML = ''; 
+            if (filteredRows.length === 0) {
+                if(noDataRow) { noDataRow.style.display = 'table-row'; tbody.appendChild(noDataRow); }
+                totalPages = 1;
+                currentPage = 1;
+            } else {
+                if(noDataRow) noDataRow.style.display = 'none';
+                
+                if (itemsPerPage === 99999) {
+                    totalPages = 1;
+                    currentPage = 1;
+                    filteredRows.forEach(row => tbody.appendChild(row));
+                } else {
+                    totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+                    if (totalPages === 0) totalPages = 1;
+                    if (page > totalPages) currentPage = totalPages;
+                    if (page < 1) currentPage = 1;
+                    
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    filteredRows.slice(startIndex, endIndex).forEach(row => tbody.appendChild(row));
+                }
+            }
+
+            // Update Pagination UI
+            document.getElementById("currentPage").textContent = currentPage;
+            document.getElementById("totalPages").textContent = totalPages;
+            document.getElementById("btnFirst").disabled = (currentPage === 1);
+            document.getElementById("btnPrev").disabled = (currentPage === 1);
+            document.getElementById("btnNext").disabled = (currentPage === totalPages);
+            document.getElementById("btnLast").disabled = (currentPage === totalPages);
+        }
 
         // ฟังก์ชัน Share QR Code
         function showShareModal(title, originalUrl, linkId) {
@@ -752,9 +893,6 @@
     </script>
     <script>
         function updateOnlineCount() {
-            // ดึง CSRF Token จาก meta tag หรือตัวแปร Jinja (ถ้ามี)
-            // เราจะลองส่งไปใน Header เพื่อผ่านระบบความปลอดภัยของ Flask
-            
             fetch("{{ url_for('heartbeat') }}", { 
                 method: "POST",
                 headers: { 
@@ -773,25 +911,21 @@
                     const el = document.getElementById('onlineCount');
                     if(el) {
                         el.textContent = data.online_count;
-                        // ถ้าตัวเลขขึ้นแล้ว ให้เปลี่ยนสีให้รู้ว่าทำงาน (Visual Debug)
                         el.style.color = "var(--bma-green)"; 
                     }
                 }
             })
             .catch(err => {
                 console.error("Heartbeat error:", err);
-                // ถ้ายังไม่ได้ ให้ลองเปลี่ยนเป็น "-" เหมือนเดิม
                 const el = document.getElementById('onlineCount');
                 if(el) el.textContent = "-";
             });
         }
 
-        // เรียกทำงานทันทีและวนซ้ำ
         updateOnlineCount();
         setInterval(updateOnlineCount, 10000);
 
         window.addEventListener('beforeunload', function() {
-            // ใช้ Beacon ซึ่งเสถียรกว่าสำหรับการปิดหน้าเว็บ
             const data = new FormData();
             const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
             data.append('csrf_token', csrfToken);
