@@ -194,28 +194,25 @@
             align-items: stretch;
         }
         
-        /* ปรับสัดส่วน: ลดความกว้างค้นหาลงนิดหน่อยเพื่อให้ที่เหลือกับ Filter */
         .search-input-wrapper { 
             flex: 1 1 250px; 
             position: relative; 
         }
         
-        /* กลุ่ม Filter */
         .filters-group {
             display: flex; 
             gap: 10px; 
-            flex: 2.5; /* ให้พื้นที่ส่วนนี้เยอะกว่า search */
+            flex: 2.5; 
             flex-wrap: wrap; 
             align-items: center;
         }
         
-        /* [แก้ไข] ช่องเลือกหน่วยงาน: ให้ยืดขยายได้มากที่สุด (flex-grow) */
         .filter-wrapper { 
-            flex: 1 1 300px; /* Base width 300px, Grow/Shrink enabled */
+            flex: 1 1 300px; 
             min-width: 220px; 
         }
 
-        /* [แก้ไข] ช่องเลือกวันที่: ให้ขนาดพอดีกับเนื้อหา ไม่ยืดจนเกินไป */
+        /* Date Range Style */
         .date-range-wrapper {
             display: flex;
             align-items: center;
@@ -223,12 +220,9 @@
             background: #f8f9fa;
             border: 1px solid var(--border-color);
             border-radius: 50px;
-            padding: 0 10px;
-            
-            /* fix: ไม่ให้ยืดจนกว้างเกินไป ให้พอดี content */
+            padding: 0 15px;
             flex: 0 0 auto; 
             width: auto;
-            
             height: 50px;
         }
         
@@ -240,7 +234,7 @@
             padding: 0;
             outline: none;
             cursor: pointer;
-            width: 125px; /* Fixed width per input */
+            width: 125px; 
             height: 100%;
             font-size: 0.9rem;
         }
@@ -267,15 +261,15 @@
             background: #ffebee;
         }
 
-        /* ปรับ Padding ให้ลดลงเพื่อไม่ให้ตัวหนังสือขาด */
+        /* ปรับ Padding ไม่ให้ตัวหนังสือขาด */
         #searchInput, #agencyFilter {
             width: 100%; 
-            padding: 0 20px 0 50px; /* ลด Padding บนล่างเหลือ 0 แล้วใช้ line-height แทน */
+            padding: 0 20px 0 50px; 
             border: 1px solid var(--border-color); border-radius: 50px;
             transition: all 0.3s ease; background: #f8f9fa;
             font-size: 1rem; font-family: 'Kanit', sans-serif;
-            height: 50px; /* Height */
-            line-height: 50px; /* จัดกึ่งกลางแนวตั้ง */
+            height: 50px; 
+            line-height: 50px; 
         }
         
         #agencyFilter {
@@ -301,7 +295,6 @@
         }
         table { width: 100%; border-collapse: collapse; min-width: 800px; background: white; }
         
-        /* Header Sorting Style */
         th {
             background: var(--bma-green);
             color: white;
@@ -310,7 +303,7 @@
             text-align: left;
             white-space: nowrap;
             position: sticky; top: 0; z-index: 10;
-            cursor: pointer; /* ทำให้รู้ว่าคลิกได้ */
+            cursor: pointer;
             user-select: none;
             transition: background 0.2s;
         }
@@ -318,7 +311,6 @@
             background: var(--bma-green-hover);
         }
         
-        /* Sort Icon */
         .sort-icon {
             display: inline-block;
             margin-left: 5px;
@@ -327,7 +319,7 @@
         }
         .sort-active {
             opacity: 1;
-            color: #ffeb3b; /* Highlight active sort */
+            color: #ffeb3b; 
         }
 
         td {
@@ -399,6 +391,9 @@
             .user-profile-pic { width: 100%; height: 100%; }
         }
 
+        /* =========================================
+           MOBILE SPECIFIC STYLES (Fixes Filters)
+           ========================================= */
         @media (max-width: 768px) {
             body { padding-top: 70px; }
             .main-header { padding: 0 15px; height: 70px; }
@@ -426,11 +421,31 @@
             .container { padding: 15px; margin: 15px auto; }
             h1 { font-size: 1.4em; }
             
-            /* ปรับ Layout ในมือถือให้เรียงต่อกัน */
-            .search-filter-container { flex-direction: column; gap: 10px; }
-            .filters-group { flex-direction: column; align-items: stretch; }
-            .search-input-wrapper, .filter-wrapper { min-width: 100%; }
-            .date-range-wrapper { width: 100%; justify-content: space-between; }
+            /* Fix Filter Layout on Mobile */
+            .search-filter-container { flex-direction: column; gap: 15px; }
+            .filters-group { flex-direction: column; width: 100%; gap: 15px; }
+            .search-input-wrapper, .filter-wrapper { width: 100%; flex: auto; min-width: 0; }
+
+            /* Fix Date Range Wrapper on Mobile */
+            .date-range-wrapper { 
+                width: 100%; 
+                justify-content: center; 
+                flex-wrap: wrap; /* ยอมให้ตกบรรทัด */
+                height: auto; /* สูงตามเนื้อหา */
+                padding: 10px;
+                gap: 10px;
+                border-radius: 20px; /* ปรับมนน้อยลงหน่อย */
+            }
+            
+            .date-input {
+                width: auto;
+                flex: 1; /* ขยายเต็มที่ */
+                min-width: 120px; /* กันไม่ให้เล็กเกินไป */
+                text-align: center;
+                background: white; /* ให้เห็นชัดขึ้น */
+                border-radius: 5px;
+                padding: 5px;
+            }
 
             /* Table Mobile Optimization: Hide non-essential columns */
             th:nth-child(2), td:nth-child(2), /* รายละเอียด */
