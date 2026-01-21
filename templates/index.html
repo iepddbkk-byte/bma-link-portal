@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMA SMART LINKAGE- หน้าหลัก</title>
+    <title>BMA SMART LINKAGE - หน้าหลัก</title>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     <script src="https://unpkg.com/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -291,6 +291,47 @@
         }
         .btn-all-links:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,123,255,0.5); }
 
+        /* --- [NEW] Video Tutorial Section --- */
+        .video-wrapper {
+            max-width: 900px;
+            margin: 0 auto 50px; /* Center horizontally & Add spacing bottom */
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+
+        .video-header {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--bma-green);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .responsive-iframe-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 15px;
+            background: #000;
+        }
+
+        .responsive-iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
         /* --- 9 Dimensions Policy Menu (With Images) --- */
         .policy-grid {
             display: grid;
@@ -574,6 +615,15 @@
             <i class="fas fa-layer-group"></i> ดูรายชื่อลิงค์ทั้งหมด
         </a>
 
+        <div class="video-wrapper">
+            <div class="video-header">
+                <i class="fas fa-play-circle" style="color: #ff0000; font-size: 1.2em;"></i> 
+                แนะนำการใช้งานระบบ
+            </div>
+            <div class="responsive-iframe-container">
+                <iframe src="https://www.youtube.com/embed/CKbVfmzZ1ws" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+            </div>
+        </div>
         <div class="section-title"><i class="fas fa-star"></i> เลือกดูตามนโยบาย 9 ด้าน 9 ดี</div>
         <div class="policy-grid">
             <a href="{{ url_for('links_page', category='เดินทางดี') }}" class="policy-btn">
