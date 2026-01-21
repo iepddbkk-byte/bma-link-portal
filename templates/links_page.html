@@ -177,6 +177,14 @@
             border-bottom: 3px solid var(--bma-green-light);
             display: flex; align-items: center; gap: 10px;
         }
+        
+        /* [NEW] Style สำหรับไอคอนนโยบายใน Header */
+        .policy-header-icon {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            vertical-align: middle;
+        }
 
         /* Search & Filter Section (UPDATED) */
         .search-filter-container {
@@ -409,8 +417,30 @@
             </div>
         {% endif %}
 
-        <h1><i class="fas fa-link" style="color: var(--bma-green);"></i> 
-            {{ agency_name if agency_name else 'รายชื่อลิงค์ทั้งหมด' }}
+        <h1>
+            {% if agency_name == 'เดินทางดี' %}
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_travel.png') }}" class="policy-header-icon" alt="icon">
+            {% elif agency_name == 'ปลอดภัยดี' %}
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_safety.png') }}" class="policy-header-icon" alt="icon">
+            {% elif agency_name == 'โปร่งใสดี' %}
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_transperant.png') }}" class="policy-header-icon" alt="icon">
+            {% elif agency_name == 'สิ่งแวดล้อมดี' %}
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_environment.png') }}" class="policy-header-icon" alt="icon">
+            {% elif agency_name == 'สุขภาพดี' %}
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_health.png') }}" class="policy-header-icon" alt="icon">
+            {% elif agency_name == 'เรียนดี' %}
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_study.png') }}" class="policy-header-icon" alt="icon">
+            {% elif agency_name == 'เศรษฐกิจดี' %}
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_economics.png') }}" class="policy-header-icon" alt="icon">
+            {% elif agency_name == 'สังคมดี' %}
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_Social.png') }}" class="policy-header-icon" alt="icon">
+            {% elif agency_name == 'บริหารจัดการดี' %}
+                <img src="{{ url_for('static', filename='pictures/BMA_Icons_manage.png') }}" class="policy-header-icon" alt="icon">
+            {% else %}
+                <i class="fas fa-link" style="color: var(--bma-green);"></i>
+            {% endif %}
+            
+            &nbsp; {{ agency_name if agency_name else 'รายชื่อลิงค์ทั้งหมด' }}
         </h1>
 
         <div class="search-filter-container">
@@ -705,7 +735,7 @@
             });
         }
     </script>
-		
+        
     <script>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -720,7 +750,7 @@
             {% endif %}
         {% endwith %}
     </script>
-	<script>
+    <script>
         function updateOnlineCount() {
             // ดึง CSRF Token จาก meta tag หรือตัวแปร Jinja (ถ้ามี)
             // เราจะลองส่งไปใน Header เพื่อผ่านระบบความปลอดภัยของ Flask
@@ -767,7 +797,7 @@
             data.append('csrf_token', csrfToken);
             navigator.sendBeacon("{{ url_for('offline') }}", data);
         });
-    </script>   
+    </script>    
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
