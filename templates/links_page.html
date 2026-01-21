@@ -210,9 +210,10 @@
             background: #f8f9fa;
             border: 1px solid var(--border-color);
             border-radius: 50px;
-            padding: 5px 15px;
+            padding: 0 15px;
             flex-grow: 1;
             min-width: 280px;
+            height: 50px; /* Fixed Height */
         }
         
         .date-input {
@@ -220,10 +221,11 @@
             background: transparent;
             font-family: 'Kanit', sans-serif;
             color: var(--text-color);
-            padding: 8px 5px;
+            padding: 0 5px;
             outline: none;
             cursor: pointer;
             width: 130px;
+            height: 100%; /* Fill height */
         }
         
         .date-separator {
@@ -247,12 +249,15 @@
             background: #ffebee;
         }
 
+        /* [แก้ไข] ปรับ Padding ให้ลดลงเพื่อไม่ให้ตัวหนังสือขาด */
         #searchInput, #agencyFilter {
-            width: 100%; padding: 15px 20px 15px 50px;
+            width: 100%; 
+            padding: 0 20px 0 50px; /* ลด Padding บนล่างเหลือ 0 แล้วใช้ line-height แทน */
             border: 1px solid var(--border-color); border-radius: 50px;
             transition: all 0.3s ease; background: #f8f9fa;
             font-size: 1rem; font-family: 'Kanit', sans-serif;
-            height: 50px; /* Force height match */
+            height: 50px; /* Height */
+            line-height: 50px; /* จัดกึ่งกลางแนวตั้ง */
         }
         
         #agencyFilter {
@@ -536,7 +541,7 @@
                 </div>
                 
                 <div class="date-range-wrapper">
-                    <span style="color:#666; font-size:0.9em;"><i class="far fa-calendar-alt"></i> วันที่:</span>
+                    <span style="color:#666; font-size:0.9em; white-space:nowrap;"><i class="far fa-calendar-alt"></i> วันที่:</span>
                     <input type="date" id="startDate" class="date-input" title="วันที่เริ่มต้น">
                     <span class="date-separator">ถึง</span>
                     <input type="date" id="endDate" class="date-input" title="วันที่สิ้นสุด">
