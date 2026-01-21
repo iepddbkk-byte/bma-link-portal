@@ -185,24 +185,37 @@
             vertical-align: middle;
         }
 
-        /* --- Search & Filter Section (UPDATED) --- */
+        /* --- Search & Filter Section (LAYOUT FIXED) --- */
         .search-filter-container {
-            display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap; align-items: stretch;
+            display: flex; 
+            gap: 15px; 
+            margin: 25px 0; 
+            flex-wrap: wrap; 
+            align-items: stretch;
         }
         
+        /* ปรับสัดส่วน: ลดความกว้างค้นหาลงนิดหน่อยเพื่อให้ที่เหลือกับ Filter */
         .search-input-wrapper { 
-            flex: 1.5; position: relative; min-width: 250px; 
+            flex: 1 1 250px; 
+            position: relative; 
         }
         
+        /* กลุ่ม Filter */
         .filters-group {
-            display: flex; gap: 10px; flex: 2; flex-wrap: wrap; align-items: center;
+            display: flex; 
+            gap: 10px; 
+            flex: 2.5; /* ให้พื้นที่ส่วนนี้เยอะกว่า search */
+            flex-wrap: wrap; 
+            align-items: center;
         }
         
+        /* [แก้ไข] ช่องเลือกหน่วยงาน: ให้ยืดขยายได้มากที่สุด (flex-grow) */
         .filter-wrapper { 
-            flex: 1; min-width: 180px; 
+            flex: 1 1 300px; /* Base width 300px, Grow/Shrink enabled */
+            min-width: 220px; 
         }
 
-        /* Date Range Style */
+        /* [แก้ไข] ช่องเลือกวันที่: ให้ขนาดพอดีกับเนื้อหา ไม่ยืดจนเกินไป */
         .date-range-wrapper {
             display: flex;
             align-items: center;
@@ -210,10 +223,13 @@
             background: #f8f9fa;
             border: 1px solid var(--border-color);
             border-radius: 50px;
-            padding: 0 15px;
-            flex-grow: 1;
-            min-width: 280px;
-            height: 50px; /* Fixed Height */
+            padding: 0 10px;
+            
+            /* fix: ไม่ให้ยืดจนกว้างเกินไป ให้พอดี content */
+            flex: 0 0 auto; 
+            width: auto;
+            
+            height: 50px;
         }
         
         .date-input {
@@ -221,16 +237,18 @@
             background: transparent;
             font-family: 'Kanit', sans-serif;
             color: var(--text-color);
-            padding: 0 5px;
+            padding: 0;
             outline: none;
             cursor: pointer;
-            width: 130px;
-            height: 100%; /* Fill height */
+            width: 125px; /* Fixed width per input */
+            height: 100%;
+            font-size: 0.9rem;
         }
         
         .date-separator {
             font-size: 0.9em;
             color: #888;
+            white-space: nowrap;
         }
 
         .btn-clear-date {
@@ -249,7 +267,7 @@
             background: #ffebee;
         }
 
-        /* [แก้ไข] ปรับ Padding ให้ลดลงเพื่อไม่ให้ตัวหนังสือขาด */
+        /* ปรับ Padding ให้ลดลงเพื่อไม่ให้ตัวหนังสือขาด */
         #searchInput, #agencyFilter {
             width: 100%; 
             padding: 0 20px 0 50px; /* ลด Padding บนล่างเหลือ 0 แล้วใช้ line-height แทน */
