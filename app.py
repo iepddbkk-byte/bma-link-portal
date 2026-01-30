@@ -50,6 +50,7 @@ staff_sheet = None
 invite_sheet = None 
 feedback_sheet = None
 stats_sheet = None 
+favorites_sheet = None # [NEW] เพิ่มตัวแปรสำหรับ Favorites Sheet
 
 try:
     json_creds = os.environ.get('GOOGLE_CREDENTIALS')
@@ -71,6 +72,12 @@ try:
         stats_sheet = spreadsheet.worksheet("SiteStats")
     except:
         print("⚠️ Warning: SiteStats sheet not found.")
+
+    # [NEW] เชื่อมต่อกับ UserFavorites Sheet
+    try:
+        favorites_sheet = spreadsheet.worksheet("UserFavorites")
+    except:
+        print("⚠️ Warning: UserFavorites sheet not found. Please create a new tab named 'UserFavorites'.")
 
     print("✅ เชื่อมต่อ Google Sheet ครบทุกแท็บสำเร็จ!")
 
@@ -471,12 +478,19 @@ def links_page():
             date_str = link.get('วันที่อัปเดต')
             link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
 
+        # [NEW] ดึงรายการ ID ที่ผู้ใช้กด Favorite ไว้ (เพื่อไปแสดงสถานะปุ่มดาว)
+        my_fav_ids = []
+        if session.get('logged_in'):
+            # เรียกฟังก์ชัน get_user_favorite_ids ที่เราเพิ่มไปก่อนหน้านี้
+            my_fav_ids = get_user_favorite_ids(session.get('username'))
+
         return render_template('links_page.html', 
                                links=links_to_display, 
                                error=None, 
-                               session=session,
+                               session=session, 
                                agency_name=page_title,
-                               bureaus=bureaus_list,
+                               fav_ids=my_fav_ids, # [NEW] ส่งรายการ ID ที่ชอบไปที่ Template
+                               bureaus=bureaus_list, 
                                districts=districts_list)
     except Exception as e: 
         return render_template('links_page.html', links=[], error=str(e), session=session, agency_name="Error")
@@ -674,14 +688,22 @@ def dashboard():
         if not session.get('visitor_id'):
             session['visitor_id'] = str(uuid.uuid4())
 
-        # Admin เห็นทั้งหมด, User เห็นเฉพาะของตัวเอง
         all_links = get_db_records()
+        
+        # [NEW] ดึงรายการ ID ที่ผู้ใช้กด Favorite ไว้
+        my_fav_ids = get_user_favorite_ids(session.get('username'))
+        
+        # Admin เห็นทั้งหมด, User เห็นเฉพาะของตัวเอง
         user_links = []
         if session.get('level') == 'Admin':
             user_links = all_links
         else:
             user_links = [l for l in all_links if l.get('CreatorUsername') == session.get('username')]
         
+        # [NEW] กรองเฉพาะรายการโปรด (Link ID ต้องอยู่ใน my_fav_ids และสถานะต้องใช้งานได้)
+        # ใช้ list comprehension เพื่อสร้างลิสต์ object ของลิงก์โปรด
+        favorite_links_obj = [l for l in all_links if l.get('ID') in my_fav_ids and l.get('สถานะ') == 'ใช้งาน']
+
         for l in user_links:
             try: l['Clicks'] = int(l.get('Clicks', 0))
             except: l['Clicks'] = 0
@@ -706,6 +728,8 @@ def dashboard():
         return render_template('dashboard.html', 
                                session=session, 
                                links=user_links, 
+                               favorite_links=favorite_links_obj, # [NEW] ส่งรายการโปรด
+                               fav_ids=my_fav_ids, # [NEW] ส่ง ID เพื่อเช็คสถานะปุ่มดาว
                                bureaus=bureaus_list, 
                                districts=districts_list,
                                chart_data=chart_data,
@@ -1047,6 +1071,63 @@ def offline():
     except Exception as e:
         print(f"Offline signal error: {e}")
     return '', 204
+    
+# ==========================================
+# [NEW] My Favorites System Logic
+# ==========================================
 
+def get_user_favorite_ids(username):
+    """ดึงรายการ LinkID ที่ User คนนี้กด Favorite ไว้"""
+    if favorites_sheet is None: return []
+    try:
+        # เพื่อประสิทธิภาพที่ดี ควรทำ Cache ในอนาคตหากข้อมูลเยอะ
+        all_favs = favorites_sheet.get_all_records()
+        user_favs = [row['LinkID'] for row in all_favs if row['Username'] == username]
+        return user_favs
+    except Exception as e:
+        print(f"Error getting favorites: {e}")
+        return []
+
+@app.route('/toggle_favorite', methods=['POST'])
+def toggle_favorite():
+    """API สำหรับกดปุ่มดาว (เพิ่ม/ลบ)"""
+    if not session.get('logged_in'):
+        return jsonify({'status': 'error', 'message': 'Please login first'}), 401
+    
+    if favorites_sheet is None:
+        return jsonify({'status': 'error', 'message': 'Database not connected'}), 500
+
+    try:
+        data = request.get_json()
+        link_id = data.get('link_id')
+        username = session.get('username')
+        
+        # ดึงข้อมูลทั้งหมดมาตรวจสอบ (Row Index เริ่มที่ 1)
+        all_records = favorites_sheet.get_all_values() 
+        found_row_index = -1
+        
+        for i, row in enumerate(all_records):
+            if i == 0: continue # ข้าม Header row
+            # Column Structure: A=Timestamp, B=Username, C=LinkID
+            # Index ใน list: 0, 1, 2
+            if len(row) > 2 and row[1] == username and row[2] == link_id:
+                found_row_index = i + 1 # +1 สำหรับ gspread index
+                break
+        
+        if found_row_index != -1:
+            # เจอ -> ลบออก (Unfavorite)
+            favorites_sheet.delete_rows(found_row_index)
+            action = 'removed'
+        else:
+            # ไม่เจอ -> เพิ่มใหม่ (Favorite)
+            favorites_sheet.append_row([get_current_timestamp(), username, link_id], value_input_option='USER_ENTERED')
+            action = 'added'
+            
+        return jsonify({'status': 'success', 'action': action})
+        
+    except Exception as e:
+        print(f"Toggle Favorite Error: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+        
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
