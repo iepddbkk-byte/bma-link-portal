@@ -117,7 +117,7 @@ STAFF_HEADERS = [
 # ==========================================
 # ส่วนระบบ Caching
 # ==========================================
-CACHE_TIMEOUT = 60 
+CACHE_TIMEOUT = 15 
 _app_cache = {
     'db_records': {'data': None, 'time': None},
     'staff_records': {'data': None, 'time': None},
