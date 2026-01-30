@@ -106,7 +106,7 @@ districts_list = [
 # [UPDATE] เพิ่ม "ความเป็นส่วนตัว" เข้าไปใน Headers (Index 13)
 DB_HEADERS = [
     "ID", "ประเภท", "หน่วยงาน", "ส่วนราชการ", "อีเมลผู้รับผิดชอบ", "เบอร์โทรติดต่อ",
-    "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "ความเป็นส่วนตัว", "Clicks"
+    "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "ความเป็นส่วนตัว", "Clicks", "EditCount"
 ]
 
 STAFF_HEADERS = [
@@ -736,7 +736,8 @@ def add_link_action():
             data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
             data['URL'], data['สถานะ'], data['รายละเอียด'], 
             get_current_timestamp(), session.get('username'), '', 
-            data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0 
+            data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0, 
+            0  # <--- [NEW] EditCount เริ่มต้นเป็น 0
         ]
         db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
         
@@ -789,35 +790,49 @@ def update_link_action(link_id):
         cell = db_sheet.find(link_id)
         if not cell: return redirect(url_for('dashboard'))
         row_vals = db_sheet.row_values(cell.row)
-        creator = row_vals[11].strip() 
+        
+        # ... (โค้ดตรวจสอบสิทธิ์เหมือนเดิม) ...
+        creator = row_vals[11].strip()
         if session.get('level', '').strip() != 'Admin' and creator != session.get('username', '').strip():
              flash('ไม่มีสิทธิ์', 'error'); return redirect(url_for('dashboard'))
-             
-        # รับค่าความเป็นส่วนตัว
+
         data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         main_agency = request.form.get('ส่วนราชการ') if session.get('level', '').strip() == 'Admin' else row_vals[3]
         
+        # [NEW LOGIC] คำนวณยอด Clicks และ EditCount
         current_clicks = row_vals[14] if len(row_vals) > 14 else 0
         
+        # ดึงค่า EditCount เดิมมาบวก 1
+        try:
+            current_edits = int(row_vals[15]) if len(row_vals) > 15 and row_vals[15] else 0
+        except:
+            current_edits = 0
+        
+        new_edit_count = current_edits + 1
+
         new_vals = [
             link_id, data['ประเภท'], data['หน่วยงาน'], main_agency, 
             data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
             data['URL'], data['สถานะ'], data['รายละเอียด'], 
             get_current_timestamp(), creator, row_vals[12] if len(row_vals) > 12 else '',
             data.get('ความเป็นส่วนตัว', 'สาธารณะ'),
-            current_clicks 
+            current_clicks,
+            new_edit_count # <--- [NEW] บันทึกค่าใหม่ลงไป
         ]
-        range_name = f"A{cell.row}:O{cell.row}" 
+        
+        # อัปเดตช่วง A ถึง P (Column 1 ถึง 16)
+        range_name = f"A{cell.row}:P{cell.row}" 
         db_sheet.update(range_name, [new_vals])
         
         clear_db_cache()
 
-        flash('แก้ไขสำเร็จ', 'success')
-        # [UPDATE] เปลี่ยนให้ Redirect ไปหน้า links_page แทน dashboard
+        flash(f'แก้ไขสำเร็จ (แก้ไขไปแล้ว {new_edit_count} ครั้ง)', 'success')
         return redirect(url_for('dashboard')) 
-    except: return redirect(url_for('dashboard'))
-
+    except Exception as e: 
+        print(e)
+        return redirect(url_for('dashboard'))
+        
 @app.route('/analytics')
 def analytics_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
@@ -827,10 +842,16 @@ def analytics_page():
         users = get_staff_records()
         feedback = feedback_sheet.get_all_records()
         
+        # แปลงค่าตัวเลขให้พร้อมคำนวณ
         for l in links:
             try: l['Clicks'] = int(l.get('Clicks', 0))
             except: l['Clicks'] = 0
-        top_10 = sorted(links, key=lambda x: x['Clicks'], reverse=True)[:10]
+            try: l['EditCount'] = int(l.get('EditCount', 0))
+            except: l['EditCount'] = 0
+
+        # [NEW] แยก Top 10 เป็น 2 ชุด
+        top_10_clicks = sorted(links, key=lambda x: x['Clicks'], reverse=True)[:10]
+        top_10_edits = sorted(links, key=lambda x: x['EditCount'], reverse=True)[:10]
 
         total_views = 0
         if stats_sheet:
@@ -839,6 +860,7 @@ def analytics_page():
 
         cat_counts = Counter(l['ประเภท'] for l in links if l.get('ประเภท'))
         dept_counts = Counter(l['ส่วนราชการ'] for l in links if l.get('ส่วนราชการ')).most_common(5)
+        
         monthly = {}
         for l in links:
             if l.get('วันที่อัปเดต'):
@@ -847,6 +869,7 @@ def analytics_page():
                     monthly[m] = monthly.get(m, 0) + 1
                 except: pass
         sorted_m = sorted(monthly.items())
+        
         sat, ease, comments, features = [], [], [], []
         for f in feedback:
             try: sat.append(int(f['SatisfactionScore']))
@@ -858,7 +881,8 @@ def analytics_page():
         
         chart_data = {
             "total_views": total_views,
-            "top_10_links": top_10,
+            "top_10_clicks": top_10_clicks, # [NEW] ส่งตัวแปร 1
+            "top_10_edits": top_10_edits,   # [NEW] ส่งตัวแปร 2
             "total_links": len(links), "total_users": len(users), 
             "active_links": sum(1 for l in links if l.get('สถานะ') == 'ใช้งาน'),
             "total_responses": len(feedback),
