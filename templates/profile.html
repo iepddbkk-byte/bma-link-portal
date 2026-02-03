@@ -207,21 +207,26 @@
         </div>
     
         <nav class="nav-menu" id="navMenu">
+            <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+            
             {% if session.get('logged_in') %}
-                <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
-                
                 {% if session.get('level') == 'Admin' %}
                 <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
                 {% endif %}
                 
                 <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
-				<a href="{{ url_for('my_favorites_page') }}" class="nav-link active-nav" title="My Favorites" style="background-color: #ffc107; color: #333; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);">
-					<i class="fas fa-star"></i> <span>My Favourite Links</span>
-                </a>
-                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
-                <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
                 
-                <a href="{{ url_for('profile_page') }}" class="nav-link active-nav profile-item" title="โปรไฟล์">
+                <a href="{{ url_for('my_favorites_page') }}" class="nav-link" title="My Favorites">
+                    <i class="fas fa-star" style="color: #ffc107;"></i> <span>My Favourite Links</span>
+                </a>
+                
+                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+                
+                <a href="{{ url_for('feedback_page') }}" class="nav-link active-nav" title="Feedback">
+                    <i class="fas fa-comment-dots"></i> <span>Feedback</span>
+                </a>
+                
+                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
                     <span>{{ session.name }}</span>
                 </a>
