@@ -494,6 +494,44 @@ def links_page():
                                districts=districts_list)
     except Exception as e: 
         return render_template('links_page.html', links=[], error=str(e), session=session, agency_name="Error")
+        
+@app.route('/my_favorites')
+def my_favorites_page():
+    # 1. บังคับ Login
+    if not session.get('logged_in'): 
+        return redirect(url_for('login_page'))
+    
+    if db_sheet is None: 
+        return render_template('favorites.html', links=[], error="Database Error", session=session)
+
+    try:
+        # 2. ดึงข้อมูลทั้งหมด
+        all_links = get_db_records()
+        
+        # 3. ดึง ID รายการโปรดของผู้ใช้
+        my_fav_ids = get_user_favorite_ids(session.get('username'))
+        
+        # 4. กรองเฉพาะลิงก์ที่เป็น Favorite และสถานะใช้งานได้ (และ User มีสิทธิ์เห็น)
+        fav_links = []
+        for l in all_links:
+            if l.get('ID') in my_fav_ids and l.get('สถานะ') == 'ใช้งาน' and check_link_permission(l, session):
+                # จัดการวันที่ให้สวยงาม
+                date_str = l.get('วันที่อัปเดต')
+                l['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
+                fav_links.append(l)
+
+        # ส่งข้อมูลไปที่หน้า favorites.html
+        return render_template('favorites.html', 
+                               links=fav_links, 
+                               session=session,
+                               fav_ids=my_fav_ids, # ส่งไปเพื่อแสดงปุ่มดาวสีเหลือง
+                               bureaus=bureaus_list, 
+                               districts=districts_list)
+                               
+    except Exception as e:
+        print(f"Favorites Page Error: {e}")
+        return redirect(url_for('dashboard'))
+        
 
 # --- 7. Routes (Auth) ---
 @app.route('/login')
