@@ -5,120 +5,368 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMA SMART LINKAGE - รายการโปรดของฉัน</title>
     
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
+            /* Theme Colors */
             --bma-green: #00963C;
+            --bma-green-hover: #007a30;
             --bma-green-light: #e8f5e9;
+            --button-red: #dc3545;
+            --button-blue: #007bff;
+            --button-yellow: #ffc107;
+            --button-gray: #6c757d;
             --text-color: #2c3e50;
+            --border-color: #e0e0e0;
             --bg-grad-start: #f5f7fa;
             --bg-grad-end: #c3cfe2;
+            
             --header-height: 80px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
-        body, button, input, select, textarea { font-family: 'Kanit', sans-serif; }
+
+        /* FIX FONT ISSUE */
+        body, button, input, select, textarea, optgroup, table, th, td {
+            font-family: 'Kanit', sans-serif;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%); color: var(--text-color); min-height: 100vh; padding-top: var(--header-height); }
 
-        /* Reuse Header Styles from links_page.html */
-        .main-header { background: white; padding: 0 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; align-items: center; justify-content: space-between; }
-        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-container img { height: 45px; }
+        body { 
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding-top: var(--header-height);
+            padding-bottom: 60px;
+        }
+
+        /* --- Header & Navigation --- */
+        .main-header {
+            background: white;
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
+        .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
-        .nav-menu { display: flex; align-items: center; gap: 8px; }
-        .nav-link { text-decoration: none; color: var(--text-color); font-weight: 500; padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap; transition: 0.2s; }
-        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); }
-        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
-        .mobile-controls { display: none; align-items: center; gap: 15px; }
-        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); }
-        .mobile-profile-btn img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--bma-green); }
 
-        /* Container */
-        .container { max-width: 1400px; margin: 30px auto; padding: 30px; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: fadeIn 0.5s ease; }
+        /* Desktop Menu */
+        .nav-menu { display: flex; align-items: center; gap: 8px; }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
+        .nav-link i { font-size: 1.1em; }
+        
+        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
+        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
+        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
+
+        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        /* --- Mobile Header Controls (Profile + Hamburger) --- */
+        .mobile-controls { display: none; align-items: center; gap: 15px; }
+        
+        .mobile-profile-btn {
+            display: flex; align-items: center; text-decoration: none;
+        }
+        .mobile-profile-btn img {
+            width: 40px; height: 40px; border-radius: 50%; 
+            border: 2px solid var(--bma-green); object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .mobile-toggle {
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 5px;
+        }
+
+        /* จัดกลุ่ม Logo กับ Stats ให้อยู่ทางซ้าย */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px; 
+        }
+
+        /* กล่องแสดงจำนวนคนออนไลน์ */
+        .header-online-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--bma-green-light);
+            color: var(--bma-green);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid var(--bma-green);
+            white-space: nowrap;
+        }
+
+        /* Mobile Responsive: ซ่อนกล่องออนไลน์ทั้งหมดบนมือถือ */
+        @media (max-width: 768px) {
+            .header-online-count { display: none; }
+        }
+
+        /* Animation จุดสีเขียวกระพริบ */
+        .pulsating-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+        /* --- Container & Content --- */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto; 
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.5s ease;
+        }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1 { color: #ffc107; font-size: 1.8rem; font-weight: 600; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid #ffecb3; display: flex; align-items: center; gap: 10px; }
-
+        h1 { 
+            color: #ffc107;
+            font-size: 1.8rem; font-weight: 600;
+            margin-bottom: 25px; padding-bottom: 15px;
+            border-bottom: 3px solid #ffe082;
+            display: flex; align-items: center; gap: 10px;
+        }
+        
         /* Search */
         .search-container { margin-bottom: 25px; position: relative; }
         #searchInput { width: 100%; padding: 15px 20px 15px 50px; border: 1px solid #e0e0e0; border-radius: 50px; background: #f8f9fa; font-size: 1rem; font-family: 'Kanit'; }
-        #searchInput:focus { outline: none; border-color: var(--bma-green); background: white; box-shadow: 0 0 0 4px var(--bma-green-light); }
+        #searchInput:focus { outline: none; border-color: #ffc107; background: white; box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.2); }
         .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #999; }
 
-        /* Table */
-        .table-responsive { overflow-x: auto; border-radius: 12px; border: 1px solid #e0e0e0; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: #ffc107; color: #333; padding: 15px; text-align: left; white-space: nowrap; font-weight: 600; cursor: pointer; }
-        td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; color: #555; }
-        tr:hover { background-color: #fff9e6; }
+        /* --- Table Styling --- */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; background: white; }
         
-        .btn-fav { background: none; border: none; cursor: pointer; font-size: 1.2rem; color: #ccc; transition: 0.2s; }
-        .btn-fav:hover { transform: scale(1.2); }
-        .btn-fav.active { color: #ffc107; text-shadow: 0 0 5px rgba(255, 193, 7, 0.5); }
-        
-        .status-badge { padding: 5px 12px; border-radius: 30px; font-size: 0.85em; font-weight: 500; display: inline-block; }
+        th {
+            background: #ffc107; /* Yellow Header for Favorites */
+            color: #333;
+            padding: 15px;
+            font-weight: 600;
+            text-align: left;
+            white-space: nowrap;
+            position: sticky; top: 0; z-index: 10;
+            cursor: pointer;
+            user-select: none;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #fff9e6; } /* Light yellow hover */
+
+        /* Custom Scrollbar for Table */
+        .table-responsive::-webkit-scrollbar { height: 8px; }
+        .table-responsive::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        .table-responsive::-webkit-scrollbar-thumb:hover { background: #ffc107; }
+
+        /* Links */
+        a { color: var(--bma-green); text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        a:hover { color: var(--bma-green-hover); text-decoration: underline; }
+
+        /* Badges */
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 30px; font-size: 0.85em; font-weight: 500; }
         .status-ok { background: #d4edda; color: #155724; }
         
-        .btn-share { width: 35px; height: 35px; border-radius: 50%; background: #17a2b8; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        /* Privacy Badges */
+        .privacy-public { background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
+        .privacy-agency { background: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; }
+        .privacy-private { background: #f3e5f5; color: #7b1fa2; border: 1px solid #e1bee7; }
+
+        /* Share Button */
+        .btn-share {
+            width: 35px; height: 35px; border-radius: 50%;
+            background: #17a2b8; color: white; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+        }
         .btn-share:hover { transform: scale(1.1); background: #138496; }
+        
+        /* Favorite Button (Active) */
+        .btn-fav {
+            background: none; border: none; cursor: pointer;
+            font-size: 1.3rem; transition: transform 0.2s;
+            color: #ccc;
+        }
+        .btn-fav:hover { transform: scale(1.2); }
+        .btn-fav.active { color: #ffc107; text-shadow: 0 0 5px rgba(255, 193, 7, 0.5); }
+
+        /* Pagination */
+        .pagination-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;
+            flex-wrap: wrap; gap: 15px;
+        }
+        .pagination-items select { padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; }
+        .pagination-nav button { 
+            background: white; border: 1px solid #ddd; color: #333; 
+            border-radius: 8px; padding: 8px 12px; min-width: 36px; cursor: pointer; transition: 0.2s;
+        }
+        .pagination-nav button:hover:not(:disabled) { background: #ffc107; color: #333; border-color: #ffc107; }
+        .pagination-nav button:disabled { opacity: 0.5; cursor: default; }
 
         /* Footer */
-        .main-footer { background: white; color: #666; text-align: center; padding: 30px; margin-top: 60px; border-top: 1px solid #eee; }
+        .main-footer {
+            background: white; color: #666; text-align: center; padding: 30px;
+            margin-top: 60px; border-top: 1px solid #eee;
+        }
 
-        /* Responsive */
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .nav-link span { display: none; }
+            .nav-link i { font-size: 1.3rem; margin: 0; }
+            .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
+            .user-profile-pic { width: 100%; height: 100%; }
+        }
+
         @media (max-width: 768px) {
             body { padding-top: 70px; }
             .main-header { padding: 0 15px; height: 70px; }
-            .mobile-controls { display: flex; }
-            .nav-menu { display: none; position: absolute; top: 70px; left: 0; width: 100%; background: white; flex-direction: column; padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
-            .nav-menu.active { display: flex; }
-            .nav-link { width: 100%; padding: 12px; border-radius: 10px; margin-bottom: 5px; }
             .logo-text { font-size: 1.1rem; }
             
-            /* Hide Columns */
+            /* Mobile Controls */
+            .mobile-controls { display: flex; }
+            .mobile-toggle { display: block; }
+
+            /* Mobile Menu */
+            .nav-menu {
+                display: none; position: absolute; top: 70px; left: 0; width: 100%;
+                background: white; flex-direction: column; align-items: stretch;
+                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
+            }
+            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
+            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; height: auto; }
+            .nav-link span { display: inline; }
+            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
+            
+            .nav-link.profile-item { display: none; }
+
+            .container { padding: 15px; margin: 15px auto; }
+            h1 { font-size: 1.4em; }
+            
+            /* Table Mobile Optimization: Hide non-essential columns */
             th:nth-child(3), td:nth-child(3), /* รายละเอียด */
-            th:nth-child(5), td:nth-child(5), /* ประเภท */
-            th:nth-child(6), td:nth-child(6), /* หน่วยงาน */
-            th:nth-child(8), td:nth-child(8), /* เบอร์ */
-            th:nth-child(9), td:nth-child(9), /* ผู้สร้าง */
-            th:nth-child(10), td:nth-child(10) /* วันที่ */
+            th:nth-child(4), td:nth-child(4), /* ระดับ */
+            th:nth-child(5), td:nth-child(5), /* สถานะ */
+            th:nth-child(7), td:nth-child(7), /* หน่วยงาน */
+            th:nth-child(8), td:nth-child(8), /* ส่วนราชการ */
+            th:nth-child(9), td:nth-child(9), /* เบอร์ */
+            th:nth-child(11), td:nth-child(11) /* วันที่ */
             { display: none; }
+            
+            .pagination-controls { justify-content: center; }
         }
     </style>
 </head>
 <body>
-
-    <header class="main-header">
+    
+<header class="main-header">
         <div class="header-left">
             <a href="{{ url_for('home') }}" class="logo-container">
-                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="Logo">
+                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
                 <div class="logo-text">BMA SMART LINKAGE</div>
             </a>
+            
+            <div class="header-online-count" title="ผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
+                <span class="pulsating-dot"></span>
+                <span id="onlineCount">-</span>
+                <span>ออนไลน์</span>
+            </div>
         </div>
 
         <div class="mobile-controls">
-            <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn"><img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile"></a>
-            <div class="mobile-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+            {% if session.get('logged_in') %}
+                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn" title="โปรไฟล์">
+                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
+                </a>
+            {% endif %}
+            <div class="mobile-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
 
         <nav class="nav-menu" id="navMenu">
             <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+
             {% if session.get('logged_in') %}
                 {% if session.get('level') == 'Admin' %}
                 <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
                 {% endif %}
+                
                 <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
-				<a href="{{ url_for('my_favorites_page') }}" class="nav-link" title="My Favourite Links"><i class="fas fa-star"></i> <span>]ลิงก์โปรด</span></a>
+                
+                <a href="{{ url_for('my_favorites_page') }}" class="nav-link active-nav" title="My Favorites" style="background-color: #ffc107; color: #333; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);">
+                    <i class="fas fa-star"></i> <span>รายการโปรด</span>
+                </a>
+                
                 <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
                 <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+                
                 <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
                     <span>{{ session.name }}</span>
                 </a>
+                
                 <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
                     <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
                 </a>
@@ -128,92 +376,240 @@
                 </a>
             {% endif %}
         </nav>
-
+    </header>
+    
     <div class="container">
+
+        {% if error %}
+            <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #c62828;">
+                <strong>⚠️ เกิดข้อผิดพลาด:</strong> {{ error }}
+            </div>
+        {% endif %}
+
         <h1><i class="fas fa-star"></i> รายการโปรดของฉัน (My Favorites)</h1>
 
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" placeholder="ค้นหาในรายการโปรด...">
+            <input type="text" id="searchInput" placeholder="ค้นหาในรายการโปรด (ชื่อ, ประเภท, หน่วยงาน)...">
         </div>
 
         <div class="table-responsive">
-            <table>
+            <table id="linksTable">
                 <thead>
                     <tr>
-                        <th style="width:50px; text-align:center;">⭐</th>
-                        <th onclick="sortTable(1)">🔗 ชื่อลิงก์ <i class="fas fa-sort"></i></th>
-                        <th>📄 รายละเอียด</th>
-                        <th>🚦 สถานะ</th>
-                        <th>📂 ประเภท</th>
-                        <th>🏢 หน่วยงาน</th>
-                        <th>🏛️ ส่วนราชการ</th>
+                        <th style="width: 50px; text-align: center;">⭐</th>
+                        <th onclick="sortTable(1)">
+                            🔗 ชื่อลิงก์ <i class="fas fa-sort"></i>
+                        </th>
+                        <th>📄 รายละเอียด</th> 
+                        <th style="text-align: center;">ระดับ</th> 
+                        <th style="text-align: center;">🚦 สถานะ</th>
+                        <th onclick="sortTable(5)">📂 ประเภท <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(6)">🏢 หน่วยงาน <i class="fas fa-sort"></i></th> 
+                        <th onclick="sortTable(7)">🏛️ ส่วนราชการ <i class="fas fa-sort"></i></th> 
                         <th>📞 เบอร์ติดต่อ</th>
                         <th>👤 ผู้สร้าง</th>
-                        <th>🗓️ วันที่</th>
+                        <th onclick="sortTable(10)">🗓️ วันที่ <i class="fas fa-sort"></i></th>
                         <th style="text-align: center;">📤 แชร์</th>
                     </tr>
                 </thead>
                 <tbody id="favTableBody">
+                    
                     {% for link in links %}
                     <tr id="row-{{ link['ID'] }}">
                         <td style="text-align: center;">
-                            <button class="btn-fav active" onclick="removeFav(this, '{{ link['ID'] }}')" title="ลบจากรายการโปรด">
+                            <button class="btn-fav active" 
+                                    onclick="removeFav(this, '{{ link['ID'] }}')" 
+                                    title="ลบจากรายการโปรด">
                                 <i class="fas fa-star"></i>
                             </button>
                         </td>
+
                         <td>
                             <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;">
                                 <i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}
                             </a>
                         </td>
                         <td>{{ link['รายละเอียด'] }}</td>
-                        <td><span class="status-badge status-ok">ใช้งาน</span></td>
+                        
+                        <td style="text-align: center;">
+                            {% if link['ความเป็นส่วนตัว'] == 'สาธารณะ' or not link['ความเป็นส่วนตัว'] %}
+                                <span class="status-badge privacy-public"><i class="fas fa-globe"></i> สาธารณะ</span>
+                            {% elif link['ความเป็นส่วนตัว'] == 'เฉพาะหน่วยงาน' %}
+                                <span class="status-badge privacy-agency"><i class="fas fa-building"></i> ภายใน</span>
+                            {% elif link['ความเป็นส่วนตัว'] == 'ส่วนตัว' %}
+                                <span class="status-badge privacy-private"><i class="fas fa-lock"></i> ส่วนตัว</span>
+                            {% endif %}
+                        </td>
+
+                        <td style="text-align: center;">
+                            {% if link['สถานะ'] == 'ใช้งาน' %}
+                                <span class="status-badge status-ok">ใช้งาน</span>
+                            {% else %}
+                                <span class="status-badge status-error">{{ link['สถานะ'] }}</span>
+                            {% endif %}
+                        </td>
                         <td>{{ link['ประเภท'] }}</td>
-                        <td>{{ link['หน่วยงาน'] }}</td>
-                        <td>{{ link['ส่วนราชการ'] }}</td>
+                        <td>{{ link['หน่วยงาน'] }}</td> 
+                        <td>{{ link['ส่วนราชการ'] }}</td> 
+                        
                         <td>{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}</td>
+                        
                         <td>{{ link['CreatorUsername'] }}</td>
+
                         <td>{{ link['วันที่อัปเดต_สั้น'] }}</td>
+
                         <td align="center">
-                            <button class="btn-share" onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')">
+                            <button type="button" 
+                                    class="btn-share" 
+                                    title="แชร์ QR Code"
+                                    onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')">
                                 <i class="fas fa-qrcode"></i>
                             </button>
                         </td>
                     </tr>
                     {% else %}
-                    <tr>
-                        <td colspan="11" style="text-align: center; padding: 50px; color: #999;">
+                    <tr id="noDataRow">
+                        <td colspan="12" style="text-align: center; padding: 50px; color: #999;">
                             <i class="far fa-star" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i><br>
                             ยังไม่มีรายการโปรด<br>
-                            <a href="{{ url_for('links_page') }}" style="color: var(--bma-green); font-weight:600;">ไปค้นหาลิงก์เพื่อกดดาว ⭐</a>
+                            <a href="{{ url_for('links_page') }}" style="color: var(--bma-green); font-weight:600; text-decoration: underline;">
+                                ไปหน้าค้นหาเพื่อกดดาว ⭐ ให้ลิงก์ที่คุณชอบ
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </div>
 
+        <div class="pagination-controls">
+            <div class="pagination-items">
+                <span>แสดง: </span>
+                <select id="itemsPerPage">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="99999">ทั้งหมด</option>
+                </select>
+            </div>
+            <div class="pagination-nav">
+                    <button id="btnFirst" title="หน้าแรก">«</button>
+                    <button id="btnPrev" title="หน้าก่อนหน้า">‹</button>
+                    <span>หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span></span>
+                    <button id="btnNext" title="หน้าถัดไป">›</button>
+                    <button id="btnLast" title="หน้าสุดท้าย">»</button>
+            </div>
+        </div>
+
+    </div> 
+    
     <footer class="main-footer">
         <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
         <p>สำนักยุทธศาสตร์และประเมินผล</p>
+        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
+        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
 
     <script>
-        function toggleMenu() { document.getElementById('navMenu').classList.toggle('active'); }
-
-        // Search Filter
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const filter = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#favTableBody tr');
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(filter) ? '' : 'none';
-            });
+        // Toggle Mobile Menu
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            nav.classList.toggle('active');
+        }
+        
+        document.addEventListener('click', (e) => {
+            const nav = document.getElementById('navMenu');
+            const toggle = document.querySelector('.mobile-toggle');
+            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+                nav.classList.remove('active');
+            }
         });
 
-        // Remove Favorite Logic
+        // Pagination and Search Functions
+        let allTableRows = []; 
+        let currentPage = 1;
+        let totalPages = 1;
+        const tbody = document.getElementById("favTableBody");
+        const noDataRow = document.getElementById("noDataRow");
+        let searchInput; 
+
+        function sortTable(columnIndex) {
+            const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
+            const collator = new Intl.Collator('th', { sensitivity: 'base' });
+            
+            // Simple sort toggle (no state tracking for brevity in fav page)
+            let dir = 'asc';
+            if (this.prevSort === columnIndex) dir = 'desc';
+            this.prevSort = columnIndex === this.prevSort && dir === 'desc' ? -1 : columnIndex;
+
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.getElementsByTagName("td")[columnIndex].textContent.trim();
+                const cellB = rowB.getElementsByTagName("td")[columnIndex].textContent.trim();
+                return dir === 'asc' ? collator.compare(cellA, cellB) : collator.compare(cellB, cellA);
+            });
+            
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+            // Re-init pagination array with new order
+            allTableRows = rows;
+            displayPage(1);
+        }
+
+        function displayPage(page) {
+            currentPage = page;
+            const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
+            const filter = searchInput.value.toLowerCase(); 
+
+            const filteredRows = allTableRows.filter(row => {
+                const textContent = row.innerText.toLowerCase();
+                return textContent.includes(filter);
+            });
+
+            // Hide all first
+            allTableRows.forEach(row => row.style.display = 'none');
+
+            // Show No Data row if needed
+            if (filteredRows.length === 0) {
+                if(noDataRow) noDataRow.style.display = 'table-row';
+                totalPages = 1; currentPage = 1;
+            } else {
+                if(noDataRow) noDataRow.style.display = 'none';
+                
+                totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+                if (page > totalPages) currentPage = totalPages;
+                if (page < 1) currentPage = 1;
+                
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                
+                filteredRows.slice(startIndex, endIndex).forEach(row => row.style.display = 'table-row');
+            }
+
+            document.getElementById("currentPage").textContent = currentPage;
+            document.getElementById("totalPages").textContent = totalPages;
+            document.getElementById("btnFirst").disabled = (currentPage === 1);
+            document.getElementById("btnPrev").disabled = (currentPage === 1);
+            document.getElementById("btnNext").disabled = (currentPage === totalPages);
+            document.getElementById("btnLast").disabled = (currentPage === totalPages);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            allTableRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
+            searchInput = document.getElementById("searchInput"); 
+            
+            document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
+            document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
+            document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
+            document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
+            document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
+            
+            searchInput.addEventListener('keyup', () => displayPage(1)); 
+            
+            displayPage(1);
+        });
+
+        // Function: Remove from Favorites
         function removeFav(btn, linkId) {
             Swal.fire({
                 title: 'นำออกจากรายการโปรด?',
@@ -222,7 +618,8 @@
                 confirmButtonColor: '#ffc107',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'ใช่, นำออก',
-                cancelButtonText: 'ยกเลิก'
+                cancelButtonText: 'ยกเลิก',
+                color: '#333'
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch("{{ url_for('toggle_favorite') }}", {
@@ -233,11 +630,22 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            // Remove row with animation
                             const row = document.getElementById('row-' + linkId);
                             row.style.transition = 'all 0.5s';
                             row.style.opacity = '0';
-                            setTimeout(() => row.remove(), 500);
+                            row.style.transform = 'translateX(20px)';
+                            
+                            setTimeout(() => {
+                                row.remove();
+                                // Remove from memory array and refresh pagination
+                                allTableRows = allTableRows.filter(r => r.id !== 'row-' + linkId);
+                                displayPage(currentPage);
+                                
+                                // Show empty state if list empty
+                                if (allTableRows.length === 0 && noDataRow) {
+                                    noDataRow.style.display = 'table-row';
+                                }
+                            }, 500);
                             
                             const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
                             Toast.fire({ icon: 'success', title: 'ลบเรียบร้อย' });
@@ -247,14 +655,74 @@
             });
         }
 
+        // Share Function
         function showShareModal(title, originalUrl, linkId) {
             const permanentLink = `${window.location.origin}/go/${linkId}`;
             const qrImageUrl = `{{ url_for('generate_qr_code') }}?url=${encodeURIComponent(permanentLink)}`;
+
             Swal.fire({
-                html: `<div style="text-align:center;"><h3 style="color:var(--bma-green);">📲 แชร์ลิงค์<\/h3><div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9rem;">${permanentLink}</div><img src="${qrImageUrl}" style="width:200px; border:1px solid #eee; border-radius:10px; margin-bottom:15px;"><button onclick="navigator.clipboard.writeText('${permanentLink}'); Swal.showValidationMessage('คัดลอกแล้ว!')" style="background:#007bff; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">คัดลอก</button></div>`,
-                showConfirmButton: false, showCloseButton: true
+                html: `
+                    <div style="text-align:center;">
+                        <h3 style="color:var(--bma-green); margin-bottom:10px;">📲 แชร์ลิงค์</h3>
+                        <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9rem; word-break:break-all;">
+                            ${permanentLink}
+                        </div>
+                        <img src="${qrImageUrl}" style="width:200px; border:1px solid #eee; padding:10px; border-radius:10px; margin-bottom:15px;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <button onclick="navigator.clipboard.writeText('${permanentLink}'); Swal.showValidationMessage('คัดลอกแล้ว!')" 
+                                style="background:#007bff; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">
+                                <i class="fas fa-copy"></i> คัดลอก
+                            </button>
+                            <a href="${qrImageUrl}" download="QR-${linkId}.png" 
+                                style="background:#28a745; color:white; text-decoration:none; padding:10px; border-radius:5px; display:inline-block;">
+                                <i class="fas fa-download"></i> บันทึก QR
+                            </a>
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true
             });
         }
+    </script>
+        
+    <script>
+        function updateOnlineCount() {
+            fetch("{{ url_for('heartbeat') }}", { 
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}" 
+                }
+            })
+            .then(response => {
+                if (!response.ok) { throw new Error("HTTP error " + response.status); }
+                return response.json();
+            })
+            .then(data => {
+                if(data.online_count !== undefined) {
+                    const el = document.getElementById('onlineCount');
+                    if(el) {
+                        el.textContent = data.online_count;
+                        el.style.color = "var(--bma-green)"; 
+                    }
+                }
+            })
+            .catch(err => {
+                const el = document.getElementById('onlineCount');
+                if(el) el.textContent = "-";
+            });
+        }
+
+        updateOnlineCount();
+        setInterval(updateOnlineCount, 10000);
+
+        window.addEventListener('beforeunload', function() {
+            const data = new FormData();
+            const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
+            data.append('csrf_token', csrfToken);
+            navigator.sendBeacon("{{ url_for('offline') }}", data);
+        });
     </script>
 </body>
 </html>
