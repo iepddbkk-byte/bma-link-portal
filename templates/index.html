@@ -291,10 +291,10 @@
         }
         .btn-all-links:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,123,255,0.5); }
 
-        /* --- [NEW] Video Tutorial Section --- */
+        /* --- Video Tutorial Section --- */
         .video-wrapper {
             max-width: 900px;
-            margin: 0 auto 50px; /* Center horizontally & Add spacing bottom */
+            margin: 0 auto 50px;
             background: white;
             padding: 20px;
             border-radius: 20px;
@@ -332,10 +332,10 @@
             border: 0;
         }
 
-        /* --- 9 Dimensions Policy Menu (With Images) --- */
+        /* --- 9 Dimensions Policy Menu --- */
         .policy-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* Mobile: 3 columns */
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 40px;
             justify-content: center;
@@ -365,9 +365,8 @@
             background-color: #f9fffa;
         }
         
-        /* New CSS for Image Logos */
         .policy-img {
-            width: 60px; /* ปรับขนาดโลโก้ตามความเหมาะสม */
+            width: 60px;
             height: 60px;
             object-fit: contain;
             margin-bottom: 8px;
@@ -385,7 +384,6 @@
             line-height: 1.3;
         }
 
-        /* Desktop: Switch to Flexbox for Centered Layout */
         @media (min-width: 768px) {
              .policy-grid { 
                  display: flex; 
@@ -403,7 +401,7 @@
                  min-height: 140px;
              }
              .policy-img {
-                 width: 70px; /* ขยายขนาดในจอใหญ่ */
+                 width: 70px;
                  height: 70px;
                  margin-bottom: 12px;
              }
@@ -418,6 +416,18 @@
         .section-title::before {
             content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
             width: 5px; height: 30px; background: var(--bma-green); border-radius: 5px;
+        }
+
+        .sub-section-title {
+            font-size: 1.2rem; 
+            font-weight: 600; 
+            color: #444; 
+            margin: 30px 0 15px 0; 
+            padding-bottom: 10px; 
+            border-bottom: 2px dashed #eaeaea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
@@ -627,6 +637,7 @@
                 <iframe src="https://www.youtube.com/embed/CKbVfmzZ1ws" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
             </div>
         </div>
+
         <div class="section-title"><i class="fas fa-star"></i> เลือกดูตามนโยบาย 9 ด้าน 9 ดี</div>
         <div class="policy-grid">
             <a href="{{ url_for('links_page', category='เดินทางดี') }}" class="policy-btn">
@@ -677,15 +688,31 @@
             {% endfor %}
         </div>
 
-        <div class="section-title"><i class="fas fa-users"></i> กลุ่มงาน / ฝ่าย (สยป.)</div>
-        <div class="menu-grid">
-            {% for district in districts %}
-            <a href="{{ url_for('links_page', agency=district) }}" class="menu-btn">
+        <div class="section-title"><i class="fas fa-users"></i> กลุ่มงาน / ฝ่าย (แยกตามสังกัด กอง/สำนักงาน)</div>
+        
+        {% set agency_mapping = {
+            "สำนักงานเลขานุการ": ["ฝ่ายบริหารงานทั่วไป (สก.)", "ฝ่ายการเจ้าหน้าที่", "ฝ่ายการคลัง"],
+            "สำนักงานบริหารยุทธศาสตร์": ["กลุ่มช่วยนักบริหาร", "ฝ่ายบริหารงานทั่วไป (สบย.)", "ส่วนบริหารยุทธศาสตร์", "กลุ่มงานนโยบายและยุทธศาสตร์", "กลุ่มงานวิจัยและประเมินผล", "กลุ่มงานยุทธศาสตร์การพัฒนาพื้นที่", "กลุ่มงานวิเคราะห์ข้อมูลเมือง", "กลุ่มงานถ่ายโอนและภารกิจพิเศษ"],
+            "กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง": ["ฝ่ายบริหารงานทั่วไป (กยศ.)", "กลุ่มงานยุทธศาสตร์เศรษฐกิจ", "กลุ่มงานนโยบายเศรษฐกิจเมือง", "กลุ่มงานส่งเสริมเศรษฐกิจเมือง"],
+            "กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง": ["ฝ่ายบริหารงานทั่วไป (กยส.)", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านสิ่งแวดล้อม", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านความปลอดภัยและจัดระเบียบเมือง"],
+            "กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง": ["ฝ่ายบริหารงานทั่วไป (กยพ.)", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านโยธาและระบายน้ำ", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านผังเมือง การจราจรและขนส่ง"],
+            "กองยุทธศาสตร์คุณภาพชีวิตเมือง": ["ฝ่ายบริหารงานทั่วไป (กยม.)", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านการศึกษา พัฒนาสังคม และสร้างสรรค์เมือง", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านสาธารณสุข"]
+        } %}
+
+        {% for bureau, divisions in agency_mapping.items() %}
+        <div class="sub-section-title">
+            <i class="fas fa-angle-double-right" style="color: var(--bma-green);"></i> 
+            สังกัด {{ bureau }}
+        </div>
+        <div class="menu-grid" style="margin-bottom: 25px;">
+            {% for div in divisions %}
+            <a href="{{ url_for('links_page', agency=div) }}" class="menu-btn">
                 <div class="menu-icon"><i class="fas fa-user-friends"></i></div>
-                {{ district }}
+                {{ div }}
             </a>
             {% endfor %}
         </div>
+        {% endfor %}
 
     </div>
     
@@ -711,7 +738,7 @@
             }
         });
 
-        // [UPDATED] Search Logic
+        // Search Logic
         document.getElementById('quickSearchForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const text = document.getElementById('homeSearchInput').value;
@@ -723,7 +750,6 @@
             if(text) params.push("search=" + encodeURIComponent(text));
             if(agency) params.push("agency=" + encodeURIComponent(agency));
             
-            // Redirect พร้อมค่าพารามิเตอร์
             window.location.href = url + params.join("&");
         });
     </script>
