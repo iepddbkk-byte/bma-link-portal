@@ -172,7 +172,7 @@
             transform: translateY(-2px);
         }
 
-        form input[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; }
+        form input[readonly], form select[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; }
 
         /* Shortener Box */
         .shortener-box {
@@ -341,14 +341,24 @@
             </div>
 
             <div>
-                <label for="หน่วยงาน">กลุ่มงาน / ฝ่าย (จำเป็น)</label>
-                <input type="text" id="หน่วยงาน" name="หน่วยงาน" placeholder="เช่น ฝ่ายบริหารงานทั่วไป, กลุ่มงานวิเคราะห์ข้อมูลเมือง..." required>
+                <label for="ส่วนราชการ">กอง / สำนักงาน (จำเป็น)</label>
+                <select id="ส่วนราชการ" name="ส่วนราชการ" required onchange="updateDivisions()">
+                    <option value="" disabled selected>--- เลือก กอง/สำนักงาน ---</option>
+                    <option value="สำนักงานเลขานุการ">สำนักงานเลขานุการ</option>
+                    <option value="สำนักงานบริหารยุทธศาสตร์">สำนักงานบริหารยุทธศาสตร์</option>
+                    <option value="กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง">กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง</option>
+                    <option value="กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง">กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง</option>
+                    <option value="กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง">กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</option>
+                    <option value="กองยุทธศาสตร์คุณภาพชีวิตเมือง">กองยุทธศาสตร์คุณภาพชีวิตเมือง</option>
+                </select>
+                <span class="info-text">💡 ค่าเริ่มต้นดึงมาจากโปรไฟล์ของคุณ (สามารถแก้ไขได้)</span>
             </div>
 
             <div>
-                <label for="ส่วนราชการ">กอง / สำนักงาน (ล็อคอัตโนมัติ)</label>
-                <input type="text" id="ส่วนราชการ" name="ส่วนราชการ" value="{{ locked_agency }}" readonly>
-                <span class="info-text">💡 ข้อมูลนี้จะถูกดึงจากโปรไฟล์ของคุณโดยอัตโนมัติ</span>
+                <label for="หน่วยงาน">กลุ่มงาน / ฝ่าย (จำเป็น)</label>
+                <select id="หน่วยงาน" name="หน่วยงาน" required>
+                    <option value="" disabled selected>--- โปรดเลือก กอง/สำนักงาน ก่อน ---</option>
+                </select>
             </div>
 
             <div>
@@ -359,15 +369,15 @@
                     <option value="เลิกใช้งาน">เลิกใช้งาน</option>
                 </select>
             </div>
-			
-			<div>
-				<label for="ความเป็นส่วนตัว">ระดับความเป็นส่วนตัว</label>
-				<select id="ความเป็นส่วนตัว" name="ความเป็นส่วนตัว" required>
-				<option value="สาธารณะ" selected>🌐 สาธารณะ (ทุกคนมองเห็น)</option>
-				<option value="เฉพาะหน่วยงาน">🏢 เฉพาะหน่วยงาน (เห็นเฉพาะเจ้าหน้าที่ในหน่วยงานเดียวกัน)</option>
-				<option value="ส่วนตัว">🔒 ส่วนตัว (เห็นเฉพาะฉัน)</option>
-				</select>
-			</div>
+            
+            <div>
+                <label for="ความเป็นส่วนตัว">ระดับความเป็นส่วนตัว</label>
+                <select id="ความเป็นส่วนตัว" name="ความเป็นส่วนตัว" required>
+                <option value="สาธารณะ" selected>🌐 สาธารณะ (ทุกคนมองเห็น)</option>
+                <option value="เฉพาะหน่วยงาน">🏢 เฉพาะหน่วยงาน (เห็นเฉพาะเจ้าหน้าที่ในหน่วยงานเดียวกัน)</option>
+                <option value="ส่วนตัว">🔒 ส่วนตัว (เห็นเฉพาะฉัน)</option>
+                </select>
+            </div>
 
             <div>
                 <label for="อีเมลผู้รับผิดชอบ">อีเมลผู้รับผิดชอบ (จำเป็น)</label>
@@ -447,6 +457,48 @@
                 setTimeout(() => { cleanRealTime(e.target); }, 10);
             });
         }
+
+        // --- เพิ่มสคริปต์ควบคุม Dropdown โครงสร้างกอง/ฝ่าย ---
+        const agencyMapping = {
+            "สำนักงานเลขานุการ": ["ฝ่ายบริหารงานทั่วไป (สก.)", "ฝ่ายการเจ้าหน้าที่", "ฝ่ายการคลัง"],
+            "สำนักงานบริหารยุทธศาสตร์": ["กลุ่มช่วยนักบริหาร", "ฝ่ายบริหารงานทั่วไป (สบย.)", "ส่วนบริหารยุทธศาสตร์", "กลุ่มงานนโยบายและยุทธศาสตร์", "กลุ่มงานวิจัยและประเมินผล", "กลุ่มงานยุทธศาสตร์การพัฒนาพื้นที่", "กลุ่มงานวิเคราะห์ข้อมูลเมือง", "กลุ่มงานถ่ายโอนและภารกิจพิเศษ"],
+            "กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง": ["ฝ่ายบริหารงานทั่วไป (กยศ.)", "กลุ่มงานยุทธศาสตร์เศรษฐกิจ", "กลุ่มงานนโยบายเศรษฐกิจเมือง", "กลุ่มงานส่งเสริมเศรษฐกิจเมือง"],
+            "กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง": ["ฝ่ายบริหารงานทั่วไป (กยส.)", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านสิ่งแวดล้อม", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านความปลอดภัยและจัดระเบียบเมือง"],
+            "กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง": ["ฝ่ายบริหารงานทั่วไป (กยพ.)", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านโยธาและระบายน้ำ", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านผังเมือง การจราจรและขนส่ง"],
+            "กองยุทธศาสตร์คุณภาพชีวิตเมือง": ["ฝ่ายบริหารงานทั่วไป (กยม.)", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านการศึกษา พัฒนาสังคม และสร้างสรรค์เมือง", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านสาธารณสุข"]
+        };
+
+        function updateDivisions() {
+            const bureauSelect = document.getElementById("ส่วนราชการ");
+            const divisionSelect = document.getElementById("หน่วยงาน");
+            const selectedBureau = bureauSelect.value;
+
+            divisionSelect.innerHTML = '<option value="" disabled selected>--- เลือก กลุ่มงาน / ฝ่าย ---</option>';
+
+            if (agencyMapping[selectedBureau]) {
+                agencyMapping[selectedBureau].forEach(function(division) {
+                    const option = document.createElement("option");
+                    option.value = division;
+                    option.textContent = division;
+                    divisionSelect.appendChild(option);
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const bureauSelect = document.getElementById("ส่วนราชการ");
+            const lockedAgency = "{{ locked_agency }}"; 
+            
+            if (lockedAgency && lockedAgency !== 'N/A') {
+                for (let i = 0; i < bureauSelect.options.length; i++) {
+                    if (bureauSelect.options[i].value === lockedAgency) {
+                        bureauSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+                updateDivisions();
+            }
+        });
     </script>
 
     <script>
