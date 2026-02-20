@@ -351,9 +351,21 @@
         .status-unknown { background: #f5f5f5; color: #666; }
 
         /* Privacy Badges */
-        .privacy-public { background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
-        .privacy-agency { background: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; }
-        .privacy-private { background: #f3e5f5; color: #7b1fa2; border: 1px solid #e1bee7; }
+        .privacy-badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+        .privacy-public { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+        .privacy-dept { background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; }
+        .privacy-bureau { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        .privacy-div { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+        .privacy-private { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
 
         /* Share Button */
         .btn-share {
@@ -652,14 +664,19 @@
                         <td>{{ link['รายละเอียด'] }}</td>
                         
                         <td style="text-align: center;">
-                            {% if link['ความเป็นส่วนตัว'] == 'สาธารณะ' or not link['ความเป็นส่วนตัว'] %}
-                                <span class="status-badge privacy-public"><i class="fas fa-globe"></i> สาธารณะ</span>
-                            {% elif link['ความเป็นส่วนตัว'] == 'เฉพาะหน่วยงาน' %}
-                                <span class="status-badge privacy-agency"><i class="fas fa-building"></i> ภายใน</span>
-                            {% elif link['ความเป็นส่วนตัว'] == 'ส่วนตัว' %}
-                                <span class="status-badge privacy-private"><i class="fas fa-lock"></i> ส่วนตัว</span>
-                            {% endif %}
-                        </td>
+						{% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
+						{% if privacy == 'ส่วนตัว' %}
+							<span class="privacy-badge privacy-private" title="เห็นเฉพาะคุณ"><i class="fas fa-lock"></i> ส่วนตัว</span>
+						{% elif privacy == 'กลุ่มงาน/ฝ่าย' %}
+							<span class="privacy-badge privacy-div" title="เห็นเฉพาะในกลุ่มงาน/ฝ่ายเดียวกัน"><i class="fas fa-user-friends"></i> ฝ่าย</span>
+						{% elif privacy == 'กอง/สำนักงาน' %}
+							<span class="privacy-badge privacy-bureau" title="เห็นเฉพาะในกอง/สำนักงานเดียวกัน"><i class="fas fa-building"></i> กอง</span>
+						{% elif privacy == 'สยป.' %}
+							<span class="privacy-badge privacy-dept" title="เห็นเฉพาะเจ้าหน้าที่ สยป."><i class="fas fa-landmark"></i> สยป.</span>
+						{% else %}
+							<span class="privacy-badge privacy-public" title="ทุกคนมองเห็นได้"><i class="fas fa-globe"></i> สาธารณะ</span>
+						{% endif %}
+						</td>
 
                         <td style="text-align: center;" data-value="{{ link['LinkStatus'] }}">
                             {% if link['LinkStatus'] == 'OK' %}
