@@ -906,7 +906,61 @@ def analytics_page():
             try: l['EditCount'] = int(l.get('EditCount', 0))
             except: l['EditCount'] = 0
 
-        # [NEW] แยก Top 10 เป็น 2 ชุด
+        # --- [NEW] คำนวณ Ranking ผู้สร้างและหน่วยงาน ---
+        user_stats = {}
+        bureau_stats = {}
+        division_stats = {}
+
+        for l in links:
+            creator = l.get('CreatorUsername', '')
+            bureau = l.get('ส่วนราชการ', 'ไม่ระบุ')
+            division = l.get('หน่วยงาน', 'ไม่ระบุ')
+            edits = l['EditCount']
+            score = 1 + edits  # คะแนนรวม = สร้างลิงก์นับ 1 + จำนวนครั้งที่อัปเดต
+
+            # 1. User Stats
+            if creator:
+                if creator not in user_stats:
+                    user_stats[creator] = {'username': creator, 'score': 0, 'links': 0, 'edits': 0}
+                user_stats[creator]['score'] += score
+                user_stats[creator]['links'] += 1
+                user_stats[creator]['edits'] += edits
+
+            # 2. Bureau Stats (กอง/สำนักงาน)
+            if bureau and bureau != 'ไม่ระบุ' and bureau != 'N/A':
+                if bureau not in bureau_stats:
+                    bureau_stats[bureau] = {'name': bureau, 'score': 0, 'links': 0, 'edits': 0}
+                bureau_stats[bureau]['score'] += score
+                bureau_stats[bureau]['links'] += 1
+                bureau_stats[bureau]['edits'] += edits
+
+            # 3. Division Stats (กลุ่มงาน/ฝ่าย)
+            if division and division != 'ไม่ระบุ' and division != 'N/A':
+                if division not in division_stats:
+                    division_stats[division] = {'name': division, 'score': 0, 'links': 0, 'edits': 0}
+                division_stats[division]['score'] += score
+                division_stats[division]['links'] += 1
+                division_stats[division]['edits'] += edits
+
+        # เติมข้อมูลชื่อนามสกุลและสังกัดให้รายชื่อ User
+        for creator, data in user_stats.items():
+            user_info = next((u for u in users if u['Username'] == creator), None)
+            if user_info:
+                data['fullname'] = user_info.get('ชื่อ', creator)
+                data['bureau'] = user_info.get('ส่วนราชการ', 'ไม่ระบุ')
+                data['division'] = user_info.get('หน่วยงาน', 'ไม่ระบุ')
+            else:
+                data['fullname'] = creator
+                data['bureau'] = 'ไม่ระบุ'
+                data['division'] = 'ไม่ระบุ'
+
+        # จัดอันดับและตัดเอาเฉพาะ Top 10
+        top_10_users = sorted(user_stats.values(), key=lambda x: x['score'], reverse=True)[:10]
+        top_10_bureaus = sorted(bureau_stats.values(), key=lambda x: x['score'], reverse=True)[:10]
+        top_10_divisions = sorted(division_stats.values(), key=lambda x: x['score'], reverse=True)[:10]
+        # ------------------------------------------------
+
+        # แยก Top 10 ลิงก์ยอดนิยม/แก้ไขบ่อย
         top_10_clicks = sorted(links, key=lambda x: x['Clicks'], reverse=True)[:10]
         top_10_edits = sorted(links, key=lambda x: x['EditCount'], reverse=True)[:10]
 
@@ -938,8 +992,11 @@ def analytics_page():
         
         chart_data = {
             "total_views": total_views,
-            "top_10_clicks": top_10_clicks, # [NEW] ส่งตัวแปร 1
-            "top_10_edits": top_10_edits,   # [NEW] ส่งตัวแปร 2
+            "top_10_clicks": top_10_clicks, 
+            "top_10_edits": top_10_edits,
+            "top_10_users": top_10_users,       # [ส่งค่าไปหน้าเว็บ]
+            "top_10_bureaus": top_10_bureaus,   # [ส่งค่าไปหน้าเว็บ]
+            "top_10_divisions": top_10_divisions, # [ส่งค่าไปหน้าเว็บ]
             "total_links": len(links), "total_users": len(users), 
             "active_links": sum(1 for l in links if l.get('สถานะ') == 'ใช้งาน'),
             "total_responses": len(feedback),

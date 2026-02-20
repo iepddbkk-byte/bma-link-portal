@@ -85,40 +85,50 @@
         .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; }
 
         /* --- Container --- */
-        .container { max-width: 900px; margin: 40px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: var(--shadow-lg); animation: fadeIn 0.5s ease; }
+        .container { max-width: 700px; margin: 40px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: var(--shadow-lg); animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         h2 {
-            color: var(--bma-green); font-size: 2em; font-weight: 600;
-            margin-bottom: 30px; padding-bottom: 15px;
-            border-bottom: 3px solid var(--bma-green-light);
+            color: var(--bma-green); font-size: 1.8em; font-weight: 600;
+            margin-bottom: 25px; padding-bottom: 10px;
+            border-bottom: 2px solid var(--bma-green-light);
             display: flex; align-items: center; gap: 10px;
         }
 
         /* --- Form --- */
-        form { display: flex; flex-direction: column; gap: 25px; }
-        form div { display: flex; flex-direction: column; }
+        form { display: flex; flex-direction: column; gap: 20px; }
+        form div { display: flex; flex-direction: column; gap: 5px; }
         
-        form label { font-weight: 600; margin-bottom: 8px; color: var(--text-color); font-size: 0.95em; }
+        form label { font-weight: 600; color: var(--text-color); font-size: 0.95em; }
         
         form input, form select {
-            width: 100%; padding: 14px 18px;
-            border: 2px solid var(--border-color); border-radius: 12px;
+            width: 100%; padding: 12px 15px;
+            border: 2px solid var(--border-color); border-radius: 10px;
             font-size: 1em; background-color: #f8f9fa; transition: all 0.3s ease;
         }
         form input:focus, form select:focus {
             outline: none; border-color: var(--bma-green); background-color: white;
             box-shadow: 0 0 0 4px var(--bma-green-light); transform: translateY(-2px);
         }
-        form input[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; }
+        
+        /* สไตล์สำหรับช่องที่ห้ามแก้ไข */
+        form input[readonly] { 
+            background-color: #f1f3f5; 
+            color: #6c757d; 
+            cursor: not-allowed; 
+            border-color: #e9ecef; 
+        }
 
         button[type="submit"] {
             background: linear-gradient(135deg, var(--bma-green), #007a30);
-            color: white; border: none; padding: 16px; border-radius: 50px;
+            color: white; border: none; padding: 15px; border-radius: 10px;
             font-size: 1.1em; font-weight: 600; cursor: pointer;
             transition: 0.3s; box-shadow: var(--shadow-md); margin-top: 10px;
         }
-        button[type="submit"]:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,150,60,0.4); }
+        button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,150,60,0.4); }
+
+        .btn-cancel { text-align: center; color: #6c757d; text-decoration: none; padding: 10px; font-weight: 500; transition: 0.3s; }
+        .btn-cancel:hover { color: #dc3545; }
 
         /* Responsive */
         @media (max-width: 992px) { .nav-link span { display: none; } }
@@ -138,7 +148,7 @@
     <header class="main-header">
         <a href="{{ url_for('home') }}" class="logo-container">
             <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-            <div class="logo-text">แก้ไขข้อมูล</div>
+            <div class="logo-text">แก้ไขข้อมูลส่วนตัว</div>
         </a>
         
         <div class="mobile-controls">
@@ -166,89 +176,64 @@
     </header>
 
     <div class="container">
-        <h2>✏️ แก้ไขข้อมูลส่วนตัว</h2>
+        <h2><i class="fas fa-user-edit"></i> แก้ไขข้อมูลส่วนตัว</h2>
 
         <form id="editProfileForm" action="{{ url_for('edit_profile_action') }}" method="POST">
             <div>
-                <label>Username (แก้ไขไม่ได้)</label>
-                <input type="text" value="{{ user['Username'] }}" readonly>
-            </div>
-
-            <div>
-                <label for="fullname">ชื่อ-นามสกุล</label>
-                <input type="text" id="fullname" name="fullname" value="{{ user['ชื่อ'] }}" required>
-            </div>
-
-            <div>
-                <label for="position">ตำแหน่ง</label>
-                <input type="text" id="position" name="position" value="{{ user['ตำแหน่ง'] }}" required>
+                <label>ชื่อ-นามสกุล <span style="color: #dc3545; font-size: 0.85em;">(ไม่สามารถแก้ไขได้)</span></label>
+                <input type="text" name="fullname" value="{{ user['ชื่อ'] }}" readonly>
             </div>
             
             <div>
-                <label for="division">กลุ่มงาน/ฝ่าย/กอง</label>
-                <input type="text" id="division" name="division" value="{{ user['หน่วยงาน'] }}" required>
+                <label>อีเมล <span style="color: #dc3545; font-size: 0.85em;">(ไม่สามารถแก้ไขได้)</span></label>
+                <input type="email" name="email" value="{{ user['Email'] }}" readonly>
+            </div>
+            
+            <div>
+                <label>กลุ่มงาน / ฝ่าย <span style="color: #dc3545; font-size: 0.85em;">(ไม่สามารถแก้ไขได้)</span></label>
+                <input type="text" name="division" value="{{ user['หน่วยงาน'] }}" readonly>
             </div>
 
             <div>
-                <label for="main_agency">ส่วนราชการ (สำนัก/เขต)</label>
-                <select id="main_agency" name="main_agency" required>
-                    <option value="" disabled>--- เลือกส่วนราชการ ---</option>
-                    <optgroup label="ระดับสำนัก">
-                        <option value="สำนักงานเลขานุการสภากรุงเทพมหานคร">สำนักงานเลขานุการสภากรุงเทพมหานคร</option>
-                        <option value="สำนักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร">สำนักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร</option>
-                        <option value="สำนักงานคณะกรรมการข้าราชการกรุงเทพมหานคร">สำนักงานคณะกรรมการข้าราชการกรุงเทพมหานคร</option>
-                        <option value="สำนักปลัดกรุงเทพมหานคร">สำนักปลัดกรุงเทพมหานคร</option>
-                        <option value="สำนักการแพทย์">สำนักการแพทย์</option>
-                        <option value="สำนักอนามัย">สำนักอนามัย</option>
-                        <option value="สำนักการศึกษา">สำนักการศึกษา</option>
-                        <option value="สำนักการโยธา">สำนักการโยธา</option>
-                        <option value="สำนักการระบายน้ำ">สำนักการระบายน้ำ</option>
-                        <option value="สำนักการคลัง">สำนักการคลัง</option>
-                        <option value="สำนักเทศกิจ">สำนักเทศกิจ</option>
-                        <option value="สำนักการจราจรและขนส่ง">สำนักการจราจรและขนส่ง</option>
-                        <option value="สำนักการวางผังเมืองและพัฒนาเมือง">สำนักการวางผังเมืองและพัฒนาเมือง</option>
-                        <option value="สำนักป้องกันและบรรเทาสาธารณภัย">สำนักป้องกันและบรรเทาสาธารณภัย</option>
-                        <option value="สำนักงบประมาณกรุงเทพมหานคร">สำนักงบประมาณกรุงเทพมหานคร</option>
-                        <option value="สำนักยุทธศาสตร์และประเมินผล">สำนักยุทธศาสตร์และประเมินผล</option>
-                        <option value="สำนักสิ่งแวดล้อม">สำนักสิ่งแวดล้อม</option>
-                        <option value="สำนักวัฒนธรรม กีฬา และการท่องเที่ยว">สำนักวัฒนธรรม กีฬา และการท่องเที่ยว</option>
-                        <option value="สำนักพัฒนาสังคม">สำนักพัฒนาสังคม</option>
-                    </optgroup>
-                    <optgroup label="สำนักงานเขต">
-                        <option value="สำนักงานเขตคลองเตย">สำนักงานเขตคลองเตย</option>
-                        <option value="สำนักงานเขตห้วยขวาง">สำนักงานเขตห้วยขวาง</option>
-                    </optgroup>
-                </select>
+                <label>กอง / สำนักงาน <span style="color: #dc3545; font-size: 0.85em;">(ไม่สามารถแก้ไขได้)</span></label>
+                <input type="text" name="main_agency" value="{{ user['ส่วนราชการ'] }}" readonly>
+            </div>
+            
+            <div>
+                <label>ส่วนราชการ <span style="color: #dc3545; font-size: 0.85em;">(ไม่สามารถแก้ไขได้)</span></label>
+                <input type="text" value="สำนักยุทธศาสตร์และประเมินผล" readonly>
+            </div>
+
+            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 10px 0;">
+
+            <div>
+                <label for="position" style="color: var(--bma-green);">ตำแหน่ง <i class="fas fa-pen"></i></label>
+                <input type="text" id="position" name="position" value="{{ user['ตำแหน่ง'] }}" required>
             </div>
 
             <div>
-                <label for="email">อีเมล</label>
-                <input type="email" id="email" name="email" value="{{ user['Email'] }}" required>
-            </div>
-
-            <div>
-                <label for="phone">เบอร์โทรศัพท์</label>
+                <label for="phone" style="color: var(--bma-green);">เบอร์โทรติดต่อ <i class="fas fa-pen"></i></label>
                 <input type="tel" id="phone" name="phone" value="{{ user['เบอร์โทร'] | replace("'", "") }}" required>
             </div>
 
-            <div>
-                <button type="submit"><i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลง</button>
-            </div>
+            <button type="submit"><i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลง</button>
+            <a href="{{ url_for('profile_page') }}" class="btn-cancel">ยกเลิก กลับไปหน้าโปรไฟล์</a>
         </form>
     </div>
 
     <script>
         function toggleMenu() { document.getElementById('navMenu').classList.toggle('active'); }
 
-        // Auto-Select Agency
-        document.addEventListener('DOMContentLoaded', function() {
-            const userAgency = "{{ user['ส่วนราชการ'] }}";
-            const agencySelect = document.getElementById('main_agency');
-            if (userAgency) { agencySelect.value = userAgency; }
-        });
-
-        // Phone Cleaner
+        // ทำความสะอาดเบอร์โทรศัพท์ (ลบฝนทอง)
         const phoneInput = document.getElementById('phone');
+        if(phoneInput) {
+            function cleanRealTime(input) {
+                let val = input.value;
+                if (val.includes("'")) input.value = val.replace(/'/g, ''); 
+            }
+            phoneInput.addEventListener('input', function(e) { cleanRealTime(e.target); });
+        }
+
         document.getElementById('editProfileForm').addEventListener('submit', function() {
             if (phoneInput) phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
         });
@@ -260,7 +245,6 @@
             {% endif %}
         {% endwith %}
 	</script>
-<!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
@@ -272,7 +256,5 @@ s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
-<!--End of Tawk.to Script-->	
-	
 </body>
 </html>
