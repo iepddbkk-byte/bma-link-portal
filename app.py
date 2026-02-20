@@ -262,32 +262,46 @@ def increment_site_views():
             print(f"Error incrementing views: {e}")
 
 # [NEW] ฟังก์ชันตรวจสอบสิทธิ์การเข้าถึงลิงก์
+# [NEW] ฟังก์ชันตรวจสอบสิทธิ์การเข้าถึงลิงก์ (ปรับปรุงใหม่ 5 ระดับ)
 def check_link_permission(link, user_session):
     privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') # Default เป็นสาธารณะ
     
-    # 1. ลิงก์สาธารณะ (ใครก็เห็นได้)
+    # 1. สาธารณะ (ใครก็เห็นได้)
     if privacy == 'สาธารณะ' or not privacy:
         return True
         
-    # กรณีอื่นๆ ต้อง Login ก่อน
+    # กรณีอื่นๆ ต้อง Login ก่อน (ถ้าไม่ได้ล็อกอิน จะไม่เห็นเลย)
     if not user_session.get('logged_in'):
         return False
         
     user_role = user_session.get('level', '')
-    user_agency = user_session.get('main_agency', '')
     username = user_session.get('username', '')
+    user_bureau = user_session.get('main_agency', '')  # กอง/สำนักงาน
+    user_division = user_session.get('division', '')   # กลุ่มงาน/ฝ่าย
     
     # Admin เห็นทุกอย่าง
     if user_role == 'Admin':
         return True
         
-    # 2. เฉพาะเจ้าหน้าที่ในหน่วยงานเดียวกัน
-    if privacy == 'เฉพาะหน่วยงาน':
-        return link.get('ส่วนราชการ') == user_agency
+    link_creator = link.get('CreatorUsername')
+    link_bureau = link.get('ส่วนราชการ')
+    link_division = link.get('หน่วยงาน')
+
+    # 2. สยป. (ทุกคนที่ล็อกอินเข้ามาในฐานะเจ้าหน้าที่จะมองเห็น)
+    if privacy == 'สยป.':
+        return True
         
-    # 3. เห็นเฉพาะตนเอง (ส่วนตัว)
+    # 3. กอง/สำนักงาน (เห็นเฉพาะคนที่อยู่ กอง เดียวกัน)
+    if privacy == 'กอง/สำนักงาน':
+        return link_bureau == user_bureau
+        
+    # 4. กลุ่มงาน/ฝ่าย (เห็นเฉพาะคนที่อยู่ ฝ่าย และ กอง เดียวกัน)
+    if privacy == 'กลุ่มงาน/ฝ่าย':
+        return link_division == user_division and link_bureau == user_bureau
+        
+    # 5. ส่วนตัว (เห็นเฉพาะตัวเอง/คนสร้างลิงก์)
     if privacy == 'ส่วนตัว':
-        return link.get('CreatorUsername') == username
+        return link_creator == username
         
     return False
 
@@ -548,6 +562,7 @@ def login_action():
             session['name'] = user_found['ชื่อ']
             session['email'] = user_found['Email']
             session['main_agency'] = user_found.get('ส่วนราชการ', 'N/A') 
+            session['division'] = user_found.get('หน่วยงาน', 'N/A') # <--- [เพิ่มบรรทัดนี้] จำค่ากลุ่มงาน
             flash('เข้าสู่ระบบสำเร็จ!', 'success') 
             return redirect(url_for('dashboard'))
         else:
@@ -704,6 +719,7 @@ def edit_profile_action():
             session['name'] = fullname
             session['email'] = email
             session['main_agency'] = main_agency
+            session['division'] = division # <--- [เพิ่มบรรทัดนี้] อัปเดตกลุ่มงาน
             flash('บันทึกเรียบร้อย', 'success')
             return redirect(url_for('profile_page'))
     except Exception as e:
@@ -773,28 +789,33 @@ def dashboard():
 @app.route('/add')
 def add_link_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
+    
+    # ดึงค่าทั้ง 2 ระดับจาก Session
     user_main_agency = session.get('main_agency', 'N/A')
-    return render_template('add_link.html', session=session, locked_agency=user_main_agency)
+    user_division = session.get('division', 'N/A')
+    
+    # ส่งค่าไปยังหน้า HTML
+    return render_template('add_link.html', session=session, locked_agency=user_main_agency, locked_division=user_division)
 
 @app.route('/add_action', methods=['POST'])
 def add_link_action():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        # [UPDATE] รับค่า "ความเป็นส่วนตัว" จากฟอร์ม
-        # [แก้ไข] เพิ่ม 'ส่วนราชการ' เข้าไปในรายการ และดึงค่าจากฟอร์มแทน session
-        data = {k: request.form.get(k) for k in ['ประเภท', 'ส่วนราชการ', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'รายละเอียด', 'สถานะ', 'ความเป็นส่วนตัว']}
+        # [UPDATE] นำ 'หน่วยงาน' ออกจากการรับค่าผ่านฟอร์ม
+        data = {k: request.form.get(k) for k in ['ประเภท', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'รายละเอียด', 'สถานะ', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         
-        main_agency = data.get('ส่วนราชการ') or session.get('main_agency', 'N/A')
+        # [UPDATE] บังคับดึงข้อมูลสังกัดจาก Session ของผู้ใช้โดยตรง ป้องกันการปลอมแปลงค่า
+        main_agency = session.get('main_agency', 'N/A') 
+        division = session.get('division', 'N/A')
         
-        # [UPDATE] บันทึกลง Sheet (เพิ่ม privacy ก่อน clicks)
         new_row = [
-            generate_new_id(), data['ประเภท'], data['หน่วยงาน'], main_agency, 
+            generate_new_id(), data['ประเภท'], division, main_agency, 
             data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
             data['URL'], data['สถานะ'], data['รายละเอียด'], 
             get_current_timestamp(), session.get('username'), '', 
             data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0, 
-            0  # <--- [NEW] EditCount เริ่มต้นเป็น 0
+            0 
         ]
         db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
         

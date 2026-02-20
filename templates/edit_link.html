@@ -129,7 +129,7 @@
             outline: none; border-color: var(--bma-green); background-color: white;
             box-shadow: 0 0 0 4px var(--bma-green-light); transform: translateY(-2px);
         }
-        form input[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; }
+        form input[readonly], form select[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border-color: #ced4da; }
 
         /* Submit Button */
         button[type="submit"] {
@@ -152,7 +152,7 @@
         .modified-indicator {
             display: inline-block; background: #fff3e0; color: #e65100;
             padding: 5px 10px; border-radius: 15px; font-size: 0.8em;
-            font-weight: 600; margin-bottom: 10px; border: 1px solid #ffb74d;
+            font-weight: 600; margin-bottom: 10px; border: 1px solid #ffb74d; width: fit-content;
         }
         
         .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
@@ -164,7 +164,6 @@
         .shortener-content.active { display: block; }
         iframe { width: 100%; height: 500px; border: none; display: block; }
         .fallback-link { padding: 15px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; }
-
 
         /* Responsive */
         @media (max-width: 992px) { .nav-link span { display: none; } }
@@ -274,24 +273,28 @@
             </div>
 
             <div>
-                <label for="หน่วยงาน">หน่วยงาน (กลุ่มงาน/ฝ่าย/กอง) (จำเป็น)</label>
-                <input type="text" id="หน่วยงาน" name="หน่วยงาน" value="{{ link['หน่วยงาน'] }}" required>
+                <label for="หน่วยงาน">กลุ่มงาน / ฝ่าย (จำเป็น)</label>
+                {% if is_admin %}
+                    <span class="modified-indicator">คุณเป็น Admin: สามารถแก้ไขกลุ่มงาน/ฝ่ายได้</span>
+                    <input type="text" id="หน่วยงาน" name="หน่วยงาน" value="{{ link['หน่วยงาน'] }}" required>
+                {% else %}
+                    <input type="text" id="หน่วยงาน" name="หน่วยงาน" value="{{ link['หน่วยงาน'] }}" readonly>
+                    <span class="info-text">💡 ข้อมูลนี้อ้างอิงตามสังกัดของผู้สร้าง ไม่สามารถเปลี่ยนแปลงได้</span>
+                {% endif %}
             </div>
 
             <div>
-                <label for="ส่วนราชการ">ส่วนราชการ (สำนัก/เขต) (จำเป็น)</label>
+                <label for="ส่วนราชการ">กอง / สำนักงาน (จำเป็น)</label>
                 {% if is_admin %}
-                    <span class="modified-indicator">คุณเป็น Admin: สามารถเปลี่ยนส่วนราชการได้</span>
+                    <span class="modified-indicator">คุณเป็น Admin: สามารถเปลี่ยนกอง/สำนักงานได้</span>
                     <select id="ส่วนราชการ" name="ส่วนราชการ" required>
-                        <option value="" disabled>--- กรุณาเลือกส่วนราชการ ---</option>
-                        <optgroup label="ระดับสำนัก">
-                            <option value="สำนักงานเลขานุการสภากรุงเทพมหานคร">สำนักงานเลขานุการสภากรุงเทพมหานคร</option>
-                            <option value="สำนักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร">สำนักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร</option>
-                            <option value="สำนักยุทธศาสตร์และประเมินผล">สำนักยุทธศาสตร์และประเมินผล</option>
-                        </optgroup>
-                        <optgroup label="สำนักงานเขต">
-                            <option value="สำนักงานเขตคลองเตย">สำนักงานเขตคลองเตย</option>
-                        </optgroup>
+                        <option value="" disabled>--- กรุณาเลือกกอง/สำนักงาน ---</option>
+                        <option value="สำนักงานเลขานุการ">สำนักงานเลขานุการ</option>
+                        <option value="สำนักงานบริหารยุทธศาสตร์">สำนักงานบริหารยุทธศาสตร์</option>
+                        <option value="กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง">กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง</option>
+                        <option value="กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง">กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง</option>
+                        <option value="กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง">กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</option>
+                        <option value="กองยุทธศาสตร์คุณภาพชีวิตเมือง">กองยุทธศาสตร์คุณภาพชีวิตเมือง</option>
                     </select>
                 {% else %}
                     <input type="text" id="ส่วนราชการ" name="ส่วนราชการ" value="{{ link['ส่วนราชการ'] }}" readonly>
@@ -308,12 +311,14 @@
             </div>
 
             <div>
-                <label for="ความเป็นส่วนตัว">ระดับความเป็นส่วนตัว</label>
+                <label for="ความเป็นส่วนตัว">ระดับความเป็นส่วนตัว (สิทธิ์การเข้าถึง)</label>
                 {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
                 <select id="ความเป็นส่วนตัว" name="ความเป็นส่วนตัว" required>
-                    <option value="สาธารณะ" {% if privacy == 'สาธารณะ' %}selected{% endif %}>🌐 สาธารณะ (ทุกคนมองเห็น)</option>
-                    <option value="เฉพาะหน่วยงาน" {% if privacy == 'เฉพาะหน่วยงาน' %}selected{% endif %}>🏢 เฉพาะหน่วยงาน (เห็นเฉพาะเจ้าหน้าที่ในหน่วยงานเดียวกัน)</option>
-                    <option value="ส่วนตัว" {% if privacy == 'ส่วนตัว' %}selected{% endif %}>🔒 ส่วนตัว (เห็นเฉพาะฉัน)</option>
+                    <option value="สาธารณะ" {% if privacy == 'สาธารณะ' %}selected{% endif %}>🌐 สาธารณะ (ทุกคนมองเห็นได้แม้ไม่ได้เข้าระบบ)</option>
+                    <option value="สยป." {% if privacy == 'สยป.' %}selected{% endif %}>🏛️ สยป. (มองเห็นได้เฉพาะเจ้าหน้าที่ สยป. ทั้งหมด)</option>
+                    <option value="กอง/สำนักงาน" {% if privacy == 'กอง/สำนักงาน' %}selected{% endif %}>🏢 กอง/สำนักงาน (มองเห็นได้เฉพาะเจ้าหน้าที่ใน "กอง" เดียวกัน)</option>
+                    <option value="กลุ่มงาน/ฝ่าย" {% if privacy == 'กลุ่มงาน/ฝ่าย' %}selected{% endif %}>👥 กลุ่มงาน/ฝ่าย (มองเห็นได้เฉพาะเจ้าหน้าที่ใน "ฝ่าย" เดียวกัน)</option>
+                    <option value="ส่วนตัว" {% if privacy == 'ส่วนตัว' %}selected{% endif %}>🔒 ส่วนตัว (เห็นเฉพาะฉันผู้สร้างลิงก์)</option>
                 </select>
             </div>
 
@@ -361,7 +366,15 @@
             {% if is_admin %}
             const currentAgency = "{{ link['ส่วนราชการ'] }}";
             const agencySelect = document.getElementById('ส่วนราชการ');
-            if (currentAgency && agencySelect) { agencySelect.value = currentAgency; }
+            if (currentAgency && agencySelect) {
+                // เช็คว่ามีตัวเลือกนี้ให้เลือกหรือไม่
+                for (let i = 0; i < agencySelect.options.length; i++) {
+                    if (agencySelect.options[i].value === currentAgency) {
+                        agencySelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
             {% endif %}
         });
 
