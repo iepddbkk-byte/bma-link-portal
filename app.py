@@ -253,7 +253,7 @@ def send_reset_email(username, recipient_email):
         token = s.dumps(username, salt='password-reset-salt')
         reset_url = url_for('reset_password_page', token=token, _external=True)
         msg = Message("คำขอรีเซ็ตรหัสผ่าน - BMA SMART LINKAGE", recipients=[recipient_email])
-        msg.body = f"""สวัสดีครับ,\nเราได้รับคำขอรีเซ็ตรหัสผ่านสำหรับ Username: {username}\nคลิกลิงค์เพื่อตั้งรหัสผ่านใหม่: {reset_url}\n(ลิงค์หมดอายุใน 1 ชั่วโมง)"""
+        msg.body = f"""สวัสดีครับ,\nเราได้รับคำขอรีเซ็ตรหัสผ่านสำหรับ Username: {username}\nคลิกลิงก์เพื่อตั้งรหัสผ่านใหม่: {reset_url}\n(ลิงก์หมดอายุใน 1 ชั่วโมง)"""
         mail.send(msg)
         return True
     except Exception as e:
@@ -268,11 +268,11 @@ def increment_site_views():
         except Exception as e:
             print(f"Error incrementing views: {e}")
 
-# [NEW] ฟังก์ชันตรวจสอบสิทธิ์การเข้าถึงลิงค์
+# [NEW] ฟังก์ชันตรวจสอบสิทธิ์การเข้าถึงลิงก์
 def check_link_permission(link, user_session):
     privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') # Default เป็นสาธารณะ
     
-    # 1. ลิงค์สาธารณะ (ใครก็เห็นได้)
+    # 1. ลิงก์สาธารณะ (ใครก็เห็นได้)
     if privacy == 'สาธารณะ' or not privacy:
         return True
         
@@ -400,7 +400,7 @@ def go_to_link(link_id):
             Thread(target=update_click_count, args=(cell.row,)).start()
 
             if target_url: return redirect(target_url)
-        return render_template('error.html', message="ไม่พบลิงค์ที่คุณค้นหา หรือลิงค์ถูกลบไปแล้ว") 
+        return render_template('error.html', message="ไม่พบลิงก์ที่คุณค้นหา หรือลิงก์ถูกลบไปแล้ว") 
     except Exception as e:
         print(f"[ERROR] Go-to-link error: {e}")
         return render_template('error.html', message="เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล") 
@@ -425,7 +425,7 @@ def home():
 
         all_records = get_db_records()
         
-        # [UPDATE] กรองลิงค์ตามสิทธิ์การเข้าถึง (Privacy)
+        # [UPDATE] กรองลิงก์ตามสิทธิ์การเข้าถึง (Privacy)
         visible_links = [link for link in all_records if link.get('สถานะ') == 'ใช้งาน' and check_link_permission(link, session)]
         
         for l in visible_links:
@@ -461,7 +461,7 @@ def links_page():
         category_filter = request.args.get('category')
         all_records = get_db_records()
         
-        # [UPDATE] กรองลิงค์ตามสิทธิ์การเข้าถึง (Privacy) ก่อนกรองหมวดหมู่
+        # [UPDATE] กรองลิงก์ตามสิทธิ์การเข้าถึง (Privacy) ก่อนกรองหมวดหมู่
         valid_links = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน' and check_link_permission(l, session)]
 
         if agency_filter:
@@ -472,7 +472,7 @@ def links_page():
             page_title = category_filter
         else:
             links_to_display = valid_links
-            page_title = "ลิงค์ทั้งหมด"
+            page_title = "ลิงก์ทั้งหมด"
         
         for link in links_to_display:
             date_str = link.get('วันที่อัปเดต')
@@ -635,7 +635,7 @@ def forgot_password():
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password_page(token):
     try: username = s.loads(token, salt='password-reset-salt', max_age=3600)
-    except: flash('ลิงค์หมดอายุหรือผิดพลาด', 'error'); return redirect(url_for('forgot_password'))
+    except: flash('ลิงก์หมดอายุหรือผิดพลาด', 'error'); return redirect(url_for('forgot_password'))
     
     if request.method == 'POST':
         password = request.form.get('password')
@@ -805,7 +805,7 @@ def add_link_action():
         
         clear_db_cache()
 
-        flash('เพิ่มลิงค์สำเร็จ', 'success'); return redirect(url_for('links_page'))
+        flash('เพิ่มลิงก์สำเร็จ', 'success'); return redirect(url_for('links_page'))
     except Exception as e: 
         flash(f'Error: {e}', 'error'); return redirect(url_for('add_link_page'))
 
@@ -833,7 +833,7 @@ def edit_link_page(link_id):
         all_links = get_db_records()
         link = next((l for l in all_links if l.get('ID', '').strip() == link_id.strip()), None)
         if not link: 
-            flash(f'ไม่พบลิงค์ ID: {link_id}', 'error')
+            flash(f'ไม่พบลิงก์ ID: {link_id}', 'error')
             return redirect(url_for('dashboard'))
         creator = link.get('CreatorUsername', '').strip()
         username = session.get('username', '').strip()

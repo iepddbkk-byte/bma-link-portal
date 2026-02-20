@@ -332,12 +332,12 @@
             <div class="stat-card">
                 <i class="fas fa-link fa-2x" style="color:#2ecc71;"></i>
                 <div class="stat-num">{{ chart_data.total_links }}</div>
-                <div class="stat-label">ลิงค์ทั้งหมด</div>
+                <div class="stat-label">ลิงก์ทั้งหมด</div>
             </div>
             <div class="stat-card">
                 <i class="fas fa-check-circle fa-2x" style="color:#27ae60;"></i>
                 <div class="stat-num">{{ chart_data.active_links }}</div>
-                <div class="stat-label">ลิงค์ที่ใช้งานอยู่</div>
+                <div class="stat-label">ลิงก์ที่ใช้งานอยู่</div>
             </div>
             <div class="stat-card">
                 <i class="fas fa-users fa-2x" style="color:#9b59b6;"></i>
@@ -349,7 +349,7 @@
         <div class="top-tables-grid">
             
             <div class="chart-container">
-                <h3><i class="fas fa-trophy" style="color: #f1c40f;"></i> 10 อันดับลิงค์ผู้ใช้งานสูงสุด</h3>
+                <h3><i class="fas fa-trophy" style="color: #f1c40f;"></i> 10 อันดับลิงก์ผู้ใช้งานสูงสุด</h3>
                 <div style="overflow-x:auto;">
                     <table>
                         <thead>
@@ -381,7 +381,7 @@
             </div>
 
             <div class="chart-container">
-                <h3><i class="fas fa-edit" style="color: #e65100;"></i> 10 อันดับลิงค์ที่มีการแก้ไขสูงสุด</h3>
+                <h3><i class="fas fa-edit" style="color: #e65100;"></i> 10 อันดับลิงก์ที่มีการแก้ไขสูงสุด</h3>
                 <div style="overflow-x:auto;">
                     <table>
                         <thead>
@@ -420,15 +420,15 @@
 
         <div class="chart-grid">
             <div class="chart-container">
-                <h3><i class="fas fa-chart-pie"></i> สัดส่วนลิงค์ตามประเภทงาน</h3>
+                <h3><i class="fas fa-chart-pie"></i> สัดส่วนลิงก์ตามประเภทงาน</h3>
                 <canvas id="categoryPieChart"></canvas>
             </div>
             <div class="chart-container">
-                <h3><i class="fas fa-chart-bar"></i> 5 ส่วนราชการที่เพิ่มลิงค์สูงสุด</h3>
+                <h3><i class="fas fa-chart-bar"></i> 5 ส่วนราชการที่เพิ่มลิงก์สูงสุด</h3>
                 <canvas id="departmentBarChart"></canvas>
             </div>
             <div class="chart-container chart-container-full">
-                <h3><i class="fas fa-chart-line"></i> จำนวนลิงค์ที่เพิ่มขึ้น (รายเดือน)</h3>
+                <h3><i class="fas fa-chart-line"></i> จำนวนลิงก์ที่เพิ่มขึ้น (รายเดือน)</h3>
                 <canvas id="monthlyLineChart"></canvas>
             </div>
         </div>
@@ -526,7 +526,7 @@
                 type: 'bar',
                 data: {
                     labels: chartData.dept_labels,
-                    datasets: [{ label: 'จำนวนลิงค์', data: chartData.dept_data, backgroundColor: getBmaColors(chartData.dept_data.length), borderRadius: 8 }]
+                    datasets: [{ label: 'จำนวนลิงก์', data: chartData.dept_data, backgroundColor: getBmaColors(chartData.dept_data.length), borderRadius: 8 }]
                 },
                 options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
@@ -537,7 +537,7 @@
                 type: 'line',
                 data: {
                     labels: chartData.month_labels,
-                    datasets: [{ label: 'จำนวนลิงค์ที่เพิ่ม', data: chartData.month_data, backgroundColor: 'rgba(0, 150, 60, 0.1)', borderColor: 'rgba(0, 150, 60, 1)', borderWidth: 3, fill: true, tension: 0.4 }]
+                    datasets: [{ label: 'จำนวนลิงก์ที่เพิ่ม', data: chartData.month_data, backgroundColor: 'rgba(0, 150, 60, 0.1)', borderColor: 'rgba(0, 150, 60, 1)', borderWidth: 3, fill: true, tension: 0.4 }]
                 },
                 options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
