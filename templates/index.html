@@ -599,12 +599,12 @@
                 <select id="agencySelect">
                     <option value="" disabled selected>--- หรือเลือกหน่วยงาน ---</option>
                     <option value="">ทั้งหมด</option>
-                    <optgroup label="สำนัก">
+                    <optgroup label="ระดับกอง/สำนักงาน">
                         {% for bureau in bureaus %}
                         <option value="{{ bureau }}">{{ bureau }}</option>
                         {% endfor %}
                     </optgroup>
-                    <optgroup label="สำนักงานเขต">
+                    <optgroup label="ระดับฝ่าย/กลุ่มงาน">
                         {% for district in districts %}
                         <option value="{{ district }}">{{ district }}</option>
                         {% endfor %}
@@ -667,21 +667,21 @@
             </a>
         </div>
 
-        <div class="section-title"><i class="fas fa-building"></i> หน่วยงานระดับสำนัก</div>
+        <div class="section-title"><i class="fas fa-sitemap"></i> กอง / สำนักงาน (สยป.)</div>
         <div class="menu-grid">
             {% for bureau in bureaus %}
             <a href="{{ url_for('links_page', agency=bureau) }}" class="menu-btn">
-                <div class="menu-icon"><i class="fas fa-landmark"></i></div>
+                <div class="menu-icon"><i class="fas fa-building"></i></div>
                 {{ bureau }}
             </a>
             {% endfor %}
         </div>
 
-        <div class="section-title"><i class="fas fa-map-marked-alt"></i> สำนักงานเขต</div>
+        <div class="section-title"><i class="fas fa-users"></i> กลุ่มงาน / ฝ่าย (สยป.)</div>
         <div class="menu-grid">
             {% for district in districts %}
             <a href="{{ url_for('links_page', agency=district) }}" class="menu-btn">
-                <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="menu-icon"><i class="fas fa-user-friends"></i></div>
                 {{ district }}
             </a>
             {% endfor %}
