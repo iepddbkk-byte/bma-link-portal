@@ -801,17 +801,17 @@ def add_link_page():
 def add_link_action():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        # [UPDATE] นำ 'หน่วยงาน' ออกจากการรับค่าผ่านฟอร์ม
+        # นำ 'หน่วยงาน' ออกจากการรับค่าผ่านฟอร์ม
         data = {k: request.form.get(k) for k in ['ประเภท', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'รายละเอียด', 'สถานะ', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         
-        # [UPDATE] บังคับดึงข้อมูลสังกัดจาก Session ของผู้ใช้โดยตรง ป้องกันการปลอมแปลงค่า
+        # บังคับดึงข้อมูลสังกัดจาก Session ของผู้ใช้โดยตรง ป้องกันการปลอมแปลงค่า
         main_agency = session.get('main_agency', 'N/A') 
         division = session.get('division', 'N/A')
         
-        # [NEW] เช็คว่า Admin ติ๊กเลือกปักหมุดหรือไม่
+        # เช็คว่า Admin ติ๊กเลือกปักหมุดหรือไม่ (เพิ่มใหม่)
         is_pinned = 'ไม่ปักหมุด'
-        if session.get('level') == 'Admin' and request.form.get('is_pinned'):
+        if session.get('level', '').strip() == 'Admin' and request.form.get('is_pinned'):
             is_pinned = 'ปักหมุด'
             
         new_row = [
@@ -821,15 +821,17 @@ def add_link_action():
             get_current_timestamp(), session.get('username'), '', 
             data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0, 
             0,
-            is_pinned 
+            is_pinned # คอลัมน์ที่ 17 (Q)
         ]
         db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
         
         clear_db_cache()
 
-        flash('เพิ่มลิงก์สำเร็จ', 'success'); return redirect(url_for('links_page'))
+        flash('เพิ่มลิงก์สำเร็จ', 'success')
+        return redirect(url_for('links_page'))
     except Exception as e: 
-        flash(f'Error: {e}', 'error'); return redirect(url_for('add_link_page'))
+        flash(f'Error: {e}', 'error')
+        return redirect(url_for('add_link_page'))
 
 @app.route('/delete/<link_id>', methods=['POST'])
 def delete_link_action(link_id):
@@ -846,7 +848,8 @@ def delete_link_action(link_id):
         else:
             flash('ไม่มีสิทธิ์', 'error')
         return redirect(url_for('dashboard'))
-    except: return redirect(url_for('dashboard'))
+    except: 
+        return redirect(url_for('dashboard'))
 
 @app.route('/edit/<link_id>')
 def edit_link_page(link_id):
@@ -857,12 +860,15 @@ def edit_link_page(link_id):
         if not link: 
             flash(f'ไม่พบลิงก์ ID: {link_id}', 'error')
             return redirect(url_for('dashboard'))
+            
         creator = link.get('CreatorUsername', '').strip()
         username = session.get('username', '').strip()
         is_admin = (session.get('level', '').strip() == 'Admin')
+        
         if not is_admin and creator != username:
             flash('คุณไม่มีสิทธิ์แก้ไขลิงก์นี้', 'error')
             return redirect(url_for('dashboard'))
+            
         return render_template('edit_link.html', session=session, link=link, locked_agency=link.get('ส่วนราชการ', 'N/A'), is_admin=is_admin)
     except Exception as e: 
         return redirect(url_for('dashboard'))
@@ -875,25 +881,37 @@ def update_link_action(link_id):
         if not cell: return redirect(url_for('dashboard'))
         row_vals = db_sheet.row_values(cell.row)
         
-        # ... (โค้ดตรวจสอบสิทธิ์เหมือนเดิม) ...
         creator = row_vals[11].strip()
-        if session.get('level', '').strip() != 'Admin' and creator != session.get('username', '').strip():
-             flash('ไม่มีสิทธิ์', 'error'); return redirect(url_for('dashboard'))
+        user_level = session.get('level', '').strip()
+        
+        if user_level != 'Admin' and creator != session.get('username', '').strip():
+             flash('ไม่มีสิทธิ์', 'error')
+             return redirect(url_for('dashboard'))
 
         data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
-        main_agency = request.form.get('ส่วนราชการ') if session.get('level', '').strip() == 'Admin' else row_vals[3]
         
-        # [NEW LOGIC] คำนวณยอด Clicks และ EditCount
+        main_agency = request.form.get('ส่วนราชการ') if user_level == 'Admin' else row_vals[3]
+        
+        # คำนวณยอด Clicks และ EditCount
         current_clicks = row_vals[14] if len(row_vals) > 14 else 0
-        
-        # ดึงค่า EditCount เดิมมาบวก 1
         try:
             current_edits = int(row_vals[15]) if len(row_vals) > 15 and row_vals[15] else 0
         except:
             current_edits = 0
         
         new_edit_count = current_edits + 1
+
+        # [FIXED LOGIC] จัดการสถานะการปักหมุด
+        # 1. ดึงค่าการปักหมุดเดิมมาก่อน (ป้องกันค่าหายเวลาคนธรรมดาแก้)
+        current_pinned = row_vals[16] if len(row_vals) > 16 else 'ไม่ปักหมุด'
+        
+        # 2. ถ้าเป็น Admin ให้ยึดค่าจาก Checkbox หน้าเว็บ
+        if user_level == 'Admin':
+            is_pinned = 'ปักหมุด' if request.form.get('is_pinned') else 'ไม่ปักหมุด'
+        else:
+            # ถ้าเป็น User ธรรมดา ให้ใช้ค่าเดิมที่มีอยู่ในฐานข้อมูล
+            is_pinned = current_pinned
 
         new_vals = [
             link_id, data['ประเภท'], data['หน่วยงาน'], main_agency, 
@@ -902,7 +920,8 @@ def update_link_action(link_id):
             get_current_timestamp(), creator, row_vals[12] if len(row_vals) > 12 else '',
             data.get('ความเป็นส่วนตัว', 'สาธารณะ'),
             current_clicks,
-            new_edit_count # <--- [NEW] บันทึกค่าใหม่ลงไป
+            new_edit_count,
+            is_pinned # <--- [FIXED] เพิ่มตัวแปรนี้เข้าไปใน Array แล้ว
         ]
         
         # อัปเดตช่วง A ถึง Q (Column 1 ถึง 17)
@@ -914,7 +933,8 @@ def update_link_action(link_id):
         flash(f'แก้ไขสำเร็จ (แก้ไขไปแล้ว {new_edit_count} ครั้ง)', 'success')
         return redirect(url_for('dashboard')) 
     except Exception as e: 
-        print(e)
+        print(f"Update Error: {e}")
+        flash('เกิดข้อผิดพลาดในการอัปเดตข้อมูล', 'error')
         return redirect(url_for('dashboard'))
         
 @app.route('/analytics')
