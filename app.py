@@ -1288,7 +1288,7 @@ def highlighted_links_page():
                                links=highlighted_links, 
                                error=None, 
                                session=session, 
-                               agency_name="📌 ลิงก์สำคัญเร่งด่วน (Highlighted)",
+                               agency_name="📌 ลิงก์สำคัญ (Highlighted)",
                                fav_ids=my_fav_ids,
                                bureaus=bureaus_list, 
                                districts=districts_list)
