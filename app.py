@@ -106,7 +106,7 @@ districts_list = [
 # [UPDATE] เพิ่ม "ความเป็นส่วนตัว" เข้าไปใน Headers (Index 13)
 DB_HEADERS = [
     "ID", "ประเภท", "หน่วยงาน", "ส่วนราชการ", "อีเมลผู้รับผิดชอบ", "เบอร์โทรติดต่อ",
-    "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "ความเป็นส่วนตัว", "Clicks", "EditCount"
+    "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "ความเป็นส่วนตัว", "Clicks", "EditCount", "ปักหมุด"
 ]
 
 STAFF_HEADERS = [
@@ -809,13 +809,19 @@ def add_link_action():
         main_agency = session.get('main_agency', 'N/A') 
         division = session.get('division', 'N/A')
         
+        # [NEW] เช็คว่า Admin ติ๊กเลือกปักหมุดหรือไม่
+        is_pinned = 'ไม่ปักหมุด'
+        if session.get('level') == 'Admin' and request.form.get('is_pinned'):
+            is_pinned = 'ปักหมุด'
+            
         new_row = [
             generate_new_id(), data['ประเภท'], division, main_agency, 
             data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
             data['URL'], data['สถานะ'], data['รายละเอียด'], 
             get_current_timestamp(), session.get('username'), '', 
             data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0, 
-            0 
+            0,
+            is_pinned 
         ]
         db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
         
@@ -899,8 +905,8 @@ def update_link_action(link_id):
             new_edit_count # <--- [NEW] บันทึกค่าใหม่ลงไป
         ]
         
-        # อัปเดตช่วง A ถึง P (Column 1 ถึง 16)
-        range_name = f"A{cell.row}:P{cell.row}" 
+        # อัปเดตช่วง A ถึง Q (Column 1 ถึง 17)
+        range_name = f"A{cell.row}:Q{cell.row}" 
         db_sheet.update(range_name, [new_vals])
         
         clear_db_cache()
@@ -1239,6 +1245,35 @@ def toggle_favorite():
     except Exception as e:
         print(f"Toggle Favorite Error: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
+        
+# ==========================================
+# [NEW] ระบบลิงก์สำคัญ (Highlighted Links)
+# ==========================================
+@app.route('/highlighted')
+def highlighted_links_page():
+    if db_sheet is None: 
+        return render_template('links_page.html', links=[], error="Sheet Error", session=session)
+    try:
+        all_records = get_db_records()
+        
+        # กรองเฉพาะลิงก์ที่ "ใช้งาน", มีสิทธิ์มองเห็น และถูกตั้งค่าว่า "ปักหมุด"
+        highlighted_links = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน' and check_link_permission(l, session) and l.get('ปักหมุด') == 'ปักหมุด']
+
+        my_fav_ids = []
+        if session.get('logged_in'):
+            my_fav_ids = get_user_favorite_ids(session.get('username'))
+
+        # เรียกใช้ links_page.html เดิม แต่ส่งข้อมูลและชื่อหน้าไปใหม่
+        return render_template('links_page.html', 
+                               links=highlighted_links, 
+                               error=None, 
+                               session=session, 
+                               agency_name="📌 ลิงก์สำคัญเร่งด่วน (Highlighted)",
+                               fav_ids=my_fav_ids,
+                               bureaus=bureaus_list, 
+                               districts=districts_list)
+    except Exception as e: 
+        return render_template('links_page.html', links=[], error=str(e), session=session, agency_name="Error")
         
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

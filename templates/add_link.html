@@ -273,6 +273,12 @@
                 {% endif %}
                 
                 <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                
+                <a href="{{ url_for('highlighted_links_page') }}" class="nav-link" title="ลิงก์สำคัญ" style="color: #e83e8c;">
+                    <i class="fas fa-bullhorn"></i> <span>ลิงก์สำคัญ</span>
+                </a>
+                
+                <a href="{{ url_for('my_favorites_page') }}" class="nav-link" title="My Favorites"><i class="fas fa-star" style="color: #ffc107;"></i> <span>My Favourite Links</span></a>
                 <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
                 <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
                 
@@ -296,6 +302,16 @@
         <h2>เพิ่มลิงก์ใหม่</h2>
 
         <form id="addLinkForm" action="{{ url_for('add_link_action') }}" method="POST">
+            
+            {% if session.get('level') == 'Admin' %}
+            <div style="background: #fff8e1; border-left: 4px solid #ffc107; padding: 15px; border-radius: 10px; display: flex; flex-direction: row; align-items: center; gap: 15px; margin-bottom: 10px;">
+                <input type="checkbox" id="is_pinned" name="is_pinned" value="ปักหมุด" style="width: 25px; height: 25px; cursor: pointer; margin: 0;">
+                <label for="is_pinned" style="color: #d35400; cursor: pointer; margin: 0; font-size: 1.1em;">
+                    <i class="fas fa-bullhorn"></i> ปักหมุดให้เป็น <strong>"ลิงก์สำคัญเร่งด่วน"</strong> (เฉพาะแอดมิน)
+                </label>
+            </div>
+            {% endif %}
+
             <div>
                 <label for="ชื่อลิงก์">ชื่อลิงก์ (จำเป็น)</label>
                 <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" placeholder="ระบุชื่อลิงก์ที่ต้องการ..." required>

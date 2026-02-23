@@ -334,7 +334,9 @@
                 {% endif %}
                 
                 <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
-                
+                <a href="{{ url_for('highlighted_links_page') }}" class="nav-link" title="ลิงก์สำคัญ" style="color: #e83e8c;">
+                    <i class="fas fa-bullhorn"></i> <span>ลิงก์สำคัญ</span>
+                </a>
                 <a href="{{ url_for('my_favorites_page') }}" class="nav-link" title="My Favorites">
                     <i class="fas fa-star" style="color: #ffc107;"></i> <span>My Favourite Links</span>
                 </a>
