@@ -1376,7 +1376,7 @@
 
         // URL Params
         const urlParams = new URLSearchParams(window.location.search);
-        const searchParam = urlParams.get('search') || urlParams.get('category') || '';
+        const searchParam = urlParams.get('search') || '';
         const agencyParam = urlParams.get('agency') || '';
         if (searchParam) searchInput.value = searchParam;
         if (agencyParam) agencyFilter.value = agencyParam;
