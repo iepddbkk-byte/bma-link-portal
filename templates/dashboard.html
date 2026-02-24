@@ -180,7 +180,7 @@
             box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
-            margin-bottom: 30px; /* Space between cards */
+            margin-bottom: 30px;
         }
 
         h2 {
@@ -192,7 +192,7 @@
             display: flex; align-items: center; gap: 12px;
         }
 
-        /* --- [NEW] Favorites Section Styles --- */
+        /* --- Favorites Section Styles --- */
         .fav-section { margin-bottom: 30px; }
         .grid-favs {
             display: grid;
@@ -249,17 +249,33 @@
         }
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
 
-        /* Table */
-        .table-responsive { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border-color); }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: var(--bma-green); color: white; padding: 15px; font-weight: 500; text-align: left; white-space: nowrap; }
+        /* =======================================
+           TABLE STYLING & SCROLL UX (UPDATED) 
+           ======================================= */
+        .table-responsive { 
+            overflow-x: auto; 
+            overflow-y: auto; 
+            max-height: 60vh; /* ล็อคความสูง เพื่อให้เลื่อนดูตารางได้ง่ายๆ */
+            border-radius: 12px; 
+            border: 1px solid var(--border-color); 
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th { 
+            background: var(--bma-green); color: white; padding: 15px; font-weight: 500; 
+            text-align: left; white-space: nowrap; 
+            position: sticky; top: 0; z-index: 10; /* ตรึงหัวตาราง */
+        }
+        th::after {
+            content: ''; position: absolute; left: 0; bottom: -1px; width: 100%;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
         td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; color: #555; }
         tr:last-child td { border-bottom: none; }
         tr:hover { background-color: #f8fff9; }
 
         /* Scrollbar */
-        .table-responsive::-webkit-scrollbar { height: 8px; }
-        .table-responsive::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        .table-responsive::-webkit-scrollbar { height: 10px; width: 10px;}
+        .table-responsive::-webkit-scrollbar-thumb { background: #ccc; border-radius: 5px; }
         .table-responsive::-webkit-scrollbar-thumb:hover { background: var(--bma-green); }
 
         /* Badges & Buttons */
@@ -268,6 +284,8 @@
         .status-error { background: #f8d7da; color: #721c24; }
         .status-blocked { background: #cce5ff; color: #004085; }
         .status-unknown { background: #e2e3e5; color: #383d41; }
+        
+        .pinned-badge { background: #fff3e0; color: #e65100; padding: 2px 6px; border-radius: 4px; font-size: 0.75em; margin-bottom: 5px; border: 1px solid #ffb74d; display: inline-block;}
         
         /* Privacy Badges */
         .privacy-badge {
@@ -296,7 +314,6 @@
         .btn-delete { background: var(--button-red); }
         .btn-icon:hover { transform: translateY(-2px); filter: brightness(0.95); }
 
-        /* [UPDATED] Button Group Style */
         .dashboard-actions {
             display: flex;
             gap: 15px;
@@ -365,7 +382,6 @@
             .mobile-controls { display: flex; }
             .mobile-toggle { display: block; }
             
-            /* [NEW] ซ่อนส่วนแสดงสถิติ (Online Count) ในมือถือ */
             .header-stats-group { display: none; }
 
             .nav-menu {
@@ -380,14 +396,12 @@
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; font-size: 1.1rem; }
             
-            /* Hide Profile Item inside menu (since it's on top) */
             .nav-link.profile-item { display: none; }
 
             .container { padding: 0 15px; margin: 20px auto; }
             .content-card { padding: 20px 15px; border-radius: 15px; }
             h2 { font-size: 1.4rem; }
             
-            /* ปรับปุ่มให้เต็มความกว้างในมือถือ */
             .dashboard-actions { flex-direction: column; gap: 10px; }
             .btn-add, .btn-view-all { width: 100%; justify-content: center; }
             
@@ -571,32 +585,38 @@
                     </thead>
                     <tbody id="linkTableBody">
                         {% for link in links %}
-                        <tr>
+                        <tr style="{% if link.get('ปักหมุด') == 'ปักหมุด' %}background-color: #fffdf5;{% endif %}">
                             <td>
-                                {% if link['สถานะ'] == 'ใช้งาน' %}
-                                    <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;">
-                                        <i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}
-                                    </a>
-                                {% else %}
-                                    <span style="color: #888;">{{ link['ชื่อลิงก์'] }}</span>
-                                {% endif %}
+                                <div style="display:flex; flex-direction:column; gap:5px;">
+                                    {% if link.get('ปักหมุด') == 'ปักหมุด' %}
+                                        <span class="pinned-badge" title="ลิงก์สำคัญ"><i class="fas fa-thumbtack"></i> ปักหมุด</span>
+                                    {% endif %}
+                                    
+                                    {% if link['สถานะ'] == 'ใช้งาน' %}
+                                        <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;">
+                                            <i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}
+                                        </a>
+                                    {% else %}
+                                        <span style="color: #888;">{{ link['ชื่อลิงก์'] }}</span>
+                                    {% endif %}
+                                </div>
                             </td>
                             <td>{{ link['รายละเอียด'] }}</td>
                             
-						<td style="text-align: center;">
-						{% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
-						{% if privacy == 'ส่วนตัว' %}
-							<span class="privacy-badge privacy-private" title="เห็นเฉพาะคุณ"><i class="fas fa-lock"></i> ส่วนตัว</span>
-						{% elif privacy == 'กลุ่มงาน/ฝ่าย' %}
-							<span class="privacy-badge privacy-div" title="เห็นเฉพาะในกลุ่มงาน/ฝ่ายเดียวกัน"><i class="fas fa-user-friends"></i> ฝ่าย</span>
-						{% elif privacy == 'กอง/สำนักงาน' %}
-							<span class="privacy-badge privacy-bureau" title="เห็นเฉพาะในกอง/สำนักงานเดียวกัน"><i class="fas fa-building"></i> กอง</span>
-						{% elif privacy == 'สยป.' %}
-							<span class="privacy-badge privacy-dept" title="เห็นเฉพาะเจ้าหน้าที่ สยป."><i class="fas fa-landmark"></i> สยป.</span>
-						{% else %}
-							<span class="privacy-badge privacy-public" title="ทุกคนมองเห็นได้"><i class="fas fa-globe"></i> สาธารณะ</span>
-						{% endif %}
-						</td>
+                        <td style="text-align: center;">
+                        {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
+                        {% if privacy == 'ส่วนตัว' %}
+                            <span class="privacy-badge privacy-private" title="เห็นเฉพาะคุณ"><i class="fas fa-lock"></i> ส่วนตัว</span>
+                        {% elif privacy == 'กลุ่มงาน/ฝ่าย' %}
+                            <span class="privacy-badge privacy-div" title="เห็นเฉพาะในกลุ่มงาน/ฝ่ายเดียวกัน"><i class="fas fa-user-friends"></i> ฝ่าย</span>
+                        {% elif privacy == 'กอง/สำนักงาน' %}
+                            <span class="privacy-badge privacy-bureau" title="เห็นเฉพาะในกอง/สำนักงานเดียวกัน"><i class="fas fa-building"></i> กอง</span>
+                        {% elif privacy == 'สยป.' %}
+                            <span class="privacy-badge privacy-dept" title="เห็นเฉพาะเจ้าหน้าที่ สยป."><i class="fas fa-landmark"></i> สยป.</span>
+                        {% else %}
+                            <span class="privacy-badge privacy-public" title="ทุกคนมองเห็นได้"><i class="fas fa-globe"></i> สาธารณะ</span>
+                        {% endif %}
+                        </td>
 
                             <td style="text-align: center;">
                                 {% if link['LinkStatus'] == 'OK' %}
