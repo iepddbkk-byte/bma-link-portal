@@ -98,15 +98,18 @@
         .profile-name { font-size: 1.8em; font-weight: 700; margin: 10px 0 5px; color: var(--text-color); }
         .profile-username { color: var(--button-gray); font-size: 1.1em; margin-bottom: 20px; font-weight: 300; }
         
+        /* [UPDATED] Badge Styles สำหรับ 3 ระดับ */
         .profile-badge { display: inline-block; padding: 6px 18px; border-radius: 30px; font-size: 0.9em; font-weight: 500; margin-bottom: 25px; }
-        .badge-admin { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-super-admin { background: #fff7ed; color: #ea580c; border: 1px solid #fdba74; }
+        .badge-admin { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
         .badge-user { background: var(--bma-green-light); color: var(--bma-green); border: 1px solid #c3e6cb; }
 
         .info-list { width: 100%; max-width: 650px; margin: 0 auto; text-align: left; }
-        .info-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
+        .info-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0; transition: background 0.2s; border-radius: 8px;}
+        .info-item:hover { background: #fdfdfd; padding-left: 10px; padding-right: 10px;}
         .info-item:last-child { border-bottom: none; }
         .info-label { font-weight: 500; color: #666; display: flex; align-items: center; gap: 10px; }
-        .info-label i { color: var(--bma-green); width: 20px; }
+        .info-label i { color: var(--bma-green); width: 20px; text-align: center; }
         .info-data { font-weight: 500; color: var(--text-color); text-align: right; }
 
         .stats-grid {
@@ -114,7 +117,7 @@
             width: 100%; margin-top: 30px; border-top: 1px solid #eee; padding-top: 30px;
         }
         .stat-item { padding: 20px; background-color: #f8f9fa; border-radius: 15px; border: 1px solid #eee; transition: 0.3s; }
-        .stat-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+        .stat-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); border-color: var(--bma-green-light); }
         .stat-value { font-size: 2em; font-weight: 700; color: var(--bma-green); line-height: 1; }
         .stat-label { color: #777; font-size: 0.9em; margin-top: 5px; }
 
@@ -123,7 +126,7 @@
             width: 100%; font-size: 1.05em; padding: 12px; border-radius: 10px;
             cursor: pointer; transition: 0.3s; margin-top: 30px;
         }
-        .btn-edit-profile:hover { background: #f8f9fa; border-color: #ccc; color: #333; }
+        .btn-edit-profile:hover { background: #f8f9fa; border-color: var(--bma-green); color: var(--bma-green); }
 
         .footer { text-align: center; margin-top: 40px; color: #888; font-size: 0.9em; }
 
@@ -156,7 +159,7 @@
 
             .profile-info { padding: 25px 20px; }
             .info-item { flex-direction: column; align-items: flex-start; gap: 5px; }
-            .info-data { text-align: left; }
+            .info-data { text-align: left; margin-left: 30px; } /* ขยับข้อมูลให้ตรงกับ icon ซ้ายมือ */
         }
     </style>
 </head>
@@ -184,8 +187,9 @@
             
             {% if session.get('logged_in') %}
                 {% if session.get('level') == 'Super Admin' %}
-                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
+                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#ea580c;"><i class="fas fa-crown"></i> <span>Admin</span></a>
                 {% endif %}
+                
                 <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
 				<a href="{{ url_for('links_page') }}" class="nav-link" title="ลิงก์ทั้งหมด" style="color: #007bff;">
                     <i class="fas fa-layer-group"></i> <span>ลิงก์ทั้งหมด</span>
@@ -216,8 +220,10 @@
                 <h1 class="profile-name">{{ user['ชื่อ'] }}</h1>
                 <p class="profile-username">@{{ user['Username'] }}</p>
                 
-                {% if user['Level'] == 'Admin' %}
-                    <span class="profile-badge badge-admin"><i class="fas fa-crown"></i> ผู้ดูแลระบบ (Admin)</span>
+                {% if user['Level'] == 'Super Admin' %}
+                    <span class="profile-badge badge-super-admin"><i class="fas fa-crown"></i> ผู้ดูแลระบบสูงสุด (Super Admin)</span>
+                {% elif user['Level'] == 'Admin' %}
+                    <span class="profile-badge badge-admin"><i class="fas fa-user-shield"></i> ผู้ดูแลระบบกอง (Admin)</span>
                 {% else %}
                     <span class="profile-badge badge-user"><i class="fas fa-user"></i> เจ้าหน้าที่ (User)</span>
                 {% endif %}
@@ -236,7 +242,7 @@
                         <span class="info-data">{{ user['ส่วนราชการ'] }}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label"><i class="fas fa-landmark"></i> ส่วนราชการ</span>
+                        <span class="info-label"><i class="fas fa-landmark"></i> สำนัก</span>
                         <span class="info-data">สำนักยุทธศาสตร์และประเมินผล</span>
                     </div>
                     <div class="info-item">
