@@ -692,7 +692,7 @@
     <nav class="nav-menu" id="navMenu">
         <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
         {% if session.get('logged_in') %}
-            {% if session.get('level') == 'Admin' %}
+            {% if session.get('level') == 'Super Admin' %}
             <a href="{{ url_for('admin_panel') }}" class="nav-link" style="color:#ea580c;"><i class="fas fa-crown"></i> <span>Admin</span></a>
             {% endif %}
             <a href="{{ url_for('dashboard') }}" class="nav-link active-nav"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
@@ -934,20 +934,18 @@
                                             title="แชร์">
                                         <i class="fas fa-share-alt"></i>
                                     </button>
-                                    {% if session.level == 'Admin' or (session.level == 'Users' and link['CreatorUsername'] == session.username) %}
-                                        <a href="{{ url_for('edit_link_page', link_id=link['ID']) }}"
-                                           class="btn-icon btn-edit" title="แก้ไข">
-                                            <i class="fas fa-pen"></i>
-                                        </a>
-                                        <form action="{{ url_for('delete_link_action', link_id=link['ID']) }}"
-                                              method="POST" class="delete-form" style="margin:0;">
-                                            <button type="submit" class="btn-icon btn-delete" title="ลบ">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    {% else %}
-                                        <span style="color:#cbd5e1; font-size:0.8rem;">—</span>
-                                    {% endif %}
+                                    {% if session.level == 'Super Admin' or (session.level == 'Admin' and link['ส่วนราชการ'] == session.main_agency) or (link['CreatorUsername'] == session.username) %}
+										<a href="{{ url_for('edit_link_page', link_id=link['ID']) }}" class="btn-icon btn-edit" title="แก้ไข">
+										<i class="fas fa-pen"></i>
+										</a>
+										<form action="{{ url_for('delete_link_action', link_id=link['ID']) }}" method="POST" class="delete-form" style="margin:0;">
+										<button type="submit" class="btn-icon btn-delete" title="ลบ">
+										<i class="fas fa-trash"></i>
+										</button>
+										</form>
+									{% else %}
+										<span style="color:#ccc; font-size:0.8rem;" class="mobile-hide-dash">-</span>
+									{% endif %}
                                 </div>
                             </td>
                         </tr>

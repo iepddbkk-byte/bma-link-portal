@@ -50,7 +50,7 @@ staff_sheet = None
 invite_sheet = None 
 feedback_sheet = None
 stats_sheet = None 
-favorites_sheet = None # [NEW] เพิ่มตัวแปรสำหรับ Favorites Sheet
+favorites_sheet = None
 
 try:
     json_creds = os.environ.get('GOOGLE_CREDENTIALS')
@@ -68,16 +68,11 @@ try:
     invite_sheet = spreadsheet.worksheet("InviteCodes")
     feedback_sheet = spreadsheet.worksheet("Feedback")
     
-    try:
-        stats_sheet = spreadsheet.worksheet("SiteStats")
-    except:
-        print("⚠️ Warning: SiteStats sheet not found.")
+    try: stats_sheet = spreadsheet.worksheet("SiteStats")
+    except: print("⚠️ Warning: SiteStats sheet not found.")
 
-    # [NEW] เชื่อมต่อกับ UserFavorites Sheet
-    try:
-        favorites_sheet = spreadsheet.worksheet("UserFavorites")
-    except:
-        print("⚠️ Warning: UserFavorites sheet not found. Please create a new tab named 'UserFavorites'.")
+    try: favorites_sheet = spreadsheet.worksheet("UserFavorites")
+    except: print("⚠️ Warning: UserFavorites sheet not found.")
 
     print("✅ เชื่อมต่อ Google Sheet ครบทุกแท็บสำเร็จ!")
 
@@ -103,7 +98,6 @@ districts_list = [
     "ฝ่ายบริหารงานทั่วไป (กยม.)", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านการศึกษา พัฒนาสังคม และสร้างสรรค์เมือง", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านสาธารณสุข"
 ]
 
-# [UPDATE] เพิ่ม "ความเป็นส่วนตัว" เข้าไปใน Headers (Index 13)
 DB_HEADERS = [
     "ID", "ประเภท", "หน่วยงาน", "ส่วนราชการ", "อีเมลผู้รับผิดชอบ", "เบอร์โทรติดต่อ",
     "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "ความเป็นส่วนตัว", "Clicks", "EditCount", "ปักหมุด", "วันที่สิ้นสุด"
@@ -121,18 +115,20 @@ CACHE_TIMEOUT = 15
 _app_cache = {
     'db_records': {'data': None, 'time': None},
     'staff_records': {'data': None, 'time': None},
-    'invite_codes': {'data': None, 'time': None} # [เพิ่ม] เพิ่ม Cache สำหรับ Invite Code
+    'invite_codes': {'data': None, 'time': None}
 }
 
 def clear_db_cache():
     global _app_cache
     _app_cache['db_records'] = {'data': None, 'time': None}
-    print("🧹 DB Cache Cleared")
 
 def clear_staff_cache():
     global _app_cache
     _app_cache['staff_records'] = {'data': None, 'time': None}
-    print("🧹 Staff Cache Cleared")
+
+def clear_invite_cache():
+    global _app_cache
+    _app_cache['invite_codes'] = {'data': None, 'time': None}
 
 # --- 4. ฟังก์ชันตัวช่วย ---
 def generate_new_id():
@@ -148,99 +144,57 @@ def generate_invite_code():
 
 def records_to_dict(records_list, headers):
     records_dict = []
-    if not records_list or len(records_list) < 2:
-        return []
-        
+    if not records_list or len(records_list) < 2: return []
     for row in records_list[1:]:
         if row and len(row) > 0 and row[0].strip(): 
             record = {}
             for i, header in enumerate(headers):
-                if i < len(row):
-                    value = row[i]
-                    if isinstance(value, str):
-                        record[header] = value.strip()
-                    else:
-                        record[header] = value
-                else:
-                    record[header] = "" 
+                record[header] = row[i].strip() if i < len(row) and isinstance(row[i], str) else row[i] if i < len(row) else ""
             records_dict.append(record)
     return records_dict
 
 def get_db_records(force_refresh=False):
     global _app_cache
     if db_sheet is None: return []
-
     now = datetime.datetime.now()
     cache = _app_cache['db_records']
-
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
-        if (now - cache['time']).total_seconds() < CACHE_TIMEOUT:
-            return cache['data']
-
+        if (now - cache['time']).total_seconds() < CACHE_TIMEOUT: return cache['data']
     try:
-        print("zzz Fetching DB from Google Sheets... (API Call)")
-        all_values = db_sheet.get_all_values()
-        data = records_to_dict(all_values, DB_HEADERS)
-        
+        data = records_to_dict(db_sheet.get_all_values(), DB_HEADERS)
         cache['data'] = data
         cache['time'] = now
         return data
-    except Exception as e:
-        print(f"❌ Error fetching DB: {e}")
-        return []
+    except: return []
 
 def get_staff_records(force_refresh=False):
     global _app_cache
     if staff_sheet is None: return []
-
     now = datetime.datetime.now()
     cache = _app_cache['staff_records']
-
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
-        if (now - cache['time']).total_seconds() < CACHE_TIMEOUT:
-            return cache['data']
-
+        if (now - cache['time']).total_seconds() < CACHE_TIMEOUT: return cache['data']
     try:
-        print("zzz Fetching Staff from Google Sheets... (API Call)")
-        all_values = staff_sheet.get_all_values()
-        data = records_to_dict(all_values, STAFF_HEADERS)
-        
+        data = records_to_dict(staff_sheet.get_all_values(), STAFF_HEADERS)
         cache['data'] = data
         cache['time'] = now
         return data
-    except Exception as e:
-        print(f"❌ Error fetching Staff: {e}")
-        return []
+    except: return []
         
 def get_invite_codes(force_refresh=False):
     global _app_cache
     if invite_sheet is None: return []
-
     now = datetime.datetime.now()
     cache = _app_cache['invite_codes']
-
-    # ถ้ามีข้อมูลใน Cache และยังไม่หมดเวลา ให้ใช้ของเดิม
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
-        if (now - cache['time']).total_seconds() < CACHE_TIMEOUT:
-            return cache['data']
-
+        if (now - cache['time']).total_seconds() < CACHE_TIMEOUT: return cache['data']
     try:
-        print("zzz Fetching Invite Codes... (API Call)")
-        # ใช้ get_all_records เพื่อให้ได้ list of dicts เลย
         data = invite_sheet.get_all_records()
-        
         cache['data'] = data
         cache['time'] = now
         return data
-    except Exception as e:
-        print(f"❌ Error fetching Invite Codes: {e}")
-        return []
+    except: return []
 
-def clear_invite_cache():
-    global _app_cache
-    _app_cache['invite_codes'] = {'data': None, 'time': None}
-    print("🧹 Invite Cache Cleared")
-    
 def send_reset_email(username, recipient_email):
     try:
         token = s.dumps(username, salt='password-reset-salt')
@@ -249,66 +203,51 @@ def send_reset_email(username, recipient_email):
         msg.body = f"""สวัสดีครับ,\nเราได้รับคำขอรีเซ็ตรหัสผ่านสำหรับ Username: {username}\nคลิกลิงก์เพื่อตั้งรหัสผ่านใหม่: {reset_url}\n(ลิงก์หมดอายุใน 1 ชั่วโมง)"""
         mail.send(msg)
         return True
-    except Exception as e:
-        print(f"Mail Error: {e}")
-        return False
+    except: return False
 
 def increment_site_views():
     if stats_sheet:
         try:
             current_views = int(stats_sheet.cell(1, 2).value or 0)
             stats_sheet.update_cell(1, 2, current_views + 1)
-        except Exception as e:
-            print(f"Error incrementing views: {e}")
+        except: pass
 
-# [NEW] ฟังก์ชันตรวจสอบสิทธิ์การเข้าถึงลิงก์
-# [NEW] ฟังก์ชันตรวจสอบสิทธิ์การเข้าถึงลิงก์ (ปรับปรุงใหม่ 5 ระดับ)
+# =======================================================
+# [UPDATED] สิทธิ์การเข้าถึงลิงก์ (รองรับ 3 Role)
+# =======================================================
 def check_link_permission(link, user_session):
-    privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') # Default เป็นสาธารณะ
-    
-    # 1. สาธารณะ (ใครก็เห็นได้)
-    if privacy == 'สาธารณะ' or not privacy:
-        return True
-        
-    # กรณีอื่นๆ ต้อง Login ก่อน (ถ้าไม่ได้ล็อกอิน จะไม่เห็นเลย)
-    if not user_session.get('logged_in'):
-        return False
+    privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ')
+    if privacy == 'สาธารณะ' or not privacy: return True
+    if not user_session.get('logged_in'): return False
         
     user_role = user_session.get('level', '')
     username = user_session.get('username', '')
-    user_bureau = user_session.get('main_agency', '')  # กอง/สำนักงาน
-    user_division = user_session.get('division', '')   # กลุ่มงาน/ฝ่าย
+    user_bureau = user_session.get('main_agency', '')
+    user_division = user_session.get('division', '')
     
-    # Admin เห็นทุกอย่าง
-    if user_role == 'Admin':
-        return True
+    # 1. Super Admin เห็นทุกลิงก์ในระบบ
+    if user_role == 'Super Admin': return True
         
     link_creator = link.get('CreatorUsername')
     link_bureau = link.get('ส่วนราชการ')
     link_division = link.get('หน่วยงาน')
 
-    # 2. สยป. (ทุกคนที่ล็อกอินเข้ามาในฐานะเจ้าหน้าที่จะมองเห็น)
-    if privacy == 'สยป.':
+    # 2. Admin (กอง) เห็นทุกลิงก์ในกองของตัวเอง แม้คนสร้างจะตั้งค่าส่วนตัว
+    if user_role == 'Admin' and link_bureau == user_bureau:
         return True
-        
-    # 3. กอง/สำนักงาน (เห็นเฉพาะคนที่อยู่ กอง เดียวกัน)
-    if privacy == 'กอง/สำนักงาน':
-        return link_bureau == user_bureau
-        
-    # 4. กลุ่มงาน/ฝ่าย (เห็นเฉพาะคนที่อยู่ ฝ่าย และ กอง เดียวกัน)
-    if privacy == 'กลุ่มงาน/ฝ่าย':
-        return link_division == user_division and link_bureau == user_bureau
-        
-    # 5. ส่วนตัว (เห็นเฉพาะตัวเอง/คนสร้างลิงก์)
-    if privacy == 'ส่วนตัว':
-        return link_creator == username
+
+    # 3. User ทั่วไป (และ Admin ที่ดูลิงก์กองอื่น) เช็คตาม Privacy
+    if privacy == 'สยป.': return True
+    if privacy == 'กอง/สำนักงาน': return link_bureau == user_bureau
+    if privacy == 'กลุ่มงาน/ฝ่าย': return link_division == user_division and link_bureau == user_bureau
+    if privacy == 'ส่วนตัว': return link_creator == username
         
     return False
 
 # --- 5. API ---
 @app.route('/check_username', methods=['POST'])
 def check_username():
-    if staff_sheet is None: return jsonify({'available': False, 'message': 'DB Error'})
+    if staff_sheet is None: return jsonify({'available': False})
     try:
         data = request.get_json()
         username = data.get('username')
@@ -321,7 +260,7 @@ def check_username():
 
 @app.route('/check_invite_code', methods=['POST'])
 def check_invite_code():
-    if invite_sheet is None: return jsonify({'available': False, 'message': 'DB Error'})
+    if invite_sheet is None: return jsonify({'available': False})
     try:
         data = request.get_json()
         code = data.get('invite_code')
@@ -330,7 +269,7 @@ def check_invite_code():
         status = invite_sheet.cell(cell.row, 2).value 
         if status == 'Available': return jsonify({'available': True, 'message': 'รหัสถูกต้อง'})
         else: return jsonify({'available': False, 'message': 'ถูกใช้งานแล้ว'})
-    except: return jsonify({'available': False, 'message': 'Server Error'})
+    except: return jsonify({'available': False})
 
 @app.route('/run_link_checker')
 def run_link_checker():
@@ -352,17 +291,14 @@ def run_link_checker():
                     status_msg = "OK" if 200 <= resp.status_code < 300 or resp.status_code == 403 else f"{resp.status_code} Error"
                 except:
                     status_msg = "Error/Timeout"
-            # อัปเดตที่คอลัมน์ M (LinkStatus)
             updates.append({'range': f'M{row_index}', 'values': [[status_msg]]})
         if updates:
             db_sheet.batch_update(updates, value_input_option='RAW')
             clear_db_cache()
             return jsonify({'status': 'success', 'message': f'Checked {len(updates)} links'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-    return jsonify({'status': 'success', 'message': 'No links checked'})
+    except Exception as e: return jsonify({'status': 'error', 'message': str(e)}), 500
+    return jsonify({'status': 'success'})
 
-# --- QR CODE ---
 @app.route('/generate_qr')
 def generate_qr_code():
     url_to_encode = request.args.get('url')
@@ -386,8 +322,7 @@ def generate_qr_code():
         img.save(img_io, 'PNG')
         img_io.seek(0)
         return send_file(img_io, mimetype='image/png', as_attachment=False)
-    except Exception as e:
-        return f"QR Generation Error: {e}", 500
+    except Exception as e: return f"QR Generation Error: {e}", 500
 
 @app.route('/go/<link_id>')
 def go_to_link(link_id):
@@ -396,34 +331,26 @@ def go_to_link(link_id):
         if cell:
             row_values = db_sheet.row_values(cell.row)
             target_url = row_values[7] 
-            
             def update_click_count(row_num):
                 try:
-                    # [UPDATE] Clicks ขยับไปเป็นคอลัมน์ที่ 15 (O) เพราะเพิ่ม Privacy เข้ามาแทรก
                     current_clicks = db_sheet.cell(row_num, 15).value
                     if not current_clicks: current_clicks = 0
                     db_sheet.update_cell(row_num, 15, int(current_clicks) + 1)
                 except: pass
             Thread(target=update_click_count, args=(cell.row,)).start()
-
             if target_url: return redirect(target_url)
         return render_template('error.html', message="ไม่พบลิงก์ที่คุณค้นหา หรือลิงก์ถูกลบไปแล้ว") 
-    except Exception as e:
-        print(f"[ERROR] Go-to-link error: {e}")
-        return render_template('error.html', message="เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล") 
+    except: return render_template('error.html', message="เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล") 
 
 # --- 6. Routes (General) ---
 @app.route('/')
 def home():
-    if db_sheet is None: 
-        return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=[], error="Sheet Error")
+    if db_sheet is None: return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=[], error="Sheet Error")
     try:
         if not session.get('visited_home'):
             Thread(target=increment_site_views).start()
             session['visited_home'] = True
-        
-        if not session.get('visitor_id'):
-            session['visitor_id'] = str(uuid.uuid4())
+        if not session.get('visitor_id'): session['visitor_id'] = str(uuid.uuid4())
 
         total_views = 0
         if stats_sheet:
@@ -431,8 +358,6 @@ def home():
             except: pass
 
         all_records = get_db_records()
-        
-        # [UPDATE] กรองลิงก์ตามสิทธิ์การเข้าถึง (Privacy)
         visible_links = [link for link in all_records if link.get('สถานะ') == 'ใช้งาน' and check_link_permission(link, session)]
         
         for l in visible_links:
@@ -445,142 +370,67 @@ def home():
             date_str = link.get('วันที่อัปเดต')
             link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
 
-        return render_template('index.html', 
-                               session=session,
-                               bureaus=bureaus_list,
-                               districts=districts_list,
-                               links=visible_links, 
-                               top_links=top_5_links, 
-                               total_views=total_views, 
-                               error=None)
-    except Exception as e: 
-        return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=[], error=str(e))
+        return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=visible_links, top_links=top_5_links, total_views=total_views, error=None)
+    except Exception as e: return render_template('index.html', session=session, error=str(e))
 
 @app.route('/links')
 def links_page():
-    if db_sheet is None: 
-        return render_template('links_page.html', links=[], error="Sheet Error", session=session, agency_name="Error")
+    if db_sheet is None: return render_template('links_page.html', links=[], error="Sheet Error", session=session)
     try:
-        if not session.get('visitor_id'):
-            session['visitor_id'] = str(uuid.uuid4())
+        if not session.get('visitor_id'): session['visitor_id'] = str(uuid.uuid4())
 
-        # รับค่าจาก URL Parameters
         search_query = request.args.get('search', '').lower()
         agency_filter = request.args.get('agency') 
         category_filter = request.args.get('category')
         all_records = get_db_records()
         
-        # 1. กรองลิงก์ที่ "ใช้งาน" และ "มีสิทธิ์เข้าถึง (Privacy)"
         valid_links = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน' and check_link_permission(l, session)]
 
         links_to_display = []
         for l in valid_links:
-            # กรองตามคำค้นหา (ถ้ามี)
-            if search_query:
-                if search_query not in l.get('ชื่อลิงก์', '').lower() and \
-                   search_query not in l.get('รายละเอียด', '').lower() and \
-                   search_query not in l.get('หน่วยงาน', '').lower():
-                    continue
-            
-            # กรองตามหน่วยงาน (เช็คทั้งระดับ กอง/สำนักงาน และ กลุ่มงาน/ฝ่าย)
-            if agency_filter and agency_filter not in (l.get('ส่วนราชการ', ''), l.get('หน่วยงาน', '')):
-                continue
-                
-            # กรองตามประเภท (ถ้ามี)
-            if category_filter and category_filter != l.get('ประเภท', ''):
-                continue
-                
+            if search_query and search_query not in l.get('ชื่อลิงก์', '').lower() and search_query not in l.get('รายละเอียด', '').lower() and search_query not in l.get('หน่วยงาน', '').lower(): continue
+            if agency_filter and agency_filter not in (l.get('ส่วนราชการ', ''), l.get('หน่วยงาน', '')): continue
+            if category_filter and category_filter != l.get('ประเภท', ''): continue
             links_to_display.append(l)
 
-        # กำหนดชื่อหัวข้อของหน้าเว็บ
-        if agency_filter:
-            page_title = agency_filter
-        elif category_filter:
-            page_title = category_filter
-        elif search_query:
-            page_title = f"ผลการค้นหา: '{request.args.get('search')}'"
-        else:
-            page_title = "รายชื่อลิงก์ทั้งหมด"
+        if agency_filter: page_title = agency_filter
+        elif category_filter: page_title = category_filter
+        elif search_query: page_title = f"ผลการค้นหา: '{request.args.get('search')}'"
+        else: page_title = "รายชื่อลิงก์ทั้งหมด"
             
-        # ========================================================
-        # [NEW LOGIC] แยกกลุ่มลิงก์ปักหมุด และลิงก์ธรรมดา
-        # ========================================================
-        pinned_links = []
-        unpinned_links = []
-        
+        pinned_links, unpinned_links = [], []
         for link in links_to_display:
-            # สร้างตัวแปรวันที่แบบสั้น
             date_str = link.get('วันที่อัปเดต')
             link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
-            
-            # คัดแยกกลุ่ม
-            if link.get('ปักหมุด') == 'ปักหมุด':
-                pinned_links.append(link)
-            else:
-                unpinned_links.append(link)
+            if link.get('ปักหมุด') == 'ปักหมุด': pinned_links.append(link)
+            else: unpinned_links.append(link)
                 
-        # เรียงลำดับข้อมูลในแต่ละกลุ่ม โดยใช้วันที่อัปเดตล่าสุด (จากใหม่สุด ไป เก่าสุด)
         pinned_links.sort(key=lambda x: x.get('วันที่อัปเดต', ''), reverse=True)
         unpinned_links.sort(key=lambda x: x.get('วันที่อัปเดต', ''), reverse=True)
-        
-        # นำลิงก์ปักหมุดมาต่อไว้ "ด้านบนสุด" ของลิงก์ธรรมดา
         final_links = pinned_links + unpinned_links
-        # ========================================================
 
-        # ดึงรายการ ID ที่ผู้ใช้กด Favorite ไว้ (เพื่อไปแสดงสถานะปุ่มดาว)
-        my_fav_ids = []
-        if session.get('logged_in'):
-            my_fav_ids = get_user_favorite_ids(session.get('username'))
+        my_fav_ids = get_user_favorite_ids(session.get('username')) if session.get('logged_in') else []
 
-        return render_template('links_page.html', 
-                               links=final_links, 
-                               error=None, 
-                               session=session, 
-                               agency_name=page_title,
-                               fav_ids=my_fav_ids,
-                               bureaus=bureaus_list, 
-                               districts=districts_list)
-    except Exception as e: 
-        print(f"Error in links_page: {e}")
-        return render_template('links_page.html', links=[], error=str(e), session=session, agency_name="Error")
+        return render_template('links_page.html', links=final_links, session=session, agency_name=page_title, fav_ids=my_fav_ids, bureaus=bureaus_list, districts=districts_list)
+    except Exception as e: return render_template('links_page.html', links=[], error=str(e), session=session)
         
 @app.route('/my_favorites')
 def my_favorites_page():
-    # 1. บังคับ Login
-    if not session.get('logged_in'): 
-        return redirect(url_for('login_page'))
-    
-    if db_sheet is None: 
-        return render_template('favorites.html', links=[], error="Database Error", session=session)
-
+    if not session.get('logged_in'): return redirect(url_for('login_page'))
+    if db_sheet is None: return render_template('favorites.html', links=[], session=session)
     try:
-        # 2. ดึงข้อมูลทั้งหมด
         all_links = get_db_records()
-        
-        # 3. ดึง ID รายการโปรดของผู้ใช้
         my_fav_ids = get_user_favorite_ids(session.get('username'))
         
-        # 4. กรองเฉพาะลิงก์ที่เป็น Favorite และสถานะใช้งานได้ (และ User มีสิทธิ์เห็น)
         fav_links = []
         for l in all_links:
             if l.get('ID') in my_fav_ids and l.get('สถานะ') == 'ใช้งาน' and check_link_permission(l, session):
-                # จัดการวันที่ให้สวยงาม
                 date_str = l.get('วันที่อัปเดต')
                 l['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
                 fav_links.append(l)
 
-        # ส่งข้อมูลไปที่หน้า favorites.html
-        return render_template('favorites.html', 
-                               links=fav_links, 
-                               session=session,
-                               fav_ids=my_fav_ids, # ส่งไปเพื่อแสดงปุ่มดาวสีเหลือง
-                               bureaus=bureaus_list, 
-                               districts=districts_list)
-                               
-    except Exception as e:
-        print(f"Favorites Page Error: {e}")
-        return redirect(url_for('dashboard'))
-        
+        return render_template('favorites.html', links=fav_links, session=session, fav_ids=my_fav_ids, bureaus=bureaus_list, districts=districts_list)
+    except: return redirect(url_for('dashboard'))
 
 # --- 7. Routes (Auth) ---
 @app.route('/login')
@@ -604,15 +454,13 @@ def login_action():
             session['name'] = user_found['ชื่อ']
             session['email'] = user_found['Email']
             session['main_agency'] = user_found.get('ส่วนราชการ', 'N/A') 
-            session['division'] = user_found.get('หน่วยงาน', 'N/A') # <--- [เพิ่มบรรทัดนี้] จำค่ากลุ่มงาน
+            session['division'] = user_found.get('หน่วยงาน', 'N/A')
             flash('เข้าสู่ระบบสำเร็จ!', 'success') 
             return redirect(url_for('dashboard'))
         else:
             flash('Username หรือ รหัสผ่าน ไม่ถูกต้อง', 'error')
             return redirect(url_for('login_page'))
-    except Exception as e:
-        flash(f'Error: {e}', 'error')
-        return redirect(url_for('login_page'))
+    except Exception as e: return redirect(url_for('login_page'))
 
 @app.route('/logout')
 def logout():
@@ -651,9 +499,8 @@ def register_action():
         hashed_password = generate_password_hash(password)
         current_time = get_current_timestamp()
         
-        new_row_final = [username, hashed_password, 'Users', fullname, position, division, main_agency, phone, email, current_time, current_time]
-        staff_sheet.append_row(new_row_final, value_input_option='USER_ENTERED')
-        
+        new_row = [username, hashed_password, 'Users', fullname, position, division, main_agency, phone, email, current_time, current_time]
+        staff_sheet.append_row(new_row, value_input_option='USER_ENTERED')
         clear_staff_cache()
         
         invite_sheet.update_cell(code_cell.row, 2, "Used")
@@ -662,10 +509,7 @@ def register_action():
         
         flash('สมัครสมาชิกสำเร็จ!', 'success')
         return redirect(url_for('login_page')) 
-    except Exception as e:
-        print(f"Register Error: {e}")
-        flash('เกิดข้อผิดพลาด', 'error')
-        return redirect(url_for('register_page'))
+    except: flash('เกิดข้อผิดพลาด', 'error'); return redirect(url_for('register_page'))
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -677,9 +521,7 @@ def forgot_password():
             if user_found: send_reset_email(user_found['Username'], user_found['Email'])
             flash('หากพบข้อมูล ระบบได้ส่งอีเมลไปแล้ว', 'info')
             return redirect(url_for('login_page'))
-        except Exception as e:
-            flash('Error sending email', 'error')
-            return redirect(url_for('forgot_password'))
+        except: return redirect(url_for('forgot_password'))
     return render_template('forgot_password.html')
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
@@ -690,17 +532,14 @@ def reset_password_page(token):
     if request.method == 'POST':
         password = request.form.get('password')
         confirm = request.form.get('confirm_password')
-        if password != confirm:
-            flash('รหัสผ่านไม่ตรงกัน', 'error'); return render_template('reset_password.html', token=token)
+        if password != confirm: flash('รหัสผ่านไม่ตรงกัน', 'error'); return render_template('reset_password.html', token=token)
         try:
             new_hash = generate_password_hash(password)
             cell = staff_sheet.find(username)
             if cell:
                 staff_sheet.update_cell(cell.row, 2, new_hash) 
                 staff_sheet.update_cell(cell.row, 11, get_current_timestamp())
-                
                 clear_staff_cache()
-                
                 flash('เปลี่ยนรหัสผ่านสำเร็จ', 'success')
                 return redirect(url_for('login_page'))
         except: flash('Error updating password', 'error')
@@ -761,36 +600,40 @@ def edit_profile_action():
             session['name'] = fullname
             session['email'] = email
             session['main_agency'] = main_agency
-            session['division'] = division # <--- [เพิ่มบรรทัดนี้] อัปเดตกลุ่มงาน
+            session['division'] = division
             flash('บันทึกเรียบร้อย', 'success')
             return redirect(url_for('profile_page'))
-    except Exception as e:
-        flash(f'Error: {e}', 'error')
-        return redirect(url_for('edit_profile_page'))
+    except Exception as e: return redirect(url_for('edit_profile_page'))
 
-# --- 9. Routes (Dashboard & Links) ---
+# --- 9. Routes (Dashboard & Links Management) ---
+
+# =======================================================
+# [UPDATED] การดึงข้อมูลใน Dashboard (รองรับ 3 Role)
+# =======================================================
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     if db_sheet is None: return render_template('dashboard.html', session=session, links=[])
     try: 
-        if not session.get('visitor_id'):
-            session['visitor_id'] = str(uuid.uuid4())
+        if not session.get('visitor_id'): session['visitor_id'] = str(uuid.uuid4())
 
         all_links = get_db_records()
-        
-        # [NEW] ดึงรายการ ID ที่ผู้ใช้กด Favorite ไว้
         my_fav_ids = get_user_favorite_ids(session.get('username'))
         
-        # Admin เห็นทั้งหมด, User เห็นเฉพาะของตัวเอง
-        user_links = []
-        if session.get('level') == 'Admin':
-            user_links = all_links
-        else:
-            user_links = [l for l in all_links if l.get('CreatorUsername') == session.get('username')]
+        user_role = session.get('level', '')
+        user_bureau = session.get('main_agency', '')
+        username = session.get('username', '')
         
-        # [NEW] กรองเฉพาะรายการโปรด (Link ID ต้องอยู่ใน my_fav_ids และสถานะต้องใช้งานได้)
-        # ใช้ list comprehension เพื่อสร้างลิสต์ object ของลิงก์โปรด
+        user_links = []
+        if user_role == 'Super Admin':
+            user_links = all_links
+        elif user_role == 'Admin':
+            # Admin เห็นและจัดการลิงก์ทุกอันใน 'ส่วนราชการ' (กอง/สำนัก) ของตนเอง
+            user_links = [l for l in all_links if l.get('ส่วนราชการ') == user_bureau]
+        else:
+            # User ทั่วไป เห็นเฉพาะที่ตัวเองสร้าง
+            user_links = [l for l in all_links if l.get('CreatorUsername') == username]
+        
         favorite_links_obj = [l for l in all_links if l.get('ID') in my_fav_ids and l.get('สถานะ') == 'ใช้งาน']
 
         for l in user_links:
@@ -807,56 +650,37 @@ def dashboard():
             except: pass
             
         chart_data = {
-            "total_views": total_views,
-            "top_10_links": top_10,
-            "total_links": len(user_links),
+            "total_views": total_views, "top_10_links": top_10, "total_links": len(user_links),
             "active_links": sum(1 for l in user_links if l.get('สถานะ') == 'ใช้งาน'),
             "total_users": len(get_staff_records()) 
         }
 
-        return render_template('dashboard.html', 
-                               session=session, 
-                               links=user_links, 
-                               favorite_links=favorite_links_obj, # [NEW] ส่งรายการโปรด
-                               fav_ids=my_fav_ids, # [NEW] ส่ง ID เพื่อเช็คสถานะปุ่มดาว
-                               bureaus=bureaus_list, 
-                               districts=districts_list,
-                               chart_data=chart_data,
-                               total_views=total_views,
-                               top_10_links=top_10)  
-    except Exception as e: 
-        print(f"Dashboard Error: {e}")
-        return redirect(url_for('home'))
+        return render_template('dashboard.html', session=session, links=user_links, favorite_links=favorite_links_obj, fav_ids=my_fav_ids, bureaus=bureaus_list, districts=districts_list, chart_data=chart_data, total_views=total_views, top_10_links=top_10)  
+    except Exception as e: return redirect(url_for('home'))
 
 @app.route('/add')
 def add_link_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
-    
-    # ดึงค่าทั้ง 2 ระดับจาก Session
     user_main_agency = session.get('main_agency', 'N/A')
     user_division = session.get('division', 'N/A')
-    
-    # ส่งค่าไปยังหน้า HTML
     return render_template('add_link.html', session=session, locked_agency=user_main_agency, locked_division=user_division)
 
 @app.route('/add_action', methods=['POST'])
 def add_link_action():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        # นำ 'หน่วยงาน' ออกจากการรับค่าผ่านฟอร์ม
         data = {k: request.form.get(k) for k in ['ประเภท', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'รายละเอียด', 'สถานะ', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         
-        # บังคับดึงข้อมูลสังกัดจาก Session ของผู้ใช้โดยตรง ป้องกันการปลอมแปลงค่า
         main_agency = session.get('main_agency', 'N/A') 
         division = session.get('division', 'N/A')
         
-        # [NEW] เช็คว่า Admin ติ๊กเลือกปักหมุดและกำหนดเวลาหรือไม่
         is_pinned = 'ไม่ปักหมุด'
         end_date = ''
-        if session.get('level', '').strip() == 'Admin':
-            if request.form.get('is_pinned'):
-                is_pinned = 'ปักหมุด'
+        
+        # [UPDATED] สิทธิ์การปักหมุดสำหรับ Super Admin และ Admin
+        if session.get('level', '').strip() in ['Super Admin', 'Admin']:
+            if request.form.get('is_pinned'): is_pinned = 'ปักหมุด'
             end_date = request.form.get('end_date', '')
             
         new_row = [
@@ -864,21 +688,17 @@ def add_link_action():
             data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
             data['URL'], data['สถานะ'], data['รายละเอียด'], 
             get_current_timestamp(), session.get('username'), '', 
-            data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0, 
-            0,
-            is_pinned,
-            end_date # <--- [NEW] บันทึกวันที่สิ้นสุด คอลัมน์ที่ 18 (R)
+            data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0, 0, is_pinned, end_date
         ]
         db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
-        
         clear_db_cache()
-
         flash('เพิ่มลิงก์สำเร็จ', 'success')
         return redirect(url_for('links_page'))
-    except Exception as e: 
-        flash(f'Error: {e}', 'error')
-        return redirect(url_for('add_link_page'))
+    except Exception as e: return redirect(url_for('add_link_page'))
 
+# =======================================================
+# [UPDATED] สิทธิ์การลบลิงก์ (รองรับ 3 Role)
+# =======================================================
 @app.route('/delete/<link_id>', methods=['POST'])
 def delete_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
@@ -886,17 +706,35 @@ def delete_link_action(link_id):
         cell = db_sheet.find(link_id)
         if not cell: return redirect(url_for('dashboard'))
         row_data = db_sheet.row_values(cell.row)
+        
         creator = row_data[11].strip() 
-        if session.get('level', '').strip() == 'Admin' or creator.strip() == session.get('username', '').strip():
+        link_bureau = row_data[3].strip() if len(row_data) > 3 else ''
+        
+        user_role = session.get('level', '').strip()
+        username = session.get('username', '').strip()
+        user_bureau = session.get('main_agency', '').strip()
+
+        can_delete = False
+        if user_role == 'Super Admin':
+            can_delete = True
+        elif user_role == 'Admin' and link_bureau == user_bureau:
+            can_delete = True
+        elif creator == username:
+            can_delete = True
+
+        if can_delete:
             db_sheet.delete_rows(cell.row)
             clear_db_cache()
             flash('ลบสำเร็จ', 'success')
         else:
             flash('ไม่มีสิทธิ์', 'error')
+            
         return redirect(url_for('dashboard'))
-    except: 
-        return redirect(url_for('dashboard'))
+    except: return redirect(url_for('dashboard'))
 
+# =======================================================
+# [UPDATED] สิทธิ์การหน้าแก้ไขลิงก์ (รองรับ 3 Role)
+# =======================================================
 @app.route('/edit/<link_id>')
 def edit_link_page(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
@@ -908,17 +746,35 @@ def edit_link_page(link_id):
             return redirect(url_for('dashboard'))
             
         creator = link.get('CreatorUsername', '').strip()
-        username = session.get('username', '').strip()
-        is_admin = (session.get('level', '').strip() == 'Admin')
+        link_bureau = link.get('ส่วนราชการ', '').strip()
         
-        if not is_admin and creator != username:
+        user_role = session.get('level', '').strip()
+        username = session.get('username', '').strip()
+        user_bureau = session.get('main_agency', '').strip()
+        
+        can_edit = False
+        is_super_admin = (user_role == 'Super Admin')
+
+        if is_super_admin:
+            can_edit = True
+        elif user_role == 'Admin' and link_bureau == user_bureau:
+            can_edit = True
+        elif creator == username:
+            can_edit = True
+        
+        if not can_edit:
             flash('คุณไม่มีสิทธิ์แก้ไขลิงก์นี้', 'error')
             return redirect(url_for('dashboard'))
             
-        return render_template('edit_link.html', session=session, link=link, locked_agency=link.get('ส่วนราชการ', 'N/A'), is_admin=is_admin)
-    except Exception as e: 
-        return redirect(url_for('dashboard'))
+        # ทั้ง Super Admin และ Admin สามารถ ปักหมุด+แก้ไขเวลา ได้
+        can_pin = (user_role in ['Super Admin', 'Admin'])
+            
+        return render_template('edit_link.html', session=session, link=link, locked_agency=link.get('ส่วนราชการ', 'N/A'), is_super_admin=is_super_admin, can_pin=can_pin)
+    except Exception as e: return redirect(url_for('dashboard'))
 
+# =======================================================
+# [UPDATED] สิทธิ์การบันทึกแก้ไขลิงก์ (รองรับ 3 Role)
+# =======================================================
 @app.route('/update_action/<link_id>', methods=['POST'])
 def update_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
@@ -928,36 +784,40 @@ def update_link_action(link_id):
         row_vals = db_sheet.row_values(cell.row)
         
         creator = row_vals[11].strip()
-        user_level = session.get('level', '').strip()
+        link_bureau = row_vals[3].strip() if len(row_vals) > 3 else ''
         
-        if user_level != 'Admin' and creator != session.get('username', '').strip():
+        user_role = session.get('level', '').strip()
+        username = session.get('username', '').strip()
+        user_bureau = session.get('main_agency', '').strip()
+        
+        can_edit = False
+        if user_role == 'Super Admin': can_edit = True
+        elif user_role == 'Admin' and link_bureau == user_bureau: can_edit = True
+        elif creator == username: can_edit = True
+
+        if not can_edit:
              flash('ไม่มีสิทธิ์', 'error')
              return redirect(url_for('dashboard'))
 
         data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         
-        main_agency = request.form.get('ส่วนราชการ') if user_level == 'Admin' else row_vals[3]
+        # เฉพาะ Super Admin เท่านั้นที่ย้ายลิงก์ข้ามกองได้
+        main_agency = request.form.get('ส่วนราชการ') if user_role == 'Super Admin' else row_vals[3]
         
-        # คำนวณยอด Clicks และ EditCount
         current_clicks = row_vals[14] if len(row_vals) > 14 else 0
-        try:
-            current_edits = int(row_vals[15]) if len(row_vals) > 15 and row_vals[15] else 0
-        except:
-            current_edits = 0
-        
+        try: current_edits = int(row_vals[15]) if len(row_vals) > 15 and row_vals[15] else 0
+        except: current_edits = 0
         new_edit_count = current_edits + 1
 
-        # 1. ดึงค่าเดิมมาก่อน
         current_pinned = row_vals[16] if len(row_vals) > 16 else 'ไม่ปักหมุด'
         current_end_date = row_vals[17] if len(row_vals) > 17 else ''
         
-        # 2. ถ้าเป็น Admin ให้ยึดค่าจากฟอร์มหน้าเว็บ
-        if user_level == 'Admin':
+        # Super Admin และ Admin อัปเดตสถานะปักหมุดได้
+        if user_role in ['Super Admin', 'Admin']:
             is_pinned = 'ปักหมุด' if request.form.get('is_pinned') else 'ไม่ปักหมุด'
             end_date = request.form.get('end_date', '')
         else:
-            # ถ้าเป็น User ธรรมดา ให้ใช้ค่าเดิมที่มีอยู่ในฐานข้อมูล
             is_pinned = current_pinned
             end_date = current_end_date
 
@@ -966,25 +826,15 @@ def update_link_action(link_id):
             data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
             data['URL'], data['สถานะ'], data['รายละเอียด'], 
             get_current_timestamp(), creator, row_vals[12] if len(row_vals) > 12 else '',
-            data.get('ความเป็นส่วนตัว', 'สาธารณะ'),
-            current_clicks,
-            new_edit_count,
-            is_pinned,
-            end_date # <--- [NEW] เพิ่มตัวแปรวันที่สิ้นสุด
+            data.get('ความเป็นส่วนตัว', 'สาธารณะ'), current_clicks, new_edit_count, is_pinned, end_date 
         ]
         
-        # อัปเดตช่วง A ถึง R (Column 1 ถึง 18)
         range_name = f"A{cell.row}:R{cell.row}" 
         db_sheet.update(range_name, [new_vals])
-        
         clear_db_cache()
-
         flash(f'แก้ไขสำเร็จ (แก้ไขไปแล้ว {new_edit_count} ครั้ง)', 'success')
         return redirect(url_for('dashboard')) 
-    except Exception as e: 
-        print(f"Update Error: {e}")
-        flash('เกิดข้อผิดพลาดในการอัปเดตข้อมูล', 'error')
-        return redirect(url_for('dashboard'))
+    except Exception as e: return redirect(url_for('dashboard'))
         
 @app.route('/analytics')
 def analytics_page():
@@ -995,50 +845,39 @@ def analytics_page():
         users = get_staff_records()
         feedback = feedback_sheet.get_all_records()
         
-        # แปลงค่าตัวเลขให้พร้อมคำนวณ
         for l in links:
             try: l['Clicks'] = int(l.get('Clicks', 0))
             except: l['Clicks'] = 0
             try: l['EditCount'] = int(l.get('EditCount', 0))
             except: l['EditCount'] = 0
 
-        # --- [NEW] คำนวณ Ranking ผู้สร้างและหน่วยงาน ---
-        user_stats = {}
-        bureau_stats = {}
-        division_stats = {}
+        user_stats, bureau_stats, division_stats = {}, {}, {}
 
         for l in links:
             creator = l.get('CreatorUsername', '')
             bureau = l.get('ส่วนราชการ', 'ไม่ระบุ')
             division = l.get('หน่วยงาน', 'ไม่ระบุ')
             edits = l['EditCount']
-            score = 1 + edits  # คะแนนรวม = สร้างลิงก์นับ 1 + จำนวนครั้งที่อัปเดต
+            score = 1 + edits 
 
-            # 1. User Stats
             if creator:
-                if creator not in user_stats:
-                    user_stats[creator] = {'username': creator, 'score': 0, 'links': 0, 'edits': 0}
+                if creator not in user_stats: user_stats[creator] = {'username': creator, 'score': 0, 'links': 0, 'edits': 0}
                 user_stats[creator]['score'] += score
                 user_stats[creator]['links'] += 1
                 user_stats[creator]['edits'] += edits
 
-            # 2. Bureau Stats (กอง/สำนักงาน)
             if bureau and bureau != 'ไม่ระบุ' and bureau != 'N/A':
-                if bureau not in bureau_stats:
-                    bureau_stats[bureau] = {'name': bureau, 'score': 0, 'links': 0, 'edits': 0}
+                if bureau not in bureau_stats: bureau_stats[bureau] = {'name': bureau, 'score': 0, 'links': 0, 'edits': 0}
                 bureau_stats[bureau]['score'] += score
                 bureau_stats[bureau]['links'] += 1
                 bureau_stats[bureau]['edits'] += edits
 
-            # 3. Division Stats (กลุ่มงาน/ฝ่าย)
             if division and division != 'ไม่ระบุ' and division != 'N/A':
-                if division not in division_stats:
-                    division_stats[division] = {'name': division, 'score': 0, 'links': 0, 'edits': 0}
+                if division not in division_stats: division_stats[division] = {'name': division, 'score': 0, 'links': 0, 'edits': 0}
                 division_stats[division]['score'] += score
                 division_stats[division]['links'] += 1
                 division_stats[division]['edits'] += edits
 
-        # เติมข้อมูลชื่อนามสกุลและสังกัดให้รายชื่อ User
         for creator, data in user_stats.items():
             user_info = next((u for u in users if u['Username'] == creator), None)
             if user_info:
@@ -1046,17 +885,11 @@ def analytics_page():
                 data['bureau'] = user_info.get('ส่วนราชการ', 'ไม่ระบุ')
                 data['division'] = user_info.get('หน่วยงาน', 'ไม่ระบุ')
             else:
-                data['fullname'] = creator
-                data['bureau'] = 'ไม่ระบุ'
-                data['division'] = 'ไม่ระบุ'
+                data['fullname'] = creator; data['bureau'] = 'ไม่ระบุ'; data['division'] = 'ไม่ระบุ'
 
-        # จัดอันดับและตัดเอาเฉพาะ Top 10
         top_10_users = sorted(user_stats.values(), key=lambda x: x['score'], reverse=True)[:10]
         top_10_bureaus = sorted(bureau_stats.values(), key=lambda x: x['score'], reverse=True)[:10]
         top_10_divisions = sorted(division_stats.values(), key=lambda x: x['score'], reverse=True)[:10]
-        # ------------------------------------------------
-
-        # แยก Top 10 ลิงก์ยอดนิยม/แก้ไขบ่อย
         top_10_clicks = sorted(links, key=lambda x: x['Clicks'], reverse=True)[:10]
         top_10_edits = sorted(links, key=lambda x: x['EditCount'], reverse=True)[:10]
 
@@ -1087,12 +920,8 @@ def analytics_page():
             if f.get('FeatureRequest'): features.append({'user': f['Username'], 'text': f['FeatureRequest']})
         
         chart_data = {
-            "total_views": total_views,
-            "top_10_clicks": top_10_clicks, 
-            "top_10_edits": top_10_edits,
-            "top_10_users": top_10_users,       # [ส่งค่าไปหน้าเว็บ]
-            "top_10_bureaus": top_10_bureaus,   # [ส่งค่าไปหน้าเว็บ]
-            "top_10_divisions": top_10_divisions, # [ส่งค่าไปหน้าเว็บ]
+            "total_views": total_views, "top_10_clicks": top_10_clicks, "top_10_edits": top_10_edits,
+            "top_10_users": top_10_users, "top_10_bureaus": top_10_bureaus, "top_10_divisions": top_10_divisions,
             "total_links": len(links), "total_users": len(users), 
             "active_links": sum(1 for l in links if l.get('สถานะ') == 'ใช้งาน'),
             "total_responses": len(feedback),
@@ -1104,26 +933,22 @@ def analytics_page():
             "recent_comments": comments[-5:][::-1], "recent_features": features[-5:][::-1]
         }
         return render_template('analytics.html', session=session, chart_data=chart_data)
-    except Exception as e:
-        print(f"Analytics Error: {e}")
-        return redirect(url_for('dashboard'))
+    except: return redirect(url_for('dashboard'))
 
+# =======================================================
+# [UPDATED] สิทธิ์เข้าเมนูผู้ดูแลระบบ (เฉพาะ Super Admin)
+# =======================================================
 @app.route('/admin')
 def admin_panel():
-    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': 
+    if not session.get('logged_in') or session.get('level', '').strip() != 'Super Admin': 
         return redirect(url_for('dashboard'))
     try:
-        # [แก้ไข] เปลี่ยน invite_sheet.get_all_records() เป็น get_invite_codes()
-        return render_template('admin_panel.html', 
-                             session=session, 
-                             staff_list=get_staff_records(), 
-                             invite_codes=get_invite_codes()) 
-    except Exception as e:
-        return f"Error loading admin panel: {e} <br><a href='/dashboard'>Back</a>"
+        return render_template('admin_panel.html', session=session, staff_list=get_staff_records(), invite_codes=get_invite_codes()) 
+    except Exception as e: return f"Error loading admin panel: {e} <br><a href='/dashboard'>Back</a>"
 
 @app.route('/admin/change_level', methods=['POST'])
 def change_user_level():
-    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': return redirect(url_for('login_page'))
+    if not session.get('logged_in') or session.get('level', '').strip() != 'Super Admin': return redirect(url_for('login_page'))
     try:
         user, level = request.form.get('username'), request.form.get('level')
         if user == session.get('username'): flash('เปลี่ยนระดับตัวเองไม่ได้', 'error'); return redirect(url_for('admin_panel'))
@@ -1137,7 +962,7 @@ def change_user_level():
 
 @app.route('/admin/delete_user', methods=['POST'])
 def delete_user():
-    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': return redirect(url_for('login_page'))
+    if not session.get('logged_in') or session.get('level', '').strip() != 'Super Admin': return redirect(url_for('login_page'))
     try:
         user = request.form.get('username')
         if user == session.get('username'): flash('ลบตัวเองไม่ได้', 'error'); return redirect(url_for('admin_panel'))
@@ -1151,50 +976,36 @@ def delete_user():
 
 @app.route('/admin/generate_code', methods=['POST'])
 def generate_code():
-    # ตรวจสอบสิทธิ์ Admin
-    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': 
+    if not session.get('logged_in') or session.get('level', '').strip() != 'Super Admin': 
         return redirect(url_for('login_page'))
-    
     try:
-        # 1. รับค่าจำนวนจากฟอร์ม (ถ้ามี error ให้เป็น 1)
-        try:
-            amount = int(request.form.get('amount', 1))
-        except ValueError:
-            amount = 1
+        try: amount = int(request.form.get('amount', 1))
+        except ValueError: amount = 1
             
-        # 2. ตรวจสอบความถูกต้อง (ขั้นต่ำ 1, สูงสุด 50 เพื่อป้องกัน Server ค้าง)
         if amount < 1: amount = 1
         if amount > 50: amount = 50
 
-        # 3. เตรียมข้อมูลสำหรับบันทึกหลายแถว
         new_rows = []
         for _ in range(amount):
-            code = generate_invite_code()
-            # รูปแบบข้อมูล: [Code, Status, UsedBy, UsedAt]
-            new_rows.append([code, 'Available', '', ''])
+            new_rows.append([generate_invite_code(), 'Available', '', ''])
 
-        # 4. บันทึกลง Google Sheet ทีเดียว (เร็วกว่า loop append_row มาก)
         if invite_sheet:
             invite_sheet.append_rows(new_rows, value_input_option='USER_ENTERED')
             clear_invite_cache()
             flash(f'✅ สร้างรหัสเชิญใหม่จำนวน {amount} รหัส สำเร็จเรียบร้อย!', 'success')
-        else:
-            flash('ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error')
-
-    except Exception as e:
-        print(f"Generate Code Error: {e}")
-        flash(f'เกิดข้อผิดพลาด: {e}', 'error')
+        else: flash('ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error')
+    except Exception as e: flash(f'เกิดข้อผิดพลาด: {e}', 'error')
         
     return redirect(url_for('admin_panel'))
     
 @app.route('/admin/delete_code', methods=['POST'])
 def delete_code():
-    if not session.get('logged_in') or session.get('level', '').strip() != 'Admin': return redirect(url_for('login_page'))
+    if not session.get('logged_in') or session.get('level', '').strip() != 'Super Admin': return redirect(url_for('login_page'))
     try:
         cell = invite_sheet.find(request.form.get('code'))
         if cell: 
             invite_sheet.delete_rows(cell.row)
-            clear_invite_cache() # [เพิ่ม] สั่งล้าง Cache ตรงนี้ด้วย
+            clear_invite_cache()
             flash('ลบสำเร็จ', 'success')
     except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
@@ -1219,9 +1030,7 @@ def get_all_links():
     except: return jsonify({"status": "error"}), 500
 
 # --- Real-time Online Counter System ---
-
 online_users = {}
-
 def cleanup_online_users():
     global online_users
     now = datetime.datetime.now()
@@ -1230,11 +1039,9 @@ def cleanup_online_users():
 @app.route('/heartbeat', methods=['POST'])
 def heartbeat():
     global online_users
-    if session.get('logged_in'):
-        user_key = f"user:{session.get('username')}"
+    if session.get('logged_in'): user_key = f"user:{session.get('username')}"
     else:
-        if not session.get('visitor_id'):
-            session['visitor_id'] = str(uuid.uuid4())
+        if not session.get('visitor_id'): session['visitor_id'] = str(uuid.uuid4())
         user_key = f"guest:{session.get('visitor_id')}"
         
     online_users[user_key] = datetime.datetime.now()
@@ -1245,77 +1052,52 @@ def heartbeat():
 def offline():
     global online_users
     try:
-        if session.get('logged_in'):
-            user_key = f"user:{session.get('username')}"
+        if session.get('logged_in'): user_key = f"user:{session.get('username')}"
         else:
-            if session.get('visitor_id'):
-                user_key = f"guest:{session.get('visitor_id')}"
-            else:
-                return '', 204
-        if user_key in online_users:
-            del online_users[user_key]
-    except Exception as e:
-        print(f"Offline signal error: {e}")
+            if session.get('visitor_id'): user_key = f"guest:{session.get('visitor_id')}"
+            else: return '', 204
+        if user_key in online_users: del online_users[user_key]
+    except: pass
     return '', 204
     
 # ==========================================
 # [NEW] My Favorites System Logic
 # ==========================================
-
 def get_user_favorite_ids(username):
-    """ดึงรายการ LinkID ที่ User คนนี้กด Favorite ไว้"""
     if favorites_sheet is None: return []
     try:
-        # เพื่อประสิทธิภาพที่ดี ควรทำ Cache ในอนาคตหากข้อมูลเยอะ
         all_favs = favorites_sheet.get_all_records()
-        user_favs = [row['LinkID'] for row in all_favs if row['Username'] == username]
-        return user_favs
-    except Exception as e:
-        print(f"Error getting favorites: {e}")
-        return []
+        return [row['LinkID'] for row in all_favs if row['Username'] == username]
+    except: return []
 
 @app.route('/toggle_favorite', methods=['POST'])
 def toggle_favorite():
-    """API สำหรับกดปุ่มดาว (เพิ่ม/ลบ)"""
-    if not session.get('logged_in'):
-        return jsonify({'status': 'error', 'message': 'Please login first'}), 401
-    
-    if favorites_sheet is None:
-        return jsonify({'status': 'error', 'message': 'Database not connected'}), 500
-
+    if not session.get('logged_in'): return jsonify({'status': 'error', 'message': 'Please login first'}), 401
+    if favorites_sheet is None: return jsonify({'status': 'error', 'message': 'Database not connected'}), 500
     try:
         data = request.get_json()
         link_id = data.get('link_id')
         username = session.get('username')
         
-        # ดึงข้อมูลทั้งหมดมาตรวจสอบ (Row Index เริ่มที่ 1)
         all_records = favorites_sheet.get_all_values() 
         found_row_index = -1
         
         for i, row in enumerate(all_records):
-            if i == 0: continue # ข้าม Header row
-            # Column Structure: A=Timestamp, B=Username, C=LinkID
-            # Index ใน list: 0, 1, 2
+            if i == 0: continue
             if len(row) > 2 and row[1] == username and row[2] == link_id:
-                found_row_index = i + 1 # +1 สำหรับ gspread index
+                found_row_index = i + 1
                 break
         
         if found_row_index != -1:
-            # เจอ -> ลบออก (Unfavorite)
             favorites_sheet.delete_rows(found_row_index)
             action = 'removed'
         else:
-            # ไม่เจอ -> เพิ่มใหม่ (Favorite)
             favorites_sheet.append_row([get_current_timestamp(), username, link_id], value_input_option='USER_ENTERED')
             action = 'added'
             
         return jsonify({'status': 'success', 'action': action})
-        
-    except Exception as e:
-        print(f"Toggle Favorite Error: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-        
-
+    except Exception as e: return jsonify({'status': 'error', 'message': str(e)}), 500
         
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)

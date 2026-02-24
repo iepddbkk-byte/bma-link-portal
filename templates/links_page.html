@@ -1003,7 +1003,7 @@
             <i class="fas fa-home"></i> <span>หน้าหลัก</span>
         </a>
         {% if session.get('logged_in') %}
-            {% if session.get('level') == 'Admin' %}
+            {% if session.get('level') == 'Super Admin' %}
             <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin" style="color:#ea580c;">
                 <i class="fas fa-crown"></i> <span>Admin</span>
             </a>

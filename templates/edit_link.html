@@ -459,7 +459,7 @@
     <nav class="nav-menu" id="navMenu">
         {% if session.get('logged_in') %}
             <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
-            {% if session.get('level') == 'Admin' %}
+            {% if session.get('level') == 'Super Admin' %}
             <a href="{{ url_for('admin_panel') }}" class="nav-link" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
             {% endif %}
             <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
@@ -505,7 +505,7 @@
         <form id="editLinkForm" action="{{ url_for('update_link_action', link_id=link.ID) }}" method="POST">
 
             <!-- ── ADMIN PANEL ── -->
-            {% if is_admin %}
+            {% if can_pin %}
             <div class="admin-panel">
                 <div class="admin-panel-header">
                     <i class="fas fa-crown"></i> ตัวเลือกพิเศษสำหรับผู้ดูแลระบบ
@@ -624,7 +624,7 @@
                             <span class="label-icon"><i class="fas fa-building"></i></span>
                             กอง / สำนักงาน
                         </label>
-                        {% if is_admin %}
+                        {% if is_super_admin %}
                             <div class="modified-indicator"><i class="fas fa-crown"></i> Admin: แก้ไขได้</div>
                             <select id="ส่วนราชการ" name="ส่วนราชการ" class="form-select" required>
                                 <option value="" disabled>--- กรุณาเลือกกอง/สำนักงาน ---</option>
@@ -647,7 +647,7 @@
                             <span class="label-icon"><i class="fas fa-users"></i></span>
                             กลุ่มงาน / ฝ่าย
                         </label>
-                        {% if is_admin %}
+                        {% if is_super_admin %}
                             <div class="modified-indicator"><i class="fas fa-crown"></i> Admin: แก้ไขได้</div>
                             <input type="text" id="หน่วยงาน" name="หน่วยงาน"
                                    value="{{ link['หน่วยงาน'] }}" class="form-input" required>
@@ -658,10 +658,14 @@
                     </div>
                 </div>
 
-                {% if not is_admin %}
+                {% if not is_super_admin %}
                 <div class="locked-hint">
                     <i class="fas fa-lock"></i>
-                    ข้อมูลสังกัดดึงจากโปรไฟล์ของผู้สร้างโดยอัตโนมัติ ไม่สามารถแก้ไขได้
+                    ข้อมูลสังกัดดึงจากผู้สร้างระบบ ไม่สามารถแก้ไขได้
+                </div>
+                {% else %}
+                <div class="form-hint" style="color: #ea580c;">
+                    <i class="fas fa-crown" style="color: #f59e0b;"></i> คุณเป็น Super Admin: สามารถปรับเปลี่ยนสังกัดของลิงก์ข้ามหน่วยงานได้
                 </div>
                 {% endif %}
             </div>
@@ -823,7 +827,7 @@
 
     // Admin: pre-select agency
     document.addEventListener('DOMContentLoaded', function() {
-        {% if is_admin %}
+        {% if is_super_admin %}
         const currentAgency = "{{ link['ส่วนราชการ'] }}";
         const agencySelect  = document.getElementById('ส่วนราชการ');
         if (currentAgency && agencySelect) {

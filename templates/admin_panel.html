@@ -381,7 +381,7 @@
             {% if session.get('logged_in') %}
                 <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
                 
-                {% if session.get('level') == 'Admin' %}
+                {% if session.get('level') == 'Super Admin' %}
                 <a href="{{ url_for('admin_panel') }}" class="nav-link active-nav" title="Admin Panel"><i class="fas fa-crown"></i> <span>Admin</span></a>
                 {% endif %}
                 

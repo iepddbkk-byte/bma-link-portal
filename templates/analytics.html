@@ -535,7 +535,7 @@
     <nav class="nav-menu" id="navMenu">
         {% if session.get('logged_in') %}
             <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
-            {% if session.get('level') == 'Admin' %}
+            {% if session.get('level') == 'Super Admin' %}
             <a href="{{ url_for('admin_panel') }}" class="nav-link" style="color:#ea580c;"><i class="fas fa-crown"></i> <span>Admin</span></a>
             {% endif %}
             <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
