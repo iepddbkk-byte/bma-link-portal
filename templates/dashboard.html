@@ -60,244 +60,94 @@
             transition: all 0.3s ease;
         }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px; 
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
         .logo-container img:hover { transform: scale(1.05); }
         .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        /* --- Status Stats Group --- */
-        .header-stats-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
         /* Online Counter Style */
         .header-online-count {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: var(--bma-green-light);
-            color: var(--bma-green);
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border: 1px solid var(--bma-green);
-            white-space: nowrap;
+            display: flex; align-items: center; gap: 8px; background-color: var(--bma-green-light);
+            color: var(--bma-green); padding: 6px 15px; border-radius: 20px; font-size: 0.9rem;
+            font-weight: 600; border: 1px solid var(--bma-green); white-space: nowrap;
         }
-
-        /* Pulsing Dot Animation */
         .pulsating-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #2ecc71;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
-            animation: pulse-green 2s infinite;
+            width: 10px; height: 10px; background-color: #2ecc71; border-radius: 50%;
+            display: inline-block; box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); animation: pulse-green 2s infinite;
         }
-
         @keyframes pulse-green {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
 
-        /* Desktop Menu */
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            white-space: nowrap;
-        }
+        .nav-menu { display: flex; align-items: center; gap: 8px; }
+        .nav-link { text-decoration: none; color: var(--text-color); font-weight: 500; padding: 8px 16px; border-radius: 50px; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap; }
         .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
         .nav-link i { font-size: 1.1em; }
-        
-        /* Active State */
         .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
         .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
         .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
 
         .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        /* --- Mobile Header Controls (Profile + Hamburger) --- */
         .mobile-controls { display: none; align-items: center; gap: 15px; }
-        
-        .mobile-profile-btn {
-            display: flex; align-items: center; text-decoration: none;
-        }
-        .mobile-profile-btn img {
-            width: 40px; height: 40px; border-radius: 50%; 
-            border: 2px solid var(--bma-green); object-fit: cover;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .mobile-toggle {
-            font-size: 1.6rem;
-            cursor: pointer;
-            color: var(--text-color);
-            padding: 5px;
-        }
+        .mobile-profile-btn img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; }
 
         /* --- 2. Dashboard Content Styles --- */
-        .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-            animation: fadeIn 0.6s ease;
-        }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; animation: fadeIn 0.6s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .content-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
+        .content-card { background: white; border-radius: 20px; padding: 30px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; margin-bottom: 30px; }
+        h2 { font-size: 1.8rem; color: var(--text-color); margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--bma-green-light); display: flex; align-items: center; gap: 12px; }
 
-        h2 {
-            font-size: 1.8rem;
-            color: var(--text-color);
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--bma-green-light);
-            display: flex; align-items: center; gap: 12px;
-        }
-
-        /* --- Favorites Section Styles --- */
         .fav-section { margin-bottom: 30px; }
-        .grid-favs {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        .fav-card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid #ffeeba;
-            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.15);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .fav-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
-            border-color: #ffc107;
-        }
-        .fav-btn-action {
-            background: linear-gradient(135deg, #ffc107, #ffca28);
-            color: #000;
-            text-decoration: none;
-            padding: 8px 18px;
-            border-radius: 25px;
-            font-size: 0.9em;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.2s;
-        }
+        .grid-favs { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .fav-card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #ffeeba; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.15); transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
+        .fav-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3); border-color: #ffc107; }
+        .fav-btn-action { background: linear-gradient(135deg, #ffc107, #ffca28); color: #000; text-decoration: none; padding: 8px 18px; border-radius: 25px; font-size: 0.9em; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s; }
         .fav-btn-action:hover { filter: brightness(0.95); transform: scale(1.05); }
 
-        /* Search & Filters */
-        .search-container {
-            display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;
-        }
+        .dashboard-actions { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn-add { background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover)); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,150,60,0.3); display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 500; transition: 0.3s; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,150,60,0.4); }
+        .btn-view-all { background: linear-gradient(135deg, #007bff, #0056b3); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,123,255,0.3); display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 500; transition: 0.3s; }
+        .btn-view-all:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,123,255,0.4); }
+
+        .search-container { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
         .search-input-wrapper { flex: 2; position: relative; min-width: 280px; }
         .filter-wrapper { flex: 1; min-width: 200px; }
 
-        #searchInput, #agencyFilter {
-            width: 100%; padding: 14px 20px 14px 45px;
-            font-family: 'Kanit', sans-serif; font-size: 1rem;
-            border: 1px solid var(--border-color); border-radius: 12px;
-            background-color: #f9f9f9; transition: 0.3s;
-        }
-        #searchInput:focus, #agencyFilter:focus {
-            background-color: white; border-color: var(--bma-green);
-            box-shadow: 0 0 0 4px var(--bma-green-light); outline: none;
-        }
+        #searchInput, #agencyFilter, .mobile-sort-select { width: 100%; padding: 14px 20px 14px 45px; font-family: 'Kanit', sans-serif; font-size: 1rem; border: 1px solid var(--border-color); border-radius: 12px; background-color: #f9f9f9; transition: 0.3s; }
+        #searchInput:focus, #agencyFilter:focus, .mobile-sort-select:focus { background-color: white; border-color: var(--bma-green); box-shadow: 0 0 0 4px var(--bma-green-light); outline: none; }
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+        .mobile-sort-wrapper { display: none; } /* ซ่อนบน PC */
 
         /* =======================================
-           TABLE STYLING & SCROLL UX (UPDATED) 
+           TABLE STYLING & SCROLL UX
            ======================================= */
-        .table-responsive { 
-            overflow-x: auto; 
-            overflow-y: auto; 
-            max-height: 60vh; /* ล็อคความสูง เพื่อให้เลื่อนดูตารางได้ง่ายๆ */
-            border-radius: 12px; 
-            border: 1px solid var(--border-color); 
-        }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th { 
-            background: var(--bma-green); color: white; padding: 15px; font-weight: 500; 
-            text-align: left; white-space: nowrap; 
-            position: sticky; top: 0; z-index: 10; /* ตรึงหัวตาราง */
-        }
-        th::after {
-            content: ''; position: absolute; left: 0; bottom: -1px; width: 100%;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
+        .table-responsive { overflow-x: auto; overflow-y: auto; max-height: 65vh; border-radius: 12px; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; min-width: 1300px; }
+        th { background: var(--bma-green); color: white; padding: 15px; font-weight: 500; text-align: left; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+        th::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 100%; border-bottom: 1px solid rgba(0,0,0,0.1); }
         td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; color: #555; }
         tr:last-child td { border-bottom: none; }
         tr:hover { background-color: #f8fff9; }
 
-        /* Scrollbar */
         .table-responsive::-webkit-scrollbar { height: 10px; width: 10px;}
         .table-responsive::-webkit-scrollbar-thumb { background: #ccc; border-radius: 5px; }
         .table-responsive::-webkit-scrollbar-thumb:hover { background: var(--bma-green); }
 
-        /* Badges & Buttons */
-        .status-badge { padding: 5px 12px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+        .pinned-badge { background: #fff3e0; color: #e65100; padding: 2px 6px; border-radius: 4px; font-size: 0.75em; margin-bottom: 5px; border: 1px solid #ffb74d; display: inline-block;}
+        .status-badge { padding: 5px 12px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
         .status-ok { background: #d4edda; color: #155724; }
         .status-error { background: #f8d7da; color: #721c24; }
         .status-blocked { background: #cce5ff; color: #004085; }
         .status-unknown { background: #e2e3e5; color: #383d41; }
         
-        .pinned-badge { background: #fff3e0; color: #e65100; padding: 2px 6px; border-radius: 4px; font-size: 0.75em; margin-bottom: 5px; border: 1px solid #ffb74d; display: inline-block;}
-        
-        /* Privacy Badges */
-        .privacy-badge {
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-        }
+        .privacy-badge { padding: 5px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 500; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
         .privacy-public { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
         .privacy-dept { background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; }
         .privacy-bureau { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
@@ -305,67 +155,22 @@
         .privacy-private { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
 
         .action-buttons { display: flex; gap: 8px; justify-content: center; }
-        .btn-icon {
-            width: 35px; height: 35px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            border: none; cursor: pointer; transition: 0.2s; text-decoration: none; color: white;
-        }
+        .btn-icon { width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: 0.2s; text-decoration: none; color: white; }
         .btn-edit { background: var(--button-yellow); color: #333; }
         .btn-delete { background: var(--button-red); }
         .btn-icon:hover { transform: translateY(-2px); filter: brightness(0.95); }
-
-        .dashboard-actions {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .btn-add { 
-            background: linear-gradient(135deg, var(--bma-green), var(--bma-green-hover));
-            color: white; border: none; padding: 12px 25px; border-radius: 50px;
-            font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,150,60,0.3);
-            display: inline-flex; align-items: center; gap: 8px;
-            text-decoration: none; font-weight: 500; transition: 0.3s;
-        }
-        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,150,60,0.4); }
-        
-        .btn-view-all {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white; border: none; padding: 12px 25px; border-radius: 50px;
-            font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,123,255,0.3);
-            display: inline-flex; align-items: center; gap: 8px;
-            text-decoration: none; font-weight: 500; transition: 0.3s;
-        }
-        .btn-view-all:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,123,255,0.4); }
-
-        .btn-share {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: #17a2b8; color: white; border: none;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;
-        }
+        .btn-share { width: 32px; height: 32px; border-radius: 50%; background: #17a2b8; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         .btn-share:hover { background: #138496; transform: scale(1.1); }
 
-        /* Pagination */
-        .pagination-controls {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;
-            flex-wrap: wrap; gap: 15px;
-        }
-        .pagination-nav button {
-            background: white; border: 1px solid #ddd; width: 36px; height: 36px; border-radius: 8px;
-            cursor: pointer; transition: 0.2s;
-        }
+        .pagination-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; flex-wrap: wrap; gap: 15px; }
+        .pagination-nav button { background: white; border: 1px solid #ddd; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .pagination-nav button:hover:not(:disabled) { background: var(--bma-green); color: white; border-color: var(--bma-green); }
         .pagination-nav button:disabled { opacity: 0.5; cursor: default; }
+        .main-footer { background: white; color: #666; text-align: center; padding: 30px; margin-top: 60px; border-top: 1px solid #eee; }
 
-        /* Footer */
-        .main-footer {
-            background: white; color: #666; text-align: center; padding: 30px;
-            margin-top: 60px; border-top: 1px solid #eee;
-        }
-
-        /* --- Responsive Media Queries --- */
+        /* =========================================
+           MOBILE SPECIFIC STYLES (CARD VIEW)
+           ========================================= */
         @media (max-width: 992px) {
             .nav-link span { display: none; }
             .nav-link i { font-size: 1.3rem; margin: 0; }
@@ -377,47 +182,83 @@
             body { padding-top: 70px; }
             .main-header { padding: 0 15px; height: 70px; }
             .logo-text { font-size: 1.1rem; }
-            
-            /* Show Mobile Controls */
-            .mobile-controls { display: flex; }
-            .mobile-toggle { display: block; }
-            
+            .mobile-controls { display: flex; } .mobile-toggle { display: block; }
             .header-stats-group { display: none; }
 
-            .nav-menu {
-                display: none; position: absolute; top: 70px; left: 0; width: 100%;
-                background: white; flex-direction: column; align-items: stretch;
-                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
-            }
-            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
-            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; height: auto; }
+            .nav-menu { display: none; position: absolute; top: 70px; left: 0; width: 100%; background: white; flex-direction: column; padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0; }
+            .nav-menu.active { display: flex; }
+            .nav-link { width: 100%; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; height: auto; }
             .nav-link span { display: inline; }
-            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
-            
             .nav-link.profile-item { display: none; }
 
             .container { padding: 0 15px; margin: 20px auto; }
-            .content-card { padding: 20px 15px; border-radius: 15px; }
+            .content-card { padding: 20px 15px; border-radius: 15px; background: transparent; box-shadow: none; }
             h2 { font-size: 1.4rem; }
             
             .dashboard-actions { flex-direction: column; gap: 10px; }
             .btn-add, .btn-view-all { width: 100%; justify-content: center; }
             
+            /* Show mobile sort */
+            .mobile-sort-wrapper { display: block; width: 100%; flex: 1 1 100%; }
             .search-container { flex-direction: column; gap: 10px; }
             .search-input-wrapper, .filter-wrapper { min-width: 100%; }
+            .mobile-sort-select { padding-left: 20px; }
 
-            /* Table Mobile Optimization: Hide less important columns */
-            th:nth-child(2), td:nth-child(2), /* รายละเอียด */
-            th:nth-child(3), td:nth-child(3), /* ระดับ (Privacy) */
-            th:nth-child(8), td:nth-child(8), /* ส่วนราชการ */
-            th:nth-child(9), td:nth-child(9), /* เบอร์ */
-            th:nth-child(11), td:nth-child(11) /* วันที่ */
-            { display: none; }
+            /* --- Table to Card Transformation --- */
+            .table-responsive { border: none; max-height: none; overflow: visible; background: transparent; }
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead { display: none; }
             
-            .pagination-controls { justify-content: center; }
+            #linkTableBody tr {
+                background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative;
+            }
+            /* ไฮไลท์การ์ดที่ปักหมุดบนมือถือ */
+            #linkTableBody tr[style*="background-color: #fffdf5"] { border: 2px solid #ffb74d !important; }
+
+            #linkTableBody td {
+                padding: 8px 0; border-bottom: 1px dashed #f0f0f0; text-align: left !important;
+                display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
+            }
+            #linkTableBody tr td:last-child { border-bottom: none; }
+
+            /* Hide Unnecessary Columns on Mobile Dashboard */
+            /* 0:Name, 1:Desc, 2:Privacy, 3:DueDate, 4:LinkStatus, 5:Status, 6:Type, 7:Div, 8:Bureau, 9:Phone, 10:Creator, 11:Date, 12:Share, 13:Manage */
+            #linkTableBody td:nth-child(2), /* Desc */
+            #linkTableBody td:nth-child(3), /* Privacy */
+            #linkTableBody td:nth-child(5), /* LinkStatus */
+            #linkTableBody td:nth-child(6), /* Status */
+            #linkTableBody td:nth-child(7), /* Type */
+            #linkTableBody td:nth-child(8), /* Division */
+            #linkTableBody td:nth-child(10) /* Phone */
+            { display: none !important; }
+
+            /* Format Visible Columns for Card */
+            #linkTableBody td:nth-child(1) { display: block; border-bottom: none; padding-bottom: 0; margin-bottom: 10px; width: 100%; }
+            #linkTableBody td:nth-child(1) a { font-size: 1.15rem; }
+            
+            /* Add Labels via CSS pseudo-elements */
+            #linkTableBody td:nth-child(4)::before { content: "⏳ กำหนดส่ง:"; font-weight: 600; color: #555; }
+            #linkTableBody td:nth-child(9)::before { content: "🏛️ กอง/สำนัก:"; font-weight: 600; color: #555; }
+            #linkTableBody td:nth-child(11)::before { content: "👤 ผู้สร้าง:"; font-weight: 600; color: #555; }
+            #linkTableBody td:nth-child(12)::before { content: "🗓️ อัปเดตล่าสุด:"; font-weight: 600; color: #555; }
+            
+            /* Combine Share & Action Buttons into the last row */
+            #linkTableBody td:nth-child(13) { display: none !important; } /* ซ่อนช่องแชร์แยก */
+            #linkTableBody td:nth-child(14) {
+                display: flex !important; justify-content: flex-end; gap: 10px;
+                border-bottom: none; border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px;
+            }
+
+            .pagination-controls { justify-content: center; background: white; padding: 15px; border-radius: 15px; }
             .pagination-items { width: 100%; text-align: center; margin-bottom: 10px; }
+        }
+        
+        /* สไตล์เสริมสำหรับการรวมปุ่มแชร์ในมือถือ */
+        @media (max-width: 768px) {
+            .mobile-hide-share { display: none !important; }
+            .mobile-show-share { display: flex !important; }
+            .mobile-hide-dash { display: none !important; }
         }
     </style>
 </head>
@@ -429,70 +270,41 @@
                 <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
                 <div class="logo-text">BMA SMART LINKAGE</div>
             </a>
-            
             <div class="header-online-count" title="ผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
-                <span class="pulsating-dot"></span>
-                <span id="onlineCount">-</span>
-                <span>ออนไลน์</span>
+                <span class="pulsating-dot"></span><span id="onlineCount">-</span><span>ออนไลน์</span>
             </div>
         </div>
-
         <div class="mobile-controls">
             {% if session.get('logged_in') %}
-                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn" title="โปรไฟล์">
+                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
                     <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
                 </a>
             {% endif %}
-            <div class="mobile-toggle" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </div>
+            <div class="mobile-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
         </div>
         
         <nav class="nav-menu" id="navMenu">
-            <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
-            
+            <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
             {% if session.get('logged_in') %}
                 {% if session.get('level') == 'Admin' %}
-                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
+                <a href="{{ url_for('admin_panel') }}" class="nav-link" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
                 {% endif %}
-                
-                <a href="{{ url_for('dashboard') }}" class="nav-link active-nav" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
-                <a href="{{ url_for('links_page') }}" class="nav-link" title="ลิงก์ทั้งหมด" style="color: #007bff;">
-                    <i class="fas fa-layer-group"></i> <span>ลิงก์ทั้งหมด</span>
-                </a>
-                <a href="{{ url_for('my_favorites_page') }}" class="nav-link" title="My Favorites">
-                    <i class="fas fa-star" style="color: #ffc107;"></i> <span>ลิงค์โปรดของฉัน</span>
-                </a>
-                
-                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
-                
-                <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback">
-                    <i class="fas fa-comment-dots"></i> <span>Feedback</span>
-                </a>
-                
-                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
-                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
-                    <span>{{ session.name }}</span>
-                </a>
-                
-                <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
-                    <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
-                </a>
+                <a href="{{ url_for('dashboard') }}" class="nav-link active-nav"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+                <a href="{{ url_for('links_page') }}" class="nav-link" style="color: #007bff;"><i class="fas fa-layer-group"></i> <span>ลิงก์ทั้งหมด</span></a>
+                <a href="{{ url_for('my_favorites_page') }}" class="nav-link"><i class="fas fa-star" style="color: #ffc107;"></i> <span>ลิงค์โปรดของฉัน</span></a>
+                <a href="{{ url_for('analytics_page') }}" class="nav-link"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+                <a href="{{ url_for('feedback_page') }}" class="nav-link"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item"><img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic"><span>{{ session.name }}</span></a>
+                <a href="{{ url_for('logout') }}" class="nav-link logout-btn"><i class="fas fa-sign-out-alt"></i> <span>ออก</span></a>
             {% else %}
-                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;">
-                    <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
-                </a>
+                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;"><i class="fas fa-user-lock"></i> <span>เข้าระบบ</span></a>
             {% endif %}
         </nav>
     </header>
     
     <div class="container">
-        
         <div class="fav-section">
-            <h2 style="color: #ffc107; border-color: #ffeeba;">
-                <i class="fas fa-star"></i> รายการโปรดของฉัน (My Favorites)
-            </h2>
-            
+            <h2 style="color: #ffc107; border-color: #ffeeba;"><i class="fas fa-star"></i> รายการโปรดของฉัน (My Favorites)</h2>
             {% if favorite_links %}
                 <div class="grid-favs">
                     {% for link in favorite_links %}
@@ -501,15 +313,11 @@
                             <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; color: var(--text-color); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                                 {{ link['ชื่อลิงก์'] }}
                             </div>
-                            <div style="font-size: 0.85em; color: #777;">
-                                <i class="far fa-building"></i> {{ link['หน่วยงาน'] }}
-                            </div>
+                            <div style="font-size: 0.85em; color: #777;"><i class="far fa-building"></i> {{ link['หน่วยงาน'] }}</div>
                         </div>
                         <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
                             <span class="status-badge status-ok" style="font-size: 0.75rem;">ใช้งาน</span>
-                            <a href="{{ link['URL'] }}" target="_blank" class="fav-btn-action">
-                                เข้าใช้งาน <i class="fas fa-arrow-right"></i>
-                            </a>
+                            <a href="{{ link['URL'] }}" target="_blank" class="fav-btn-action">เข้าใช้งาน <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
                     {% endfor %}
@@ -519,9 +327,7 @@
                     <i class="far fa-star" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i><br>
                     <h3 style="margin: 0 0 10px 0;">คุณยังไม่มีรายการโปรด</h3>
                     <p style="margin: 0; opacity: 0.8;">กดที่รูปดาว ⭐ หน้าชื่อลิงก์ในหน้าค้นหา เพื่อเพิ่มรายการที่ใช้บ่อยไว้ตรงนี้</p>
-                    <a href="{{ url_for('links_page') }}" style="display: inline-block; margin-top: 15px; color: #d39e00; font-weight: 600; text-decoration: underline;">
-                        ไปที่หน้าค้นหาลิงก์
-                    </a>
+                    <a href="{{ url_for('links_page') }}" style="display: inline-block; margin-top: 15px; color: #d39e00; font-weight: 600; text-decoration: underline;">ไปที่หน้าค้นหาลิงก์</a>
                 </div>
             {% endif %}
         </div>
@@ -530,12 +336,8 @@
             <h2>🖥️ Dashboard จัดการลิงก์</h2>
             
             <div class="dashboard-actions">
-                <a href="{{ url_for('add_link_page') }}" class="btn-add">
-                    <i class="fas fa-plus-circle"></i> เพิ่มลิงก์ใหม่
-                </a>
-                <a href="{{ url_for('links_page') }}" class="btn-view-all">
-                    <i class="fas fa-list-ul"></i> ดูรายชื่อลิงก์ทั้งหมด
-                </a>
+                <a href="{{ url_for('add_link_page') }}" class="btn-add"><i class="fas fa-plus-circle"></i> เพิ่มลิงก์ใหม่</a>
+                <a href="{{ url_for('links_page') }}" class="btn-view-all"><i class="fas fa-list-ul"></i> ดูรายชื่อลิงก์ทั้งหมด</a>
             </div>
 
             <div class="search-container">
@@ -543,20 +345,20 @@
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" id="searchInput" placeholder="ค้นหาทุกลิงก์ (ชื่อ, สถานะ, ผู้สร้าง)...">
                 </div>
-                
                 <div class="filter-wrapper">
                     <select id="agencyFilter">
                         <option value="">🏢 ทุกส่วนราชการ (ทั้งหมด)</option>
-                        <optgroup label="ระดับสำนัก">
-                            {% for bureau in bureaus %}
-                            <option value="{{ bureau }}">{{ bureau }}</option>
-                            {% endfor %}
-                        </optgroup>
-                        <optgroup label="สำนักงานเขต">
-                            {% for district in districts %}
-                            <option value="{{ district }}">{{ district }}</option>
-                            {% endfor %}
-                        </optgroup>
+                        <optgroup label="ระดับสำนัก">{% for bureau in bureaus %}<option value="{{ bureau }}">{{ bureau }}</option>{% endfor %}</optgroup>
+                        <optgroup label="สำนักงานเขต">{% for district in districts %}<option value="{{ district }}">{{ district }}</option>{% endfor %}</optgroup>
+                    </select>
+                </div>
+                <div class="mobile-sort-wrapper">
+                    <select id="mobileSort" class="mobile-sort-select">
+                        <option value="">↕️ เรียงลำดับข้อมูล</option>
+                        <option value="0_asc">ชื่อลิงก์ (ก-ฮ)</option>
+                        <option value="0_desc">ชื่อลิงก์ (ฮ-ก)</option>
+                        <option value="11_desc">วันที่อัปเดต (ใหม่-เก่า)</option>
+                        <option value="11_asc">วันที่อัปเดต (เก่า-ใหม่)</option>
                     </select>
                 </div>
             </div>
@@ -565,20 +367,18 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>
-                                ชื่อลิงก์ 
-                                <span class="sort-icon" onclick="sortTable(0, 'asc')" style="cursor:pointer; opacity:0.7;">↕</span>
-                            </th>
+                            <th onclick="sortTable(0)">ชื่อลิงก์ <span id="sort-0" class="sort-icon">↕</span></th>
                             <th>รายละเอียด</th>
                             <th style="text-align:center;">ระดับ</th> 
+                            <th style="text-align:center;">⏳ กำหนดส่ง</th>
                             <th style="text-align:center;">สถานะลิงก์</th> 
                             <th style="text-align:center;">การใช้งาน</th>
                             <th>ประเภท</th>
                             <th>หน่วยงาน</th> 
-                            <th>ส่วนราชการ</th> 
+                            <th onclick="sortTable(8)">ส่วนราชการ <span id="sort-8" class="sort-icon">↕</span></th> 
                             <th>เบอร์ติดต่อ</th>
-                            <th>ผู้สร้าง</th>
-                            <th>วันที่</th>
+                            <th onclick="sortTable(10)">ผู้สร้าง <span id="sort-10" class="sort-icon">↕</span></th>
+                            <th onclick="sortTable(11, 'date')">วันที่ <span id="sort-11" class="sort-icon">↕</span></th>
                             <th style="text-align: center;">แชร์</th>
                             <th style="text-align: center;">จัดการ</th>
                         </tr>
@@ -586,102 +386,65 @@
                     <tbody id="linkTableBody">
                         {% for link in links %}
                         <tr style="{% if link.get('ปักหมุด') == 'ปักหมุด' %}background-color: #fffdf5;{% endif %}">
-                            <td>
+                            <td data-sort="{{ link['ชื่อลิงก์'] }}">
                                 <div style="display:flex; flex-direction:column; gap:5px;">
                                     {% if link.get('ปักหมุด') == 'ปักหมุด' %}
                                         <span class="pinned-badge" title="ลิงก์สำคัญ"><i class="fas fa-thumbtack"></i> ปักหมุด</span>
                                     {% endif %}
-                                    
                                     {% if link['สถานะ'] == 'ใช้งาน' %}
-                                        <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;">
-                                            <i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}
-                                        </a>
+                                        <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;"><i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}</a>
                                     {% else %}
                                         <span style="color: #888;">{{ link['ชื่อลิงก์'] }}</span>
                                     {% endif %}
                                 </div>
                             </td>
                             <td>{{ link['รายละเอียด'] }}</td>
-                            
-                        <td style="text-align: center;">
-                        {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
-                        {% if privacy == 'ส่วนตัว' %}
-                            <span class="privacy-badge privacy-private" title="เห็นเฉพาะคุณ"><i class="fas fa-lock"></i> ส่วนตัว</span>
-                        {% elif privacy == 'กลุ่มงาน/ฝ่าย' %}
-                            <span class="privacy-badge privacy-div" title="เห็นเฉพาะในกลุ่มงาน/ฝ่ายเดียวกัน"><i class="fas fa-user-friends"></i> ฝ่าย</span>
-                        {% elif privacy == 'กอง/สำนักงาน' %}
-                            <span class="privacy-badge privacy-bureau" title="เห็นเฉพาะในกอง/สำนักงานเดียวกัน"><i class="fas fa-building"></i> กอง</span>
-                        {% elif privacy == 'สยป.' %}
-                            <span class="privacy-badge privacy-dept" title="เห็นเฉพาะเจ้าหน้าที่ สยป."><i class="fas fa-landmark"></i> สยป.</span>
-                        {% else %}
-                            <span class="privacy-badge privacy-public" title="ทุกคนมองเห็นได้"><i class="fas fa-globe"></i> สาธารณะ</span>
-                        {% endif %}
-                        </td>
-
                             <td style="text-align: center;">
-                                {% if link['LinkStatus'] == 'OK' %}
-                                    <span class="status-badge status-ok"><i class="fas fa-check-circle"></i> ปกติ</span>
-                                {% elif link['LinkStatus'] == '403 Blocked' %}
-                                    <span class="status-badge status-blocked"><i class="fas fa-ban"></i> Block</span>
-                                {% elif link['LinkStatus'] %}
-                                    <span class="status-badge status-error"><i class="fas fa-exclamation-triangle"></i> {{ link['LinkStatus'] }}</span>
-                                {% else %}
-                                    <span class="status-badge status-unknown">? รอตรวจ</span>
-                                {% endif %}
+                                {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
+                                {% if privacy == 'ส่วนตัว' %}<span class="privacy-badge privacy-private" title="เห็นเฉพาะคุณ"><i class="fas fa-lock"></i> ส่วนตัว</span>
+                                {% elif privacy == 'กลุ่มงาน/ฝ่าย' %}<span class="privacy-badge privacy-div" title="เห็นเฉพาะในกลุ่มงาน/ฝ่ายเดียวกัน"><i class="fas fa-user-friends"></i> ฝ่าย</span>
+                                {% elif privacy == 'กอง/สำนักงาน' %}<span class="privacy-badge privacy-bureau" title="เห็นเฉพาะในกอง/สำนักงานเดียวกัน"><i class="fas fa-building"></i> กอง</span>
+                                {% elif privacy == 'สยป.' %}<span class="privacy-badge privacy-dept" title="เห็นเฉพาะเจ้าหน้าที่ สยป."><i class="fas fa-landmark"></i> สยป.</span>
+                                {% else %}<span class="privacy-badge privacy-public" title="ทุกคนมองเห็นได้"><i class="fas fa-globe"></i> สาธารณะ</span>{% endif %}
                             </td>
-
                             <td style="text-align: center;">
-                                {% if link['สถานะ'] == 'ใช้งาน' %}
-                                    <span class="status-badge status-ok">ใช้งาน</span>
-                                {% elif link['สถานะ'] == 'ปรับปรุง' %}
-                                    <span class="status-badge" style="background:#fff3cd; color:#856404;">ปรับปรุง</span>
-                                {% else %}
-                                    <span class="status-badge status-error">เลิกใช้</span>
-                                {% endif %}
+                                <div class="countdown-timer" data-end-date="{{ link.get('วันที่สิ้นสุด', '') }}"></div>
                             </td>
-                            
+                            <td style="text-align: center;">
+                                {% if link['LinkStatus'] == 'OK' %}<span class="status-badge status-ok"><i class="fas fa-check-circle"></i> ปกติ</span>
+                                {% elif link['LinkStatus'] == '403 Blocked' %}<span class="status-badge status-blocked"><i class="fas fa-ban"></i> Block</span>
+                                {% elif link['LinkStatus'] %}<span class="status-badge status-error"><i class="fas fa-exclamation-triangle"></i> {{ link['LinkStatus'] }}</span>
+                                {% else %}<span class="status-badge status-unknown">? รอตรวจ</span>{% endif %}
+                            </td>
+                            <td style="text-align: center;">
+                                {% if link['สถานะ'] == 'ใช้งาน' %}<span class="status-badge status-ok">ใช้งาน</span>
+                                {% elif link['สถานะ'] == 'ปรับปรุง' %}<span class="status-badge" style="background:#fff3cd; color:#856404;">ปรับปรุง</span>
+                                {% else %}<span class="status-badge status-error">เลิกใช้</span>{% endif %}
+                            </td>
                             <td>{{ link['ประเภท'] }}</td>
                             <td>{{ link['หน่วยงาน'] }}</td>
                             <td>{{ link['ส่วนราชการ'] }}</td>
-                            
                             <td>{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}</td>
-                            
-                            <td>
-                                <a href="{{ url_for('view_profile', username=link['CreatorUsername']) }}" style="color: var(--text-color);">
-                                    <i class="far fa-user"></i> {{ link['CreatorUsername'] }}
-                                </a>
-                            </td>
-                            <td>{{ link['วันที่อัปเดต_สั้น'] }}</td>
-                            
+                            <td><a href="{{ url_for('view_profile', username=link['CreatorUsername']) }}" style="color: var(--text-color);"><i class="far fa-user"></i> {{ link['CreatorUsername'] }}</a></td>
+                            <td data-sort="{{ link['วันที่อัปเดต_สั้น'] }}">{{ link['วันที่อัปเดต_สั้น'] }}</td>
                             <td align="center">
-                                <button type="button" class="btn-share" onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')">
-                                    <i class="fas fa-qrcode"></i>
-                                </button>
+                                <button type="button" class="btn-share mobile-hide-share" onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')"><i class="fas fa-qrcode"></i></button>
                             </td>
-                            
                             <td>
-                                <div class="action-buttons" style="justify-content: center;">
+                                <div class="action-buttons">
+                                    <button type="button" class="btn-icon btn-share mobile-show-share" style="display:none; background:#17a2b8;" onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')"><i class="fas fa-share-alt"></i></button>
                                 {% if session.level == 'Admin' or (session.level == 'Users' and link['CreatorUsername'] == session.username) %}
-                                    <a href="{{ url_for('edit_link_page', link_id=link['ID']) }}" class="btn-icon btn-edit" title="แก้ไข">
-                                        <i class="fas fa-pen"></i>
-                                    </a>
-                                    <form action="{{ url_for('delete_link_action', link_id=link['ID']) }}" method="POST" class="delete-form" style="margin:0;">
-                                        <button type="submit" class="btn-icon btn-delete" title="ลบ">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    <a href="{{ url_for('edit_link_page', link_id=link['ID']) }}" class="btn-icon btn-edit" title="แก้ไข"><i class="fas fa-pen"></i></a>
+                                    <form action="{{ url_for('delete_link_action', link_id=link['ID']) }}" method="POST" class="delete-form" style="margin:0;"><button type="submit" class="btn-icon btn-delete" title="ลบ"><i class="fas fa-trash"></i></button></form>
                                 {% else %}
-                                    <span style="color:#ccc; font-size:0.8rem;">-</span>
+                                    <span style="color:#ccc; font-size:0.8rem;" class="mobile-hide-dash">-</span>
                                 {% endif %}
                                 </div>
                             </td>
                         </tr>
                         {% else %}
                         <tr id="noDataRow">
-                            <td colspan="13" style="text-align: center; padding: 30px; color: #999;">
-                                <i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
-                                ไม่พบข้อมูลลิงก์
-                            </td>
+                            <td colspan="14" style="text-align: center; padding: 30px; color: #999;"><i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 10px;"></i><br>ไม่พบข้อมูลลิงก์</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -689,23 +452,8 @@
             </div>
 
             <div class="pagination-controls">
-                <div class="pagination-items">
-                    แสดง: 
-                    <select id="itemsPerPage" style="padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
-                        <option value="10">10</option>
-                        <option value="20" selected>20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                        <option value="99999">ทั้งหมด</option>
-                    </select>
-                </div>
-                <div class="pagination-nav">
-                    <button id="btnFirst">«</button>
-                    <button id="btnPrev">‹</button>
-                    <span style="margin: 0 10px; font-weight: 500;">หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span></span>
-                    <button id="btnNext">›</button>
-                    <button id="btnLast">»</button>
-                </div>
+                <div class="pagination-items">แสดง: <select id="itemsPerPage" style="padding: 5px; border-radius: 5px; border: 1px solid #ddd;"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option><option value="100">100</option><option value="99999">ทั้งหมด</option></select></div>
+                <div class="pagination-nav"><button id="btnFirst">«</button><button id="btnPrev">‹</button><span style="margin: 0 10px; font-weight: 500;">หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span></span><button id="btnNext">›</button><button id="btnLast">»</button></div>
             </div>
         </div>
     </div> 
@@ -713,43 +461,64 @@
     <footer class="main-footer">
         <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
         <p>สำนักยุทธศาสตร์และประเมินผล</p>
-        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
         <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
     </footer>
 
     <script>
-        // Toggle Hamburger Menu
-        function toggleMenu() {
-            const menu = document.getElementById('navMenu');
-            menu.classList.toggle('active');
-        }
+        function toggleMenu() { document.getElementById('navMenu').classList.toggle('active'); }
         
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            const nav = document.getElementById('navMenu');
-            const toggle = document.querySelector('.mobile-toggle');
-            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
-                nav.classList.remove('active');
-            }
-        });
-
-        // --- JavaScript Logic (Pagination, Search, Sort) ---
         let allTableRows = []; 
-        let currentPage = 1;
-        let totalPages = 1;
+        let currentPage = 1; let totalPages = 1;
         const tbody = document.getElementById("linkTableBody");
         const noDataRow = document.getElementById("noDataRow");
         const searchInput = document.getElementById("searchInput");
         const agencyFilter = document.getElementById("agencyFilter");
+        const mobileSort = document.getElementById("mobileSort");
 
-        function sortTable(columnIndex, direction) {
+        // --- Sort Logic (ให้ปักหมุดอยู่บนสุดเสมอ) ---
+        let sortState = { columnIndex: -1, direction: 'asc' };
+
+        function sortTable(columnIndex, forceDirection = null, type = 'text') {
+            const direction = forceDirection || (sortState.columnIndex === columnIndex && sortState.direction === 'asc' ? 'desc' : 'asc');
+            sortState = { columnIndex, direction };
+
+            document.querySelectorAll('.sort-icon').forEach(icon => { icon.textContent = '↕'; icon.classList.remove('sort-active'); });
+            const currentIcon = document.getElementById(`sort-${columnIndex}`);
+            if (currentIcon) { currentIcon.textContent = direction === 'asc' ? '▲' : '▼'; currentIcon.classList.add('sort-active'); }
+
             const collator = new Intl.Collator('th', { sensitivity: 'base' });
+            
             allTableRows.sort((rowA, rowB) => {
+                // เช็คว่าแถวไหนมีการปักหมุด
+                const isPinnedA = rowA.innerHTML.includes('fa-thumbtack') ? 1 : 0;
+                const isPinnedB = rowB.innerHTML.includes('fa-thumbtack') ? 1 : 0;
+                
+                // ถ้าอันนึงปักหมุด แต่อีกอันไม่ ให้ปักหมุดขึ้นก่อนเสมอ
+                if (isPinnedA !== isPinnedB) {
+                    return isPinnedB - isPinnedA;
+                }
+
+                // ถ้าสถานะปักหมุดเหมือนกัน ให้เรียงตามคอลัมน์ที่เลือก
                 const cellA = rowA.children[columnIndex].innerText.trim();
                 const cellB = rowB.children[columnIndex].innerText.trim();
+                
+                if(type === 'date') {
+                    const dateA = new Date(cellA); const dateB = new Date(cellB);
+                    return direction === 'asc' ? dateA - dateB : dateB - dateA;
+                }
                 return direction === 'asc' ? collator.compare(cellA, cellB) : collator.compare(cellB, cellA);
             });
             displayPage(currentPage);
+        }
+
+        // Event สำหรับ Dropdown เรียงลำดับในมือถือ
+        if(mobileSort) {
+            mobileSort.addEventListener('change', function() {
+                if(!this.value) return;
+                const [col, dir] = this.value.split('_');
+                // คอลัมน์ที่ 11 คือ วันที่อัปเดต
+                sortTable(parseInt(col), dir, col === '11' ? 'date' : 'text');
+            });
         }
 
         function displayPage(page) {
@@ -758,19 +527,14 @@
             const filterText = searchInput.value.toLowerCase();
             const selectedAgency = agencyFilter.value;
 
-            // กรองข้อมูล
             const filteredRows = allTableRows.filter(row => {
                 const textContent = row.innerText.toLowerCase();
-                // Agency Cell is at index 7
-                const agencyCell = row.children[7].innerText.trim(); 
-                
-                const matchesText = textContent.includes(filterText);
-                const matchesAgency = (selectedAgency === "") || (agencyCell === selectedAgency);
-                return matchesText && matchesAgency;
+                // ส่วนราชการอยู่ที่ index 8 ของตารางใหม่
+                const agencyCell = row.children[8].innerText.trim(); 
+                return textContent.includes(filterText) && (selectedAgency === "" || agencyCell === selectedAgency);
             });
 
             tbody.innerHTML = ''; 
-
             if (filteredRows.length === 0) {
                 if(noDataRow) { noDataRow.style.display = 'table-row'; tbody.appendChild(noDataRow); }
                 totalPages = 1; currentPage = 1;
@@ -793,9 +557,36 @@
             document.getElementById("btnLast").disabled = (currentPage === totalPages);
         }
 
+        // --- ระบบนับถอยหลัง เวลาคงเหลือ และแปลงวันที่ภาษาไทย ---
+        function updateCountdowns() {
+            const elements = document.querySelectorAll('.countdown-timer');
+            const now = new Date();
+            const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            
+            elements.forEach(el => {
+                const endDateStr = el.getAttribute('data-end-date');
+                if (!endDateStr) { el.innerHTML = '<span style="color:#999; font-size: 0.85em;">- ไม่ระบุ -</span>'; return; }
+                
+                const endDate = new Date(endDateStr); const diffMs = endDate - now;
+                const d = endDate.getDate(); const m = thaiMonths[endDate.getMonth()]; const y = endDate.getFullYear() + 543;
+                const hrs = String(endDate.getHours()).padStart(2, '0'); const mins = String(endDate.getMinutes()).padStart(2, '0');
+                const formattedThaiDate = `${d} ${m} ${y} เวลา ${hrs}:${mins} น.`;
+                
+                if (diffMs <= 0) { el.innerHTML = `<div style="font-weight: 600; color: #444; font-size: 0.95em; margin-bottom: 5px; white-space: nowrap;">${formattedThaiDate}</div><span style="color:#c62828; font-weight:bold; background: #ffebee; padding: 3px 8px; border-radius: 12px; font-size:0.85em;"><i class="fas fa-times-circle"></i> หมดเวลา</span>`; return; }
+                
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                const diffHrs = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let text = `เหลือ ${diffDays} วัน ${diffHrs} ชม.`;
+                if (diffDays === 0) { const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)); text = `เหลือ ${diffHrs} ชม. ${diffMins} นาที`; }
+                
+                let colorStyle, bgColor;
+                if (diffDays <= 3) { colorStyle = 'color: #c62828;'; bgColor = 'background: #ffebee;'; } else if (diffDays <= 7) { colorStyle = 'color: #e65100;'; bgColor = 'background: #fff3e0;'; } else { colorStyle = 'color: #2e7d32;'; bgColor = 'background: #e8f5e9;'; }
+                el.innerHTML = `<div style="font-weight: 600; color: #333; font-size: 0.95em; margin-bottom: 5px; white-space: nowrap;">${formattedThaiDate}</div><span style="${colorStyle} font-weight: 600; ${bgColor} padding: 4px 10px; border-radius: 12px; font-size:0.85em; display: inline-block; white-space: nowrap;"><i class="fas fa-clock"></i> ${text}</span>`;
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             allTableRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
-            
             document.getElementById("btnFirst").onclick = () => displayPage(1);
             document.getElementById("btnPrev").onclick = () => displayPage(currentPage - 1);
             document.getElementById("btnNext").onclick = () => displayPage(currentPage + 1);
@@ -803,7 +594,8 @@
             document.getElementById("itemsPerPage").onchange = () => displayPage(1);
             searchInput.onkeyup = () => displayPage(1);
             agencyFilter.onchange = () => displayPage(1);
-
+            
+            updateCountdowns(); setInterval(updateCountdowns, 60000);
             displayPage(1); 
         });
 
@@ -830,97 +622,11 @@
         function showShareModal(title, originalUrl, linkId) {
             const permanentLink = `${window.location.origin}/go/${linkId}`;
             const qrImageUrl = `{{ url_for('generate_qr_code') }}?url=${encodeURIComponent(permanentLink)}`;
-
             Swal.fire({
-                html: `
-                    <div style="text-align:center;">
-                        <h3 style="color:var(--bma-green); margin-bottom:10px;">📲 แชร์ลิงก์</h3>
-                        <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9rem; word-break:break-all;">
-                            ${permanentLink}
-                        </div>
-                        <img src="${qrImageUrl}" style="width:200px; border:1px solid #eee; padding:10px; border-radius:10px; margin-bottom:15px;">
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <button onclick="navigator.clipboard.writeText('${permanentLink}'); Swal.showValidationMessage('คัดลอกแล้ว!')" 
-                                style="background:#007bff; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">
-                                <i class="fas fa-copy"></i> คัดลอก
-                            </button>
-                            <a href="${qrImageUrl}" download="QR-${linkId}.png" 
-                                style="background:#28a745; color:white; text-decoration:none; padding:10px; border-radius:5px; display:inline-block;">
-                                <i class="fas fa-download"></i> บันทึก QR
-                            </a>
-                        </div>
-                    </div>
-                `,
-                showConfirmButton: false,
-                showCloseButton: true
+                html: `<div style="text-align:center;"><h3 style="color:var(--bma-green); margin-bottom:10px;">📲 แชร์ลิงก์</h3><div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9rem; word-break:break-all;">${permanentLink}</div><img src="${qrImageUrl}" style="width:200px; border:1px solid #eee; padding:10px; border-radius:10px; margin-bottom:15px;"><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><button onclick="navigator.clipboard.writeText('${permanentLink}'); Swal.showValidationMessage('คัดลอกแล้ว!')" style="background:#007bff; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;"><i class="fas fa-copy"></i> คัดลอก</button><a href="${qrImageUrl}" download="QR-${linkId}.png" style="background:#28a745; color:white; text-decoration:none; padding:10px; border-radius:5px; display:inline-block;"><i class="fas fa-download"></i> บันทึก QR</a></div></div>`,
+                showConfirmButton: false, showCloseButton: true
             });
         }
-    </script>
-    
-    <script>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                const messages = {{ messages | tojson }};
-                const Toast = Swal.mixin({
-                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true
-                });
-                messages.forEach(([category, message]) => {
-                    Toast.fire({ icon: category, title: message });
-                });
-            {% endif %}
-        {% endwith %}
-    </script>
-    <script>
-        function updateOnlineCount() {
-            fetch("{{ url_for('heartbeat') }}", { 
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}" 
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("HTTP error " + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if(data.online_count !== undefined) {
-                    const el = document.getElementById('onlineCount');
-                    if(el) {
-                        el.textContent = data.online_count;
-                        el.style.color = "var(--bma-green)"; 
-                    }
-                }
-            })
-            .catch(err => {
-                console.error("Heartbeat error:", err);
-                const el = document.getElementById('onlineCount');
-                if(el) el.textContent = "-";
-            });
-        }
-
-        updateOnlineCount();
-        setInterval(updateOnlineCount, 10000);
-
-        window.addEventListener('beforeunload', function() {
-            const data = new FormData();
-            const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
-            data.append('csrf_token', csrfToken);
-            navigator.sendBeacon("{{ url_for('offline') }}", data);
-        });
-    </script>
-    <script type="text/javascript">
-    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-    (function(){
-    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-    s1.async=true;
-    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-    s1.charset='UTF-8';
-    s1.setAttribute('crossorigin','*');
-    s0.parentNode.insertBefore(s1,s0);
-    })();
     </script>
 </body>
 </html>

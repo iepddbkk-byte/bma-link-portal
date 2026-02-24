@@ -149,6 +149,7 @@
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
+        
         /* --- Container & Content --- */
         .container {
             max-width: 1400px;
@@ -253,7 +254,7 @@
         }
 
         /* ปรับ Padding ไม่ให้ตัวหนังสือขาด */
-        #searchInput, #agencyFilter {
+        #searchInput, #agencyFilter, .mobile-sort-select {
             width: 100%; 
             padding: 0 20px 0 50px; 
             border: 1px solid var(--border-color); border-radius: 50px;
@@ -268,7 +269,7 @@
             cursor: pointer;
         }
 
-        #searchInput:focus, #agencyFilter:focus { 
+        #searchInput:focus, #agencyFilter:focus, .mobile-sort-select:focus { 
             outline: none; border-color: var(--bma-green); 
             background: white; box-shadow: 0 0 0 4px var(--bma-green-light); 
         }
@@ -277,6 +278,8 @@
             position: absolute; left: 20px; top: 50%; 
             transform: translateY(-50%); color: #999; font-size: 1.1rem;
         }
+        
+        .mobile-sort-wrapper { display: none; } /* ซ่อนตัวเรียงลำดับบนหน้าจอคอม */
 
         /* =======================================
            TABLE STYLING & SCROLL UX (UPDATED) 
@@ -289,12 +292,7 @@
             border: 1px solid var(--border-color);
             box-shadow: inset 0 0 10px rgba(0,0,0,0.02); /* เพิ่มมิติด้านในนิดหน่อย */
         }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            min-width: 950px; 
-            background: white; 
-        }
+        table { width: 100%; border-collapse: collapse; min-width: 950px; background: white; }
         
         /* Header Sorting Style (Sticky Top) */
         th {
@@ -357,11 +355,7 @@
         .status-unknown { background: #f5f5f5; color: #666; }
 
         /* Pinned Badge (UPDATED) */
-        .pinned-badge { 
-            background: #fff3e0; color: #e65100; padding: 4px 10px; 
-            border-radius: 12px; font-size: 0.85em; margin-bottom: 5px; 
-            font-weight: 600; display: inline-block; border: 1px solid #ffb74d; 
-        }
+        .pinned-badge { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-bottom: 5px; font-weight: 600; display: inline-block; border: 1px solid #ffb74d; }
 
         /* Privacy Badges */
         .privacy-badge {
@@ -427,7 +421,7 @@
         }
 
         /* =========================================
-           MOBILE SPECIFIC STYLES
+           MOBILE SPECIFIC STYLES (CARD VIEW)
            ========================================= */
         @media (max-width: 768px) {
             body { padding-top: 70px; }
@@ -453,7 +447,7 @@
             
             .nav-link.profile-item { display: none; }
 
-            .container { padding: 15px; margin: 15px auto; }
+            .container { padding: 15px; margin: 15px auto; background: transparent; box-shadow: none; }
             h1 { font-size: 1.4em; }
             
             /* Fix Filter Layout on Mobile */
@@ -461,43 +455,83 @@
             .filters-group { flex-direction: column; width: 100%; gap: 15px; }
             .search-input-wrapper, .filter-wrapper { width: 100%; flex: auto; min-width: 0; }
 
+            /* Show Mobile Sort */
+            .mobile-sort-wrapper { display: block; width: 100%; }
+            .mobile-sort-select { padding-left: 20px !important; }
+
             /* Fix Date Range Wrapper on Mobile */
             .date-range-wrapper { 
                 width: 100%; 
                 justify-content: center; 
-                flex-wrap: wrap; 
-                height: auto; 
+                flex-wrap: wrap; /* ยอมให้ตกบรรทัด */
+                height: auto; /* สูงตามเนื้อหา */
                 padding: 10px;
                 gap: 10px;
-                border-radius: 20px; 
+                border-radius: 20px; /* ปรับมนน้อยลงหน่อย */
             }
             
             .date-input {
                 width: auto;
-                flex: 1; 
-                min-width: 120px; 
+                flex: 1; /* ขยายเต็มที่ */
+                min-width: 120px; /* กันไม่ให้เล็กเกินไป */
                 text-align: center;
-                background: white; 
+                background: white; /* ให้เห็นชัดขึ้น */
                 border-radius: 5px;
                 padding: 5px;
             }
 
-            /* Adjust table height for mobile */
-            .table-responsive { max-height: 60vh; }
-
-            /* Table Mobile Optimization: Hide non-essential columns */
-            th:nth-child(3), td:nth-child(3), /* รายละเอียด */
-            th:nth-child(4), td:nth-child(4), /* ระดับ */
-            th:nth-child(5), td:nth-child(5), /* กำหนดส่ง */
-            th:nth-child(6), td:nth-child(6), /* LinkStatus */
-            th:nth-child(7), td:nth-child(7), /* สถานะ */
-            th:nth-child(9), td:nth-child(9), /* หน่วยงาน */
-            th:nth-child(10), td:nth-child(10), /* ส่วนราชการ */
-            th:nth-child(11), td:nth-child(11), /* เบอร์ */
-            th:nth-child(13), td:nth-child(13) /* วันที่ */
-            { display: none; }
+            /* --- Table to Card Transformation --- */
+            .table-responsive { border: none; max-height: none; overflow: visible; background: transparent; }
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead { display: none; }
             
-            .pagination-controls { justify-content: center; }
+            #linkTableBody tr {
+                background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative;
+            }
+            /* ไฮไลท์การ์ดที่ปักหมุดบนมือถือ */
+            #linkTableBody tr[style*="background-color: #fffdf5"] { border: 2px solid #ffb74d !important; }
+
+            #linkTableBody td {
+                padding: 8px 0; border-bottom: 1px dashed #f0f0f0; text-align: left !important;
+                display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
+            }
+            #linkTableBody tr td:last-child { border-bottom: none; }
+
+            /* Fix Favorite Star position */
+            #linkTableBody td:nth-child(1) {
+                display: block !important; position: absolute; top: 15px; right: 15px; border: none; padding: 0; width: auto;
+            }
+
+            /* Hide Unnecessary Columns on Mobile */
+            /* 1:Star, 2:Name, 3:Desc, 4:Privacy, 5:DueDate, 6:StatusCheck, 7:Status, 8:Type, 9:Div, 10:Bureau, 11:Phone, 12:Creator, 13:Date, 14:Share */
+            #linkTableBody td:nth-child(3), /* Desc */
+            #linkTableBody td:nth-child(4), /* Privacy */
+            #linkTableBody td:nth-child(6), /* Status Check */
+            #linkTableBody td:nth-child(7), /* Status */
+            #linkTableBody td:nth-child(8), /* Type */
+            #linkTableBody td:nth-child(9), /* Div */
+            #linkTableBody td:nth-child(11) /* Phone */
+            { display: none !important; }
+
+            /* Format Visible Columns for Card */
+            #linkTableBody td:nth-child(2) { display: block; border-bottom: none; padding-bottom: 0; margin-bottom: 10px; width: 90%; }
+            #linkTableBody td:nth-child(2) a { font-size: 1.15rem; }
+            
+            /* Add Labels via CSS pseudo-elements */
+            #linkTableBody td:nth-child(5)::before { content: "⏳ กำหนดส่ง:"; font-weight: 600; color: #555; }
+            #linkTableBody td:nth-child(10)::before { content: "🏛️ กอง/สำนัก:"; font-weight: 600; color: #555; }
+            #linkTableBody td:nth-child(12)::before { content: "👤 ผู้สร้าง:"; font-weight: 600; color: #555; }
+            #linkTableBody td:nth-child(13)::before { content: "🗓️ อัปเดตล่าสุด:"; font-weight: 600; color: #555; }
+            
+            /* Combine Share Button to bottom */
+            #linkTableBody td:nth-child(14) {
+                display: flex !important; justify-content: flex-end; gap: 10px;
+                border-bottom: none; border-top: 1px solid #eee; padding-top: 15px; margin-top: 10px;
+            }
+
+            .pagination-controls { justify-content: center; background: white; padding: 15px; border-radius: 15px; }
+            .pagination-items { width: 100%; text-align: center; margin-bottom: 10px; }
         }
     </style>
 </head>
@@ -622,6 +656,16 @@
                     <input type="date" id="endDate" class="date-input" title="วันที่สิ้นสุด">
                     <button id="clearDates" class="btn-clear-date" title="ล้างวันที่"><i class="fas fa-times"></i></button>
                 </div>
+                
+                <div class="mobile-sort-wrapper">
+                    <select id="mobileSort" class="mobile-sort-select">
+                        <option value="">↕️ เรียงลำดับข้อมูล</option>
+                        <option value="1_asc">ชื่อลิงก์ (ก-ฮ)</option>
+                        <option value="1_desc">ชื่อลิงก์ (ฮ-ก)</option>
+                        <option value="12_desc">วันที่อัปเดต (ใหม่-เก่า)</option>
+                        <option value="12_asc">วันที่อัปเดต (เก่า-ใหม่)</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -667,7 +711,7 @@
                 <tbody id="linkTableBody">
                     
                     {% for link in links %}
-                    <tr style="{% if link.get('ปักหมุด') == 'ปักหมุด' %}background-color: #fffdf5; border-left: 4px solid #ff9800;{% endif %}">
+                    <tr style="{% if link.get('ปักหมุด') == 'ปักหมุด' %}background-color: #fffdf5;{% endif %}">
                         <td style="text-align: center;">
                             {% if session.get('logged_in') %}
                                 <button class="btn-fav {% if link['ID'] in fav_ids %}active{% endif %}" 
@@ -831,6 +875,7 @@
         let startDateInput;
         let endDateInput;
         let clearDatesBtn;
+        let mobileSort;
         
         // State for sorting
         let sortState = {
@@ -847,9 +892,10 @@
             startDateInput = document.getElementById("startDate");
             endDateInput = document.getElementById("endDate");
             clearDatesBtn = document.getElementById("clearDates");
+            mobileSort = document.getElementById("mobileSort");
             
             // Check URL Params
-            const urlParams = new URLSearchParams(window.location.search);
+            const urlParams = newSearchParams(window.location.search);
             const searchParam = urlParams.get('search');
             const agencyParam = urlParams.get('agency');
             const categoryParam = urlParams.get('category');
@@ -906,14 +952,10 @@
             return true;
         }
 
-        // Sort Function
-        function sortTable(columnIndex, type = 'text') {
-            if (sortState.columnIndex === columnIndex) {
-                sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortState.columnIndex = columnIndex;
-                sortState.direction = 'asc';
-            }
+        // --- Sort Logic (ให้ปักหมุดอยู่บนสุดเสมอ) ---
+        function sortTable(columnIndex, forceDirection = null, type = 'text') {
+            const direction = forceDirection || (sortState.columnIndex === columnIndex && sortState.direction === 'asc' ? 'desc' : 'asc');
+            sortState = { columnIndex, direction };
 
             document.querySelectorAll('.sort-icon').forEach(icon => {
                 icon.textContent = '↕';
@@ -921,15 +963,25 @@
             });
             const currentIcon = document.getElementById(`sort-${columnIndex}`);
             if (currentIcon) {
-                currentIcon.textContent = sortState.direction === 'asc' ? '▲' : '▼';
+                currentIcon.textContent = direction === 'asc' ? '▲' : '▼';
                 currentIcon.classList.add('sort-active');
             }
 
             const collator = new Intl.Collator('th', { sensitivity: 'base' });
 
             allTableRows.sort((rowA, rowB) => {
-                let cellA = rowA.getElementsByTagName("td")[columnIndex].textContent.trim();
-                let cellB = rowB.getElementsByTagName("td")[columnIndex].textContent.trim();
+                // เช็คว่าแถวไหนมีการปักหมุด
+                const isPinnedA = rowA.innerHTML.includes('fa-thumbtack') ? 1 : 0;
+                const isPinnedB = rowB.innerHTML.includes('fa-thumbtack') ? 1 : 0;
+                
+                // ถ้าอันนึงปักหมุด แต่อีกอันไม่ ให้ปักหมุดขึ้นก่อนเสมอ
+                if (isPinnedA !== isPinnedB) {
+                    return isPinnedB - isPinnedA;
+                }
+
+                // ถ้าสถานะปักหมุดเหมือนกัน ให้เรียงตามคอลัมน์ที่เลือก
+                let cellA = rowA.children[columnIndex].textContent.trim();
+                let cellB = rowB.children[columnIndex].textContent.trim();
 
                 let comparison = 0;
 
@@ -945,10 +997,20 @@
                     comparison = collator.compare(cellA, cellB);
                 }
 
-                return sortState.direction === 'asc' ? comparison : -comparison;
+                return direction === 'asc' ? comparison : -comparison;
             });
 
-            displayPage(1); 
+            displayPage(currentPage); 
+        }
+
+        // Event สำหรับ Dropdown เรียงลำดับในมือถือ
+        if(mobileSort) {
+            mobileSort.addEventListener('change', function() {
+                if(!this.value) return;
+                const [col, dir] = this.value.split('_');
+                // คอลัมน์ที่ 12 คือ วันที่อัปเดต
+                sortTable(parseInt(col), dir, col === '12' ? 'date' : 'text');
+            });
         }
 
         // Display Logic
@@ -963,9 +1025,10 @@
 
             const filteredRows = allTableRows.filter(row => {
                 const textContent = row.innerText.toLowerCase();
-                const divisionCell = row.getElementsByTagName("td")[8].textContent.trim(); 
-                const bureauCell = row.getElementsByTagName("td")[9].textContent.trim(); 
-                const dateCell = row.getElementsByTagName("td")[12].textContent.trim(); 
+                // [UPDATED] อัปเดต Index คอลัมน์ให้ตรงกับการแทรกคอลัมน์ใหม่ (กำหนดส่ง)
+                const divisionCell = row.children[8].innerText.trim(); 
+                const bureauCell = row.children[9].innerText.trim(); 
+                const dateCell = row.children[12].innerText.trim(); 
                 
                 const matchesText = textContent.includes(textFilter);
                 const matchesAgency = (selectedAgency === "") || (divisionCell === selectedAgency) || (bureauCell === selectedAgency);
@@ -1076,7 +1139,7 @@
                     el.innerHTML = `
                         <div style="font-weight: 600; color: #444; font-size: 0.95em; margin-bottom: 5px; white-space: nowrap;">${formattedThaiDate}</div>
                         <span style="color:#c62828; font-weight:bold; background: #ffebee; padding: 3px 8px; border-radius: 12px; font-size:0.85em;">
-                            <i class="fas fa-times-circle"></i> ครบกำหนดส่ง
+                            <i class="fas fa-times-circle"></i> หมดเวลา
                         </span>
                     `;
                     return;
@@ -1120,7 +1183,7 @@
             Swal.fire({
                 html: `
                     <div style="text-align:center;">
-                        <h3 style="color:var(--bma-green); margin-bottom:10px;">📲 แชร์ลิงค์</h3>
+                        <h3 style="color:var(--bma-green); margin-bottom:10px;">📲 แชร์ลิงก์</h3>
                         <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9rem; word-break:break-all;">
                             ${permanentLink}
                         </div>
