@@ -4,447 +4,862 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMA SMART LINKAGE - แก้ไขลิงก์</title>
-    
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
+        /* ==========================================
+           ROOT & RESET
+        ========================================== */
         :root {
-            /* Theme Colors */
-            --bma-green: #00963C;
-            --bma-green-hover: #007a30;
-            --bma-green-light: #e8f5e9;
-            --button-red: #dc3545;
-            --button-blue: #007bff;
-            --button-yellow: #ffc107;
-            --button-gray: #6c757d;
-            --text-color: #2c3e50;
-            --border-color: #e0e0e0;
-            --bg-grad-start: #f5f7fa;
-            --bg-grad-end: #c3cfe2;
-            
-            --header-height: 80px;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --bma-green:        #00963C;
+            --bma-green-hover:  #007a30;
+            --bma-green-dark:   #005a24;
+            --bma-green-light:  #e8f5e9;
+            --bma-green-mid:    #c8e6c9;
+            --text-color:       #1a2332;
+            --text-muted:       #64748b;
+            --border-color:     #e2e8f0;
+            --bg-page:          #f0f4f8;
+            --bg-card:          #ffffff;
+            --bg-input:         #f8fafc;
+            --header-height:    72px;
+            --shadow-sm:  0 1px 3px rgba(0,0,0,0.07);
+            --shadow-md:  0 4px 12px rgba(0,0,0,0.07);
+            --shadow-lg:  0 10px 30px rgba(0,0,0,0.09);
+            --shadow-xl:  0 20px 50px rgba(0,0,0,0.12);
+            --radius-sm:  8px;
+            --radius-md:  12px;
+            --radius-lg:  16px;
+            --radius-xl:  22px;
+            --radius-full: 9999px;
+            --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
         }
 
-        /* FIX FONT ISSUE */
-        body, button, input, select, textarea, optgroup {
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
             font-family: 'Kanit', sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body { 
-            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+            background: var(--bg-page);
             color: var(--text-color);
             min-height: 100vh;
             padding-top: var(--header-height);
+            -webkit-font-smoothing: antialiased;
         }
+        input, select, button, textarea { font-family: 'Kanit', sans-serif; }
 
-        /* --- Header & Navigation --- */
+        /* ==========================================
+           HEADER
+        ========================================== */
         .main-header {
-            background: white;
-            padding: 0 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            height: var(--header-height);
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 0 24px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.06), var(--shadow-sm);
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 1000; height: var(--header-height);
             display: flex; align-items: center; justify-content: space-between;
-            transition: all 0.3s ease;
         }
 
-        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
-        .logo-container img:hover { transform: scale(1.05); }
-        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
+        .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-container img { height: 42px; transition: transform var(--transition); }
+        .logo-container:hover img { transform: scale(1.05); }
+        .logo-text { font-size: 1.2rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        .nav-menu { display: flex; align-items: center; gap: 8px; }
-
+        .nav-menu { display: flex; align-items: center; gap: 4px; }
         .nav-link {
-            text-decoration: none; color: var(--text-color); font-weight: 500;
-            padding: 8px 16px; border-radius: 50px; transition: all 0.2s ease;
-            display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;
+            text-decoration: none; color: var(--text-muted); font-weight: 500;
+            padding: 8px 14px; border-radius: var(--radius-full);
+            transition: all var(--transition); display: flex; align-items: center;
+            gap: 7px; font-size: 0.9rem; white-space: nowrap;
         }
-        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
-        .nav-link i { font-size: 1.1em; }
-        
-        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
-        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
-        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
+        .nav-link:hover { background: var(--bma-green-light); color: var(--bma-green); }
+        .nav-link.active-nav { background: var(--bma-green); color: #fff; box-shadow: 0 4px 12px rgba(0,150,60,0.25); }
+        .nav-link.logout-btn { color: #ef4444; }
+        .nav-link.logout-btn:hover { background: #fef2f2; }
+        .user-profile-pic { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
 
-        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
-
-        /* --- Mobile Header Controls --- */
-        .mobile-controls { display: none; align-items: center; gap: 15px; }
-        .mobile-profile-btn { display: flex; align-items: center; text-decoration: none; }
-        .mobile-profile-btn img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .mobile-toggle { font-size: 1.6rem; cursor: pointer; color: var(--text-color); padding: 5px; }
-
-        /* --- Container --- */
-        .container { max-width: 900px; margin: 40px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: var(--shadow-lg); animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Back Button */
-        .btn-back {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: linear-gradient(135deg, var(--button-gray), #5a6268);
-            color: white; border: none; padding: 10px 20px; border-radius: 25px;
-            cursor: pointer; font-size: 0.95em; font-weight: 500;
-            transition: all 0.3s ease; box-shadow: var(--shadow-sm);
-            text-decoration: none; margin-bottom: 30px;
+        .mobile-controls { display: none; align-items: center; gap: 10px; }
+        .mobile-profile-btn img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+        .mobile-toggle {
+            width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border-radius: var(--radius-sm); background: #f8fafc;
+            transition: background var(--transition);
         }
-        .btn-back:hover { background: linear-gradient(135deg, #5a6268, #495057); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .mobile-toggle:hover { background: var(--bma-green-light); color: var(--bma-green); }
+        .mobile-toggle i { font-size: 1.25rem; color: var(--text-color); }
 
-        h2 {
-            color: var(--bma-green); font-size: 2em; font-weight: 600;
-            margin-bottom: 30px; padding-bottom: 15px;
-            border-bottom: 3px solid var(--bma-green-light);
-            display: flex; align-items: center; gap: 10px;
+        /* ==========================================
+           PAGE LAYOUT
+        ========================================== */
+        .page-wrapper {
+            max-width: 780px;
+            margin: 32px auto 60px;
+            padding: 0 20px;
+            animation: fadeInUp 0.4s ease;
         }
-        h2::before { content: "✏️"; font-size: 0.8em; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==========================================
+           PAGE HEADER BANNER
+        ========================================== */
+        .page-banner {
+            background: linear-gradient(135deg, #005a24 0%, #007a30 40%, var(--bma-green) 100%);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: 28px 32px;
+            display: flex; align-items: center; gap: 18px;
+            position: relative; overflow: hidden;
+        }
+        .page-banner::before {
+            content: '';
+            position: absolute; top: -40px; right: -40px;
+            width: 160px; height: 160px;
+            background: rgba(255,255,255,0.07); border-radius: 50%;
+        }
+        .page-banner::after {
+            content: '';
+            position: absolute; bottom: -60px; right: 100px;
+            width: 110px; height: 110px;
+            background: rgba(255,255,255,0.04); border-radius: 50%;
+        }
+
+        .banner-icon {
+            width: 52px; height: 52px;
+            background: rgba(255,255,255,0.18);
+            border-radius: var(--radius-lg);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; flex-shrink: 0;
+            backdrop-filter: blur(8px);
+            position: relative; z-index: 1;
+        }
+        .banner-text { position: relative; z-index: 1; }
+        .banner-text h1 { font-size: 1.35rem; font-weight: 700; color: #fff; margin-bottom: 3px; display: flex; align-items: center; gap: 10px; }
+        .banner-text p  { font-size: 0.82rem; color: rgba(255,255,255,0.75); }
 
         .id-badge {
-            display: inline-block; background: var(--bma-green-light); color: var(--bma-green);
-            padding: 5px 15px; border-radius: 20px; font-size: 0.5em; font-weight: 600;
-            margin-left: 10px; border: 1px solid var(--bma-green); vertical-align: middle;
+            display: inline-flex; align-items: center;
+            background: rgba(255,255,255,0.2);
+            color: #fff; padding: 3px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.72rem; font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.35);
+            letter-spacing: 0.04em;
         }
 
-        /* Form Styles */
-        form { display: flex; flex-direction: column; gap: 25px; }
-        form div { display: flex; flex-direction: column; }
-        
-        form label { font-weight: 600; margin-bottom: 8px; color: var(--text-color); font-size: 0.95em; display: flex; align-items: center; gap: 5px; }
-        form label::before { content: "📌"; font-size: 0.9em; }
-
-        form input, form textarea, form select {
-            width: 100%; padding: 14px 18px; border: 2px solid var(--border-color);
-            border-radius: 12px; font-size: 1em; background-color: #f8f9fa;
-            transition: all 0.3s ease; color: var(--text-color);
+        /* ==========================================
+           FORM CARD
+        ========================================== */
+        .form-card {
+            background: var(--bg-card);
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
         }
-        form input:focus, form select:focus, form textarea:focus {
-            outline: none; border-color: var(--bma-green); background-color: white;
-            box-shadow: 0 0 0 4px var(--bma-green-light); transform: translateY(-2px);
-        }
-        form input[readonly], form select[readonly] { background-color: #e9ecef; color: #6c757d; cursor: not-allowed; border-color: #ced4da; }
 
-        /* Submit Button */
-        button[type="submit"] {
-            background: linear-gradient(135deg, var(--bma-green), #007a30);
-            color: white; border: none; padding: 16px; border-radius: 50px;
-            font-size: 1.1em; font-weight: 600; cursor: pointer;
-            transition: 0.3s; box-shadow: var(--shadow-md); margin-top: 10px;
+        /* ==========================================
+           INFO BOX
+        ========================================== */
+        .info-box {
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 24px;
+            font-size: 0.875rem; color: #1e40af;
+        }
+        .info-box i { font-size: 1rem; color: #3b82f6; flex-shrink: 0; }
+
+        /* ==========================================
+           FORM SECTIONS
+        ========================================== */
+        .form-section {
+            margin-bottom: 28px;
+        }
+        .form-section-title {
+            font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--text-muted);
+            display: flex; align-items: center; gap: 8px;
+            padding-bottom: 12px; margin-bottom: 16px;
+            border-bottom: 1.5px solid var(--border-color);
+        }
+        .form-section-title .section-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--bma-green); flex-shrink: 0;
+        }
+
+        /* ==========================================
+           FORM GROUPS
+        ========================================== */
+        .form-group {
+            display: flex; flex-direction: column; gap: 6px;
+            margin-bottom: 18px;
+        }
+        .form-group:last-child { margin-bottom: 0; }
+
+        .form-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+        }
+
+        /* Labels */
+        .form-label {
+            font-size: 0.875rem; font-weight: 600; color: var(--text-color);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .label-icon {
+            width: 20px; height: 20px; border-radius: 5px;
+            background: var(--bma-green-light); color: var(--bma-green);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.68rem; flex-shrink: 0;
+        }
+        .required-star { color: #ef4444; margin-left: 2px; font-size: 0.8rem; }
+
+        /* Inputs */
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 0.92rem; font-family: 'Kanit', sans-serif;
+            color: var(--text-color);
+            background: var(--bg-input);
+            transition: all var(--transition);
+            -webkit-appearance: none; appearance: none;
+        }
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--bma-green);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(0,150,60,0.12);
+        }
+        .form-input::placeholder,
+        .form-textarea::placeholder { color: #94a3b8; font-size: 0.88rem; }
+
+        .form-input.locked,
+        .form-select.locked {
+            background: #f1f5f9; color: var(--text-muted);
+            cursor: not-allowed; border-color: #e2e8f0;
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+        .form-select.locked { background-image: none; }
+
+        .form-textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+
+        /* Input with icon prefix */
+        .input-wrapper {
+            position: relative; display: flex; align-items: center;
+        }
+        .input-prefix-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 0.85rem; pointer-events: none; z-index: 1;
+        }
+        .input-wrapper .form-input { padding-left: 38px; }
+
+        /* Hint text */
+        .form-hint {
+            font-size: 0.78rem; color: var(--text-muted);
+            display: flex; align-items: flex-start; gap: 5px;
+            line-height: 1.5;
+        }
+        .form-hint i { color: var(--bma-green); margin-top: 1px; flex-shrink: 0; font-size: 0.75rem; }
+
+        /* Locked field hint */
+        .locked-hint {
+            display: flex; align-items: center; gap: 6px;
+            background: #f8fafc; border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); padding: 6px 10px;
+            font-size: 0.77rem; color: var(--text-muted);
+        }
+        .locked-hint i { color: var(--bma-green); font-size: 0.72rem; }
+
+        /* Modified indicator */
+        .modified-indicator {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #fff3e0; color: #c2410c;
+            padding: 4px 10px; border-radius: var(--radius-full);
+            font-size: 0.76rem; font-weight: 600;
+            border: 1px solid #fed7aa; width: fit-content; margin-bottom: 6px;
+        }
+        .modified-indicator i { font-size: 0.72rem; }
+
+        /* ==========================================
+           ADMIN PANEL
+        ========================================== */
+        .admin-panel {
+            background: linear-gradient(135deg, #fffbeb, #fef9e7);
+            border: 1.5px solid #fde68a;
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            margin-bottom: 20px;
+        }
+        .admin-panel-header {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.82rem; font-weight: 700; color: #92400e;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            margin-bottom: 14px; padding-bottom: 10px;
+            border-bottom: 1px dashed #fde68a;
+        }
+        .admin-panel-header i { color: #f59e0b; }
+
+        /* Pin checkbox row */
+        .pin-row {
+            display: flex; align-items: center; gap: 12px;
+            background: #fff; border: 1.5px solid #fde68a;
+            border-radius: var(--radius-md); padding: 12px 16px;
+            cursor: pointer; transition: all var(--transition);
+            margin-bottom: 14px;
+        }
+        .pin-row:hover { border-color: #f59e0b; background: #fffbeb; }
+
+        .pin-checkbox {
+            width: 20px; height: 20px; cursor: pointer;
+            accent-color: #f59e0b; flex-shrink: 0;
+        }
+        .pin-label {
+            font-size: 0.88rem; font-weight: 600; color: #92400e; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; margin: 0;
+        }
+        .pin-label i { color: #f59e0b; }
+
+        .date-group { display: flex; flex-direction: column; gap: 6px; }
+        .date-label { font-size: 0.82rem; font-weight: 600; color: #92400e; display: flex; align-items: center; gap: 6px; }
+        .date-label i { color: #f59e0b; }
+        .form-input.date-input {
+            border-color: #fde68a; max-width: 300px;
+            background: #fff;
+        }
+        .form-input.date-input:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
+
+        /* ==========================================
+           URL SHORTENER BOX
+        ========================================== */
+        .shortener-box {
+            margin-top: 10px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #fff;
+        }
+        .shortener-header {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff; padding: 11px 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; font-size: 0.85rem; font-weight: 500;
+            transition: filter var(--transition);
+            user-select: none;
+        }
+        .shortener-header:hover { filter: brightness(1.08); }
+        .shortener-header-left { display: flex; align-items: center; gap: 8px; }
+        .shortener-content { display: none; }
+        .shortener-content.active { display: block; }
+        .shortener-content iframe { width: 100%; height: 420px; border: none; display: block; }
+        .shortener-footer {
+            padding: 10px 14px; background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem; color: var(--text-muted);
+        }
+        .shortener-footer a { color: #2563eb; text-decoration: none; font-weight: 500; }
+        .shortener-footer a:hover { text-decoration: underline; }
+
+        /* ==========================================
+           SUBMIT BUTTON
+        ========================================== */
+        .submit-section { margin-top: 8px; }
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--bma-green-dark), var(--bma-green));
+            color: #fff; border: none;
+            padding: 16px 24px; border-radius: var(--radius-full);
+            font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: all var(--transition);
+            box-shadow: 0 4px 15px rgba(0,150,60,0.3);
             display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        button[type="submit"]:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 150, 60, 0.4); }
-        button[type="submit"]::before { content: "💾"; font-size: 1.2em; }
-
-        .info-box {
-            background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px;
-            border-radius: 10px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;
-            color: #0d47a1; font-size: 0.95em;
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,150,60,0.4);
+            background: linear-gradient(135deg, var(--bma-green), #00c851);
         }
-        .info-box::before { content: "ℹ️"; font-size: 1.5em; }
+        .btn-submit:active { transform: translateY(0); }
 
-        .modified-indicator {
-            display: inline-block; background: #fff3e0; color: #e65100;
-            padding: 5px 10px; border-radius: 15px; font-size: 0.8em;
-            font-weight: 600; margin-bottom: 10px; border: 1px solid #ffb74d; width: fit-content;
+        /* Back link */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 20px; font-size: 0.85rem;
+            color: var(--text-muted); text-decoration: none;
+            transition: color var(--transition);
         }
-        
-        .info-text { font-size: 0.85em; color: #666; margin-top: 5px; font-style: italic; }
-        
-        /* Shortener Box */
-        .shortener-box { border: 1px solid #d0d7de; background-color: #ffffff; border-radius: 12px; overflow: hidden; margin-top: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .shortener-header { background: linear-gradient(135deg, var(--button-blue), #0056b3); color: white; padding: 12px 20px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .shortener-content { display: none; background: white; border-top: 1px solid #eee; }
-        .shortener-content.active { display: block; }
-        iframe { width: 100%; height: 500px; border: none; display: block; }
-        .fallback-link { padding: 15px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; }
+        .back-link:hover { color: var(--bma-green); }
 
-
-        /* Responsive */
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
         @media (max-width: 992px) { .nav-link span { display: none; } }
         @media (max-width: 768px) {
-            .mobile-controls { display: flex; } .mobile-toggle { display: block; }
-            .nav-menu { display: none; position: absolute; top: 70px; left: 0; width: 100%; background: white; flex-direction: column; padding: 15px; box-shadow: var(--shadow-lg); }
+            .mobile-controls { display: flex; }
+            .nav-menu {
+                display: none; position: absolute; top: var(--header-height);
+                left: 0; width: 100%; background: #fff;
+                flex-direction: column; padding: 12px;
+                box-shadow: var(--shadow-lg); border-top: 1px solid var(--border-color);
+            }
             .nav-menu.active { display: flex; }
-            .nav-link { width: 100%; padding: 12px; height: auto; justify-content: flex-start; }
+            .nav-link { width: 100%; padding: 12px 16px; border-radius: var(--radius-md); }
             .nav-link span { display: inline; }
             .nav-link.profile-item { display: none; }
-            
-            .container { padding: 25px 20px; margin: 20px 15px; }
-            h2 { font-size: 1.5em; }
-            .id-badge { font-size: 0.6em; display: block; width: fit-content; margin-top: 5px; margin-left: 0; }
+
+            .page-wrapper { margin: 16px auto 40px; }
+            .page-banner { padding: 20px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+            .form-card { padding: 20px; }
+            .form-row { grid-template-columns: 1fr; }
+            .banner-text h1 { font-size: 1.1rem; flex-wrap: wrap; }
+            .form-input.date-input { max-width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <header class="main-header">
-        <a href="{{ url_for('home') }}" class="logo-container">
-            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-            <div class="logo-text">แก้ไขข้อมูล</div>
-        </a>
-        
-        <div class="mobile-controls">
-            {% if session.get('logged_in') %}
-                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
-                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
-                </a>
-            {% endif %}
-            <div class="mobile-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+<header class="main-header">
+    <a href="{{ url_for('home') }}" class="logo-container">
+        <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+        <div class="logo-text">BMA Smart Linkage</div>
+    </a>
+
+    <div class="mobile-controls">
+        {% if session.get('logged_in') %}
+            <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
+                <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
+            </a>
+        {% endif %}
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars" id="menuIcon"></i>
         </div>
-    
-        <nav class="nav-menu" id="navMenu">
-            {% if session.get('logged_in') %}
-                <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
-                
-                {% if session.get('level') == 'Admin' %}
-                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
-                {% endif %}
-                
-                <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
-                
-                <a href="{{ url_for('links_page') }}" class="nav-link" title="ลิงก์ทั้งหมด" style="color: #007bff;">
-                    <i class="fas fa-layer-group"></i> <span>ลิงก์ทั้งหมด</span>
-                </a> 
-                
-                <a href="{{ url_for('my_favorites_page') }}" class="nav-link" title="My Favorites"><i class="fas fa-star" style="color: #ffc107;"></i> <span>ลิงค์โปรดของฉัน</span></a>
-                <a href="{{ url_for('analytics_page') }}" class="nav-link"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
-                <a href="{{ url_for('feedback_page') }}" class="nav-link"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
-                
-                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item">
-                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
-                    <span>{{ session.name }}</span>
-                </a>
-                
-                <a href="{{ url_for('logout') }}" class="nav-link logout-btn"><i class="fas fa-sign-out-alt"></i> <span>ออก</span></a>
+    </div>
+
+    <nav class="nav-menu" id="navMenu">
+        {% if session.get('logged_in') %}
+            <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+            {% if session.get('level') == 'Admin' %}
+            <a href="{{ url_for('admin_panel') }}" class="nav-link" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
             {% endif %}
-        </nav>
-    </header>
+            <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('links_page') }}" class="nav-link"><i class="fas fa-layer-group"></i> <span>ลิงก์ทั้งหมด</span></a>
+            <a href="{{ url_for('my_favorites_page') }}" class="nav-link"><i class="fas fa-star" style="color:#f59e0b;"></i> <span>ลิงค์โปรด</span></a>
+            <a href="{{ url_for('analytics_page') }}" class="nav-link"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+            <a href="{{ url_for('feedback_page') }}" class="nav-link"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+            <a href="{{ url_for('profile_page') }}" class="nav-link profile-item">
+                <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                <span>{{ session.name }}</span>
+            </a>
+            <a href="{{ url_for('logout') }}" class="nav-link logout-btn"><i class="fas fa-sign-out-alt"></i> <span>ออก</span></a>
+        {% else %}
+            <a href="{{ url_for('login_page') }}" class="nav-link active-nav"><i class="fas fa-user-lock"></i> <span>เข้าระบบ</span></a>
+        {% endif %}
+    </nav>
+</header>
 
-    <div class="container">
-        <a href="{{ url_for('dashboard') }}" class="btn-back">⬅️ กลับหน้า Dashboard</a>
+<!-- ==================== FORM ==================== -->
+<div class="page-wrapper">
 
-        <h2>
-            แก้ไขลิงก์
-            <span class="id-badge">ID: {{ link.ID }}</span>
-        </h2>
+    <!-- Banner -->
+    <div class="page-banner">
+        <div class="banner-icon">✏️</div>
+        <div class="banner-text">
+            <h1>
+                แก้ไขลิงก์
+                <span class="id-badge">ID: {{ link.ID }}</span>
+            </h1>
+            <p>แก้ไขข้อมูลลิงก์ในระบบ BMA Smart Linkage — กรุณาตรวจสอบให้ครบถ้วนก่อนบันทึก</p>
+        </div>
+    </div>
 
+    <!-- Form Card -->
+    <div class="form-card">
+
+        <!-- Info Box -->
         <div class="info-box">
-            <p><strong>กำลังแก้ไขข้อมูล:</strong> กรุณาตรวจสอบข้อมูลให้ครบถ้วนก่อนบันทึก</p>
+            <i class="fas fa-circle-info"></i>
+            <span>กำลังแก้ไขข้อมูลลิงก์ กรุณาตรวจสอบข้อมูลให้ครบถ้วนก่อนกดบันทึก</span>
         </div>
 
         <form id="editLinkForm" action="{{ url_for('update_link_action', link_id=link.ID) }}" method="POST">
-            
+
+            <!-- ── ADMIN PANEL ── -->
             {% if is_admin %}
-            <div style="background: #fff8e1; border-left: 4px solid #ffc107; padding: 15px; border-radius: 10px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 10px;">
-                <div style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
-                    <input type="checkbox" id="is_pinned" name="is_pinned" value="ปักหมุด" {% if link.get('ปักหมุด') == 'ปักหมุด' %}checked{% endif %} style="width: 25px; height: 25px; cursor: pointer; margin: 0;">
-                    <label for="is_pinned" style="color: #d35400; cursor: pointer; margin: 0; font-size: 1.1em;">
-                        <i class="fas fa-fire"></i> ปักหมุดให้เป็น <strong>"ลิงก์สำคัญเร่งด่วน"</strong> (เฉพาะแอดมิน)
-                    </label>
+            <div class="admin-panel">
+                <div class="admin-panel-header">
+                    <i class="fas fa-crown"></i> ตัวเลือกพิเศษสำหรับผู้ดูแลระบบ
                 </div>
-                
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <label for="end_date" style="color: #d35400; font-size: 0.95em; margin:0;"><i class="fas fa-calendar-alt"></i> วันที่สิ้นสุด / กำหนดส่งงาน (ถ้ามี)</label>
-                    <input type="datetime-local" id="end_date" name="end_date" value="{{ link.get('วันที่สิ้นสุด', '') }}" style="border: 1px solid #ffc107; border-radius: 8px; padding: 10px; max-width: 300px; background: white;">
+
+                <label class="pin-row" for="is_pinned">
+                    <input type="checkbox" id="is_pinned" name="is_pinned" value="ปักหมุด" class="pin-checkbox"
+                           {% if link.get('ปักหมุด') == 'ปักหมุด' %}checked{% endif %}>
+                    <span class="pin-label">
+                        <i class="fas fa-thumbtack"></i>
+                        ปักหมุด — ตั้งให้เป็น <strong>"ลิงก์สำคัญเร่งด่วน"</strong>
+                    </span>
+                </label>
+
+                <div class="date-group">
+                    <label class="date-label" for="end_date">
+                        <i class="fas fa-calendar-alt"></i> วันที่สิ้นสุด / กำหนดส่งงาน (ถ้ามี)
+                    </label>
+                    <input type="datetime-local" id="end_date" name="end_date"
+                           value="{{ link.get('วันที่สิ้นสุด', '') }}"
+                           class="form-input date-input">
                 </div>
             </div>
             {% endif %}
 
-            <div>
-                <label for="ชื่อลิงก์">ชื่อลิงก์ (จำเป็น)</label>
-                <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์" value="{{ link['ชื่อลิงก์'] }}" required>
+            <!-- ── SECTION 1: ข้อมูลหลัก ── -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span class="section-dot"></span>
+                    ข้อมูลหลักของลิงก์
+                </div>
+
+                <!-- ชื่อลิงก์ -->
+                <div class="form-group">
+                    <label class="form-label" for="ชื่อลิงก์">
+                        <span class="label-icon"><i class="fas fa-tag"></i></span>
+                        ชื่อลิงก์ <span class="required-star">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-tag input-prefix-icon"></i>
+                        <input type="text" id="ชื่อลิงก์" name="ชื่อลิงก์"
+                               class="form-input" value="{{ link['ชื่อลิงก์'] }}" required>
+                    </div>
+                </div>
+
+                <!-- URL -->
+                <div class="form-group">
+                    <label class="form-label" for="URL">
+                        <span class="label-icon"><i class="fas fa-link"></i></span>
+                        URL ลิงก์ <span class="required-star">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-globe input-prefix-icon"></i>
+                        <input type="url" id="URL" name="URL"
+                               class="form-input" value="{{ link.URL }}" placeholder="https://..." required>
+                    </div>
+
+                    <!-- Shortener -->
+                    <div class="shortener-box">
+                        <div class="shortener-header" onclick="toggleShortener()">
+                            <div class="shortener-header-left">
+                                <i class="fas fa-scissors"></i>
+                                เครื่องมือย่อลิงก์ กทม. (คลิกเพื่อเปิด)
+                            </div>
+                            <i class="fas fa-chevron-down" id="shortenerIcon"></i>
+                        </div>
+                        <div class="shortener-content" id="shortenerContent">
+                            <iframe src="https://u.bangkok.go.th/index.php" title="BMA URL Shortener" loading="lazy"></iframe>
+                            <div class="shortener-footer">
+                                Credit: สำนักดิจิทัล กรุงเทพมหานคร &nbsp;|&nbsp;
+                                <a href="https://u.bangkok.go.th/index.php" target="_blank" rel="noopener">
+                                    <i class="fas fa-external-link-alt"></i> เปิดในหน้าต่างใหม่
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-hint">
+                        <i class="fas fa-lightbulb"></i>
+                        คัดลอกลิงก์สั้นจากเครื่องมือด้านบน แล้วนำมาวางในช่อง URL ด้านบน
+                    </div>
+                </div>
+
+                <!-- ประเภท -->
+                <div class="form-group">
+                    <label class="form-label" for="ประเภท">
+                        <span class="label-icon"><i class="fas fa-th-large"></i></span>
+                        ประเภท (นโยบาย 9 ด้าน) <span class="required-star">*</span>
+                    </label>
+                    <select id="ประเภท" name="ประเภท" class="form-select" required>
+                        <option value="" disabled>— เลือกประเภท (9 ด้าน 9 ดี) —</option>
+                        <option value="เดินทางดี" {% if link['ประเภท'] == 'เดินทางดี' %}selected{% endif %}>1. เดินทางดี</option>
+                        <option value="ปลอดภัยดี" {% if link['ประเภท'] == 'ปลอดภัยดี' %}selected{% endif %}>2. ปลอดภัยดี</option>
+                        <option value="โปร่งใสดี" {% if link['ประเภท'] == 'โปร่งใสดี' %}selected{% endif %}>3. โปร่งใสดี</option>
+                        <option value="สิ่งแวดล้อมดี" {% if link['ประเภท'] == 'สิ่งแวดล้อมดี' %}selected{% endif %}>4. สิ่งแวดล้อมดี</option>
+                        <option value="สุขภาพดี" {% if link['ประเภท'] == 'สุขภาพดี' %}selected{% endif %}>5. สุขภาพดี</option>
+                        <option value="เรียนดี" {% if link['ประเภท'] == 'เรียนดี' %}selected{% endif %}>6. เรียนดี</option>
+                        <option value="เศรษฐกิจดี" {% if link['ประเภท'] == 'เศรษฐกิจดี' %}selected{% endif %}>7. เศรษฐกิจดี</option>
+                        <option value="สังคมดี" {% if link['ประเภท'] == 'สังคมดี' %}selected{% endif %}>8. สังคมดี</option>
+                        <option value="บริหารจัดการดี" {% if link['ประเภท'] == 'บริหารจัดการดี' %}selected{% endif %}>9. บริหารจัดการดี</option>
+                        <option value="อื่นๆ" {% if link['ประเภท'] == 'อื่นๆ' %}selected{% endif %}>อื่นๆ</option>
+                    </select>
+                </div>
             </div>
 
-            <div>
-                <label for="URL">URL (จำเป็น)</label>
-                <input type="url" id="URL" name="URL" value="{{ link.URL }}" placeholder="https://..." required>
+            <!-- ── SECTION 2: สังกัด ── -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span class="section-dot"></span>
+                    ข้อมูลสังกัดหน่วยงาน
+                </div>
 
-                <div class="shortener-box">
-                    <div class="shortener-header" onclick="toggleShortener()">
-                        <span><i class="fas fa-cut"></i> เครื่องมือย่อลิงก์ กทม. (คลิกเพื่อใช้งาน)</span>
-                        <i class="fas fa-chevron-down" id="shortenerIcon"></i>
+                <div class="form-row">
+                    <!-- กอง/สำนักงาน -->
+                    <div class="form-group">
+                        <label class="form-label" for="ส่วนราชการ">
+                            <span class="label-icon"><i class="fas fa-building"></i></span>
+                            กอง / สำนักงาน
+                        </label>
+                        {% if is_admin %}
+                            <div class="modified-indicator"><i class="fas fa-crown"></i> Admin: แก้ไขได้</div>
+                            <select id="ส่วนราชการ" name="ส่วนราชการ" class="form-select" required>
+                                <option value="" disabled>--- กรุณาเลือกกอง/สำนักงาน ---</option>
+                                <option value="สำนักงานเลขานุการ">สำนักงานเลขานุการ</option>
+                                <option value="สำนักงานบริหารยุทธศาสตร์">สำนักงานบริหารยุทธศาสตร์</option>
+                                <option value="กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง">กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง</option>
+                                <option value="กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง">กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง</option>
+                                <option value="กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง">กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</option>
+                                <option value="กองยุทธศาสตร์คุณภาพชีวิตเมือง">กองยุทธศาสตร์คุณภาพชีวิตเมือง</option>
+                            </select>
+                        {% else %}
+                            <input type="text" id="ส่วนราชการ" name="ส่วนราชการ"
+                                   value="{{ link['ส่วนราชการ'] }}" class="form-input locked" readonly>
+                        {% endif %}
                     </div>
-                    <div class="shortener-content" id="shortenerContent">
-                        <iframe src="https://u.bangkok.go.th/index.php" title="BMA Shortener"></iframe>
-                        <div class="fallback-link">
-                            ⚠️ Credit: สำนักดิจิทัล กรุงเทพมหานคร <br>
-                            <a href="https://u.bangkok.go.th/index.php" target="_blank" style="color:var(--button-blue); font-weight:bold; text-decoration:none;">
-                                <i class="fas fa-external-link-alt"></i> คลิกที่นี่เพื่อเปิดในหน้าต่างใหม่
-                            </a>
+
+                    <!-- กลุ่มงาน/ฝ่าย -->
+                    <div class="form-group">
+                        <label class="form-label" for="หน่วยงาน">
+                            <span class="label-icon"><i class="fas fa-users"></i></span>
+                            กลุ่มงาน / ฝ่าย
+                        </label>
+                        {% if is_admin %}
+                            <div class="modified-indicator"><i class="fas fa-crown"></i> Admin: แก้ไขได้</div>
+                            <input type="text" id="หน่วยงาน" name="หน่วยงาน"
+                                   value="{{ link['หน่วยงาน'] }}" class="form-input" required>
+                        {% else %}
+                            <input type="text" id="หน่วยงาน" name="หน่วยงาน"
+                                   value="{{ link['หน่วยงาน'] }}" class="form-input locked" readonly>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if not is_admin %}
+                <div class="locked-hint">
+                    <i class="fas fa-lock"></i>
+                    ข้อมูลสังกัดดึงจากโปรไฟล์ของผู้สร้างโดยอัตโนมัติ ไม่สามารถแก้ไขได้
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ── SECTION 3: สถานะและสิทธิ์ ── -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span class="section-dot"></span>
+                    สถานะและสิทธิ์การเข้าถึง
+                </div>
+
+                <div class="form-row">
+                    <!-- สถานะ -->
+                    <div class="form-group">
+                        <label class="form-label" for="สถานะ">
+                            <span class="label-icon"><i class="fas fa-toggle-on"></i></span>
+                            สถานะ <span class="required-star">*</span>
+                        </label>
+                        <select id="สถานะ" name="สถานะ" class="form-select" required>
+                            <option value="ใช้งาน" {% if link['สถานะ'] == 'ใช้งาน' %}selected{% endif %}>✅ ใช้งาน</option>
+                            <option value="ปรับปรุง" {% if link['สถานะ'] == 'ปรับปรุง' %}selected{% endif %}>🔧 ปรับปรุง</option>
+                            <option value="เลิกใช้งาน" {% if link['สถานะ'] == 'เลิกใช้งาน' %}selected{% endif %}>❌ เลิกใช้งาน</option>
+                        </select>
+                    </div>
+
+                    <!-- ความเป็นส่วนตัว -->
+                    <div class="form-group">
+                        {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
+                        <label class="form-label" for="ความเป็นส่วนตัว">
+                            <span class="label-icon"><i class="fas fa-shield-alt"></i></span>
+                            ระดับการเข้าถึง <span class="required-star">*</span>
+                        </label>
+                        <select id="ความเป็นส่วนตัว" name="ความเป็นส่วนตัว" class="form-select" required>
+                            <option value="สาธารณะ" {% if privacy == 'สาธารณะ' %}selected{% endif %}>🌐 สาธารณะ (ทุกคน)</option>
+                            <option value="สยป." {% if privacy == 'สยป.' %}selected{% endif %}>🏛️ สยป. (เจ้าหน้าที่ สยป.)</option>
+                            <option value="กอง/สำนักงาน" {% if privacy == 'กอง/สำนักงาน' %}selected{% endif %}>🏢 กอง/สำนักงาน</option>
+                            <option value="กลุ่มงาน/ฝ่าย" {% if privacy == 'กลุ่มงาน/ฝ่าย' %}selected{% endif %}>👥 กลุ่มงาน/ฝ่าย</option>
+                            <option value="ส่วนตัว" {% if privacy == 'ส่วนตัว' %}selected{% endif %}>🔒 ส่วนตัว (เฉพาะฉัน)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SECTION 4: ข้อมูลติดต่อ ── -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span class="section-dot"></span>
+                    ข้อมูลติดต่อผู้รับผิดชอบ
+                </div>
+
+                <div class="form-row">
+                    <!-- อีเมล -->
+                    <div class="form-group">
+                        <label class="form-label" for="อีเมลผู้รับผิดชอบ">
+                            <span class="label-icon"><i class="fas fa-envelope"></i></span>
+                            อีเมลผู้รับผิดชอบ <span class="required-star">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-prefix-icon"></i>
+                            <input type="email" id="อีเมลผู้รับผิดชอบ" name="อีเมลผู้รับผิดชอบ"
+                                   class="form-input" value="{{ link['อีเมลผู้รับผิดชอบ'] }}" required>
+                        </div>
+                    </div>
+
+                    <!-- เบอร์โทร -->
+                    <div class="form-group">
+                        <label class="form-label" for="เบอร์โทรติดต่อ">
+                            <span class="label-icon"><i class="fas fa-phone"></i></span>
+                            เบอร์โทรติดต่อ <span class="required-star">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone input-prefix-icon"></i>
+                            <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ"
+                                   class="form-input"
+                                   value="{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}" required>
+                        </div>
+                        <div class="form-hint">
+                            <i class="fas fa-info-circle"></i>
+                            ระบบจะลบเครื่องหมาย ' ให้อัตโนมัติหาก Copy มาจาก Excel
                         </div>
                     </div>
                 </div>
-                <span class="info-text">💡 ก๊อปปี้ลิงก์สั้นจากเครื่องมือด้านบน แล้วนำมาวางในช่อง URL</span>
-            </div>
-            
-            <div>
-                <label for="ประเภท">ประเภท (จำเป็น)</label>
-                <select id="ประเภท" name="ประเภท" required>
-                    <option value="" disabled>--- เลือกประเภท (9 ด้าน 9 ดี) ---</option>
-                    <option value="เดินทางดี" {% if link['ประเภท'] == 'เดินทางดี' %}selected{% endif %}>1. เดินทางดี</option>
-                    <option value="ปลอดภัยดี" {% if link['ประเภท'] == 'ปลอดภัยดี' %}selected{% endif %}>2. ปลอดภัยดี</option>
-                    <option value="โปร่งใสดี" {% if link['ประเภท'] == 'โปร่งใสดี' %}selected{% endif %}>3. โปร่งใสดี</option>
-                    <option value="สิ่งแวดล้อมดี" {% if link['ประเภท'] == 'สิ่งแวดล้อมดี' %}selected{% endif %}>4. สิ่งแวดล้อมดี</option>
-                    <option value="สุขภาพดี" {% if link['ประเภท'] == 'สุขภาพดี' %}selected{% endif %}>5. สุขภาพดี</option>
-                    <option value="เรียนดี" {% if link['ประเภท'] == 'เรียนดี' %}selected{% endif %}>6. เรียนดี</option>
-                    <option value="เศรษฐกิจดี" {% if link['ประเภท'] == 'เศรษฐกิจดี' %}selected{% endif %}>7. เศรษฐกิจดี</option>
-                    <option value="สังคมดี" {% if link['ประเภท'] == 'สังคมดี' %}selected{% endif %}>8. สังคมดี</option>
-                    <option value="บริหารจัดการดี" {% if link['ประเภท'] == 'บริหารจัดการดี' %}selected{% endif %}>9. บริหารจัดการดี</option>
-                    <option value="อื่นๆ" {% if link['ประเภท'] == 'อื่นๆ' %}selected{% endif %}>อื่นๆ</option>
-                </select>
             </div>
 
-            <div>
-                <label for="หน่วยงาน">กลุ่มงาน / ฝ่าย (จำเป็น)</label>
-                {% if is_admin %}
-                    <span class="modified-indicator">คุณเป็น Admin: สามารถแก้ไขกลุ่มงาน/ฝ่ายได้</span>
-                    <input type="text" id="หน่วยงาน" name="หน่วยงาน" value="{{ link['หน่วยงาน'] }}" required>
-                {% else %}
-                    <input type="text" id="หน่วยงาน" name="หน่วยงาน" value="{{ link['หน่วยงาน'] }}" readonly>
-                    <span class="info-text">💡 ข้อมูลนี้อ้างอิงตามสังกัดของผู้สร้าง ไม่สามารถเปลี่ยนแปลงได้</span>
-                {% endif %}
+            <!-- ── SECTION 5: รายละเอียดเพิ่มเติม ── -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span class="section-dot"></span>
+                    รายละเอียดเพิ่มเติม (ไม่บังคับ)
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="รายละเอียด">
+                        <span class="label-icon"><i class="fas fa-align-left"></i></span>
+                        รายละเอียด / หมายเหตุ
+                    </label>
+                    <textarea id="รายละเอียด" name="รายละเอียด" rows="3"
+                              class="form-textarea"
+                              placeholder="ระบุรายละเอียดเพิ่มเติม หรือหมายเหตุพิเศษ (ถ้ามี)...">{{ link['รายละเอียด'] }}</textarea>
+                </div>
             </div>
 
-            <div>
-                <label for="ส่วนราชการ">กอง / สำนักงาน (จำเป็น)</label>
-                {% if is_admin %}
-                    <span class="modified-indicator">คุณเป็น Admin: สามารถเปลี่ยนกอง/สำนักงานได้</span>
-                    <select id="ส่วนราชการ" name="ส่วนราชการ" required>
-                        <option value="" disabled>--- กรุณาเลือกกอง/สำนักงาน ---</option>
-                        <option value="สำนักงานเลขานุการ">สำนักงานเลขานุการ</option>
-                        <option value="สำนักงานบริหารยุทธศาสตร์">สำนักงานบริหารยุทธศาสตร์</option>
-                        <option value="กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง">กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง</option>
-                        <option value="กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง">กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง</option>
-                        <option value="กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง">กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</option>
-                        <option value="กองยุทธศาสตร์คุณภาพชีวิตเมือง">กองยุทธศาสตร์คุณภาพชีวิตเมือง</option>
-                    </select>
-                {% else %}
-                    <input type="text" id="ส่วนราชการ" name="ส่วนราชการ" value="{{ link['ส่วนราชการ'] }}" readonly>
-                {% endif %}
+            <!-- ── SUBMIT ── -->
+            <div class="submit-section">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i>
+                    ยืนยันการแก้ไขลิงก์
+                </button>
             </div>
 
-            <div>
-                <label for="สถานะ">สถานะ (จำเป็น)</label>
-                <select id="สถานะ" name="สถานะ" required>
-                    <option value="ใช้งาน" {% if link['สถานะ'] == 'ใช้งาน' %}selected{% endif %}>ใช้งาน</option>
-                    <option value="ปรับปรุง" {% if link['สถานะ'] == 'ปรับปรุง' %}selected{% endif %}>ปรับปรุง</option>
-                    <option value="เลิกใช้งาน" {% if link['สถานะ'] == 'เลิกใช้งาน' %}selected{% endif %}>เลิกใช้งาน</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="ความเป็นส่วนตัว">ระดับความเป็นส่วนตัว (สิทธิ์การเข้าถึง)</label>
-                {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
-                <select id="ความเป็นส่วนตัว" name="ความเป็นส่วนตัว" required>
-                    <option value="สาธารณะ" {% if privacy == 'สาธารณะ' %}selected{% endif %}>🌐 สาธารณะ (ทุกคนมองเห็นได้แม้ไม่ได้เข้าระบบ)</option>
-                    <option value="สยป." {% if privacy == 'สยป.' %}selected{% endif %}>🏛️ สยป. (มองเห็นได้เฉพาะเจ้าหน้าที่ สยป. ทั้งหมด)</option>
-                    <option value="กอง/สำนักงาน" {% if privacy == 'กอง/สำนักงาน' %}selected{% endif %}>🏢 กอง/สำนักงาน (มองเห็นได้เฉพาะเจ้าหน้าที่ใน "กอง" เดียวกัน)</option>
-                    <option value="กลุ่มงาน/ฝ่าย" {% if privacy == 'กลุ่มงาน/ฝ่าย' %}selected{% endif %}>👥 กลุ่มงาน/ฝ่าย (มองเห็นได้เฉพาะเจ้าหน้าที่ใน "ฝ่าย" เดียวกัน)</option>
-                    <option value="ส่วนตัว" {% if privacy == 'ส่วนตัว' %}selected{% endif %}>🔒 ส่วนตัว (เห็นเฉพาะฉันผู้สร้างลิงก์)</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="อีเมลผู้รับผิดชอบ">อีเมลผู้รับผิดชอบ (จำเป็น)</label>
-                <input type="email" id="อีเมลผู้รับผิดชอบ" name="อีเมลผู้รับผิดชอบ" value="{{ link['อีเมลผู้รับผิดชอบ'] }}" required>
-            </div>
-
-            <div>
-                <label for="เบอร์โทรติดต่อ">เบอร์โทรติดต่อ (จำเป็น)</label>
-                <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ" value="{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}" required>
-                <span class="info-text">💡 ระบบจะลบเครื่องหมาย ' (ฝนทอง) ให้อัตโนมัติ</span>
-            </div>
-
-            <div>
-                <label for="รายละเอียด">รายละเอียด (ถ้ามี)</label>
-                <textarea id="รายละเอียด" name="รายละเอียด" rows="3">{{ link['รายละเอียด'] }}</textarea>
-            </div>
-
-            <div>
-                <button type="submit">ยืนยันการแก้ไข</button>
-            </div>
         </form>
-    </div>
 
-    <script>
-        function toggleMenu() { document.getElementById('navMenu').classList.toggle('active'); }
+        <!-- Back link -->
+        <a href="{{ url_for('dashboard') }}" class="back-link">
+            <i class="fas fa-arrow-left" style="font-size:0.8rem;"></i>
+            กลับไปหน้า Dashboard
+        </a>
+    </div><!-- /.form-card -->
 
-        // Toggle Shortener Box
-        function toggleShortener() {
-            const content = document.getElementById('shortenerContent');
-            const icon = document.getElementById('shortenerIcon');
-            if (content.classList.contains('active')) {
-                content.classList.remove('active');
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            } else {
-                content.classList.add('active');
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            }
+</div><!-- /.page-wrapper -->
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+    // Mobile Menu
+    function toggleMenu() {
+        const nav  = document.getElementById('navMenu');
+        const icon = document.getElementById('menuIcon');
+        nav.classList.toggle('active');
+        icon.className = nav.classList.contains('active') ? 'fas fa-times' : 'fas fa-bars';
+    }
+    document.addEventListener('click', (e) => {
+        const nav    = document.getElementById('navMenu');
+        const toggle = document.querySelector('.mobile-toggle');
+        if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+            nav.classList.remove('active');
+            document.getElementById('menuIcon').className = 'fas fa-bars';
         }
+    });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            {% if is_admin %}
-            const currentAgency = "{{ link['ส่วนราชการ'] }}";
-            const agencySelect = document.getElementById('ส่วนราชการ');
-            if (currentAgency && agencySelect) {
-                // เช็คว่ามีตัวเลือกนี้ให้เลือกหรือไม่
-                for (let i = 0; i < agencySelect.options.length; i++) {
-                    if (agencySelect.options[i].value === currentAgency) {
-                        agencySelect.selectedIndex = i;
-                        break;
-                    }
+    // Toggle URL Shortener
+    function toggleShortener() {
+        const content = document.getElementById('shortenerContent');
+        const icon    = document.getElementById('shortenerIcon');
+        const isOpen  = content.classList.toggle('active');
+        icon.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+    }
+
+    // Phone number cleaning
+    const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
+    if (phoneInput) {
+        const clean = (input) => { input.value = input.value.replace(/'/g, ''); };
+        phoneInput.addEventListener('input',  (e) => clean(e.target));
+        phoneInput.addEventListener('paste',  (e) => setTimeout(() => clean(e.target), 10));
+    }
+
+    document.getElementById('editLinkForm').addEventListener('submit', function() {
+        if (phoneInput) phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
+    });
+
+    // Admin: pre-select agency
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if is_admin %}
+        const currentAgency = "{{ link['ส่วนราชการ'] }}";
+        const agencySelect  = document.getElementById('ส่วนราชการ');
+        if (currentAgency && agencySelect) {
+            for (let i = 0; i < agencySelect.options.length; i++) {
+                if (agencySelect.options[i].value === currentAgency) {
+                    agencySelect.selectedIndex = i;
+                    break;
                 }
             }
-            {% endif %}
-        });
-
-        // Phone cleaning script
-        document.getElementById('editLinkForm').addEventListener('submit', function(e) {
-            const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
-            if (phoneInput) {
-                phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
-            }
-        });
-        const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
-        if(phoneInput) {
-            function cleanRealTime(input) {
-                let val = input.value;
-                if (val.includes("'")) {
-                    input.value = val.replace(/'/g, '');
-                }
-            }
-            phoneInput.addEventListener('input', function(e) { cleanRealTime(e.target); });
-            phoneInput.addEventListener('paste', function(e) {
-                setTimeout(() => { cleanRealTime(e.target); }, 10);
-            });
         }
+        {% endif %}
+    });
+</script>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 3000 });
-                {% for category, message in messages %} Toast.fire({ icon: '{{ category }}', title: '{{ message }}' }); {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </script>
-    <script type="text/javascript">
+<!-- Flash Messages -->
+<script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+            {% for category, message in messages %}
+                Toast.fire({ icon: '{{ category }}', title: '{{ message }}' });
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</script>
+
+<!-- Tawk.to -->
+<script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
-    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-    s1.async=true;
-    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-    s1.charset='UTF-8';
-    s1.setAttribute('crossorigin','*');
-    s0.parentNode.insertBefore(s1,s0);
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true; s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+        s1.charset='UTF-8'; s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
     })();
-    </script>
+</script>
+
 </body>
 </html>
