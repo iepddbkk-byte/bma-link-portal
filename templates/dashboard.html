@@ -668,33 +668,19 @@
                 <table>
                     <thead>
                         <tr>
-                            <!-- TD 1 -->
-                            <th style="width:46px; text-align:center; cursor:default;">⭐</th>
-                            <!-- TD 2 -->
-                            <th onclick="sortTable(1)">ชื่อลิงก์ <span id="sort-1" class="sort-icon">↕</span></th>
-                            <!-- TD 3 -->
-                            <th>รายละเอียด</th>
-                            <!-- TD 4 -->
-                            <th style="text-align:center; width:90px;">ระดับ</th>
-                            <!-- TD 5 -->
-                            <th style="text-align:center;">⏳ กำหนดส่ง</th>
-                            <!-- TD 6 -->
-                            <th style="text-align:center;">สถานะลิงก์</th>
-                            <!-- TD 7 -->
-                            <th style="text-align:center;">การใช้งาน</th>
-                            <!-- TD 8 -->
-                            <th>ประเภท</th>
-                            <!-- TD 9 -->
-                            <th>หน่วยงาน</th>
-                            <!-- TD 10 -->
-                            <th onclick="sortTable(9)">ส่วนราชการ <span id="sort-9" class="sort-icon">↕</span></th>
-                            <!-- TD 11 -->
-                            <th>เบอร์ติดต่อ</th>
-                            <!-- TD 12 -->
-                            <th onclick="sortTable(11)">ผู้สร้าง <span id="sort-11" class="sort-icon">↕</span></th>
-                            <!-- TD 13 -->
-                            <th onclick="sortTable(12,'date')">วันที่ <span id="sort-12" class="sort-icon">↕</span></th>
-                            <!-- TD 14 -->
+                            <th style="width:46px; text-align:center;">⭐</th>
+							<th onclick="sortTable(1)">🔗 ชื่อลิงก์ <span id="sort-1" class="sort-icon">↕</span></th>
+							<th>📄 รายละเอียด</th>
+							<th style="text-align:center; width:90px;">ระดับ</th>
+							<th style="text-align:center;">⏳ กำหนดส่ง</th>
+							<th style="text-align:center;" onclick="sortTable(5)">🚦 การตรวจ <span id="sort-5" class="sort-icon">↕</span></th>
+							<th style="text-align:center;" onclick="sortTable(6)">📊 สถานะ <span id="sort-6" class="sort-icon">↕</span></th>
+							<th onclick="sortTable(7)">📂 ประเภท <span id="sort-7" class="sort-icon">↕</span></th>
+							<th onclick="sortTable(8)">🏢 หน่วยงาน <span id="sort-8" class="sort-icon">↕</span></th>
+							<th onclick="sortTable(9)">🏛️ ส่วนราชการ <span id="sort-9" class="sort-icon">↕</span></th>
+							<th>📞 เบอร์ติดต่อ</th>
+							<th onclick="sortTable(11)">👤 ผู้สร้าง <span id="sort-11" class="sort-icon">↕</span></th>
+							<th onclick="sortTable(12, 'date')">🗓️ วันที่อัปเดต <span id="sort-12" class="sort-icon">↕</span></th>
                             <th style="text-align:center; width:56px;">แชร์</th>
                             <!-- TD 15 -->
                             <th style="text-align:center; width:110px;">จัดการ</th>
@@ -1020,7 +1006,7 @@
     // ──────────────────────────────────────────
     //  Toggle Favorite
     // ──────────────────────────────────────────
-    function toggleFav(btn, linkId) {
+        function toggleFav(btn, linkId) {
         const isActive = btn.classList.contains('active');
         isActive ? btn.classList.remove('active') : btn.classList.add('active');
         if (!isActive) {
