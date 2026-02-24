@@ -4,53 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMA SMART LINKAGE - รายการโปรดของฉัน</title>
-    
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
+        /* ==========================================
+           ROOT VARIABLES & BASE
+        ========================================== */
         :root {
-            /* Theme Colors */
             --bma-green: #00963C;
             --bma-green-hover: #007a30;
+            --bma-green-dark: #005a24;
             --bma-green-light: #e8f5e9;
-            --button-red: #dc3545;
-            --button-blue: #007bff;
-            --button-yellow: #ffc107;
-            --button-gray: #6c757d;
-            --text-color: #2c3e50;
-            --border-color: #e0e0e0;
-            --bg-grad-start: #f5f7fa;
-            --bg-grad-end: #c3cfe2;
-            
-            --header-height: 80px;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --bma-green-mid: #c8e6c9;
+            --fav-gold: #f59e0b;
+            --fav-gold-light: #fef9c3;
+            --fav-gold-mid: #fde68a;
+            --text-color: #1a2332;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --bg-page: #f0f4f8;
+            --bg-card: #ffffff;
+            --header-height: 72px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.06);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* FIX FONT ISSUE */
-        body, button, input, select, textarea, optgroup, table, th, td {
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
             font-family: 'Kanit', sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body { 
-            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+            background: var(--bg-page);
             color: var(--text-color);
             min-height: 100vh;
             padding-top: var(--header-height);
             padding-bottom: 60px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* --- Header & Navigation --- */
+        input, select, button, textarea { font-family: 'Kanit', sans-serif; }
+
+        /* ==========================================
+           HEADER
+        ========================================== */
         .main-header {
-            background: white;
-            padding: 0 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 0 24px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.06), var(--shadow-sm);
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 1000;
@@ -58,426 +73,725 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.3s ease;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
-        .logo-container img:hover { transform: scale(1.05); }
-        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
+        .header-left { display: flex; align-items: center; gap: 16px; }
 
-        /* Desktop Menu */
-        .nav-menu { display: flex; align-items: center; gap: 8px; }
+        .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-container img { height: 42px; width: auto; transition: transform var(--transition); }
+        .logo-container:hover img { transform: scale(1.05); }
+        .logo-text { font-size: 1.25rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; letter-spacing: -0.3px; }
 
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            white-space: nowrap;
-        }
-        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
-        .nav-link i { font-size: 1.1em; }
-        
-        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
-        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
-        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
-
-        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
-
-        /* --- Mobile Header Controls (Profile + Hamburger) --- */
-        .mobile-controls { display: none; align-items: center; gap: 15px; }
-        
-        .mobile-profile-btn {
-            display: flex; align-items: center; text-decoration: none;
-        }
-        .mobile-profile-btn img {
-            width: 40px; height: 40px; border-radius: 50%; 
-            border: 2px solid var(--bma-green); object-fit: cover;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .mobile-toggle {
-            font-size: 1.6rem;
-            cursor: pointer;
-            color: var(--text-color);
-            padding: 5px;
-        }
-
-        /* จัดกลุ่ม Logo กับ Stats ให้อยู่ทางซ้าย */
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px; 
-        }
-
-        /* กล่องแสดงจำนวนคนออนไลน์ */
         .header-online-count {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: var(--bma-green-light);
-            color: var(--bma-green);
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border: 1px solid var(--bma-green);
+            display: flex; align-items: center; gap: 7px;
+            background: var(--bma-green-light); color: var(--bma-green-dark);
+            padding: 5px 14px; border-radius: var(--radius-full);
+            font-size: 0.85rem; font-weight: 600;
+            border: 1px solid var(--bma-green-mid);
             white-space: nowrap;
         }
-
-        /* Mobile Responsive: ซ่อนกล่องออนไลน์ทั้งหมดบนมือถือ */
-        @media (max-width: 768px) {
-            .header-online-count { display: none; }
-        }
-
-        /* Animation จุดสีเขียวกระพริบ */
         .pulsating-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #2ecc71;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            width: 9px; height: 9px;
+            background: #22c55e; border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(34,197,94,0.7);
             animation: pulse-green 2s infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+            70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+            100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
         }
 
-        @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        /* Desktop Nav */
+        .nav-menu { display: flex; align-items: center; gap: 4px; }
+        .nav-link {
+            text-decoration: none; color: var(--text-muted); font-weight: 500;
+            padding: 8px 14px; border-radius: var(--radius-full);
+            transition: all var(--transition);
+            display: flex; align-items: center; gap: 7px;
+            font-size: 0.9rem; white-space: nowrap;
         }
-        /* --- Container & Content --- */
+        .nav-link:hover { background: var(--bma-green-light); color: var(--bma-green); }
+        .nav-link.active-nav {
+            background: var(--fav-gold); color: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(245,158,11,0.3);
+        }
+        .nav-link.active-nav:hover { background: #e89e0a; }
+        .nav-link.logout-btn { color: #ef4444; }
+        .nav-link.logout-btn:hover { background: #fef2f2; color: #dc2626; }
+        .user-profile-pic { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        /* Mobile Controls */
+        .mobile-controls { display: none; align-items: center; gap: 12px; }
+        .mobile-profile-btn img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+        .mobile-toggle {
+            width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-color);
+            border-radius: var(--radius-sm);
+            transition: background var(--transition);
+        }
+        .mobile-toggle:hover { background: var(--bma-green-light); }
+        .mobile-toggle i { font-size: 1.3rem; }
+
+        /* ==========================================
+           PAGE CONTAINER
+        ========================================== */
         .container {
             max-width: 1400px;
-            margin: 30px auto; 
-            padding: 30px;
-            background: white;
-            border-radius: 20px;
+            margin: 28px auto;
+            padding: 28px 32px;
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
             box-shadow: var(--shadow-lg);
-            animation: fadeIn 0.5s ease;
+            animation: fadeInUp 0.4s ease;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1 { 
-            color: #ffc107;
-            font-size: 1.8rem; font-weight: 600;
-            margin-bottom: 25px; padding-bottom: 15px;
-            border-bottom: 3px solid #ffe082;
-            display: flex; align-items: center; gap: 10px;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        /* Search */
-        .search-container { margin-bottom: 25px; position: relative; }
-        #searchInput { width: 100%; padding: 15px 20px 15px 50px; border: 1px solid #e0e0e0; border-radius: 50px; background: #f8f9fa; font-size: 1rem; font-family: 'Kanit'; }
-        #searchInput:focus { outline: none; border-color: #ffc107; background: white; box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.2); }
-        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #999; }
 
-        /* --- Table Styling --- */
-        .table-responsive {
-            overflow-x: auto;
-            border-radius: 12px;
+        /* ==========================================
+           PAGE TITLE
+        ========================================== */
+        .page-title {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 24px; padding-bottom: 20px;
+            border-bottom: 2px solid var(--fav-gold-mid);
+        }
+        .page-title-icon-wrap {
+            width: 48px; height: 48px;
+            background: var(--fav-gold-light);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--fav-gold); font-size: 1.5rem;
+            border: 1px solid var(--fav-gold-mid);
+        }
+        .page-title h1 {
+            font-size: 1.6rem; font-weight: 700;
+            color: #92400e; letter-spacing: -0.5px;
+        }
+        .page-title-count {
+            margin-left: auto;
+            background: var(--fav-gold-light);
+            color: #92400e;
+            border: 1px solid var(--fav-gold-mid);
+            padding: 4px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem; font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* ==========================================
+           SEARCH & FILTERS
+        ========================================== */
+        .search-filter-container {
+            display: flex; gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; align-items: center;
+        }
+        .search-input-wrapper {
+            flex: 1 1 240px; min-width: 200px;
+            position: relative; display: flex; align-items: center;
+        }
+        .search-icon-inner {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 0.95rem; pointer-events: none; z-index: 1; line-height: 1;
+        }
+        .search-input-wrapper input {
+            width: 100%; height: 46px;
+            padding: 0 16px 0 44px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-full);
+            background: #f8fafc; font-size: 0.92rem;
+            color: var(--text-color); transition: all var(--transition);
+        }
+        .search-input-wrapper input:focus {
+            outline: none; border-color: var(--fav-gold);
+            background: #fff; box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+        }
+        .search-input-wrapper input::placeholder { color: #94a3b8; }
+
+        /* Mobile Sort */
+        .mobile-sort-wrapper { display: none; }
+        .mobile-sort-select {
+            width: 100%; height: 46px; padding: 0 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-full);
+            background: #f8fafc; font-family: 'Kanit', sans-serif;
+            font-size: 0.92rem; color: var(--text-color); cursor: pointer;
+        }
+
+        /* ==========================================
+           TABLE (DESKTOP)
+        ========================================== */
+        .table-wrapper {
+            border-radius: var(--radius-lg);
             border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; background: white; }
-        
-        th {
-            background: #ffc107; /* Yellow Header for Favorites */
-            color: #333;
-            padding: 15px;
-            font-weight: 600;
-            text-align: left;
+        .table-responsive {
+            overflow-x: auto; overflow-y: auto; max-height: 62vh;
+        }
+        .table-responsive::-webkit-scrollbar { height: 6px; width: 6px; }
+        .table-responsive::-webkit-scrollbar-track { background: #f1f5f9; }
+        .table-responsive::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .table-responsive::-webkit-scrollbar-thumb:hover { background: var(--fav-gold); }
+
+        table { width: 100%; border-collapse: collapse; min-width: 900px; background: #fff; }
+
+        thead th {
+            background: var(--fav-gold);
+            color: #1a1a1a;
+            padding: 13px 14px; font-weight: 600;
+            font-size: 0.88rem; text-align: left;
             white-space: nowrap;
             position: sticky; top: 0; z-index: 10;
-            cursor: pointer;
-            user-select: none;
+            cursor: pointer; user-select: none;
+            transition: background var(--transition);
+            border-right: 1px solid rgba(0,0,0,0.06);
         }
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+        thead th:last-child { border-right: none; }
+        thead th:hover { background: #e89e0a; }
+
+        .sort-icon { display: inline-block; margin-left: 4px; font-size: 0.75em; opacity: 0.6; }
+        .sort-active { opacity: 1; color: #7c3aed; }
+
+        tbody td {
+            padding: 13px 14px;
+            border-bottom: 1px solid #f1f5f9;
             vertical-align: middle;
-            color: #555;
-            font-size: 0.95rem;
+            color: #475569; font-size: 0.9rem;
         }
-        tr:last-child td { border-bottom: none; }
-        tr:hover { background-color: #fff9e6; } /* Light yellow hover */
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr { transition: background var(--transition); }
+        tbody tr:hover { background: #fffbeb; }
 
-        /* Custom Scrollbar for Table */
-        .table-responsive::-webkit-scrollbar { height: 8px; }
-        .table-responsive::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-        .table-responsive::-webkit-scrollbar-thumb:hover { background: #ffc107; }
+        a { color: var(--bma-green); text-decoration: none; transition: color var(--transition); }
+        a:hover { color: var(--bma-green-hover); }
 
-        /* Links */
-        a { color: var(--bma-green); text-decoration: none; font-weight: 500; transition: all 0.2s; }
-        a:hover { color: var(--bma-green-hover); text-decoration: underline; }
+        /* ==========================================
+           BADGES
+        ========================================== */
+        .badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: var(--radius-full);
+            font-size: 0.8rem; font-weight: 500; white-space: nowrap;
+        }
+        .badge-ok { background: #dcfce7; color: #166534; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-error { background: #fee2e2; color: #991b1b; }
+        .badge-public { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .badge-dept { background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+        .badge-bureau { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-div { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .badge-private { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        /* Badges */
-        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 30px; font-size: 0.85em; font-weight: 500; }
-        .status-ok { background: #d4edda; color: #155724; }
-        
-        /* Privacy Badges */
-        .privacy-public { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
-        .privacy-dept { background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; }
-        .privacy-bureau { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-        .privacy-div { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
-        .privacy-private { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
-        /* Share Button */
+        /* ==========================================
+           BUTTONS
+        ========================================== */
         .btn-share {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: #17a2b8; color: white; border: none;
+            width: 34px; height: 34px; border-radius: 50%;
+            background: #0891b2; color: #fff; border: none;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s;
+            transition: all var(--transition); font-size: 0.85rem;
         }
-        .btn-share:hover { transform: scale(1.1); background: #138496; }
-        
-        /* Favorite Button (Active) */
-        .btn-fav {
-            background: none; border: none; cursor: pointer;
-            font-size: 1.3rem; transition: transform 0.2s;
-            color: #ccc;
-        }
-        .btn-fav:hover { transform: scale(1.2); }
-        .btn-fav.active { color: #ffc107; text-shadow: 0 0 5px rgba(255, 193, 7, 0.5); }
+        .btn-share:hover { background: #0e7490; transform: scale(1.1); box-shadow: 0 4px 12px rgba(8,145,178,0.3); }
 
-        /* Pagination */
+        .btn-fav {
+            background: none; border: none; cursor: pointer; font-size: 1.1rem;
+            transition: transform var(--transition);
+            color: var(--fav-gold);
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .btn-fav:hover { transform: scale(1.2); background: var(--fav-gold-light); }
+        .btn-fav i { filter: drop-shadow(0 0 4px rgba(245,158,11,0.4)); }
+
+        /* Remove (unfav) button — used in mobile card footer */
+        .btn-remove-fav {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #fef2f2; color: #ef4444;
+            border: 1px solid #fecaca;
+            border-radius: var(--radius-full);
+            padding: 6px 14px; font-size: 0.82rem; font-weight: 600;
+            cursor: pointer; transition: all var(--transition);
+            font-family: 'Kanit', sans-serif;
+        }
+        .btn-remove-fav:hover { background: #fee2e2; border-color: #ef4444; transform: scale(1.03); }
+
+        /* ==========================================
+           PAGINATION
+        ========================================== */
         .pagination-controls {
             display: flex; justify-content: space-between; align-items: center;
-            margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;
-            flex-wrap: wrap; gap: 15px;
+            margin-top: 20px; padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap; gap: 12px;
         }
-        .pagination-items select { padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; }
-        .pagination-nav button { 
-            background: white; border: 1px solid #ddd; color: #333; 
-            border-radius: 8px; padding: 8px 12px; min-width: 36px; cursor: pointer; transition: 0.2s;
+        .pagination-info { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 0.88rem; }
+        .pagination-info select {
+            border: 1.5px solid var(--border-color); border-radius: var(--radius-sm);
+            padding: 5px 10px; font-family: 'Kanit', sans-serif;
+            font-size: 0.88rem; color: var(--text-color);
+            cursor: pointer; background: #fff; transition: all var(--transition);
         }
-        .pagination-nav button:hover:not(:disabled) { background: #ffc107; color: #333; border-color: #ffc107; }
-        .pagination-nav button:disabled { opacity: 0.5; cursor: default; }
+        .pagination-info select:focus { outline: none; border-color: var(--fav-gold); }
 
-        /* Footer */
+        .pagination-nav { display: flex; align-items: center; gap: 6px; }
+        .page-btn {
+            height: 34px; min-width: 34px; padding: 0 10px;
+            border: 1.5px solid var(--border-color); border-radius: var(--radius-sm);
+            background: #fff; color: var(--text-color); font-family: 'Kanit', sans-serif;
+            font-size: 0.88rem; cursor: pointer; transition: all var(--transition);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .page-btn:hover:not(:disabled) { background: var(--fav-gold); color: #1a1a1a; border-color: var(--fav-gold); }
+        .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .page-info { color: var(--text-muted); font-size: 0.88rem; white-space: nowrap; }
+
+        /* ==========================================
+           ALERT
+        ========================================== */
+        .alert-error {
+            background: #fef2f2; color: #991b1b;
+            padding: 14px 18px; border-radius: var(--radius-md);
+            margin-bottom: 20px; border-left: 4px solid #ef4444;
+            font-size: 0.9rem;
+        }
+
+        /* ==========================================
+           FOOTER
+        ========================================== */
         .main-footer {
-            background: white; color: #666; text-align: center; padding: 30px;
-            margin-top: 60px; border-top: 1px solid #eee;
+            background: #fff; color: var(--text-muted);
+            text-align: center; padding: 28px 20px;
+            margin-top: 40px; border-top: 1px solid var(--border-color);
+            font-size: 0.88rem; line-height: 1.7;
+        }
+        .main-footer strong { color: var(--text-color); }
+
+        /* ==========================================
+           NO DATA ROW
+        ========================================== */
+        #noDataRow td {
+            text-align: center !important;
+            padding: 50px 20px !important;
+            color: #94a3b8 !important;
+            display: table-cell !important;
         }
 
-        /* --- Responsive --- */
-        @media (max-width: 992px) {
-            .nav-link span { display: none; }
-            .nav-link i { font-size: 1.3rem; margin: 0; }
-            .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
-            .user-profile-pic { width: 100%; height: 100%; }
-        }
-
+        /* ==========================================
+           MOBILE CARD VIEW
+        ========================================== */
         @media (max-width: 768px) {
-            body { padding-top: 70px; }
-            .main-header { padding: 0 15px; height: 70px; }
-            .logo-text { font-size: 1.1rem; }
-            
-            /* Mobile Controls */
+            :root { --header-height: 64px; }
+            body { padding-top: var(--header-height); }
+            .main-header { padding: 0 16px; height: 64px; }
+            .logo-text { font-size: 1.05rem; }
+            .header-online-count { display: none; }
             .mobile-controls { display: flex; }
-            .mobile-toggle { display: block; }
 
             /* Mobile Menu */
             .nav-menu {
-                display: none; position: absolute; top: 70px; left: 0; width: 100%;
-                background: white; flex-direction: column; align-items: stretch;
-                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
+                display: none; position: fixed;
+                top: 64px; left: 0; right: 0;
+                background: #fff; flex-direction: column; align-items: stretch;
+                padding: 12px; box-shadow: var(--shadow-xl);
+                border-top: 1px solid var(--border-color);
+                z-index: 999; max-height: calc(100vh - 64px); overflow-y: auto;
             }
-            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
-            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; height: auto; }
+            .nav-menu.active { display: flex; animation: slideDown 0.25s ease; }
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateY(-8px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .nav-link { width: 100%; border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 4px; justify-content: flex-start; color: var(--text-color); font-size: 0.95rem; }
             .nav-link span { display: inline; }
-            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
-            
+            .nav-link i { margin-right: 10px; }
             .nav-link.profile-item { display: none; }
 
-            .container { padding: 15px; margin: 15px auto; }
-            h1 { font-size: 1.4em; }
-            
-            /* Table Mobile Optimization: Hide non-essential columns */
-            th:nth-child(3), td:nth-child(3), /* รายละเอียด */
-            th:nth-child(4), td:nth-child(4), /* ระดับ */
-            th:nth-child(5), td:nth-child(5), /* สถานะ */
-            th:nth-child(7), td:nth-child(7), /* หน่วยงาน */
-            th:nth-child(8), td:nth-child(8), /* ส่วนราชการ */
-            th:nth-child(9), td:nth-child(9), /* เบอร์ */
-            th:nth-child(11), td:nth-child(11) /* วันที่ */
-            { display: none; }
-            
-            .pagination-controls { justify-content: center; }
+            /* Container */
+            .container { padding: 16px; margin: 12px; border-radius: var(--radius-lg); }
+            .page-title h1 { font-size: 1.2rem; }
+            .page-title-count { display: none; }
+
+            /* Search Stack */
+            .search-filter-container { flex-direction: column; gap: 10px; }
+            .search-input-wrapper { min-width: 0; width: 100%; flex: none; position: relative; display: flex; align-items: center; }
+            .search-input-wrapper input { width: 100%; }
+            .mobile-sort-wrapper { display: block; width: 100%; }
+
+            /* =============================================
+               TABLE → CARD TRANSFORMATION (Favorites)
+               ============================================= */
+            .table-wrapper { border: none; box-shadow: none; background: transparent; }
+            .table-responsive { overflow: visible; max-height: none; }
+            table { display: block; min-width: unset; background: transparent; }
+            thead { display: none; }
+            tbody { display: flex; flex-direction: column; gap: 12px; }
+
+            /* Each TR → Card */
+            tbody tr {
+                display: flex; flex-direction: column;
+                background: #fff; border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--border-color);
+                padding: 0; overflow: hidden;
+                transition: transform var(--transition), box-shadow var(--transition);
+                position: relative;
+            }
+            tbody tr:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); background: #fff; }
+
+            /* Hide all cells by default */
+            tbody td { display: none !important; border: none; padding: 0; }
+
+            /* ── TD 2: Link name (card header) ── */
+            tbody td:nth-child(2) {
+                display: block !important;
+                padding: 16px 16px 12px 16px !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                order: 1;
+            }
+
+            /* ── TD 6: ประเภท ── */
+            tbody td:nth-child(6) {
+                display: flex !important;
+                align-items: center; gap: 6px;
+                padding: 8px 16px !important;
+                font-size: 0.84rem; color: var(--text-muted);
+                border-bottom: 1px solid #f8fafc !important;
+                order: 2;
+            }
+            tbody td:nth-child(6)::before {
+                content: "\f07b";
+                font-family: "Font Awesome 6 Free"; font-weight: 900;
+                color: var(--fav-gold); font-size: 0.78rem; flex-shrink: 0;
+            }
+
+            /* ── TD 8: ส่วนราชการ ── */
+            tbody td:nth-child(8) {
+                display: flex !important;
+                align-items: center; gap: 6px;
+                padding: 8px 16px !important;
+                font-size: 0.84rem; color: var(--text-muted);
+                border-bottom: 1px solid #f8fafc !important;
+                order: 3;
+            }
+            tbody td:nth-child(8)::before {
+                content: "\f19c";
+                font-family: "Font Awesome 6 Free"; font-weight: 900;
+                color: var(--bma-green); font-size: 0.78rem; flex-shrink: 0;
+            }
+
+            /* ── TD 11: วันที่ ── */
+            tbody td:nth-child(11) {
+                display: flex !important;
+                align-items: center; gap: 6px;
+                padding: 8px 16px !important;
+                font-size: 0.82rem; color: #94a3b8;
+                border-bottom: 1px solid #f8fafc !important;
+                order: 4;
+            }
+            tbody td:nth-child(11)::before {
+                content: "\f073";
+                font-family: "Font Awesome 6 Free"; font-weight: 900;
+                color: #94a3b8; font-size: 0.75rem; flex-shrink: 0;
+            }
+
+            /* ── TD 1: Card footer (star + share + remove) ── */
+            tbody td:nth-child(1) {
+                display: flex !important;
+                flex-direction: row; justify-content: space-between; align-items: center;
+                padding: 10px 16px !important;
+                border-top: 1px solid #f1f5f9 !important;
+                background: #fafcff; border-bottom: none !important;
+                order: 99;
+                gap: 8px;
+            }
+
+            /* Hide desktop-only cells */
+            tbody td:nth-child(3),
+            tbody td:nth-child(4),
+            tbody td:nth-child(5),
+            tbody td:nth-child(7),
+            tbody td:nth-child(9),
+            tbody td:nth-child(10),
+            tbody td:nth-child(12) { display: none !important; }
+
+            /* Mobile card link name */
+            tbody td:nth-child(2) .card-link-name {
+                font-size: 1rem; font-weight: 600; color: var(--bma-green-dark);
+                display: flex; align-items: flex-start; gap: 8px; flex-direction: column;
+            }
+
+            /* Mobile card footer actions */
+            .mobile-card-actions { display: flex; align-items: center; gap: 8px; }
+
+            /* Pagination mobile */
+            .pagination-controls { flex-direction: column; align-items: center; gap: 10px; }
+
+            /* No data mobile */
+            #noDataRow { display: flex !important; background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+            #noDataRow td { display: flex !important; width: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+        }
+
+        /* TABLET */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .nav-link span { display: none; }
+            .nav-link { padding: 9px; border-radius: 50%; width: 42px; height: 42px; justify-content: center; }
         }
     </style>
 </head>
 <body>
-    
+
+<!-- ==================== HEADER ==================== -->
 <header class="main-header">
-        <div class="header-left">
-            <a href="{{ url_for('home') }}" class="logo-container">
-                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-                <div class="logo-text">BMA SMART LINKAGE</div>
+    <div class="header-left">
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+            <div class="logo-text">BMA SMART LINKAGE</div>
+        </a>
+        <div class="header-online-count" title="ผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
+            <span class="pulsating-dot"></span>
+            <span id="onlineCount">-</span>
+            <span>ออนไลน์</span>
+        </div>
+    </div>
+
+    <!-- Mobile Controls -->
+    <div class="mobile-controls">
+        {% if session.get('logged_in') %}
+            <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
+                <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
             </a>
-            
-            <div class="header-online-count" title="ผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
-                <span class="pulsating-dot"></span>
-                <span id="onlineCount">-</span>
-                <span>ออนไลน์</span>
-            </div>
-        </div>
-
-        <div class="mobile-controls">
-            {% if session.get('logged_in') %}
-                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn" title="โปรไฟล์">
-                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
-                </a>
-            {% endif %}
-            <div class="mobile-toggle" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </div>
-        </div>
-
-        <nav class="nav-menu" id="navMenu">
-            <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
-
-            {% if session.get('logged_in') %}
-                {% if session.get('level') == 'Admin' %}
-                <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin Panel" style="color:#d35400;"><i class="fas fa-crown"></i> <span>Admin</span></a>
-                {% endif %}
-                
-                <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
-                <a href="{{ url_for('links_page') }}" class="nav-link" title="ลิงก์ทั้งหมด" style="color: #007bff;">
-                    <i class="fas fa-layer-group"></i> <span>ลิงก์ทั้งหมด</span>
-                </a>
-                <a href="{{ url_for('my_favorites_page') }}" class="nav-link active-nav" title="My Favorites" style="background-color: #ffc107; color: #333; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);">
-                    <i class="fas fa-star"></i> <span>ลิงค์โปรดของฉัน</span>
-                </a>
-                
-                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
-                <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
-                
-                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
-                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
-                    <span>{{ session.name }}</span>
-                </a>
-                
-                <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
-                    <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
-                </a>
-            {% else %}
-                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;">
-                    <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
-                </a>
-            {% endif %}
-        </nav>
-    </header>
-    
-    <div class="container">
-
-        {% if error %}
-            <div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #c62828;">
-                <strong>⚠️ เกิดข้อผิดพลาด:</strong> {{ error }}
-            </div>
         {% endif %}
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars" id="menuIcon"></i>
+        </div>
+    </div>
 
-        <h1><i class="fas fa-star"></i> ลิงก์โปรดของฉัน (My Favorites)</h1>
+    <!-- Desktop Nav -->
+    <nav class="nav-menu" id="navMenu">
+        <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก">
+            <i class="fas fa-home"></i> <span>หน้าหลัก</span>
+        </a>
+        {% if session.get('logged_in') %}
+            {% if session.get('level') == 'Admin' %}
+            <a href="{{ url_for('admin_panel') }}" class="nav-link" title="Admin" style="color:#ea580c;">
+                <i class="fas fa-crown"></i> <span>Admin</span>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard">
+                <i class="fas fa-columns"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('links_page') }}" class="nav-link" title="ลิงก์ทั้งหมด">
+                <i class="fas fa-layer-group"></i> <span>ลิงก์ทั้งหมด</span>
+            </a>
+            <a href="{{ url_for('my_favorites_page') }}" class="nav-link active-nav" title="ลิงก์โปรด">
+                <i class="fas fa-star"></i> <span>ลิงค์โปรด</span>
+            </a>
+            <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics">
+                <i class="fas fa-chart-pie"></i> <span>Analytics</span>
+            </a>
+            <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback">
+                <i class="fas fa-comment-dots"></i> <span>Feedback</span>
+            </a>
+            <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
+                <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                <span>{{ session.name }}</span>
+            </a>
+            <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
+                <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
+            </a>
+        {% else %}
+            <a href="{{ url_for('login_page') }}" class="nav-link active-nav">
+                <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
+            </a>
+        {% endif %}
+    </nav>
+</header>
 
-        <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
+<!-- ==================== MAIN CONTENT ==================== -->
+<div class="container">
+
+    {% if error %}
+    <div class="alert-error">
+        <i class="fas fa-exclamation-triangle"></i> <strong>เกิดข้อผิดพลาด:</strong> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Page Title -->
+    <div class="page-title">
+        <div class="page-title-icon-wrap">
+            <i class="fas fa-star"></i>
+        </div>
+        <h1>ลิงก์โปรดของฉัน</h1>
+        <span class="page-title-count">
+            <i class="fas fa-star" style="color:var(--fav-gold);font-size:0.8rem;"></i>
+            {{ links | length }} รายการ
+        </span>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="search-filter-container">
+        <div class="search-input-wrapper">
+            <i class="fas fa-search search-icon-inner"></i>
             <input type="text" id="searchInput" placeholder="ค้นหาในรายการโปรด (ชื่อ, ประเภท, หน่วยงาน)...">
         </div>
 
+        <!-- Mobile Sort -->
+        <div class="mobile-sort-wrapper">
+            <select id="mobileSort" class="mobile-sort-select">
+                <option value="">↕️ เรียงลำดับ</option>
+                <option value="1_asc">ชื่อลิงก์ (ก-ฮ)</option>
+                <option value="1_desc">ชื่อลิงก์ (ฮ-ก)</option>
+                <option value="10_desc">วันที่ (ใหม่-เก่า)</option>
+                <option value="10_asc">วันที่ (เก่า-ใหม่)</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
         <div class="table-responsive">
             <table id="linksTable">
                 <thead>
                     <tr>
-                        <th style="width: 50px; text-align: center;">⭐</th>
-                        <th onclick="sortTable(1)">
-                            🔗 ชื่อลิงก์ <i class="fas fa-sort"></i>
-                        </th>
-                        <th>📄 รายละเอียด</th> 
-                        <th style="text-align: center;">ระดับ</th> 
-                        <th style="text-align: center;">🚦 สถานะ</th>
-                        <th onclick="sortTable(5)">📂 ประเภท <i class="fas fa-sort"></i></th>
-                        <th onclick="sortTable(6)">🏢 หน่วยงาน <i class="fas fa-sort"></i></th> 
-                        <th onclick="sortTable(7)">🏛️ ส่วนราชการ <i class="fas fa-sort"></i></th> 
+                        <th style="width:46px; text-align:center;">⭐</th>
+                        <th onclick="sortTable(1)">🔗 ชื่อลิงก์ <span id="sort-1" class="sort-icon">↕</span></th>
+                        <th>📄 รายละเอียด</th>
+                        <th style="text-align:center; width:90px;">ระดับ</th>
+                        <th style="text-align:center;">🚦 สถานะ</th>
+                        <th onclick="sortTable(5)">📂 ประเภท <span id="sort-5" class="sort-icon">↕</span></th>
+                        <th onclick="sortTable(6)">🏢 หน่วยงาน <span id="sort-6" class="sort-icon">↕</span></th>
+                        <th onclick="sortTable(7)">🏛️ ส่วนราชการ <span id="sort-7" class="sort-icon">↕</span></th>
                         <th>📞 เบอร์ติดต่อ</th>
-                        <th>👤 ผู้สร้าง</th>
-                        <th onclick="sortTable(10)">🗓️ วันที่ <i class="fas fa-sort"></i></th>
-                        <th style="text-align: center;">📤 แชร์</th>
+                        <th onclick="sortTable(9)">👤 ผู้สร้าง <span id="sort-9" class="sort-icon">↕</span></th>
+                        <th onclick="sortTable(10, 'date')">🗓️ วันที่อัปเดต <span id="sort-10" class="sort-icon">↕</span></th>
+                        <th style="text-align:center; width:60px;">📤 แชร์</th>
                     </tr>
                 </thead>
                 <tbody id="favTableBody">
-                    
+
                     {% for link in links %}
                     <tr id="row-{{ link['ID'] }}">
-                        <td style="text-align: center;">
-                            <button class="btn-fav active" 
-                                    onclick="removeFav(this, '{{ link['ID'] }}')" 
-                                    title="ลบจากรายการโปรด">
+
+                        <!-- TD 1: Star / Actions (card footer on mobile) -->
+                        <td style="text-align:center;" class="td-star">
+                            <!-- Desktop: star unfav button -->
+                            <button class="btn-fav"
+                                    onclick="removeFav(this, '{{ link['ID'] }}')"
+                                    title="ลบออกจากรายการโปรด">
                                 <i class="fas fa-star"></i>
                             </button>
+                            <!-- Mobile card footer actions (injected via JS) -->
+                            <div class="mobile-card-actions" style="display:none;">
+                                <button type="button"
+                                        class="btn-share"
+                                        onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')"
+                                        title="แชร์ QR Code">
+                                    <i class="fas fa-qrcode"></i>
+                                </button>
+                                <button class="btn-remove-fav"
+                                        onclick="removeFav(this, '{{ link['ID'] }}')"
+                                        title="ลบออกจากรายการโปรด">
+                                    <i class="fas fa-star-half-alt"></i> นำออก
+                                </button>
+                            </div>
                         </td>
 
-                        <td>
-                            <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;">
-                                <i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}
-                            </a>
-                        </td>
-                        <td>{{ link['รายละเอียด'] }}</td>
-                        
-                        <td style="text-align: center;">
-                            {% if link['ความเป็นส่วนตัว'] == 'สาธารณะ' or not link['ความเป็นส่วนตัว'] %}
-                                <span class="status-badge privacy-public"><i class="fas fa-globe"></i> สาธารณะ</span>
-                            {% elif link['ความเป็นส่วนตัว'] == 'เฉพาะหน่วยงาน' %}
-                                <span class="status-badge privacy-agency"><i class="fas fa-building"></i> ภายใน</span>
-                            {% elif link['ความเป็นส่วนตัว'] == 'ส่วนตัว' %}
-                                <span class="status-badge privacy-private"><i class="fas fa-lock"></i> ส่วนตัว</span>
-                            {% endif %}
+                        <!-- TD 2: Link Name -->
+                        <td data-value="{{ link['ชื่อลิงก์'] }}">
+                            <div style="display:flex; flex-direction:column; gap:5px; align-items:flex-start;">
+                                <a href="{{ link['URL'] }}" target="_blank" rel="noopener"
+                                   style="font-weight:600; color:var(--bma-green); display:flex; align-items:center; gap:6px;" class="card-link-name">
+                                    <i class="fas fa-external-link-alt" style="font-size:0.75em; flex-shrink:0;"></i>
+                                    {{ link['ชื่อลิงก์'] }}
+                                </a>
+                            </div>
                         </td>
 
-                        <td style="text-align: center;">
-                            {% if link['สถานะ'] == 'ใช้งาน' %}
-                                <span class="status-badge status-ok">ใช้งาน</span>
+                        <!-- TD 3: Description -->
+                        <td style="color:#64748b; font-size:0.88rem; max-width:200px;">{{ link['รายละเอียด'] }}</td>
+
+                        <!-- TD 4: Privacy -->
+                        <td style="text-align:center;">
+                            {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
+                            {% if privacy == 'ส่วนตัว' %}
+                                <span class="badge badge-private"><i class="fas fa-lock"></i> ส่วนตัว</span>
+                            {% elif privacy == 'กลุ่มงาน/ฝ่าย' %}
+                                <span class="badge badge-div"><i class="fas fa-user-friends"></i> ฝ่าย</span>
+                            {% elif privacy == 'กอง/สำนักงาน' %}
+                                <span class="badge badge-bureau"><i class="fas fa-building"></i> กอง</span>
+                            {% elif privacy == 'สยป.' %}
+                                <span class="badge badge-dept"><i class="fas fa-landmark"></i> สยป.</span>
                             {% else %}
-                                <span class="status-badge status-error">{{ link['สถานะ'] }}</span>
+                                <span class="badge badge-public"><i class="fas fa-globe"></i> สาธารณะ</span>
                             {% endif %}
                         </td>
+
+                        <!-- TD 5: Status -->
+                        <td style="text-align:center;">
+                            {% if link['สถานะ'] == 'ใช้งาน' %}
+                                <span class="badge badge-ok"><span style="font-size:0.7em;">●</span> ใช้งาน</span>
+                            {% elif link['สถานะ'] == 'ปรับปรุง' %}
+                                <span class="badge badge-pending"><span style="font-size:0.7em;">●</span> ปรับปรุง</span>
+                            {% else %}
+                                <span class="badge badge-error"><span style="font-size:0.7em;">●</span> {{ link['สถานะ'] }}</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- TD 6: Type -->
                         <td>{{ link['ประเภท'] }}</td>
-                        <td>{{ link['หน่วยงาน'] }}</td> 
-                        <td>{{ link['ส่วนราชการ'] }}</td> 
-                        
-                        <td>{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}</td>
-                        
-                        <td>{{ link['CreatorUsername'] }}</td>
 
-                        <td>{{ link['วันที่อัปเดต_สั้น'] }}</td>
+                        <!-- TD 7: Division -->
+                        <td>{{ link['หน่วยงาน'] }}</td>
 
-                        <td align="center">
-                            <button type="button" 
-                                    class="btn-share" 
-                                    title="แชร์ QR Code"
-                                    onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')">
+                        <!-- TD 8: Bureau -->
+                        <td>{{ link['ส่วนราชการ'] }}</td>
+
+                        <!-- TD 9: Phone -->
+                        <td style="white-space:nowrap;">{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}</td>
+
+                        <!-- TD 10: Creator -->
+                        <td>
+                            {% if link['CreatorUsername'] %}
+                                <a href="{{ url_for('view_profile', username=link['CreatorUsername']) }}"
+                                   target="_blank" style="color:#475569; font-weight:500;">
+                                    {{ link['CreatorUsername'] }}
+                                </a>
+                            {% else %}
+                                <span style="color:#cbd5e1;">—</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- TD 11: Updated Date -->
+                        <td data-value="{{ link['วันที่อัปเดต_สั้น'] }}" style="white-space:nowrap; color:#64748b; font-size:0.87rem;">
+                            {{ link['วันที่อัปเดต_สั้น'] }}
+                        </td>
+
+                        <!-- TD 12: Share -->
+                        <td style="text-align:center;">
+                            <button type="button"
+                                    class="btn-share"
+                                    onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')"
+                                    title="แชร์ QR Code">
                                 <i class="fas fa-qrcode"></i>
                             </button>
                         </td>
                     </tr>
                     {% else %}
                     <tr id="noDataRow">
-                        <td colspan="12" style="text-align: center; padding: 50px; color: #999;">
-                            <i class="far fa-star" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i><br>
-                            ยังไม่มีรายการโปรด<br>
-                            <a href="{{ url_for('links_page') }}" style="color: var(--bma-green); font-weight:600; text-decoration: underline;">
-                                ไปหน้าค้นหาเพื่อกดดาว ⭐ ให้ลิงก์ที่คุณชอบ
+                        <td colspan="12">
+                            <i class="far fa-star" style="font-size:2.5rem; margin-bottom:10px; display:block; color:#fde68a;"></i>
+                            <span style="font-size:0.95rem; color:#64748b;">ยังไม่มีรายการโปรด</span><br>
+                            <a href="{{ url_for('links_page') }}"
+                               style="color:var(--bma-green); font-weight:600; margin-top:8px; display:inline-block;">
+                                ไปหน้าค้นหาเพื่อกด ⭐ ให้ลิงก์ที่ชอบ
                             </a>
                         </td>
                     </tr>
@@ -485,247 +799,317 @@
                 </tbody>
             </table>
         </div>
+    </div>
 
-        <div class="pagination-controls">
-            <div class="pagination-items">
-                <span>แสดง: </span>
-                <select id="itemsPerPage">
-                    <option value="10">10</option>
-                    <option value="20" selected>20</option>
-                    <option value="50">50</option>
-                    <option value="99999">ทั้งหมด</option>
-                </select>
-            </div>
-            <div class="pagination-nav">
-                    <button id="btnFirst" title="หน้าแรก">«</button>
-                    <button id="btnPrev" title="หน้าก่อนหน้า">‹</button>
-                    <span>หน้า <span id="currentPage">1</span> / <span id="totalPages">1</span></span>
-                    <button id="btnNext" title="หน้าถัดไป">›</button>
-                    <button id="btnLast" title="หน้าสุดท้าย">»</button>
-            </div>
+    <!-- Pagination -->
+    <div class="pagination-controls">
+        <div class="pagination-info">
+            <span>แสดง:</span>
+            <select id="itemsPerPage">
+                <option value="10">10</option>
+                <option value="20" selected>20</option>
+                <option value="50">50</option>
+                <option value="99999">ทั้งหมด</option>
+            </select>
+            <span>รายการ</span>
         </div>
+        <div class="pagination-nav">
+            <button class="page-btn" id="btnFirst" title="หน้าแรก">«</button>
+            <button class="page-btn" id="btnPrev" title="หน้าก่อนหน้า">‹</button>
+            <span class="page-info">หน้า <strong id="currentPage">1</strong> / <span id="totalPages">1</span></span>
+            <button class="page-btn" id="btnNext" title="หน้าถัดไป">›</button>
+            <button class="page-btn" id="btnLast" title="หน้าสุดท้าย">»</button>
+        </div>
+    </div>
+</div>
 
-    </div> 
-    
-    <footer class="main-footer">
-        <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
-        <p>สำนักยุทธศาสตร์และประเมินผล</p>
-        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
-        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
-    </footer>
+<!-- ==================== FOOTER ==================== -->
+<footer class="main-footer">
+    <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
+    <p>สำนักยุทธศาสตร์และประเมินผล</p>
+    <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
+    <p style="margin-top:12px; font-size:0.82rem; opacity:0.7;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
+</footer>
 
-    <script>
-        // Toggle Mobile Menu
-        function toggleMenu() {
-            const nav = document.getElementById('navMenu');
-            nav.classList.toggle('active');
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+    // ──────────────────────────────────────────
+    //  Mobile Menu Toggle
+    // ──────────────────────────────────────────
+    function toggleMenu() {
+        const nav = document.getElementById('navMenu');
+        const icon = document.getElementById('menuIcon');
+        nav.classList.toggle('active');
+        icon.className = nav.classList.contains('active') ? 'fas fa-times' : 'fas fa-bars';
+    }
+    document.addEventListener('click', (e) => {
+        const nav = document.getElementById('navMenu');
+        const toggle = document.querySelector('.mobile-toggle');
+        if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+            nav.classList.remove('active');
+            document.getElementById('menuIcon').className = 'fas fa-bars';
         }
-        
-        document.addEventListener('click', (e) => {
-            const nav = document.getElementById('navMenu');
-            const toggle = document.querySelector('.mobile-toggle');
-            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
-                nav.classList.remove('active');
-            }
+    });
+
+    // ──────────────────────────────────────────
+    //  Mobile layout: show/hide elements
+    // ──────────────────────────────────────────
+    function applyMobileLayout() {
+        const isMobile = window.innerWidth <= 768;
+        // In TD 1: show mobile actions block, hide desktop star
+        document.querySelectorAll('.td-star').forEach(td => {
+            const desktopStar = td.querySelector('.btn-fav');
+            const mobileActions = td.querySelector('.mobile-card-actions');
+            if (desktopStar) desktopStar.style.display = isMobile ? 'none' : 'flex';
+            if (mobileActions) mobileActions.style.display = isMobile ? 'flex' : 'none';
+        });
+    }
+    window.addEventListener('resize', applyMobileLayout);
+
+    // ──────────────────────────────────────────
+    //  State & References
+    // ──────────────────────────────────────────
+    let allTableRows = [];
+    let currentPage = 1;
+    let totalPages = 1;
+    const tbody = document.getElementById("favTableBody");
+    const noDataRow = document.getElementById("noDataRow");
+    let sortState = { columnIndex: -1, direction: 'asc' };
+
+    // ──────────────────────────────────────────
+    //  DOMContentLoaded Init
+    // ──────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        allTableRows = Array.from(tbody.querySelectorAll('tr')).filter(r => r.id !== 'noDataRow');
+
+        const searchInput = document.getElementById("searchInput");
+        const mobileSort  = document.getElementById("mobileSort");
+
+        document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
+        document.getElementById("btnPrev").addEventListener('click',  () => displayPage(currentPage - 1));
+        document.getElementById("btnNext").addEventListener('click',  () => displayPage(currentPage + 1));
+        document.getElementById("btnLast").addEventListener('click',  () => displayPage(totalPages));
+        document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1));
+
+        searchInput.addEventListener('input', () => displayPage(1));
+
+        mobileSort.addEventListener('change', function () {
+            if (!this.value) return;
+            const [col, dir] = this.value.split('_');
+            sortTable(parseInt(col), col === '10' ? 'date' : 'text', dir);
         });
 
-        // Pagination and Search Functions
-        let allTableRows = []; 
-        let currentPage = 1;
-        let totalPages = 1;
-        const tbody = document.getElementById("favTableBody");
-        const noDataRow = document.getElementById("noDataRow");
-        let searchInput; 
+        applyMobileLayout();
+        displayPage(1);
+    });
 
-        function sortTable(columnIndex) {
-            const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
-            const collator = new Intl.Collator('th', { sensitivity: 'base' });
-            
-            // Simple sort toggle (no state tracking for brevity in fav page)
-            let dir = 'asc';
-            if (this.prevSort === columnIndex) dir = 'desc';
-            this.prevSort = columnIndex === this.prevSort && dir === 'desc' ? -1 : columnIndex;
+    // ──────────────────────────────────────────
+    //  Sort Table
+    // ──────────────────────────────────────────
+    function sortTable(columnIndex, type = 'text', forceDirection = null) {
+        const direction = forceDirection || (sortState.columnIndex === columnIndex && sortState.direction === 'asc' ? 'desc' : 'asc');
+        sortState = { columnIndex, direction };
 
-            rows.sort((rowA, rowB) => {
-                const cellA = rowA.getElementsByTagName("td")[columnIndex].textContent.trim();
-                const cellB = rowB.getElementsByTagName("td")[columnIndex].textContent.trim();
-                return dir === 'asc' ? collator.compare(cellA, cellB) : collator.compare(cellB, cellA);
-            });
-            
-            // Re-append sorted rows
-            rows.forEach(row => tbody.appendChild(row));
-            // Re-init pagination array with new order
-            allTableRows = rows;
-            displayPage(1);
-        }
+        document.querySelectorAll('.sort-icon').forEach(icon => { icon.textContent = '↕'; icon.classList.remove('sort-active'); });
+        const activeIcon = document.getElementById(`sort-${columnIndex}`);
+        if (activeIcon) { activeIcon.textContent = direction === 'asc' ? '▲' : '▼'; activeIcon.classList.add('sort-active'); }
 
-        function displayPage(page) {
-            currentPage = page;
-            const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
-            const filter = searchInput.value.toLowerCase(); 
+        const collator = new Intl.Collator('th', { sensitivity: 'base' });
+        allTableRows.sort((a, b) => {
+            let cellA = (a.children[columnIndex]?.dataset?.value || a.children[columnIndex]?.textContent || '').trim();
+            let cellB = (b.children[columnIndex]?.dataset?.value || b.children[columnIndex]?.textContent || '').trim();
+            let cmp = 0;
+            if (type === 'date') { cmp = new Date(cellA) - new Date(cellB); }
+            else { cmp = collator.compare(cellA, cellB); }
+            return direction === 'asc' ? cmp : -cmp;
+        });
+        displayPage(currentPage);
+    }
 
-            const filteredRows = allTableRows.filter(row => {
-                const textContent = row.innerText.toLowerCase();
-                return textContent.includes(filter);
-            });
+    // ──────────────────────────────────────────
+    //  Display Page
+    // ──────────────────────────────────────────
+    function displayPage(page) {
+        const textFilter   = document.getElementById("searchInput").value.toLowerCase().trim();
+        const itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
 
-            // Hide all first
-            allTableRows.forEach(row => row.style.display = 'none');
+        const filteredRows = allTableRows.filter(row => {
+            return !textFilter || row.innerText.toLowerCase().includes(textFilter);
+        });
 
-            // Show No Data row if needed
-            if (filteredRows.length === 0) {
-                if(noDataRow) noDataRow.style.display = 'table-row';
+        tbody.innerHTML = '';
+
+        if (filteredRows.length === 0) {
+            if (noDataRow) { noDataRow.style.display = ''; tbody.appendChild(noDataRow); }
+            totalPages = 1; currentPage = 1;
+        } else {
+            if (noDataRow) noDataRow.style.display = 'none';
+            if (itemsPerPage >= 99999) {
                 totalPages = 1; currentPage = 1;
+                filteredRows.forEach(r => tbody.appendChild(r));
             } else {
-                if(noDataRow) noDataRow.style.display = 'none';
-                
-                totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-                if (page > totalPages) currentPage = totalPages;
-                if (page < 1) currentPage = 1;
-                
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-                
-                filteredRows.slice(startIndex, endIndex).forEach(row => row.style.display = 'table-row');
+                totalPages  = Math.max(1, Math.ceil(filteredRows.length / itemsPerPage));
+                currentPage = Math.min(Math.max(1, page), totalPages);
+                const start = (currentPage - 1) * itemsPerPage;
+                filteredRows.slice(start, start + itemsPerPage).forEach(r => tbody.appendChild(r));
             }
-
-            document.getElementById("currentPage").textContent = currentPage;
-            document.getElementById("totalPages").textContent = totalPages;
-            document.getElementById("btnFirst").disabled = (currentPage === 1);
-            document.getElementById("btnPrev").disabled = (currentPage === 1);
-            document.getElementById("btnNext").disabled = (currentPage === totalPages);
-            document.getElementById("btnLast").disabled = (currentPage === totalPages);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            allTableRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.id !== 'noDataRow');
-            searchInput = document.getElementById("searchInput"); 
-            
-            document.getElementById("btnFirst").addEventListener('click', () => displayPage(1));
-            document.getElementById("btnPrev").addEventListener('click', () => displayPage(currentPage - 1));
-            document.getElementById("btnNext").addEventListener('click', () => displayPage(currentPage + 1));
-            document.getElementById("btnLast").addEventListener('click', () => displayPage(totalPages));
-            document.getElementById("itemsPerPage").addEventListener('change', () => displayPage(1)); 
-            
-            searchInput.addEventListener('keyup', () => displayPage(1)); 
-            
-            displayPage(1);
-        });
+        document.getElementById("currentPage").textContent = currentPage;
+        document.getElementById("totalPages").textContent  = totalPages;
+        document.getElementById("btnFirst").disabled = currentPage === 1;
+        document.getElementById("btnPrev").disabled  = currentPage === 1;
+        document.getElementById("btnNext").disabled  = currentPage === totalPages;
+        document.getElementById("btnLast").disabled  = currentPage === totalPages;
 
-        // Function: Remove from Favorites
-        function removeFav(btn, linkId) {
-            Swal.fire({
-                title: 'นำออกจากรายการโปรด?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#ffc107',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'ใช่, นำออก',
-                cancelButtonText: 'ยกเลิก',
-                color: '#333'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch("{{ url_for('toggle_favorite') }}", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}" },
-                        body: JSON.stringify({ link_id: linkId })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            const row = document.getElementById('row-' + linkId);
-                            row.style.transition = 'all 0.5s';
+        // Re-apply mobile layout after DOM rebuild
+        applyMobileLayout();
+    }
+
+    // ──────────────────────────────────────────
+    //  Remove from Favorites
+    // ──────────────────────────────────────────
+    function removeFav(btn, linkId) {
+        Swal.fire({
+            title: 'นำออกจากรายการโปรด?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: '<i class="fas fa-star-half-alt"></i> ใช่, นำออก',
+            cancelButtonText: 'ยกเลิก',
+            customClass: { popup: 'swal-fav-popup' },
+            fontFamily: 'Kanit, sans-serif'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("{{ url_for('toggle_favorite') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}"
+                    },
+                    body: JSON.stringify({ link_id: linkId })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const row = document.getElementById('row-' + linkId);
+                        if (row) {
+                            row.style.transition = 'all 0.4s ease';
                             row.style.opacity = '0';
                             row.style.transform = 'translateX(20px)';
-                            
                             setTimeout(() => {
                                 row.remove();
-                                // Remove from memory array and refresh pagination
                                 allTableRows = allTableRows.filter(r => r.id !== 'row-' + linkId);
                                 displayPage(currentPage);
-                                
-                                // Show empty state if list empty
                                 if (allTableRows.length === 0 && noDataRow) {
-                                    noDataRow.style.display = 'table-row';
+                                    noDataRow.style.display = '';
+                                    tbody.appendChild(noDataRow);
                                 }
-                            }, 500);
-                            
-                            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
-                            Toast.fire({ icon: 'success', title: 'ลบเรียบร้อย' });
+                            }, 400);
                         }
-                    });
-                }
-            });
-        }
-
-        // Share Function
-        function showShareModal(title, originalUrl, linkId) {
-            const permanentLink = `${window.location.origin}/go/${linkId}`;
-            const qrImageUrl = `{{ url_for('generate_qr_code') }}?url=${encodeURIComponent(permanentLink)}`;
-
-            Swal.fire({
-                html: `
-                    <div style="text-align:center;">
-                        <h3 style="color:var(--bma-green); margin-bottom:10px;">📲 แชร์ลิงก์</h3>
-                        <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9rem; word-break:break-all;">
-                            ${permanentLink}
-                        </div>
-                        <img src="${qrImageUrl}" style="width:200px; border:1px solid #eee; padding:10px; border-radius:10px; margin-bottom:15px;">
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <button onclick="navigator.clipboard.writeText('${permanentLink}'); Swal.showValidationMessage('คัดลอกแล้ว!')" 
-                                style="background:#007bff; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">
-                                <i class="fas fa-copy"></i> คัดลอก
-                            </button>
-                            <a href="${qrImageUrl}" download="QR-${linkId}.png" 
-                                style="background:#28a745; color:white; text-decoration:none; padding:10px; border-radius:5px; display:inline-block;">
-                                <i class="fas fa-download"></i> บันทึก QR
-                            </a>
-                        </div>
-                    </div>
-                `,
-                showConfirmButton: false,
-                showCloseButton: true
-            });
-        }
-    </script>
-        
-    <script>
-        function updateOnlineCount() {
-            fetch("{{ url_for('heartbeat') }}", { 
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}" 
-                }
-            })
-            .then(response => {
-                if (!response.ok) { throw new Error("HTTP error " + response.status); }
-                return response.json();
-            })
-            .then(data => {
-                if(data.online_count !== undefined) {
-                    const el = document.getElementById('onlineCount');
-                    if(el) {
-                        el.textContent = data.online_count;
-                        el.style.color = "var(--bma-green)"; 
+                        const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1800 });
+                        Toast.fire({ icon: 'success', title: 'ลบออกจากรายการโปรดแล้ว' });
                     }
-                }
-            })
-            .catch(err => {
-                const el = document.getElementById('onlineCount');
-                if(el) el.textContent = "-";
-            });
-        }
-
-        updateOnlineCount();
-        setInterval(updateOnlineCount, 10000);
-
-        window.addEventListener('beforeunload', function() {
-            const data = new FormData();
-            const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
-            data.append('csrf_token', csrfToken);
-            navigator.sendBeacon("{{ url_for('offline') }}", data);
+                })
+                .catch(() => {
+                    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถลบรายการโปรดได้', 'error');
+                });
+            }
         });
-    </script>
+    }
+
+    // ──────────────────────────────────────────
+    //  Share / QR Modal
+    // ──────────────────────────────────────────
+    function showShareModal(title, originalUrl, linkId) {
+        const permanentLink = `${window.location.origin}/go/${linkId}`;
+        const qrUrl = `{{ url_for('generate_qr_code') }}?url=${encodeURIComponent(permanentLink)}`;
+
+        Swal.fire({
+            html: `
+                <div style="text-align:center; font-family:'Kanit',sans-serif;">
+                    <div style="width:48px;height:48px;background:#fef9c3;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.4rem;color:#f59e0b;">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h3 style="color:#1a2332;font-weight:700;margin-bottom:6px;font-size:1.1rem;">📲 แชร์ลิงก์</h3>
+                    <p style="color:#64748b;font-size:0.85rem;margin-bottom:14px;">${title}</p>
+                    <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px 14px;border-radius:10px;margin-bottom:16px;font-size:0.82rem;word-break:break-all;color:#475569;text-align:left;">
+                        ${permanentLink}
+                    </div>
+                    <img src="${qrUrl}" style="width:180px;height:180px;border:1px solid #e2e8f0;padding:8px;border-radius:12px;margin-bottom:16px;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <button onclick="navigator.clipboard.writeText('${permanentLink}').then(()=>Swal.showValidationMessage('✅ คัดลอกแล้ว!'))"
+                            style="background:#007bff;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-family:'Kanit',sans-serif;font-size:0.9rem;display:flex;align-items:center;justify-content:center;gap:7px;">
+                            <i class="fas fa-copy"></i> คัดลอก
+                        </button>
+                        <a href="${qrUrl}" download="QR-${linkId}.png"
+                            style="background:#00963C;color:#fff;text-decoration:none;padding:10px 14px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:0.9rem;">
+                            <i class="fas fa-download"></i> บันทึก QR
+                        </a>
+                    </div>
+                </div>
+            `,
+            showConfirmButton: false,
+            showCloseButton: true,
+            customClass: { popup: 'swal-share-popup' }
+        });
+    }
+
+    // ──────────────────────────────────────────
+    //  Online Count Heartbeat
+    // ──────────────────────────────────────────
+    function updateOnlineCount() {
+        fetch("{{ url_for('heartbeat') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}"
+            }
+        })
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(data => {
+            const el = document.getElementById('onlineCount');
+            if (el && data.online_count !== undefined) el.textContent = data.online_count;
+        })
+        .catch(() => {
+            const el = document.getElementById('onlineCount');
+            if (el) el.textContent = '-';
+        });
+    }
+
+    updateOnlineCount();
+    setInterval(updateOnlineCount, 10000);
+
+    window.addEventListener('beforeunload', () => {
+        const fd = new FormData();
+        fd.append('csrf_token', "{{ csrf_token() if csrf_token is defined else '' }}");
+        navigator.sendBeacon("{{ url_for('offline') }}", fd);
+    });
+</script>
+
+<!-- Flash Messages -->
+<script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                Swal.fire({ icon: '{{ category }}', title: '{{ message }}', showConfirmButton: false, timer: 3000, toast: true, position: 'top-end' });
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</script>
+
+<!-- Tawk.to Live Chat -->
+<script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+        var s1=document.createElement("script"), s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+        s1.charset='UTF-8'; s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+    })();
+</script>
+
 </body>
 </html>
