@@ -454,7 +454,6 @@
 </head>
 <body>
 
-<!-- ==================== HEADER ==================== -->
 <header class="main-header">
     <a href="{{ url_for('home') }}" class="logo-container">
         <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
@@ -494,10 +493,8 @@
     </nav>
 </header>
 
-<!-- ==================== FORM ==================== -->
 <div class="page-wrapper">
 
-    <!-- Banner -->
     <div class="page-banner">
         <div class="banner-icon">➕</div>
         <div class="banner-text">
@@ -506,12 +503,10 @@
         </div>
     </div>
 
-    <!-- Form Card -->
     <div class="form-card">
         <form id="addLinkForm" action="{{ url_for('add_link_action') }}" method="POST">
 
-            <!-- ── ADMIN PANEL ── -->
-            {% if session.get('level') == 'Admin' %}
+            {% if session.get('level') in ['Super Admin', 'Admin'] %}
             <div class="admin-panel">
                 <div class="admin-panel-header">
                     <i class="fas fa-crown"></i> ตัวเลือกพิเศษสำหรับผู้ดูแลระบบ
@@ -534,14 +529,12 @@
             </div>
             {% endif %}
 
-            <!-- ── SECTION 1: ข้อมูลหลัก ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
                     ข้อมูลหลักของลิงก์
                 </div>
 
-                <!-- ชื่อลิงก์ -->
                 <div class="form-group">
                     <label class="form-label" for="ชื่อลิงก์">
                         <span class="label-icon"><i class="fas fa-tag"></i></span>
@@ -554,7 +547,6 @@
                     </div>
                 </div>
 
-                <!-- URL -->
                 <div class="form-group">
                     <label class="form-label" for="URL">
                         <span class="label-icon"><i class="fas fa-link"></i></span>
@@ -566,7 +558,6 @@
                                class="form-input" placeholder="https://example.com" required>
                     </div>
 
-                    <!-- Shortener -->
                     <div class="shortener-box">
                         <div class="shortener-header" onclick="toggleShortener()">
                             <div class="shortener-header-left">
@@ -591,7 +582,6 @@
                     </div>
                 </div>
 
-                <!-- ประเภท -->
                 <div class="form-group">
                     <label class="form-label" for="ประเภท">
                         <span class="label-icon"><i class="fas fa-th-large"></i></span>
@@ -613,7 +603,6 @@
                 </div>
             </div>
 
-            <!-- ── SECTION 2: สังกัด ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
@@ -644,7 +633,6 @@
                 </div>
             </div>
 
-            <!-- ── SECTION 3: สถานะและสิทธิ์ ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
@@ -652,7 +640,6 @@
                 </div>
 
                 <div class="form-row">
-                    <!-- สถานะ -->
                     <div class="form-group">
                         <label class="form-label" for="สถานะ">
                             <span class="label-icon"><i class="fas fa-toggle-on"></i></span>
@@ -665,7 +652,6 @@
                         </select>
                     </div>
 
-                    <!-- ความเป็นส่วนตัว -->
                     <div class="form-group">
                         <label class="form-label" for="ความเป็นส่วนตัว">
                             <span class="label-icon"><i class="fas fa-shield-alt"></i></span>
@@ -682,7 +668,6 @@
                 </div>
             </div>
 
-            <!-- ── SECTION 4: ข้อมูลติดต่อ ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
@@ -690,7 +675,6 @@
                 </div>
 
                 <div class="form-row">
-                    <!-- อีเมล -->
                     <div class="form-group">
                         <label class="form-label" for="อีเมลผู้รับผิดชอบ">
                             <span class="label-icon"><i class="fas fa-envelope"></i></span>
@@ -703,7 +687,6 @@
                         </div>
                     </div>
 
-                    <!-- เบอร์โทร -->
                     <div class="form-group">
                         <label class="form-label" for="เบอร์โทรติดต่อ">
                             <span class="label-icon"><i class="fas fa-phone"></i></span>
@@ -722,7 +705,6 @@
                 </div>
             </div>
 
-            <!-- ── SECTION 5: รายละเอียดเพิ่มเติม ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
@@ -740,7 +722,6 @@
                 </div>
             </div>
 
-            <!-- ── SUBMIT ── -->
             <div class="submit-section">
                 <button type="submit" class="btn-submit">
                     <i class="fas fa-save"></i>
@@ -750,17 +731,11 @@
 
         </form>
 
-        <!-- Back link -->
         <a href="{{ url_for('dashboard') }}" class="back-link">
             <i class="fas fa-arrow-left" style="font-size:0.8rem;"></i>
             กลับไปหน้า Dashboard
         </a>
-    </div><!-- /.form-card -->
-
-</div><!-- /.page-wrapper -->
-
-<!-- ==================== SCRIPTS ==================== -->
-<script>
+    </div></div><script>
     // Mobile Menu
     function toggleMenu() {
         const nav  = document.getElementById('navMenu');
@@ -798,7 +773,6 @@
     });
 </script>
 
-<!-- Flash Messages -->
 <script>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -810,7 +784,6 @@
     {% endwith %}
 </script>
 
-<!-- Tawk.to -->
 <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){

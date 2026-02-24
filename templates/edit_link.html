@@ -478,10 +478,8 @@
     </nav>
 </header>
 
-<!-- ==================== FORM ==================== -->
 <div class="page-wrapper">
 
-    <!-- Banner -->
     <div class="page-banner">
         <div class="banner-icon">✏️</div>
         <div class="banner-text">
@@ -493,10 +491,8 @@
         </div>
     </div>
 
-    <!-- Form Card -->
     <div class="form-card">
 
-        <!-- Info Box -->
         <div class="info-box">
             <i class="fas fa-circle-info"></i>
             <span>กำลังแก้ไขข้อมูลลิงก์ กรุณาตรวจสอบข้อมูลให้ครบถ้วนก่อนกดบันทึก</span>
@@ -504,8 +500,7 @@
 
         <form id="editLinkForm" action="{{ url_for('update_link_action', link_id=link.ID) }}" method="POST">
 
-            <!-- ── ADMIN PANEL ── -->
-            {% if can_pin %}
+            {% if session.get('level') in ['Super Admin', 'Admin'] %}
             <div class="admin-panel">
                 <div class="admin-panel-header">
                     <i class="fas fa-crown"></i> ตัวเลือกพิเศษสำหรับผู้ดูแลระบบ
@@ -531,14 +526,12 @@
             </div>
             {% endif %}
 
-            <!-- ── SECTION 1: ข้อมูลหลัก ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
                     ข้อมูลหลักของลิงก์
                 </div>
 
-                <!-- ชื่อลิงก์ -->
                 <div class="form-group">
                     <label class="form-label" for="ชื่อลิงก์">
                         <span class="label-icon"><i class="fas fa-tag"></i></span>
@@ -551,7 +544,6 @@
                     </div>
                 </div>
 
-                <!-- URL -->
                 <div class="form-group">
                     <label class="form-label" for="URL">
                         <span class="label-icon"><i class="fas fa-link"></i></span>
@@ -563,7 +555,6 @@
                                class="form-input" value="{{ link.URL }}" placeholder="https://..." required>
                     </div>
 
-                    <!-- Shortener -->
                     <div class="shortener-box">
                         <div class="shortener-header" onclick="toggleShortener()">
                             <div class="shortener-header-left">
@@ -588,7 +579,6 @@
                     </div>
                 </div>
 
-                <!-- ประเภท -->
                 <div class="form-group">
                     <label class="form-label" for="ประเภท">
                         <span class="label-icon"><i class="fas fa-th-large"></i></span>
@@ -610,7 +600,6 @@
                 </div>
             </div>
 
-            <!-- ── SECTION 2: สังกัด ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
@@ -618,13 +607,12 @@
                 </div>
 
                 <div class="form-row">
-                    <!-- กอง/สำนักงาน -->
                     <div class="form-group">
                         <label class="form-label" for="ส่วนราชการ">
                             <span class="label-icon"><i class="fas fa-building"></i></span>
                             กอง / สำนักงาน
                         </label>
-                        {% if is_super_admin %}
+                        {% if session.get('level') == 'Super Admin' %}
                             <div class="modified-indicator"><i class="fas fa-crown"></i> Admin: แก้ไขได้</div>
                             <select id="ส่วนราชการ" name="ส่วนราชการ" class="form-select" required>
                                 <option value="" disabled>--- กรุณาเลือกกอง/สำนักงาน ---</option>
@@ -641,13 +629,12 @@
                         {% endif %}
                     </div>
 
-                    <!-- กลุ่มงาน/ฝ่าย -->
                     <div class="form-group">
                         <label class="form-label" for="หน่วยงาน">
                             <span class="label-icon"><i class="fas fa-users"></i></span>
                             กลุ่มงาน / ฝ่าย
                         </label>
-                        {% if is_super_admin %}
+                        {% if session.get('level') == 'Super Admin' %}
                             <div class="modified-indicator"><i class="fas fa-crown"></i> Admin: แก้ไขได้</div>
                             <input type="text" id="หน่วยงาน" name="หน่วยงาน"
                                    value="{{ link['หน่วยงาน'] }}" class="form-input" required>
@@ -658,7 +645,7 @@
                     </div>
                 </div>
 
-                {% if not is_super_admin %}
+                {% if session.get('level') != 'Super Admin' %}
                 <div class="locked-hint">
                     <i class="fas fa-lock"></i>
                     ข้อมูลสังกัดดึงจากผู้สร้างระบบ ไม่สามารถแก้ไขได้
@@ -670,7 +657,6 @@
                 {% endif %}
             </div>
 
-            <!-- ── SECTION 3: สถานะและสิทธิ์ ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
@@ -678,7 +664,6 @@
                 </div>
 
                 <div class="form-row">
-                    <!-- สถานะ -->
                     <div class="form-group">
                         <label class="form-label" for="สถานะ">
                             <span class="label-icon"><i class="fas fa-toggle-on"></i></span>
@@ -691,7 +676,6 @@
                         </select>
                     </div>
 
-                    <!-- ความเป็นส่วนตัว -->
                     <div class="form-group">
                         {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
                         <label class="form-label" for="ความเป็นส่วนตัว">
@@ -709,7 +693,6 @@
                 </div>
             </div>
 
-            <!-- ── SECTION 4: ข้อมูลติดต่อ ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
@@ -717,7 +700,6 @@
                 </div>
 
                 <div class="form-row">
-                    <!-- อีเมล -->
                     <div class="form-group">
                         <label class="form-label" for="อีเมลผู้รับผิดชอบ">
                             <span class="label-icon"><i class="fas fa-envelope"></i></span>
@@ -730,7 +712,6 @@
                         </div>
                     </div>
 
-                    <!-- เบอร์โทร -->
                     <div class="form-group">
                         <label class="form-label" for="เบอร์โทรติดต่อ">
                             <span class="label-icon"><i class="fas fa-phone"></i></span>
@@ -750,7 +731,6 @@
                 </div>
             </div>
 
-            <!-- ── SECTION 5: รายละเอียดเพิ่มเติม ── -->
             <div class="form-section">
                 <div class="form-section-title">
                     <span class="section-dot"></span>
@@ -768,7 +748,6 @@
                 </div>
             </div>
 
-            <!-- ── SUBMIT ── -->
             <div class="submit-section">
                 <button type="submit" class="btn-submit">
                     <i class="fas fa-save"></i>
@@ -778,17 +757,11 @@
 
         </form>
 
-        <!-- Back link -->
         <a href="{{ url_for('dashboard') }}" class="back-link">
             <i class="fas fa-arrow-left" style="font-size:0.8rem;"></i>
-            กลับไปหน้า Dashboard
+            ยกเลิกและกลับไปหน้า Dashboard
         </a>
-    </div><!-- /.form-card -->
-
-</div><!-- /.page-wrapper -->
-
-<!-- ==================== SCRIPTS ==================== -->
-<script>
+    </div></div><script>
     // Mobile Menu
     function toggleMenu() {
         const nav  = document.getElementById('navMenu');
@@ -813,6 +786,22 @@
         icon.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
     }
 
+    // Set Admin Select Value
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if session.get('level') == 'Super Admin' %}
+        const currentAgency = "{{ link['ส่วนราชการ'] }}";
+        const agencySelect = document.getElementById('ส่วนราชการ');
+        if (currentAgency && agencySelect) {
+            for (let i = 0; i < agencySelect.options.length; i++) {
+                if (agencySelect.options[i].value === currentAgency) {
+                    agencySelect.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+        {% endif %}
+    });
+
     // Phone number cleaning
     const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
     if (phoneInput) {
@@ -824,25 +813,8 @@
     document.getElementById('editLinkForm').addEventListener('submit', function() {
         if (phoneInput) phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
     });
-
-    // Admin: pre-select agency
-    document.addEventListener('DOMContentLoaded', function() {
-        {% if is_super_admin %}
-        const currentAgency = "{{ link['ส่วนราชการ'] }}";
-        const agencySelect  = document.getElementById('ส่วนราชการ');
-        if (currentAgency && agencySelect) {
-            for (let i = 0; i < agencySelect.options.length; i++) {
-                if (agencySelect.options[i].value === currentAgency) {
-                    agencySelect.selectedIndex = i;
-                    break;
-                }
-            }
-        }
-        {% endif %}
-    });
 </script>
 
-<!-- Flash Messages -->
 <script>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -854,7 +826,6 @@
     {% endwith %}
 </script>
 
-<!-- Tawk.to -->
 <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
