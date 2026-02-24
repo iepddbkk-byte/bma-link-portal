@@ -4,660 +4,885 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMA SMART LINKAGE - Admin Panel</title>
-    
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"></noscript>
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
+        /* ==========================================
+           ROOT & RESET
+        ========================================== */
         :root {
-            /* Theme Colors */
-            --bma-green: #00963C;
+            --bma-green:       #00963C;
             --bma-green-hover: #007a30;
+            --bma-green-dark:  #005a24;
             --bma-green-light: #e8f5e9;
-            --button-red: #dc3545;
-            --button-blue: #007bff;
-            --button-yellow: #ffc107;
-            --button-gray: #6c757d;
-            --text-color: #2c3e50;
-            --border-color: #e0e0e0;
-            --bg-grad-start: #f5f7fa;
-            --bg-grad-end: #c3cfe2;
-            
-            --header-height: 80px;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --bma-green-mid:   #c8e6c9;
+            --text-color:      #1a2332;
+            --text-muted:      #64748b;
+            --border-color:    #e2e8f0;
+            --bg-page:         #f0f4f8;
+            --bg-card:         #ffffff;
+            --red:             #ef4444;
+            --red-light:       #fef2f2;
+            --blue:            #3b82f6;
+            --blue-light:      #eff6ff;
+            --amber:           #f59e0b;
+            --amber-light:     #fffbeb;
+            --header-height:   72px;
+            --shadow-sm:  0 1px 3px rgba(0,0,0,0.07);
+            --shadow-md:  0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg:  0 10px 30px rgba(0,0,0,0.09);
+            --shadow-xl:  0 20px 50px rgba(0,0,0,0.12);
+            --radius-sm:  8px;
+            --radius-md:  12px;
+            --radius-lg:  16px;
+            --radius-xl:  22px;
+            --radius-full:9999px;
+            --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
         }
 
-        /* FIX FONT ISSUE */
-        body, button, input, select, textarea, optgroup, table, th, td {
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
             font-family: 'Kanit', sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body { 
-            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+            background: var(--bg-page);
             color: var(--text-color);
             min-height: 100vh;
             padding-top: var(--header-height);
             padding-bottom: 60px;
+            -webkit-font-smoothing: antialiased;
         }
+        input, select, button, textarea { font-family: 'Kanit', sans-serif; }
 
-        /* --- Header & Navigation --- */
+        /* ==========================================
+           HEADER
+        ========================================== */
         .main-header {
-            background: white;
-            padding: 0 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 0 24px;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.06), var(--shadow-sm);
+            position: fixed; top:0; left:0; right:0;
+            z-index: 1000; height: var(--header-height);
+            display: flex; align-items: center; justify-content: space-between;
         }
 
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-        .logo-container img { height: 45px; width: auto; transition: transform 0.3s; }
-        .logo-container img:hover { transform: scale(1.05); }
-        .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
+        .header-left { display: flex; align-items: center; gap: 14px; }
 
-        /* Desktop Menu */
-        .nav-menu { display: flex; align-items: center; gap: 8px; }
+        .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-container img { height: 42px; transition: transform var(--transition); }
+        .logo-container:hover img { transform: scale(1.05); }
+        .logo-text { font-size: 1.2rem; font-weight: 700; color: var(--bma-green); white-space: nowrap; }
 
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-            white-space: nowrap;
+        .stat-pill {
+            display: flex; align-items: center; gap: 7px;
+            padding: 5px 14px; border-radius: var(--radius-full);
+            font-size: 0.84rem; font-weight: 600; white-space: nowrap;
+            background: var(--bma-green-light); color: var(--bma-green-dark);
+            border: 1px solid var(--bma-green-mid);
         }
-        .nav-link:hover { background-color: var(--bma-green-light); color: var(--bma-green); transform: translateY(-1px); }
-        .nav-link i { font-size: 1.1em; }
-        
-        .nav-link.active-nav { background-color: var(--bma-green); color: white; box-shadow: 0 4px 10px rgba(0, 150, 60, 0.2); }
-        .nav-link.logout-btn { color: #dc3545; border: 1px solid transparent; }
-        .nav-link.logout-btn:hover { background-color: #fff5f5; border-color: #dc3545; }
-
-        .user-profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
-
-        /* --- Mobile Header Controls (Profile + Hamburger) --- */
-        .mobile-controls { display: none; align-items: center; gap: 15px; }
-        
-        .mobile-profile-btn {
-            display: flex; align-items: center; text-decoration: none;
-        }
-        .mobile-profile-btn img {
-            width: 40px; height: 40px; border-radius: 50%; 
-            border: 2px solid var(--bma-green); object-fit: cover;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .mobile-toggle {
-            font-size: 1.6rem;
-            cursor: pointer;
-            color: var(--text-color);
-            padding: 5px;
-        }
-        
-        /* จัดกลุ่ม Logo กับ Stats ให้อยู่ทางซ้าย */
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex: 1; /* ให้ยืดหยุ่นในมือถือ */
-            min-width: 0; /* ป้องกันการดันจนล้น */
-        }
-
-        /* กล่องแสดงจำนวนคนออนไลน์ */
-        .header-online-count {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: var(--bma-green-light);
-            color: var(--bma-green);
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border: 1px solid var(--bma-green);
-            white-space: nowrap;
-        }
-
-        /* Animation จุดสีเขียวกระพริบ */
         .pulsating-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #2ecc71;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            width: 8px; height: 8px; background: #22c55e;
+            border-radius: 50%; flex-shrink: 0;
             animation: pulse-green 2s infinite;
         }
-
         @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+            0%  { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+            70% { box-shadow: 0 0 0 7px rgba(34,197,94,0); }
+            100%{ box-shadow: 0 0 0 0 rgba(34,197,94,0); }
         }
 
-        /* --- Admin Grid Layout --- */
+        /* Nav */
+        .nav-menu { display: flex; align-items: center; gap: 4px; }
+        .nav-link {
+            text-decoration: none; color: var(--text-muted); font-weight: 500;
+            padding: 8px 14px; border-radius: var(--radius-full);
+            transition: all var(--transition);
+            display: flex; align-items: center; gap: 7px;
+            font-size: 0.9rem; white-space: nowrap;
+        }
+        .nav-link:hover { background: var(--bma-green-light); color: var(--bma-green); }
+        .nav-link.active-nav { background: var(--bma-green); color: #fff; box-shadow: 0 4px 12px rgba(0,150,60,0.25); }
+        .nav-link.logout-btn { color: var(--red); }
+        .nav-link.logout-btn:hover { background: var(--red-light); }
+        .user-profile-pic { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+
+        /* Mobile */
+        .mobile-controls { display: none; align-items: center; gap: 10px; }
+        .mobile-profile-btn img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--bma-green); object-fit: cover; }
+        .mobile-toggle {
+            width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border-radius: var(--radius-sm); background: #f8fafc;
+            transition: background var(--transition);
+        }
+        .mobile-toggle:hover { background: var(--bma-green-light); }
+        .mobile-toggle i { font-size: 1.25rem; color: var(--text-color); }
+
+        /* ==========================================
+           PAGE BANNER
+        ========================================== */
+        .page-banner {
+            background: linear-gradient(135deg, var(--bma-green-dark) 0%, var(--bma-green) 60%, #00c851 100%);
+            padding: 32px 32px 36px;
+            position: relative; overflow: hidden;
+        }
+        .page-banner::before {
+            content: ''; position: absolute; top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            background: rgba(255,255,255,0.07); border-radius: 50%;
+        }
+        .page-banner::after {
+            content: ''; position: absolute; bottom: -80px; left: 30%;
+            width: 160px; height: 160px;
+            background: rgba(255,255,255,0.04); border-radius: 50%;
+        }
+        .banner-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; }
+        .banner-icon {
+            width: 56px; height: 56px; flex-shrink: 0;
+            background: rgba(255,255,255,0.18); border-radius: var(--radius-lg);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; backdrop-filter: blur(8px);
+        }
+        .banner-text h1 { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .banner-text p { font-size: 0.84rem; color: rgba(255,255,255,0.75); }
+
+        /* Summary pills in banner */
+        .banner-stats {
+            margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
+        }
+        .banner-stat {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: var(--radius-md);
+            padding: 10px 18px; text-align: center;
+            backdrop-filter: blur(6px); min-width: 80px;
+        }
+        .banner-stat-num { font-size: 1.4rem; font-weight: 700; color: #fff; line-height: 1; }
+        .banner-stat-label { font-size: 0.73rem; color: rgba(255,255,255,0.75); margin-top: 2px; }
+
+        /* ==========================================
+           CONTAINER
+        ========================================== */
         .container {
-            max-width: 1400px;
-            margin: 30px auto; 
-            padding: 0 20px;
-            animation: fadeIn 0.5s ease;
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 28px 24px 60px;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        h2 {
-            color: var(--bma-green);
-            margin-bottom: 25px;
-            font-size: 1.8em;
-            font-weight: 600;
-            display: flex; align-items: center; gap: 10px;
-        }
-
+        /* ==========================================
+           ADMIN GRID
+        ========================================== */
         .admin-grid {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr; /* แบ่งสัดส่วนซ้ายขวา */
-            gap: 25px;
+            grid-template-columns: 1fr 420px;
+            gap: 24px;
+            align-items: start;
         }
 
+        /* ==========================================
+           CARDS
+        ========================================== */
         .admin-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
             box-shadow: var(--shadow-lg);
-            border: 1px solid #f0f0f0;
-            display: flex; flex-direction: column;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            animation: fadeInUp 0.4s ease both;
+        }
+        .admin-card:nth-child(2) { animation-delay: 0.08s; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .admin-card h3 {
-            color: var(--text-color);
-            border-bottom: 2px solid var(--bma-green-light);
-            padding-bottom: 15px;
+        .card-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1.5px solid var(--border-color);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .card-header-icon {
+            width: 38px; height: 38px; border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
+        .card-header-icon.green { background: var(--bma-green-light); color: var(--bma-green); }
+        .card-header-icon.blue  { background: var(--blue-light);       color: var(--blue); }
+
+        .card-header h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-color); }
+        .card-header p  { font-size: 0.78rem; color: var(--text-muted); }
+
+        .card-body { padding: 20px 24px 24px; }
+
+        /* ==========================================
+           TABLE
+        ========================================== */
+        .table-wrapper {
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .table-scroll { overflow-x: auto; }
+        .table-scroll::-webkit-scrollbar { height: 5px; }
+        .table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .table-scroll::-webkit-scrollbar-thumb:hover { background: var(--bma-green); }
+
+        table { width: 100%; border-collapse: collapse; min-width: 520px; background: #fff; }
+
+        thead th {
+            background: var(--bma-green);
+            color: #fff; padding: 12px 16px;
+            font-size: 0.82rem; font-weight: 600;
+            text-align: left; white-space: nowrap;
+            position: sticky; top: 0; z-index: 5;
+        }
+
+        tbody td {
+            padding: 13px 16px; border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle; color: #475569; font-size: 0.9rem;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr { transition: background var(--transition); }
+        tbody tr:hover { background: #f8fffe; }
+
+        /* ==========================================
+           INVITE CODE TABLE (smaller)
+        ========================================== */
+        .code-table { min-width: 300px; }
+        .code-mono {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem; font-weight: 700;
+            color: var(--blue); letter-spacing: 0.04em;
+            background: var(--blue-light);
+            padding: 3px 10px; border-radius: var(--radius-sm);
+            display: inline-block;
+        }
+
+        /* ==========================================
+           BADGES
+        ========================================== */
+        .badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: var(--radius-full);
+            font-size: 0.78rem; font-weight: 600; white-space: nowrap;
+        }
+        .badge-available { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-used      { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-admin     { background: var(--amber-light); color: #92400e; border: 1px solid #fde68a; }
+        .badge-user      { background: #f1f5f9;            color: #475569; border: 1px solid #e2e8f0; }
+
+        /* ==========================================
+           LEVEL SELECT
+        ========================================== */
+        .level-form { display: flex; align-items: center; gap: 8px; }
+        .level-select {
+            height: 34px; padding: 0 10px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.85rem; color: var(--text-color);
+            background: #f8fafc; cursor: pointer;
+            transition: border-color var(--transition);
+        }
+        .level-select:focus { outline: none; border-color: var(--bma-green); box-shadow: 0 0 0 3px rgba(0,150,60,0.12); }
+        .level-select:disabled { cursor: not-allowed; opacity: 0.55; }
+
+        /* ==========================================
+           BUTTONS
+        ========================================== */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+            padding: 8px 16px; border-radius: var(--radius-sm);
+            font-family: 'Kanit', sans-serif; font-size: 0.88rem; font-weight: 600;
+            border: none; cursor: pointer;
+            transition: all var(--transition); white-space: nowrap;
+        }
+        .btn-icon {
+            width: 34px; height: 34px; padding: 0;
+            border-radius: var(--radius-sm);
+        }
+        .btn-save   { background: var(--bma-green); color: #fff; }
+        .btn-save:hover   { background: var(--bma-green-hover); transform: scale(1.05); }
+        .btn-delete { background: var(--red-light); color: var(--red); border: 1px solid #fecaca; }
+        .btn-delete:hover { background: var(--red); color: #fff; transform: scale(1.05); }
+        .btn-generate {
+            flex: 1;
+            background: linear-gradient(135deg, var(--blue), #1d4ed8);
+            color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+            border-radius: var(--radius-md); padding: 12px 20px;
+            font-size: 0.95rem;
+        }
+        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59,130,246,0.4); }
+        .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+        /* ==========================================
+           GENERATE FORM
+        ========================================== */
+        .generate-form {
+            display: flex; gap: 10px; align-items: stretch;
             margin-bottom: 20px;
-            font-size: 1.3em;
-            display: flex; align-items: center; gap: 10px;
         }
-
-        /* --- Table Styles --- */
-        .table-wrapper { 
-            overflow-x: auto; 
-            border-radius: 12px; 
-            border: 1px solid #eee; 
-            width: 100%;
-        }
-
-        table { width: 100%; border-collapse: collapse; font-size: 0.9em; background: white; white-space: nowrap; /* บังคับให้ไม่ตัดบรรทัดเพื่อให้อ่านง่ายและ Scroll เอา */ }
-
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
-
-        th { 
-            background: #f8f9fa; color: var(--text-color); font-weight: 600;
-            text-transform: uppercase; font-size: 0.85em; border-bottom: 2px solid #ddd;
-        }
-
-        tbody tr:hover { background: #f9f9f9; }
-
-        /* --- Actions & Form --- */
-        
-        /* [NEW] กล่องจัดวางฟอร์มสร้างรหัส */
-        .generate-wrapper {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: stretch; /* ให้ความสูงเท่ากัน */
-        }
-
-        /* [NEW] ช่องกรอกจำนวน */
         .qty-input {
-            width: 80px;
-            padding: 0 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 1.1em;
-            font-weight: 500;
-            color: var(--text-color);
-            outline: none;
-            transition: border-color 0.3s;
+            width: 76px; height: 46px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            text-align: center; font-size: 1.1rem; font-weight: 700;
+            color: var(--text-color); background: #f8fafc;
+            transition: border-color var(--transition);
         }
-        
-        .qty-input:focus {
-            border-color: var(--button-blue);
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-        
-        /* [EDITED] ปุ่มสร้างรหัส - ใช้สีน้ำเงินไล่เฉดชัดเจน */
-        .btn-generate { 
-            flex: 1; /* ยืดเต็มพื้นที่ที่เหลือ */
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); 
-            color: white; 
-            border: none; 
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 1em; 
-            font-weight: 500;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 8px;
-            cursor: pointer; 
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
-        }
-        
-        .btn-generate:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3); 
-            background: linear-gradient(135deg, #0069d9 0%, #004494 100%);
-        }
-        
-        .action-form { display: flex; gap: 5px; align-items: center; }
-        .action-form-inline { display: inline-block; margin: 0; }
-        
-        select {
-            padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px;
-            background: white; cursor: pointer;
-        }
+        .qty-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); background: #fff; }
 
-        .btn-action { border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; color: white; transition: 0.2s; }
-        .btn-save { background: var(--bma-green); }
-        .btn-delete { background: var(--button-red); }
-        .btn-action:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-action:disabled { background: #ccc; cursor: default; transform: none; }
+        /* ==========================================
+           EMPTY STATE
+        ========================================== */
+        .empty-state {
+            text-align: center; padding: 40px 20px;
+            color: #94a3b8;
+        }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 10px; display: block; opacity: 0.4; }
 
-        /* --- Badges --- */
-        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 0.8em; font-weight: 500; }
-        .status-ok { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
-        .status-used { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        /* ==========================================
+           MOBILE CARDS for User Table
+        ========================================== */
+        .user-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            display: none; /* shown only on mobile */
+            flex-direction: column; gap: 12px;
+            transition: box-shadow var(--transition);
+        }
+        .user-card:hover { box-shadow: var(--shadow-md); }
 
-        /* --- Footer --- */
+        .user-card-header { display: flex; align-items: center; gap: 12px; }
+        .user-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--bma-green-light); color: var(--bma-green);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: 700; flex-shrink: 0;
+            border: 2px solid var(--bma-green-mid);
+        }
+        .user-info-name { font-weight: 600; color: var(--text-color); font-size: 0.95rem; }
+        .user-info-sub  { font-size: 0.8rem; color: var(--text-muted); margin-top: 1px; }
+
+        .user-card-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        /* Code cards for mobile */
+        .code-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 14px 16px;
+            box-shadow: var(--shadow-sm);
+            display: none;
+            align-items: center; gap: 12px;
+        }
+        .code-card-body { flex: 1; min-width: 0; }
+        .code-card-code { font-family: 'Courier New', monospace; font-weight: 700; font-size: 1rem; color: var(--blue); }
+        .code-card-sub  { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* ==========================================
+           FOOTER
+        ========================================== */
         .main-footer {
-            background: linear-gradient(135deg, var(--bma-green) 0%, #007a30 100%);
-            color: white; text-align: center;
-            padding: 25px; margin-top: 40px;
-            font-size: 0.9em; box-shadow: var(--shadow-lg);
+            background: var(--bg-card); color: var(--text-muted);
+            text-align: center; padding: 28px 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.88rem; line-height: 1.8;
         }
-        .main-footer p { margin: 8px 0; opacity: 0.95; }
+        .main-footer strong { color: var(--text-color); }
 
-        /* --- Responsive --- */
-        @media (max-width: 992px) {
+        /* ==========================================
+           TABLET
+        ========================================== */
+        @media (max-width: 1024px) and (min-width: 769px) {
             .nav-link span { display: none; }
-            .nav-link i { font-size: 1.3rem; margin: 0; }
-            .nav-link { padding: 10px; border-radius: 50%; width: 45px; height: 45px; justify-content: center; }
-            .user-profile-pic { width: 100%; height: 100%; }
+            .nav-link { padding: 9px; border-radius: 50%; width: 42px; height: 42px; justify-content: center; }
+            .admin-grid { grid-template-columns: 1fr; }
+            .banner-stats { display: none; }
         }
 
+        /* ==========================================
+           MOBILE
+        ========================================== */
         @media (max-width: 768px) {
-            body { padding-top: 70px; }
-            .main-header { padding: 0 15px; height: 70px; }
-            .logo-text { font-size: 1.1rem; }
-            
-            /* Mobile Controls */
+            :root { --header-height: 64px; }
+            body { padding-top: var(--header-height); }
+            .main-header { padding: 0 16px; height: 64px; }
+            .logo-text { font-size: 1rem; }
+            .logo-container img { height: 34px; }
+            .stat-pill { display: none; }
             .mobile-controls { display: flex; }
-            .mobile-toggle { display: block; }
-            
-            /* ซ่อนส่วนแสดงคนออนไลน์ทั้งหมดในมือถือ */
-            .header-online-count { display: none; }
 
-            /* Mobile Menu */
             .nav-menu {
-                display: none; position: absolute; top: 70px; left: 0; width: 100%;
-                background: white; flex-direction: column; align-items: stretch;
-                padding: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 1px solid #f0f0f0;
+                display: none; position: fixed;
+                top: 64px; left: 0; right: 0;
+                background: #fff; flex-direction: column; align-items: stretch;
+                padding: 12px; box-shadow: var(--shadow-xl);
+                border-top: 1px solid var(--border-color);
+                z-index: 999; max-height: calc(100vh - 64px); overflow-y: auto;
             }
-            .nav-menu.active { display: flex; animation: slideDown 0.3s ease; }
-            @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-            .nav-link { width: 100%; border-radius: 12px; padding: 12px 15px; margin-bottom: 5px; justify-content: flex-start; height: auto; }
+            .nav-menu.active { display: flex; animation: slideDown 0.25s ease; }
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateY(-8px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+            .nav-link { width: 100%; border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 4px; justify-content: flex-start; color: var(--text-color); font-size: 0.95rem; }
             .nav-link span { display: inline; }
-            .nav-link i { margin-right: 10px; font-size: 1.1rem; }
-            
-            /* Hide Profile Item in Menu (Since it's on top) */
             .nav-link.profile-item { display: none; }
-            
-            /* Layout Adjustments for Mobile */
-            .container { padding: 0 10px; margin: 20px auto; } /* ลด padding ซ้ายขวา */
-            .admin-grid { grid-template-columns: 1fr; gap: 15px; } /* เรียงเป็นคอลัมน์เดียว */
-            .admin-card { padding: 15px; } /* ลด padding ในการ์ด */
-            
-            h2 { font-size: 1.5em; margin-bottom: 15px; }
-            .admin-card h3 { font-size: 1.1em; }
-            
-            /* Table Adjustments */
-            th, td { padding: 10px 8px; font-size: 0.85em; }
-            select { padding: 4px 2px; }
+
+            /* Banner */
+            .page-banner { padding: 24px 18px 28px; }
+            .banner-text h1 { font-size: 1.2rem; }
+            .banner-stats { display: none; }
+
+            /* Container */
+            .container { padding: 16px 14px 50px; }
+
+            /* Grid → single column */
+            .admin-grid { grid-template-columns: 1fr; gap: 16px; }
+
+            .card-header { padding: 16px 16px 14px; }
+            .card-body   { padding: 16px 16px 20px; }
+
+            /* Hide desktop table, show mobile cards */
+            .desktop-table { display: none !important; }
+            .mobile-user-cards { display: flex; flex-direction: column; gap: 10px; }
+            .user-card { display: flex; }
+
+            .mobile-code-cards { display: flex; flex-direction: column; gap: 8px; }
+            .code-card { display: flex; }
+
+            /* Generate form */
+            .generate-form { flex-wrap: nowrap; }
+        }
+
+        /* ==========================================
+           PRINT / accessibility
+        ========================================== */
+        @media (max-width: 400px) {
+            .banner-icon { display: none; }
         }
     </style>
 </head>
 <body>
-    
-        <header class="main-header">
-        <div class="header-left">
-            <a href="{{ url_for('home') }}" class="logo-container">
-                <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
-                <div class="logo-text">BMA SMART LINKAGE</div>
+
+<!-- ==================== HEADER ==================== -->
+<header class="main-header">
+    <div class="header-left">
+        <a href="{{ url_for('home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='pictures/logo.png') }}" alt="BMA Logo">
+            <div class="logo-text">BMA SMART LINKAGE</div>
+        </a>
+        <div class="stat-pill">
+            <span class="pulsating-dot"></span>
+            <span id="onlineCount">-</span>
+            <span>ออนไลน์</span>
+        </div>
+    </div>
+
+    <div class="mobile-controls">
+        {% if session.get('logged_in') %}
+        <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
+            <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
+        </a>
+        {% endif %}
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars" id="menuIcon"></i>
+        </div>
+    </div>
+
+    <nav class="nav-menu" id="navMenu">
+        {% if session.get('logged_in') %}
+            <a href="{{ url_for('home') }}" class="nav-link"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
+            {% if session.get('level') == 'Super Admin' %}
+            <a href="{{ url_for('admin_panel') }}" class="nav-link active-nav"><i class="fas fa-crown"></i> <span>Admin</span></a>
+            {% endif %}
+            <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('links_page') }}" class="nav-link"><i class="fas fa-layer-group"></i> <span>ลิงก์ทั้งหมด</span></a>
+            <a href="{{ url_for('my_favorites_page') }}" class="nav-link"><i class="fas fa-star" style="color:#f59e0b;"></i> <span>ลิงค์โปรด</span></a>
+            <a href="{{ url_for('analytics_page') }}" class="nav-link"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
+            <a href="{{ url_for('feedback_page') }}" class="nav-link"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
+            <a href="{{ url_for('profile_page') }}" class="nav-link profile-item">
+                <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
+                <span>{{ session.name }}</span>
             </a>
-            
-            <div class="header-online-count" title="ผู้ใช้งานที่กำลังออนไลน์ขณะนี้">
-                <span class="pulsating-dot"></span>
-                <span id="onlineCount">-</span>
-                <span>ออนไลน์</span>
+            <a href="{{ url_for('logout') }}" class="nav-link logout-btn"><i class="fas fa-sign-out-alt"></i> <span>ออก</span></a>
+        {% else %}
+            <a href="{{ url_for('login_page') }}" class="nav-link active-nav"><i class="fas fa-user-lock"></i> <span>เข้าระบบ</span></a>
+        {% endif %}
+    </nav>
+</header>
+
+<!-- ==================== PAGE BANNER ==================== -->
+<div class="page-banner">
+    <div class="banner-inner">
+        <div class="banner-icon">👑</div>
+        <div class="banner-text">
+            <h1>Admin Control Panel</h1>
+            <p>ระบบจัดการผู้ดูแลและรหัสเชิญ — BMA Smart Linkage</p>
+        </div>
+        <div class="banner-stats">
+            <div class="banner-stat">
+                <div class="banner-stat-num">{{ staff_list | length }}</div>
+                <div class="banner-stat-label">เจ้าหน้าที่</div>
+            </div>
+            <div class="banner-stat">
+                <div class="banner-stat-num">{{ invite_codes | selectattr('Status', 'equalto', 'Available') | list | length }}</div>
+                <div class="banner-stat-label">รหัสว่าง</div>
+            </div>
+            <div class="banner-stat">
+                <div class="banner-stat-num">{{ invite_codes | length }}</div>
+                <div class="banner-stat-label">รหัสทั้งหมด</div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="mobile-controls">
-            {% if session.get('logged_in') %}
-                <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn" title="โปรไฟล์">
-                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" alt="Profile">
-                </a>
-            {% endif %}
-            <div class="mobile-toggle" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </div>
-        </div>
-        
-        <nav class="nav-menu" id="navMenu">
-            {% if session.get('logged_in') %}
-                <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก"><i class="fas fa-home"></i> <span>หน้าหลัก</span></a>
-                
-                {% if session.get('level') == 'Super Admin' %}
-                <a href="{{ url_for('admin_panel') }}" class="nav-link active-nav" title="Admin Panel"><i class="fas fa-crown"></i> <span>Admin</span></a>
-                {% endif %}
-                
-                <a href="{{ url_for('dashboard') }}" class="nav-link" title="Dashboard"><i class="fas fa-columns"></i> <span>Dashboard</span></a>
-				<a href="{{ url_for('links_page') }}" class="nav-link" title="ลิงก์ทั้งหมด" style="color: #007bff;">
-                    <i class="fas fa-layer-group"></i> <span>ลิงก์ทั้งหมด</span>
-                </a>
-				<a href="{{ url_for('my_favorites_page') }}" class="nav-link" title="My Favourite Links"><i class="fas fa-star"></i> <span>ลิงค์โปรดของฉัน</span></a>
-                <a href="{{ url_for('analytics_page') }}" class="nav-link" title="Analytics"><i class="fas fa-chart-pie"></i> <span>Analytics</span></a>
-                <a href="{{ url_for('feedback_page') }}" class="nav-link" title="Feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a>
-                
-                <a href="{{ url_for('profile_page') }}" class="nav-link profile-item" title="โปรไฟล์">
-                    <img src="https://ui-avatars.com/api/?name={{ session.name }}&background=00963C&color=fff" class="user-profile-pic" alt="Profile">
-                    <span>{{ session.name }}</span>
-                </a>
-                
-                <a href="{{ url_for('logout') }}" class="nav-link logout-btn" title="ออกจากระบบ">
-                    <i class="fas fa-sign-out-alt"></i> <span>ออก</span>
-                </a>
-            {% else %}
-                <a href="{{ url_for('login_page') }}" class="nav-link" style="background: var(--bma-green); color: white;">
-                    <i class="fas fa-user-lock"></i> <span>เจ้าหน้าที่เข้าสู่ระบบ</span>
-                </a>
-            {% endif %}
-        </nav>
-    </header>
-    
-    <div class="container">
-        <h2>👑 Admin Control Panel <span style="font-size:0.6em; color: #777; font-weight:400; margin-left:10px; display:inline-block;">(ระบบจัดการผู้ดูแล)</span></h2>
+<!-- ==================== CONTENT ==================== -->
+<div class="container">
+    <div class="admin-grid">
 
-        <div class="admin-grid">
-            
-            <div class="admin-card">
-                <h3><i class="fas fa-users-cog"></i> จัดการผู้ใช้งาน (Staff List)</h3>
-                
-                <div class="table-wrapper">
-                    <table id="user-table">
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>ระดับ (Level)</th>
-                                <th>ชื่อเจ้าหน้าที่</th>
-                                <th style="text-align: center;">ลบ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for user in staff_list %}
-                            <tr>
-                                <td style="font-weight: 500;">{{ user.Username }}</td>
-                                <td>
-                                    <form class="action-form" action="{{ url_for('change_user_level') }}" method="POST">
-                                        <input type="hidden" name="username" value="{{ user.Username }}">
-                                        <select name="level" {% if user.Username == session.username %}disabled{% endif %}>
-                                            <option value="Admin" {% if user.Level == 'Admin' %}selected{% endif %}>Admin</option>
-                                            <option value="Users" {% if user.Level == 'Users' %}selected{% endif %}>Users</option>
-                                        </select>
-                                        <button type="submit" class="btn-action btn-save" {% if user.Username == session.username %}disabled{% endif %} title="บันทึก">
-                                            <i class="fas fa-save"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                                <td>{{ user.ชื่อ }}</td>
-                                <td style="text-align: center;">
-                                    <form class="action-form-inline delete-user-form" action="{{ url_for('delete_user') }}" method="POST">
-                                        <input type="hidden" name="username" value="{{ user.Username }}">
-                                        <button type="submit" class="btn-action btn-delete" {% if user.Username == session.username %}disabled{% endif %} title="ลบผู้ใช้">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <!-- ════════════════════════════════
+             LEFT: USER MANAGEMENT
+        ════════════════════════════════ -->
+        <div class="admin-card">
+            <div class="card-header">
+                <div class="card-header-icon green"><i class="fas fa-users-cog"></i></div>
+                <div>
+                    <h3>จัดการผู้ใช้งาน</h3>
+                    <p>Staff List — เปลี่ยนระดับสิทธิ์หรือลบผู้ใช้ออกจากระบบ</p>
                 </div>
             </div>
+            <div class="card-body">
 
-            <div class="admin-card">
-                <h3><i class="fas fa-key"></i> รหัสเชิญ (Invite Codes)</h3>
-                
-                <form action="{{ url_for('generate_code') }}" method="POST">
-                    <div class="generate-wrapper">
-                        <input type="number" name="amount" class="qty-input" value="1" min="1" max="50" title="ระบุจำนวนที่ต้องการสร้าง">
-                        
-                        <button type="submit" class="btn-generate">
-                            <i class="fas fa-plus-circle"></i> สร้างรหัสเชิญ (Generate)
-                        </button>
+                <!-- ── DESKTOP TABLE ── -->
+                <div class="table-wrapper desktop-table">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>👤 Username</th>
+                                    <th>ชื่อเจ้าหน้าที่</th>
+                                    <th>ระดับสิทธิ์</th>
+                                    <th style="text-align:center; width:60px;">ลบ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in staff_list %}
+                                <tr>
+                                    <td style="font-weight:600; color:var(--text-color);">
+                                        <div style="display:flex;align-items:center;gap:9px;">
+                                            <img src="https://ui-avatars.com/api/?name={{ user.ชื่อ }}&background=e8f5e9&color=00963C&size=32"
+                                                 style="width:30px;height:30px;border-radius:50%;border:1.5px solid var(--bma-green-mid);" alt="">
+                                            {{ user.Username }}
+                                        </div>
+                                    </td>
+                                    <td>{{ user.ชื่อ }}</td>
+                                    <td>
+                                        <form class="level-form" action="{{ url_for('change_user_level') }}" method="POST">
+                                            <input type="hidden" name="username" value="{{ user.Username }}">
+                                            <select name="level" class="level-select" {% if user.Username == session.username %}disabled{% endif %}>
+                                                <option value="Admin" {% if user.Level == 'Admin' %}selected{% endif %}>👑 Admin</option>
+                                                <option value="Users" {% if user.Level == 'Users' %}selected{% endif %}>👤 Users</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-icon btn-save"
+                                                    {% if user.Username == session.username %}disabled{% endif %}
+                                                    title="บันทึกระดับ">
+                                                <i class="fas fa-save"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <form class="delete-user-form" action="{{ url_for('delete_user') }}" method="POST">
+                                            <input type="hidden" name="username" value="{{ user.Username }}">
+                                            <button type="submit" class="btn btn-icon btn-delete"
+                                                    {% if user.Username == session.username %}disabled{% endif %}
+                                                    title="ลบผู้ใช้">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <i class="fas fa-users"></i>
+                                        ยังไม่มีข้อมูลผู้ใช้งาน
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
+                </div>
+
+                <!-- ── MOBILE CARDS ── -->
+                <div class="mobile-user-cards">
+                    {% for user in staff_list %}
+                    <div class="user-card">
+                        <div class="user-card-header">
+                            <div class="user-avatar">{{ user.ชื่อ[0] if user.ชื่อ else user.Username[0] }}</div>
+                            <div>
+                                <div class="user-info-name">{{ user.Username }}</div>
+                                <div class="user-info-sub">{{ user.ชื่อ }}</div>
+                            </div>
+                            <span class="badge {% if user.Level == 'Admin' %}badge-admin{% else %}badge-user{% endif %}" style="margin-left:auto;">
+                                {% if user.Level == 'Admin' %}👑 Admin{% else %}👤 Users{% endif %}
+                            </span>
+                        </div>
+                        <div class="user-card-actions">
+                            <form class="level-form" action="{{ url_for('change_user_level') }}" method="POST" style="flex:1;">
+                                <input type="hidden" name="username" value="{{ user.Username }}">
+                                <select name="level" class="level-select" style="flex:1;width:auto;" {% if user.Username == session.username %}disabled{% endif %}>
+                                    <option value="Admin" {% if user.Level == 'Admin' %}selected{% endif %}>👑 Admin</option>
+                                    <option value="Users" {% if user.Level == 'Users' %}selected{% endif %}>👤 Users</option>
+                                </select>
+                                <button type="submit" class="btn btn-save"
+                                        {% if user.Username == session.username %}disabled{% endif %}>
+                                    <i class="fas fa-save"></i> บันทึก
+                                </button>
+                            </form>
+                            <form class="delete-user-form" action="{{ url_for('delete_user') }}" method="POST">
+                                <input type="hidden" name="username" value="{{ user.Username }}">
+                                <button type="submit" class="btn btn-delete"
+                                        {% if user.Username == session.username %}disabled{% endif %}>
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        ยังไม่มีข้อมูลผู้ใช้งาน
+                    </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ════════════════════════════════
+             RIGHT: INVITE CODES
+        ════════════════════════════════ -->
+        <div class="admin-card">
+            <div class="card-header">
+                <div class="card-header-icon blue"><i class="fas fa-key"></i></div>
+                <div>
+                    <h3>รหัสเชิญ</h3>
+                    <p>Invite Codes — สร้างและจัดการรหัสสำหรับสมัครสมาชิก</p>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <!-- Generate form -->
+                <form action="{{ url_for('generate_code') }}" method="POST" class="generate-form">
+                    <input type="number" name="amount" class="qty-input" value="1" min="1" max="50" title="จำนวนรหัสที่ต้องการสร้าง">
+                    <button type="submit" class="btn btn-generate">
+                        <i class="fas fa-plus-circle"></i> สร้างรหัสเชิญ
+                    </button>
                 </form>
 
-                <div class="table-wrapper">
-                    <table id="code-table">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th style="text-align: center;">สถานะ</th>
-                                <th>ใช้โดย</th>
-                                <th style="text-align: center;">ลบ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for code in invite_codes %}
-                            <tr>
-                                <td style="font-family: monospace; font-size: 1.1em; color: var(--button-blue);">{{ code.Code }}</td>
-                                <td style="text-align: center;">
-                                    {% if code.Status == 'Available' %}
-                                        <span class="status-badge status-ok">ว่าง</span>
-                                    {% else %}
-                                        <span class="status-badge status-used">ใช้แล้ว</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if code.UsedByUsername %}
-                                        {{ code.UsedByUsername }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td style="text-align: center;">
-                                    <form class="action-form-inline delete-code-form" action="{{ url_for('delete_code') }}" method="POST">
-                                        <input type="hidden" name="code" value="{{ code.Code }}">
-                                        <button type="submit" class="btn-action btn-delete" title="ลบรหัส">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="4" style="text-align: center; color: #999; padding: 20px;">
-                                    ไม่มีรหัสเชิญในระบบ
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <!-- ── DESKTOP TABLE ── -->
+                <div class="table-wrapper desktop-table">
+                    <div class="table-scroll">
+                        <table class="code-table">
+                            <thead>
+                                <tr>
+                                    <th>🔑 Code</th>
+                                    <th style="text-align:center;">สถานะ</th>
+                                    <th>ใช้โดย</th>
+                                    <th style="text-align:center; width:50px;">ลบ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for code in invite_codes %}
+                                <tr>
+                                    <td><span class="code-mono">{{ code.Code }}</span></td>
+                                    <td style="text-align:center;">
+                                        {% if code.Status == 'Available' %}
+                                            <span class="badge badge-available"><i class="fas fa-check-circle"></i> ว่าง</span>
+                                        {% else %}
+                                            <span class="badge badge-used"><i class="fas fa-times-circle"></i> ใช้แล้ว</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="font-size:0.86rem; color:var(--text-muted);">
+                                        {{ code.UsedByUsername or '—' }}
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <form class="delete-code-form" action="{{ url_for('delete_code') }}" method="POST">
+                                            <input type="hidden" name="code" value="{{ code.Code }}">
+                                            <button type="submit" class="btn btn-icon btn-delete" title="ลบรหัส">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <i class="fas fa-key"></i>
+                                        ยังไม่มีรหัสเชิญในระบบ
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
+                <!-- ── MOBILE CARDS ── -->
+                <div class="mobile-code-cards">
+                    {% for code in invite_codes %}
+                    <div class="code-card">
+                        <div class="code-card-body">
+                            <div class="code-card-code">{{ code.Code }}</div>
+                            <div class="code-card-sub">
+                                {% if code.UsedByUsername %}ใช้โดย: {{ code.UsedByUsername }}{% else %}ยังไม่มีการใช้งาน{% endif %}
+                            </div>
+                        </div>
+                        {% if code.Status == 'Available' %}
+                            <span class="badge badge-available"><i class="fas fa-check-circle"></i> ว่าง</span>
+                        {% else %}
+                            <span class="badge badge-used"><i class="fas fa-times-circle"></i> ใช้แล้ว</span>
+                        {% endif %}
+                        <form class="delete-code-form" action="{{ url_for('delete_code') }}" method="POST">
+                            <input type="hidden" name="code" value="{{ code.Code }}">
+                            <button type="submit" class="btn btn-icon btn-delete" title="ลบ">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-key"></i>
+                        ยังไม่มีรหัสเชิญในระบบ
+                    </div>
+                    {% endfor %}
+                </div>
+
             </div>
+        </div>
 
-        </div> 
-    </div> 
-    
-     <footer class="main-footer">
-        <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
-        <p>สำนักยุทธศาสตร์และประเมินผล</p>
-        <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
-        <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.9;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
-    </footer>
+    </div><!-- /.admin-grid -->
+</div><!-- /.container -->
 
-    <script>
-        // Toggle Mobile Menu
-        function toggleMenu() {
-            const menu = document.getElementById('navMenu');
-            menu.classList.toggle('active');
+<!-- ==================== FOOTER ==================== -->
+<footer class="main-footer">
+    <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
+    <p>สำนักยุทธศาสตร์และประเมินผล</p>
+    <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
+    <p style="margin-top:10px; font-size:0.8rem; opacity:0.6;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
+</footer>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+    // Mobile Menu
+    function toggleMenu() {
+        const nav  = document.getElementById('navMenu');
+        const icon = document.getElementById('menuIcon');
+        nav.classList.toggle('active');
+        icon.className = nav.classList.contains('active') ? 'fas fa-times' : 'fas fa-bars';
+    }
+    document.addEventListener('click', (e) => {
+        const nav    = document.getElementById('navMenu');
+        const toggle = document.querySelector('.mobile-toggle');
+        if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
+            nav.classList.remove('active');
+            document.getElementById('menuIcon').className = 'fas fa-bars';
         }
+    });
 
-        document.addEventListener('click', (e) => {
-            const nav = document.getElementById('navMenu');
-            const toggle = document.querySelector('.mobile-toggle');
-            if (nav && nav.classList.contains('active') && !nav.contains(e.target) && !toggle.contains(e.target)) {
-                nav.classList.remove('active');
-            }
+    // Confirm Delete User
+    document.querySelectorAll('.delete-user-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = this.querySelector('input[name="username"]').value;
+            Swal.fire({
+                title: 'ยืนยันการลบผู้ใช้?',
+                html: `ต้องการลบ <strong>${username}</strong> ออกจากระบบ?<br><small style="color:#94a3b8;">การกระทำนี้ไม่สามารถย้อนกลับได้</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fas fa-trash-alt"></i> ลบ',
+                cancelButtonText: 'ยกเลิก',
+                customClass: { popup: 'swal2-thai' }
+            }).then(r => { if (r.isConfirmed) this.submit(); });
         });
+    });
 
-        // Confirm Delete User
-        document.querySelectorAll('.delete-user-form').forEach(form => {
-            form.addEventListener('submit', function(event) {
-                event.preventDefault(); 
-                const username = this.querySelector('input[name="username"]').value;
-
-                Swal.fire({
-                    title: 'ยืนยันการลบผู้ใช้?',
-                    text: `คุณแน่ใจหรือไม่ว่าต้องการลบผู้ใช้ "${username}"? (การกระทำนี้ไม่สามารถย้อนกลับได้)`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'ใช่, ลบเลย!',
-                    cancelButtonText: 'ยกเลิก'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.submit(); 
-                    }
-                });
-            });
+    // Confirm Delete Code
+    document.querySelectorAll('.delete-code-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const code = this.querySelector('input[name="code"]').value;
+            Swal.fire({
+                title: 'ยืนยันการลบรหัส?',
+                html: `ต้องการลบรหัส <strong style="font-family:monospace;">${code}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fas fa-trash-alt"></i> ลบ',
+                cancelButtonText: 'ยกเลิก'
+            }).then(r => { if (r.isConfirmed) this.submit(); });
         });
+    });
 
-        // Confirm Delete Code
-        document.querySelectorAll('.delete-code-form').forEach(form => {
-            form.addEventListener('submit', function(event) {
-                event.preventDefault(); 
-                const code = this.querySelector('input[name="code"]').value;
+    // Flash Messages
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+            {% for category, message in messages %}
+                Toast.fire({ icon: '{{ category }}', title: '{{ message }}' });
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-                Swal.fire({
-                    title: 'ยืนยันการลบรหัส?',
-                    text: `คุณแน่ใจหรือไม่ว่าต้องการลบรหัส "${code}"?`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'ใช่, ลบเลย!',
-                    cancelButtonText: 'ยกเลิก'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.submit(); 
-                    }
-                });
-            });
-        });
+    // Online Heartbeat
+    function updateOnlineCount() {
+        fetch("{{ url_for('heartbeat') }}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}" }
+        })
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(data => {
+            const el = document.getElementById('onlineCount');
+            if (el && data.online_count !== undefined) el.textContent = data.online_count;
+        })
+        .catch(() => { const el = document.getElementById('onlineCount'); if (el) el.textContent = '-'; });
+    }
+    updateOnlineCount();
+    setInterval(updateOnlineCount, 10000);
 
-        // Flash Messages
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                const messages = {{ messages | tojson }};
-                const Toast = Swal.mixin({
-                    toast: true, position: 'top', showConfirmButton: false, timer: 3000, timerProgressBar: true
-                });
-                messages.forEach(([category, message]) => {
-                    Toast.fire({ icon: category, title: message });
-                });
-            {% endif %}
-        {% endwith %}
-    </script>
-    
-    <script>
-        function updateOnlineCount() {
-            fetch("{{ url_for('heartbeat') }}", { 
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token() if csrf_token is defined else '' }}" 
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("HTTP error " + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if(data.online_count !== undefined) {
-                    const el = document.getElementById('onlineCount');
-                    if(el) {
-                        el.textContent = data.online_count;
-                        el.style.color = "var(--bma-green)"; 
-                    }
-                }
-            })
-            .catch(err => {
-                console.error("Heartbeat error:", err);
-                const el = document.getElementById('onlineCount');
-                if(el) el.textContent = "-";
-            });
-        }
+    window.addEventListener('beforeunload', () => {
+        const fd = new FormData();
+        fd.append('csrf_token', "{{ csrf_token() if csrf_token is defined else '' }}");
+        navigator.sendBeacon("{{ url_for('offline') }}", fd);
+    });
+</script>
 
-        updateOnlineCount();
-        setInterval(updateOnlineCount, 10000);
-
-        window.addEventListener('beforeunload', function() {
-            const data = new FormData();
-            const csrfToken = "{{ csrf_token() if csrf_token is defined else '' }}";
-            data.append('csrf_token', csrfToken);
-            navigator.sendBeacon("{{ url_for('offline') }}", data);
-        });
-    </script>
-    
-    <script type="text/javascript">
+<!-- Tawk.to -->
+<script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
-    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-    s1.async=true;
-    s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-    s1.charset='UTF-8';
-    s1.setAttribute('crossorigin','*');
-    s0.parentNode.insertBefore(s1,s0);
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true; s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+        s1.charset='UTF-8'; s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
     })();
-    </script>
+</script>
+
 </body>
 </html>
