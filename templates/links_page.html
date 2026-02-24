@@ -14,21 +14,12 @@
     <style>
         :root {
             /* Theme Colors */
-            --bma-green: #00963C;
-            --bma-green-hover: #007a30;
-            --bma-green-light: #e8f5e9;
-            --button-red: #dc3545;
-            --button-blue: #007bff;
-            --button-yellow: #ffc107;
-            --button-gray: #6c757d;
-            --text-color: #2c3e50;
-            --border-color: #e0e0e0;
-            --bg-grad-start: #f5f7fa;
-            --bg-grad-end: #c3cfe2;
-            
+            --bma-green: #00963C; --bma-green-hover: #007a30; --bma-green-light: #e8f5e9;
+            --button-blue: #007bff; --button-yellow: #ffc107; --button-gray: #6c757d;
+            --text-color: #2c3e50; --border-color: #e0e0e0;
+            --bg-grad-start: #f5f7fa; --bg-grad-end: #c3cfe2;
             --header-height: 80px;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05); --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
         }
 
         /* FIX FONT ISSUE */
@@ -287,15 +278,25 @@
             transform: translateY(-50%); color: #999; font-size: 1.1rem;
         }
 
-        /* --- Table Styling --- */
+        /* =======================================
+           TABLE STYLING & SCROLL UX (UPDATED) 
+           ======================================= */
         .table-responsive {
             overflow-x: auto;
+            overflow-y: auto; /* เปิดให้เลื่อนขึ้นลงในตารางได้ */
+            max-height: 65vh; /* จำกัดความสูง เพื่อให้ Scrollbar ล่างสุดลอยอยู่เสมอ */
             border-radius: 12px;
             border: 1px solid var(--border-color);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02); /* เพิ่มมิติด้านในนิดหน่อย */
         }
-        table { width: 100%; border-collapse: collapse; min-width: 950px; background: white; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            min-width: 950px; 
+            background: white; 
+        }
         
-        /* Header Sorting Style */
+        /* Header Sorting Style (Sticky Top) */
         th {
             background: var(--bma-green);
             color: white;
@@ -303,10 +304,15 @@
             font-weight: 500;
             text-align: left;
             white-space: nowrap;
-            position: sticky; top: 0; z-index: 10;
+            position: sticky; top: 0; z-index: 10; /* ตรึง Header ด้านบน */
             cursor: pointer;
             user-select: none;
             transition: background 0.2s;
+        }
+        /* เติมเงาให้ Header ตอน Scroll */
+        th::after {
+            content: ''; position: absolute; left: 0; bottom: -1px; width: 100%;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
         th:hover {
             background: var(--bma-green-hover);
@@ -334,8 +340,8 @@
         tr:hover { background-color: #f8fff9; }
 
         /* Custom Scrollbar for Table */
-        .table-responsive::-webkit-scrollbar { height: 8px; }
-        .table-responsive::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        .table-responsive::-webkit-scrollbar { height: 10px; width: 10px; }
+        .table-responsive::-webkit-scrollbar-thumb { background: #ccc; border-radius: 5px; }
         .table-responsive::-webkit-scrollbar-thumb:hover { background: var(--bma-green); }
 
         /* Links */
@@ -350,8 +356,12 @@
         .status-pending { background: #fff3e0; color: #ef6c00; }
         .status-unknown { background: #f5f5f5; color: #666; }
 
-        /* Pinned Badge */
-        .pinned-badge { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-bottom: 5px; font-weight: 600; display: inline-block; border: 1px solid #ffb74d; }
+        /* Pinned Badge (UPDATED) */
+        .pinned-badge { 
+            background: #fff3e0; color: #e65100; padding: 4px 10px; 
+            border-radius: 12px; font-size: 0.85em; margin-bottom: 5px; 
+            font-weight: 600; display: inline-block; border: 1px solid #ffb74d; 
+        }
 
         /* Privacy Badges */
         .privacy-badge {
@@ -417,7 +427,7 @@
         }
 
         /* =========================================
-           MOBILE SPECIFIC STYLES (Fixes Filters)
+           MOBILE SPECIFIC STYLES
            ========================================= */
         @media (max-width: 768px) {
             body { padding-top: 70px; }
@@ -455,22 +465,25 @@
             .date-range-wrapper { 
                 width: 100%; 
                 justify-content: center; 
-                flex-wrap: wrap; /* ยอมให้ตกบรรทัด */
-                height: auto; /* สูงตามเนื้อหา */
+                flex-wrap: wrap; 
+                height: auto; 
                 padding: 10px;
                 gap: 10px;
-                border-radius: 20px; /* ปรับมนน้อยลงหน่อย */
+                border-radius: 20px; 
             }
             
             .date-input {
                 width: auto;
-                flex: 1; /* ขยายเต็มที่ */
-                min-width: 120px; /* กันไม่ให้เล็กเกินไป */
+                flex: 1; 
+                min-width: 120px; 
                 text-align: center;
-                background: white; /* ให้เห็นชัดขึ้น */
+                background: white; 
                 border-radius: 5px;
                 padding: 5px;
             }
+
+            /* Adjust table height for mobile */
+            .table-responsive { max-height: 60vh; }
 
             /* Table Mobile Optimization: Hide non-essential columns */
             th:nth-child(3), td:nth-child(3), /* รายละเอียด */
@@ -576,7 +589,7 @@
                 <i class="fas fa-link" style="color: var(--bma-green);"></i>
             {% endif %}
             
-            &nbsp; {{ agency_name if agency_name else 'รายชื่อลิงค์ทั้งหมด' }}
+            &nbsp; {{ agency_name if agency_name else 'รายชื่อลิงก์ทั้งหมด' }}
         </h1>
 
         <div class="search-filter-container">
@@ -670,7 +683,7 @@
                         <td data-value="{{ link['ชื่อลิงก์'] }}">
                             <div style="display:flex; flex-direction: column; gap: 5px; align-items: flex-start;">
                                 {% if link.get('ปักหมุด') == 'ปักหมุด' %}
-                                    <span class="pinned-badge" title="ลิงก์สำคัญเร่งด่วน"><i class="fas fa-fire"></i> ปักหมุด</span>
+                                    <span class="pinned-badge" title="ลิงก์สำคัญเร่งด่วน"><i class="fas fa-thumbtack"></i> ปักหมุด</span>
                                 {% endif %}
                                 <a href="{{ link['URL'] }}" target="_blank" style="font-weight: 500; color: var(--bma-green); display:flex; align-items:center; gap:5px;">
                                     <i class="fas fa-external-link-alt" style="font-size:0.8em;"></i> {{ link['ชื่อลิงก์'] }}
@@ -872,7 +885,7 @@
             displayPage(1);
         });
 
-        // [NEW] Helper function to check date range
+        // Helper function to check date range
         function checkDateRange(dateStr, start, end) {
             if (!start && !end) return true;
             if (!dateStr || dateStr === '-' || dateStr === '') return false;
@@ -950,7 +963,6 @@
 
             const filteredRows = allTableRows.filter(row => {
                 const textContent = row.innerText.toLowerCase();
-                // [UPDATED] อัปเดต Index คอลัมน์ให้ตรงกับการแทรกคอลัมน์ใหม่ (กำหนดส่ง)
                 const divisionCell = row.getElementsByTagName("td")[8].textContent.trim(); 
                 const bureauCell = row.getElementsByTagName("td")[9].textContent.trim(); 
                 const dateCell = row.getElementsByTagName("td")[12].textContent.trim(); 
@@ -1041,7 +1053,6 @@
             const elements = document.querySelectorAll('.countdown-timer');
             const now = new Date();
 
-            // อาเรย์ชื่อเดือนภาษาไทย
             const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 
             elements.forEach(el => {
@@ -1054,18 +1065,16 @@
                 const endDate = new Date(endDateStr);
                 const diffMs = endDate - now;
 
-                // --- แปลงวันที่เป็นรูปแบบภาษาไทย (เช่น 25 ก.พ. 2569 เวลา 16:30 น.) ---
                 const d = endDate.getDate();
                 const m = thaiMonths[endDate.getMonth()];
-                const y = endDate.getFullYear() + 543; // แปลง ค.ศ. เป็น พ.ศ.
+                const y = endDate.getFullYear() + 543;
                 const hrs = String(endDate.getHours()).padStart(2, '0');
                 const mins = String(endDate.getMinutes()).padStart(2, '0');
                 const formattedThaiDate = `${d} ${m} ${y} เวลา ${hrs}:${mins} น.`;
 
-                // ถ้าเลยกำหนดแล้ว
                 if (diffMs <= 0) {
                     el.innerHTML = `
-                        <div style="font-weight: 600; color: #444; font-size: 0.95em; margin-bottom: 5px;">${formattedThaiDate}</div>
+                        <div style="font-weight: 600; color: #444; font-size: 0.95em; margin-bottom: 5px; white-space: nowrap;">${formattedThaiDate}</div>
                         <span style="color:#c62828; font-weight:bold; background: #ffebee; padding: 3px 8px; border-radius: 12px; font-size:0.85em;">
                             <i class="fas fa-times-circle"></i> หมดเวลา
                         </span>
@@ -1073,7 +1082,6 @@
                     return;
                 }
 
-                // คำนวณวันและชั่วโมงที่เหลือ
                 const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
                 const diffHrs = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 
@@ -1083,22 +1091,20 @@
                     text = `เหลือ ${diffHrs} ชม. ${diffMins} นาที`;
                 }
 
-                // ตั้งค่าสีตามความเร่งด่วน
                 let colorStyle, bgColor;
                 if (diffDays <= 3) {
-                    colorStyle = 'color: #c62828;'; // แดง (0-3 วัน)
+                    colorStyle = 'color: #c62828;'; // แดง
                     bgColor = 'background: #ffebee;';
                 } else if (diffDays <= 7) {
-                    colorStyle = 'color: #e65100;'; // ส้ม (4-7 วัน)
+                    colorStyle = 'color: #e65100;'; // ส้ม
                     bgColor = 'background: #fff3e0;';
                 } else {
-                    colorStyle = 'color: #2e7d32;'; // เขียว (มากกว่า 7 วัน)
+                    colorStyle = 'color: #2e7d32;'; // เขียว
                     bgColor = 'background: #e8f5e9;';
                 }
 
-                // แสดงผล วันที่ภาษาไทย (บรรทัดบน) + ป้ายนับเวลา (บรรทัดล่าง)
                 el.innerHTML = `
-                    <div style="font-weight: 600; color: #333; font-size: 0.95em; margin-bottom: 5px;">${formattedThaiDate}</div>
+                    <div style="font-weight: 600; color: #333; font-size: 0.95em; margin-bottom: 5px; white-space: nowrap;">${formattedThaiDate}</div>
                     <span style="${colorStyle} font-weight: 600; ${bgColor} padding: 4px 10px; border-radius: 12px; font-size:0.85em; display: inline-block; white-space: nowrap;">
                         <i class="fas fa-clock"></i> ${text}
                     </span>
