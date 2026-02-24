@@ -106,7 +106,7 @@ districts_list = [
 # [UPDATE] เพิ่ม "ความเป็นส่วนตัว" เข้าไปใน Headers (Index 13)
 DB_HEADERS = [
     "ID", "ประเภท", "หน่วยงาน", "ส่วนราชการ", "อีเมลผู้รับผิดชอบ", "เบอร์โทรติดต่อ",
-    "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "ความเป็นส่วนตัว", "Clicks", "EditCount", "ปักหมุด"
+    "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "ความเป็นส่วนตัว", "Clicks", "EditCount", "ปักหมุด", "วันที่สิ้นสุด"
 ]
 
 STAFF_HEADERS = [
@@ -464,42 +464,84 @@ def links_page():
         if not session.get('visitor_id'):
             session['visitor_id'] = str(uuid.uuid4())
 
+        # รับค่าจาก URL Parameters
+        search_query = request.args.get('search', '').lower()
         agency_filter = request.args.get('agency') 
         category_filter = request.args.get('category')
         all_records = get_db_records()
         
-        # [UPDATE] กรองลิงก์ตามสิทธิ์การเข้าถึง (Privacy) ก่อนกรองหมวดหมู่
+        # 1. กรองลิงก์ที่ "ใช้งาน" และ "มีสิทธิ์เข้าถึง (Privacy)"
         valid_links = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน' and check_link_permission(l, session)]
 
+        links_to_display = []
+        for l in valid_links:
+            # กรองตามคำค้นหา (ถ้ามี)
+            if search_query:
+                if search_query not in l.get('ชื่อลิงก์', '').lower() and \
+                   search_query not in l.get('รายละเอียด', '').lower() and \
+                   search_query not in l.get('หน่วยงาน', '').lower():
+                    continue
+            
+            # กรองตามหน่วยงาน (เช็คทั้งระดับ กอง/สำนักงาน และ กลุ่มงาน/ฝ่าย)
+            if agency_filter and agency_filter not in (l.get('ส่วนราชการ', ''), l.get('หน่วยงาน', '')):
+                continue
+                
+            # กรองตามประเภท (ถ้ามี)
+            if category_filter and category_filter != l.get('ประเภท', ''):
+                continue
+                
+            links_to_display.append(l)
+
+        # กำหนดชื่อหัวข้อของหน้าเว็บ
         if agency_filter:
-            links_to_display = [l for l in valid_links if l.get('ส่วนราชการ') == agency_filter]
             page_title = agency_filter
         elif category_filter:
-            links_to_display = [l for l in valid_links if l.get('ประเภท') == category_filter]
             page_title = category_filter
+        elif search_query:
+            page_title = f"ผลการค้นหา: '{request.args.get('search')}'"
         else:
-            links_to_display = valid_links
-            page_title = "ลิงก์ทั้งหมด"
+            page_title = "รายชื่อลิงก์ทั้งหมด"
+            
+        # ========================================================
+        # [NEW LOGIC] แยกกลุ่มลิงก์ปักหมุด และลิงก์ธรรมดา
+        # ========================================================
+        pinned_links = []
+        unpinned_links = []
         
         for link in links_to_display:
+            # สร้างตัวแปรวันที่แบบสั้น
             date_str = link.get('วันที่อัปเดต')
             link['วันที่อัปเดต_สั้น'] = date_str.split(' ')[0] if date_str else ''
+            
+            # คัดแยกกลุ่ม
+            if link.get('ปักหมุด') == 'ปักหมุด':
+                pinned_links.append(link)
+            else:
+                unpinned_links.append(link)
+                
+        # เรียงลำดับข้อมูลในแต่ละกลุ่ม โดยใช้วันที่อัปเดตล่าสุด (จากใหม่สุด ไป เก่าสุด)
+        pinned_links.sort(key=lambda x: x.get('วันที่อัปเดต', ''), reverse=True)
+        unpinned_links.sort(key=lambda x: x.get('วันที่อัปเดต', ''), reverse=True)
+        
+        # นำลิงก์ปักหมุดมาต่อไว้ "ด้านบนสุด" ของลิงก์ธรรมดา
+        final_links = pinned_links + unpinned_links
+        # ========================================================
 
-        # [NEW] ดึงรายการ ID ที่ผู้ใช้กด Favorite ไว้ (เพื่อไปแสดงสถานะปุ่มดาว)
+        # ดึงรายการ ID ที่ผู้ใช้กด Favorite ไว้ (เพื่อไปแสดงสถานะปุ่มดาว)
         my_fav_ids = []
         if session.get('logged_in'):
-            # เรียกฟังก์ชัน get_user_favorite_ids ที่เราเพิ่มไปก่อนหน้านี้
             my_fav_ids = get_user_favorite_ids(session.get('username'))
 
         return render_template('links_page.html', 
-                               links=links_to_display, 
+                               links=final_links, 
                                error=None, 
                                session=session, 
                                agency_name=page_title,
-                               fav_ids=my_fav_ids, # [NEW] ส่งรายการ ID ที่ชอบไปที่ Template
+                               fav_ids=my_fav_ids,
                                bureaus=bureaus_list, 
                                districts=districts_list)
     except Exception as e: 
+        print(f"Error in links_page: {e}")
         return render_template('links_page.html', links=[], error=str(e), session=session, agency_name="Error")
         
 @app.route('/my_favorites')
@@ -809,10 +851,13 @@ def add_link_action():
         main_agency = session.get('main_agency', 'N/A') 
         division = session.get('division', 'N/A')
         
-        # เช็คว่า Admin ติ๊กเลือกปักหมุดหรือไม่ (เพิ่มใหม่)
+        # [NEW] เช็คว่า Admin ติ๊กเลือกปักหมุดและกำหนดเวลาหรือไม่
         is_pinned = 'ไม่ปักหมุด'
-        if session.get('level', '').strip() == 'Admin' and request.form.get('is_pinned'):
-            is_pinned = 'ปักหมุด'
+        end_date = ''
+        if session.get('level', '').strip() == 'Admin':
+            if request.form.get('is_pinned'):
+                is_pinned = 'ปักหมุด'
+            end_date = request.form.get('end_date', '')
             
         new_row = [
             generate_new_id(), data['ประเภท'], division, main_agency, 
@@ -821,7 +866,8 @@ def add_link_action():
             get_current_timestamp(), session.get('username'), '', 
             data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0, 
             0,
-            is_pinned # คอลัมน์ที่ 17 (Q)
+            is_pinned,
+            end_date # <--- [NEW] บันทึกวันที่สิ้นสุด คอลัมน์ที่ 18 (R)
         ]
         db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
         
@@ -902,16 +948,18 @@ def update_link_action(link_id):
         
         new_edit_count = current_edits + 1
 
-        # [FIXED LOGIC] จัดการสถานะการปักหมุด
-        # 1. ดึงค่าการปักหมุดเดิมมาก่อน (ป้องกันค่าหายเวลาคนธรรมดาแก้)
+        # 1. ดึงค่าเดิมมาก่อน
         current_pinned = row_vals[16] if len(row_vals) > 16 else 'ไม่ปักหมุด'
+        current_end_date = row_vals[17] if len(row_vals) > 17 else ''
         
-        # 2. ถ้าเป็น Admin ให้ยึดค่าจาก Checkbox หน้าเว็บ
+        # 2. ถ้าเป็น Admin ให้ยึดค่าจากฟอร์มหน้าเว็บ
         if user_level == 'Admin':
             is_pinned = 'ปักหมุด' if request.form.get('is_pinned') else 'ไม่ปักหมุด'
+            end_date = request.form.get('end_date', '')
         else:
             # ถ้าเป็น User ธรรมดา ให้ใช้ค่าเดิมที่มีอยู่ในฐานข้อมูล
             is_pinned = current_pinned
+            end_date = current_end_date
 
         new_vals = [
             link_id, data['ประเภท'], data['หน่วยงาน'], main_agency, 
@@ -921,11 +969,12 @@ def update_link_action(link_id):
             data.get('ความเป็นส่วนตัว', 'สาธารณะ'),
             current_clicks,
             new_edit_count,
-            is_pinned # <--- [FIXED] เพิ่มตัวแปรนี้เข้าไปใน Array แล้ว
+            is_pinned,
+            end_date # <--- [NEW] เพิ่มตัวแปรวันที่สิ้นสุด
         ]
         
-        # อัปเดตช่วง A ถึง Q (Column 1 ถึง 17)
-        range_name = f"A{cell.row}:Q{cell.row}" 
+        # อัปเดตช่วง A ถึง R (Column 1 ถึง 18)
+        range_name = f"A{cell.row}:R{cell.row}" 
         db_sheet.update(range_name, [new_vals])
         
         clear_db_cache()
@@ -1266,34 +1315,7 @@ def toggle_favorite():
         print(f"Toggle Favorite Error: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
         
-# ==========================================
-# [NEW] ระบบลิงก์สำคัญ (Highlighted Links)
-# ==========================================
-@app.route('/highlighted')
-def highlighted_links_page():
-    if db_sheet is None: 
-        return render_template('links_page.html', links=[], error="Sheet Error", session=session)
-    try:
-        all_records = get_db_records()
-        
-        # กรองเฉพาะลิงก์ที่ "ใช้งาน", มีสิทธิ์มองเห็น และถูกตั้งค่าว่า "ปักหมุด"
-        highlighted_links = [l for l in all_records if l.get('สถานะ') == 'ใช้งาน' and check_link_permission(l, session) and l.get('ปักหมุด') == 'ปักหมุด']
 
-        my_fav_ids = []
-        if session.get('logged_in'):
-            my_fav_ids = get_user_favorite_ids(session.get('username'))
-
-        # เรียกใช้ links_page.html เดิม แต่ส่งข้อมูลและชื่อหน้าไปใหม่
-        return render_template('links_page.html', 
-                               links=highlighted_links, 
-                               error=None, 
-                               session=session, 
-                               agency_name="📌 ลิงก์สำคัญ (Highlighted)",
-                               fav_ids=my_fav_ids,
-                               bureaus=bureaus_list, 
-                               districts=districts_list)
-    except Exception as e: 
-        return render_template('links_page.html', links=[], error=str(e), session=session, agency_name="Error")
         
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
