@@ -180,7 +180,7 @@
         ========================================== */
         .admin-grid {
             display: grid;
-            grid-template-columns: 1fr 420px;
+            grid-template-columns: 1fr 380px;
             gap: 24px;
             align-items: start;
         }
@@ -222,6 +222,20 @@
         .card-body { padding: 20px 24px 24px; }
 
         /* ==========================================
+           SEARCH INPUT (NEW)
+        ========================================== */
+        .search-container { margin-bottom: 15px; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-prefix-icon { position: absolute; left: 14px; color: var(--text-muted); font-size: 0.9rem; }
+        .form-input-search {
+            width: 100%; padding: 10px 15px 10px 40px;
+            border: 1.5px solid var(--border-color); border-radius: var(--radius-md);
+            font-size: 0.95rem; font-family: 'Kanit', sans-serif;
+            color: var(--text-color); background: var(--bg-input); transition: all var(--transition);
+        }
+        .form-input-search:focus { outline: none; border-color: var(--bma-green); background: #fff; box-shadow: 0 0 0 3px rgba(0,150,60,0.12); }
+
+        /* ==========================================
            TABLE
         ========================================== */
         .table-wrapper {
@@ -255,7 +269,7 @@
         /* ==========================================
            INVITE CODE TABLE (smaller)
         ========================================== */
-        .code-table { min-width: 300px; }
+        .code-table { min-width: 250px; }
         .code-mono {
             font-family: 'Courier New', monospace;
             font-size: 0.95rem; font-weight: 700;
@@ -274,9 +288,8 @@
             font-size: 0.78rem; font-weight: 600; white-space: nowrap;
         }
         .badge-available   { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .badge-used        { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         
-        /* [UPDATED] 3 Role Badges */
+        /* 3 Role Badges */
         .badge-super-admin { background: #fff7ed; color: #ea580c; border: 1px solid #fdba74; }
         .badge-admin       { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
         .badge-user        { background: var(--bma-green-light); color: var(--bma-green); border: 1px solid #c3e6cb; }
@@ -298,7 +311,7 @@
         .level-select:disabled { cursor: not-allowed; opacity: 0.55; }
 
         /* ==========================================
-           BUTTONS
+           BUTTONS & PAGINATION (NEW)
         ========================================== */
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 7px;
@@ -315,6 +328,7 @@
         .btn-save:hover   { background: var(--bma-green-hover); transform: scale(1.05); }
         .btn-delete { background: var(--red-light); color: var(--red); border: 1px solid #fecaca; }
         .btn-delete:hover { background: var(--red); color: #fff; transform: scale(1.05); }
+        
         .btn-generate {
             flex: 1;
             background: linear-gradient(135deg, var(--blue), #1d4ed8);
@@ -324,6 +338,20 @@
         }
         .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59,130,246,0.4); }
         .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+        .pagination-controls {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);
+        }
+        .pagination-info { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+        .pagination-nav { display: flex; gap: 6px; }
+        .btn-page {
+            background: #fff; border: 1px solid var(--border-color);
+            color: var(--text-color); padding: 6px 12px; border-radius: var(--radius-sm);
+            cursor: pointer; font-family: 'Kanit', sans-serif; font-size: 0.85rem; transition: 0.2s;
+        }
+        .btn-page:hover:not(:disabled) { background: var(--bma-green-light); color: var(--bma-green); border-color: var(--bma-green); }
+        .btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* ==========================================
            GENERATE FORM
@@ -352,7 +380,7 @@
         .empty-state i { font-size: 2.5rem; margin-bottom: 10px; display: block; opacity: 0.4; }
 
         /* ==========================================
-           MOBILE CARDS for User Table
+           MOBILE CARDS
         ========================================== */
         .user-card {
             background: var(--bg-card);
@@ -360,7 +388,7 @@
             border-radius: var(--radius-lg);
             padding: 16px;
             box-shadow: var(--shadow-sm);
-            display: none; /* shown only on mobile */
+            display: none; /* hidden on desktop */
             flex-direction: column; gap: 12px;
             transition: box-shadow var(--transition);
         }
@@ -379,19 +407,17 @@
 
         .user-card-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-        /* Code cards for mobile */
         .code-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             padding: 14px 16px;
             box-shadow: var(--shadow-sm);
-            display: none;
+            display: flex; /* Always flex but hidden in desktop via wrapper */
             align-items: center; gap: 12px;
         }
         .code-card-body { flex: 1; min-width: 0; }
         .code-card-code { font-family: 'Courier New', monospace; font-weight: 700; font-size: 1rem; color: var(--blue); }
-        .code-card-sub  { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
 
         /* ==========================================
            FOOTER
@@ -405,7 +431,7 @@
         .main-footer strong { color: var(--text-color); }
 
         /* ==========================================
-           TABLET
+           TABLET & MOBILE
         ========================================== */
         @media (max-width: 1024px) and (min-width: 769px) {
             .nav-link span { display: none; }
@@ -414,9 +440,6 @@
             .banner-stats { display: none; }
         }
 
-        /* ==========================================
-           MOBILE
-        ========================================== */
         @media (max-width: 768px) {
             :root { --header-height: 64px; }
             body { padding-top: var(--header-height); }
@@ -443,35 +466,31 @@
             .nav-link span { display: inline; }
             .nav-link.profile-item { display: none; }
 
-            /* Banner */
             .page-banner { padding: 24px 18px 28px; }
             .banner-text h1 { font-size: 1.2rem; }
             .banner-stats { display: none; }
 
-            /* Container */
             .container { padding: 16px 14px 50px; }
-
-            /* Grid → single column */
             .admin-grid { grid-template-columns: 1fr; gap: 16px; }
 
             .card-header { padding: 16px 16px 14px; }
             .card-body   { padding: 16px 16px 20px; }
 
-            /* Hide desktop table, show mobile cards */
+            /* Hide desktop tables, show mobile wrappers */
             .desktop-table { display: none !important; }
             .mobile-user-cards { display: flex; flex-direction: column; gap: 10px; }
-            .user-card { display: flex; }
+            .user-card { display: flex; } /* Now visible on mobile */
 
             .mobile-code-cards { display: flex; flex-direction: column; gap: 8px; }
-            .code-card { display: flex; }
-
-            /* Generate form */
+            
             .generate-form { flex-wrap: nowrap; }
         }
 
-        /* ==========================================
-           PRINT / accessibility
-        ========================================== */
+        /* Default hide mobile cards on desktop */
+        @media (min-width: 769px) {
+            .mobile-user-cards, .mobile-code-cards { display: none !important; }
+        }
+
         @media (max-width: 400px) {
             .banner-icon { display: none; }
         }
@@ -532,18 +551,17 @@
             <h1>Admin Control Panel</h1>
             <p>ระบบจัดการผู้ดูแลและรหัสเชิญ — BMA Smart Linkage</p>
         </div>
+        
+        {% set available_codes = invite_codes | selectattr('Status', 'equalto', 'Available') | list %}
+        
         <div class="banner-stats">
             <div class="banner-stat">
                 <div class="banner-stat-num">{{ staff_list | length }}</div>
                 <div class="banner-stat-label">เจ้าหน้าที่</div>
             </div>
             <div class="banner-stat">
-                <div class="banner-stat-num">{{ invite_codes | selectattr('Status', 'equalto', 'Available') | list | length }}</div>
-                <div class="banner-stat-label">รหัสว่าง</div>
-            </div>
-            <div class="banner-stat">
-                <div class="banner-stat-num">{{ invite_codes | length }}</div>
-                <div class="banner-stat-label">รหัสทั้งหมด</div>
+                <div class="banner-stat-num" style="color: #6ee7b7;">{{ available_codes | length }}</div>
+                <div class="banner-stat-label">รหัสพร้อมใช้งาน</div>
             </div>
         </div>
     </div>
@@ -555,12 +573,19 @@
         <div class="admin-card">
             <div class="card-header">
                 <div class="card-header-icon green"><i class="fas fa-users-cog"></i></div>
-                <div>
+                <div style="flex:1;">
                     <h3>จัดการผู้ใช้งาน</h3>
-                    <p>Staff List — เปลี่ยนระดับสิทธิ์หรือลบผู้ใช้ออกจากระบบ</p>
+                    <p>ค้นหา เปลี่ยนระดับสิทธิ์ หรือลบผู้ใช้ออกจากระบบ</p>
                 </div>
             </div>
             <div class="card-body">
+
+                <div class="search-container">
+                    <div class="input-wrapper">
+                        <i class="fas fa-search input-prefix-icon"></i>
+                        <input type="text" id="userSearchInput" class="form-input-search" placeholder="ค้นหาด้วยชื่อ หรือ Username...">
+                    </div>
+                </div>
 
                 <div class="table-wrapper desktop-table">
                     <div class="table-scroll">
@@ -573,17 +598,17 @@
                                     <th style="text-align:center; width:60px;">ลบ</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="userTableBody">
                                 {% for user in staff_list %}
-                                <tr>
+                                <tr class="user-row">
                                     <td style="font-weight:600; color:var(--text-color);">
                                         <div style="display:flex;align-items:center;gap:9px;">
                                             <img src="https://ui-avatars.com/api/?name={{ user.ชื่อ }}&background=e8f5e9&color=00963C&size=32"
                                                  style="width:30px;height:30px;border-radius:50%;border:1.5px solid var(--bma-green-mid);" alt="">
-                                            {{ user.Username }}
+                                            <span class="searchable-text">{{ user.Username }}</span>
                                         </div>
                                     </td>
-                                    <td>{{ user.ชื่อ }}</td>
+                                    <td class="searchable-text">{{ user.ชื่อ }}</td>
                                     <td>
                                         <form class="level-form" action="{{ url_for('change_user_level') }}" method="POST">
                                             <input type="hidden" name="username" value="{{ user.Username }}">
@@ -610,33 +635,31 @@
                                         </form>
                                     </td>
                                 </tr>
-                                {% else %}
-                                <tr>
+                                {% endfor %}
+                                <tr id="desktopEmptyState" style="display: none;">
                                     <td colspan="4" class="empty-state">
-                                        <i class="fas fa-users"></i>
-                                        ยังไม่มีข้อมูลผู้ใช้งาน
+                                        <i class="fas fa-search"></i>
+                                        ไม่พบข้อมูลผู้ใช้งานที่ค้นหา
                                     </td>
                                 </tr>
-                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="mobile-user-cards">
+                <div class="mobile-user-cards" id="mobileUserContainer">
                     {% for user in staff_list %}
-                    <div class="user-card">
+                    <div class="user-card user-mobile-item">
                         <div class="user-card-header">
                             <div class="user-avatar">{{ user.ชื่อ[0] if user.ชื่อ else user.Username[0] }}</div>
                             <div>
-                                <div class="user-info-name">{{ user.Username }}</div>
-                                <div class="user-info-sub">{{ user.ชื่อ }}</div>
+                                <div class="user-info-name searchable-mobile">{{ user.Username }}</div>
+                                <div class="user-info-sub searchable-mobile">{{ user.ชื่อ }}</div>
                             </div>
                             <span class="badge 
                                 {% if user.Level == 'Super Admin' %}badge-super-admin
                                 {% elif user.Level == 'Admin' %}badge-admin
                                 {% else %}badge-user{% endif %}" style="margin-left:auto;">
-                                
                                 {% if user.Level == 'Super Admin' %}👑 Super Admin
                                 {% elif user.Level == 'Admin' %}🛡️ Admin
                                 {% else %}👤 Users{% endif %}
@@ -664,12 +687,22 @@
                             </form>
                         </div>
                     </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-users"></i>
-                        ยังไม่มีข้อมูลผู้ใช้งาน
-                    </div>
                     {% endfor %}
+                    <div id="mobileEmptyState" class="empty-state" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        ไม่พบข้อมูลผู้ใช้งานที่ค้นหา
+                    </div>
+                </div>
+
+                <div class="pagination-controls">
+                    <div class="pagination-info">
+                        หน้า <span id="userCurrentPage" style="color:var(--text-color); font-weight:700;">1</span> 
+                        จาก <span id="userTotalPages">1</span>
+                    </div>
+                    <div class="pagination-nav">
+                        <button id="btnUserPrev" class="btn-page"><i class="fas fa-chevron-left"></i> ก่อนหน้า</button>
+                        <button id="btnUserNext" class="btn-page">ถัดไป <i class="fas fa-chevron-right"></i></button>
+                    </div>
                 </div>
 
             </div>
@@ -679,8 +712,8 @@
             <div class="card-header">
                 <div class="card-header-icon blue"><i class="fas fa-key"></i></div>
                 <div>
-                    <h3>รหัสเชิญ</h3>
-                    <p>Invite Codes — สร้างและจัดการรหัสสำหรับสมัครสมาชิก</p>
+                    <h3>รหัสเชิญพร้อมใช้งาน</h3>
+                    <p>สร้างและลบรหัสเชิญเข้าสู่ระบบ (แสดงเฉพาะรหัสว่าง)</p>
                 </div>
             </div>
             <div class="card-body">
@@ -688,7 +721,7 @@
                 <form action="{{ url_for('generate_code') }}" method="POST" class="generate-form">
                     <input type="number" name="amount" class="qty-input" value="1" min="1" max="50" title="จำนวนรหัสที่ต้องการสร้าง">
                     <button type="submit" class="btn btn-generate">
-                        <i class="fas fa-plus-circle"></i> สร้างรหัสเชิญ
+                        <i class="fas fa-plus-circle"></i> สร้างรหัสเชิญใหม่
                     </button>
                 </form>
 
@@ -699,23 +732,15 @@
                                 <tr>
                                     <th>🔑 Code</th>
                                     <th style="text-align:center;">สถานะ</th>
-                                    <th>ใช้โดย</th>
                                     <th style="text-align:center; width:50px;">ลบ</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for code in invite_codes %}
+                                {% for code in available_codes %}
                                 <tr>
                                     <td><span class="code-mono">{{ code.Code }}</span></td>
                                     <td style="text-align:center;">
-                                        {% if code.Status == 'Available' %}
-                                            <span class="badge badge-available"><i class="fas fa-check-circle"></i> ว่าง</span>
-                                        {% else %}
-                                            <span class="badge badge-used"><i class="fas fa-times-circle"></i> ใช้แล้ว</span>
-                                        {% endif %}
-                                    </td>
-                                    <td style="font-size:0.86rem; color:var(--text-muted);">
-                                        {{ code.UsedByUsername or '—' }}
+                                        <span class="badge badge-available"><i class="fas fa-check-circle"></i> ว่าง</span>
                                     </td>
                                     <td style="text-align:center;">
                                         <form class="delete-code-form" action="{{ url_for('delete_code') }}" method="POST">
@@ -728,9 +753,9 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="4" class="empty-state">
+                                    <td colspan="3" class="empty-state">
                                         <i class="fas fa-key"></i>
-                                        ยังไม่มีรหัสเชิญในระบบ
+                                        ไม่มีรหัสเชิญว่างในขณะนี้
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -740,19 +765,12 @@
                 </div>
 
                 <div class="mobile-code-cards">
-                    {% for code in invite_codes %}
+                    {% for code in available_codes %}
                     <div class="code-card">
                         <div class="code-card-body">
                             <div class="code-card-code">{{ code.Code }}</div>
-                            <div class="code-card-sub">
-                                {% if code.UsedByUsername %}ใช้โดย: {{ code.UsedByUsername }}{% else %}ยังไม่มีการใช้งาน{% endif %}
-                            </div>
                         </div>
-                        {% if code.Status == 'Available' %}
-                            <span class="badge badge-available"><i class="fas fa-check-circle"></i> ว่าง</span>
-                        {% else %}
-                            <span class="badge badge-used"><i class="fas fa-times-circle"></i> ใช้แล้ว</span>
-                        {% endif %}
+                        <span class="badge badge-available"><i class="fas fa-check-circle"></i> ว่าง</span>
                         <form class="delete-code-form" action="{{ url_for('delete_code') }}" method="POST">
                             <input type="hidden" name="code" value="{{ code.Code }}">
                             <button type="submit" class="btn btn-icon btn-delete" title="ลบ">
@@ -763,7 +781,7 @@
                     {% else %}
                     <div class="empty-state">
                         <i class="fas fa-key"></i>
-                        ยังไม่มีรหัสเชิญในระบบ
+                        ไม่มีรหัสเชิญว่างในขณะนี้
                     </div>
                     {% endfor %}
                 </div>
@@ -779,7 +797,7 @@
 </footer>
 
 <script>
-    // Mobile Menu
+    // --- Mobile Menu ---
     function toggleMenu() {
         const nav  = document.getElementById('navMenu');
         const icon = document.getElementById('menuIcon');
@@ -795,7 +813,83 @@
         }
     });
 
-    // Confirm Delete User
+    // --- Search & Pagination Logic for Users ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const desktopRows = Array.from(document.querySelectorAll('.user-row'));
+        const mobileCards = Array.from(document.querySelectorAll('.user-mobile-item'));
+        const searchInput = document.getElementById('userSearchInput');
+        
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let filteredIndices = []; // เก็บ index ของแถวที่ค้นหาเจอ
+
+        function renderUsers() {
+            const query = searchInput.value.toLowerCase().trim();
+            filteredIndices = [];
+
+            // 1. ค้นหาและเก็บ Index
+            desktopRows.forEach((row, index) => {
+                // ดึงข้อความจากคลาส searchable-text ใน Desktop
+                const desktopTexts = Array.from(row.querySelectorAll('.searchable-text')).map(el => el.textContent.toLowerCase());
+                // ดึงข้อความจากคลาส searchable-mobile ใน Mobile
+                const mobileTexts = mobileCards[index] ? Array.from(mobileCards[index].querySelectorAll('.searchable-mobile')).map(el => el.textContent.toLowerCase()) : [];
+                
+                const combinedText = [...desktopTexts, ...mobileTexts].join(' ');
+
+                if (combinedText.includes(query)) {
+                    filteredIndices.push(index);
+                }
+                
+                // ซ่อนทั้งหมดไว้ก่อน
+                row.style.display = 'none';
+                if(mobileCards[index]) mobileCards[index].style.display = 'none';
+            });
+
+            // 2. คำนวณหน้า
+            const totalPages = Math.ceil(filteredIndices.length / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            // 3. แสดงผลเฉพาะรายการในหน้านั้นๆ
+            for (let i = startIndex; i < endIndex; i++) {
+                if (i < filteredIndices.length) {
+                    const originalIndex = filteredIndices[i];
+                    desktopRows[originalIndex].style.display = ''; // แสดงในตาราง
+                    if (mobileCards[originalIndex]) mobileCards[originalIndex].style.display = 'flex'; // แสดงในการ์ดมือถือ
+                }
+            }
+
+            // 4. อัปเดต UI ปุ่มแบ่งหน้า
+            document.getElementById('userCurrentPage').textContent = currentPage;
+            document.getElementById('userTotalPages').textContent = totalPages;
+            document.getElementById('btnUserPrev').disabled = (currentPage === 1);
+            document.getElementById('btnUserNext').disabled = (currentPage === totalPages);
+
+            // 5. แสดงกล่อง "ไม่พบข้อมูล" ถ้าค้นหาไม่เจอ
+            const desktopEmpty = document.getElementById('desktopEmptyState');
+            const mobileEmpty = document.getElementById('mobileEmptyState');
+            if (filteredIndices.length === 0) {
+                if(desktopEmpty) desktopEmpty.style.display = '';
+                if(mobileEmpty) mobileEmpty.style.display = 'block';
+            } else {
+                if(desktopEmpty) desktopEmpty.style.display = 'none';
+                if(mobileEmpty) mobileEmpty.style.display = 'none';
+            }
+        }
+
+        // Events
+        searchInput.addEventListener('input', () => { currentPage = 1; renderUsers(); });
+        document.getElementById('btnUserPrev').addEventListener('click', () => { currentPage--; renderUsers(); });
+        document.getElementById('btnUserNext').addEventListener('click', () => { currentPage++; renderUsers(); });
+
+        // Initial Render
+        renderUsers();
+    });
+
+    // --- Confirm Delete User ---
     document.querySelectorAll('.delete-user-form').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -814,7 +908,7 @@
         });
     });
 
-    // Confirm Delete Code
+    // --- Confirm Delete Code ---
     document.querySelectorAll('.delete-code-form').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -832,7 +926,7 @@
         });
     });
 
-    // Flash Messages
+    // --- Flash Messages ---
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
@@ -842,7 +936,7 @@
         {% endif %}
     {% endwith %}
 
-    // Online Heartbeat
+    // --- Online Heartbeat ---
     function updateOnlineCount() {
         fetch("{{ url_for('heartbeat') }}", {
             method: "POST",
