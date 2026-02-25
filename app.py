@@ -164,11 +164,11 @@ def send_reset_email(username, recipient_email):
 
 def increment_site_views():
     try:
-        # เปลี่ยนเป็นตัวพิมพ์เล็ก site_stats และเรียกคอลัมน์ TotalViews ตามภาพ
-        res = supabase.table('site_stats').select('TotalViews').eq('id', 1).execute()
+        # เปลี่ยนเป็นตัวพิมพ์เล็ก SiteStats และเรียกคอลัมน์ TotalViews ตามภาพ
+        res = supabase.table('SiteStats').select('TotalViews').eq('id', 1).execute()
         if res.data:
             current_views = int(res.data[0].get('TotalViews', 0))
-            supabase.table('site_stats').update({'TotalViews': current_views + 1}).eq('id', 1).execute()
+            supabase.table('SiteStats').update({'TotalViews': current_views + 1}).eq('id', 1).execute()
     except Exception as e:
         print(f"Stats Error: {e}")
 
@@ -311,7 +311,7 @@ def home():
 
         total_views = 0
         try:
-            res = supabase.table('site_stats').select('TotalViews').eq('id', 1).execute()
+            res = supabase.table('SiteStats').select('TotalViews').eq('id', 1).execute()
             if res.data: total_views = res.data[0].get('TotalViews', 0)
         except: pass
 
@@ -609,7 +609,7 @@ def dashboard():
         
         total_views = 0
         try:
-            res = supabase.table('site_stats').select('TotalViews').eq('id', 1).execute()
+            res = supabase.table('SiteStats').select('TotalViews').eq('id', 1).execute()
             if res.data: total_views = int(res.data[0].get('TotalViews', 0))
         except: pass
             
@@ -848,7 +848,7 @@ def analytics_page():
 
         total_views = 0
         try:
-            res_views = supabase.table('site_stats').select('TotalViews').eq('id', 1).execute()
+            res_views = supabase.table('SiteStats').select('TotalViews').eq('id', 1).execute()
             if res_views.data: total_views = int(res_views.data[0].get('TotalViews', 0))
         except: pass
 
