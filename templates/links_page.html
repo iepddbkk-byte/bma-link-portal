@@ -1540,43 +1540,45 @@
         const now = new Date();
 
         document.querySelectorAll('.countdown-timer').forEach(el => {
-            const endDateStr = el.getAttribute('data-end-date');
-            if (!endDateStr) {
+            let str = el.getAttribute('data-end-date');
+
+            // 1. เช็คว่าเป็นค่าว่าง หรือเป็นคำว่า None / null ที่มาจาก Database
+            if (!str || str.trim() === '' || str === 'None' || str === 'null') {
                 el.innerHTML = '<span class="countdown-none">— ไม่ระบุ —</span>';
                 return;
             }
 
-            const endDate = new Date(endDateStr);
-            const diffMs  = endDate - now;
+            const end = new Date(str);
 
-            const d   = endDate.getDate();
-            const m   = thaiMonths[endDate.getMonth()];
-            const y   = endDate.getFullYear() + 543;
-            const hrs = String(endDate.getHours()).padStart(2,'0');
-            const min = String(endDate.getMinutes()).padStart(2,'0');
-            const dateLabel = `${d} ${m} ${y} ${hrs}:${min} น.`;
-
-            if (diffMs <= 0) {
-                el.innerHTML = `
-                    <div class="countdown-container">
-                        <span class="countdown-date">${dateLabel}</span>
-                        <span class="countdown-badge countdown-expired"><i class="fas fa-times-circle"></i> หมดเวลา</span>
-                    </div>`;
+            // 2. ป้องกัน error ขั้นที่สอง: เช็คว่าแปลงเป็นวันที่ได้สำเร็จจริงๆ (ไม่เป็น NaN)
+            if (isNaN(end.getTime())) {
+                el.innerHTML = '<span class="countdown-none">— ไม่ระบุ —</span>';
                 return;
             }
 
-            const diffDays = Math.floor(diffMs / 86400000);
-            const diffHrs  = Math.floor((diffMs % 86400000) / 3600000);
-            const diffMins = Math.floor((diffMs % 3600000) / 60000);
+            const diffMs = end - now;
+            const d = end.getDate(), m = thaiMonths[end.getMonth()], y = end.getFullYear() + 543;
+            const H = String(end.getHours()).padStart(2,'0'), M = String(end.getMinutes()).padStart(2,'0');
+            const label = `${d} ${m} ${y} ${H}:${M} น.`;
 
-            let text  = diffDays > 0 ? `${diffDays} วัน ${diffHrs} ชม.` : `${diffHrs} ชม. ${diffMins} นาที`;
-            let cls   = diffDays <= 3 ? 'countdown-red' : diffDays <= 7 ? 'countdown-orange' : 'countdown-green';
-
-            el.innerHTML = `
-                <div class="countdown-container">
-                    <span class="countdown-date">${dateLabel}</span>
-                    <span class="countdown-badge ${cls}"><i class="fas fa-clock"></i> เหลือ ${text}</span>
+            if (diffMs <= 0) {
+                el.innerHTML = `<div class="countdown-container">
+                    <span class="countdown-date">${label}</span>
+                    <span class="countdown-badge countdown-red"><i class="fas fa-times-circle"></i> หมดเวลา</span>
                 </div>`;
+                return;
+            }
+
+            const days = Math.floor(diffMs / 86400000);
+            const hrs  = Math.floor((diffMs % 86400000) / 3600000);
+            const mins = Math.floor((diffMs % 3600000) / 60000);
+            const text = days > 0 ? `${days} วัน ${hrs} ชม.` : `${hrs} ชม. ${mins} นาที`;
+            const cls  = days <= 3 ? 'countdown-red' : days <= 7 ? 'countdown-orange' : 'countdown-green';
+
+            el.innerHTML = `<div class="countdown-container">
+                <span class="countdown-date">${label}</span>
+                <span class="countdown-badge ${cls}"><i class="fas fa-clock"></i> เหลือ ${text}</span>
+            </div>`;
         });
     }
 

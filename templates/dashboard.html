@@ -1043,10 +1043,22 @@
         const now = new Date();
 
         document.querySelectorAll('.countdown-timer').forEach(el => {
-            const str = el.getAttribute('data-end-date');
-            if (!str) { el.innerHTML = '<span class="countdown-none">— ไม่ระบุ —</span>'; return; }
+            let str = el.getAttribute('data-end-date');
 
-            const end    = new Date(str);
+            // 1. เช็คว่าเป็นค่าว่าง หรือเป็นคำว่า None / null ที่มาจาก Database
+            if (!str || str.trim() === '' || str === 'None' || str === 'null') {
+                el.innerHTML = '<span class="countdown-none">— ไม่ระบุ —</span>';
+                return;
+            }
+
+            const end = new Date(str);
+
+            // 2. ป้องกัน error ขั้นที่สอง: เช็คว่าแปลงเป็นวันที่ได้สำเร็จจริงๆ (ไม่เป็น NaN)
+            if (isNaN(end.getTime())) {
+                el.innerHTML = '<span class="countdown-none">— ไม่ระบุ —</span>';
+                return;
+            }
+
             const diffMs = end - now;
             const d = end.getDate(), m = thaiMonths[end.getMonth()], y = end.getFullYear() + 543;
             const H = String(end.getHours()).padStart(2,'0'), M = String(end.getMinutes()).padStart(2,'0');
