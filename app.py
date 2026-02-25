@@ -164,11 +164,11 @@ def send_reset_email(username, recipient_email):
 
 def increment_site_views():
     try:
-        # สมมติว่ามีตาราง SiteStats และมี Row ที่ id = 1
-        res = supabase.table('SiteStats').select('total_views').eq('id', 1).execute()
+        # เปลี่ยนเป็นตัวพิมพ์เล็ก site_stats และเรียกคอลัมน์ TotalViews ตามภาพ
+        res = supabase.table('site_stats').select('TotalViews').eq('id', 1).execute()
         if res.data:
-            current_views = int(res.data[0].get('total_views', 0))
-            supabase.table('SiteStats').update({'total_views': current_views + 1}).eq('id', 1).execute()
+            current_views = int(res.data[0].get('TotalViews', 0))
+            supabase.table('site_stats').update({'TotalViews': current_views + 1}).eq('id', 1).execute()
     except Exception as e:
         print(f"Stats Error: {e}")
 
@@ -311,8 +311,8 @@ def home():
 
         total_views = 0
         try:
-            res = supabase.table('SiteStats').select('total_views').eq('id', 1).execute()
-            if res.data: total_views = res.data[0].get('total_views', 0)
+            res = supabase.table('site_stats').select('TotalViews').eq('id', 1).execute()
+            if res.data: total_views = res.data[0].get('TotalViews', 0)
         except: pass
 
         all_records = get_db_records()
@@ -609,8 +609,8 @@ def dashboard():
         
         total_views = 0
         try:
-            res = supabase.table('SiteStats').select('total_views').eq('id', 1).execute()
-            if res.data: total_views = int(res.data[0].get('total_views', 0))
+            res = supabase.table('site_stats').select('TotalViews').eq('id', 1).execute()
+            if res.data: total_views = int(res.data[0].get('TotalViews', 0))
         except: pass
             
         chart_data = {
@@ -848,8 +848,8 @@ def analytics_page():
 
         total_views = 0
         try:
-            res_views = supabase.table('SiteStats').select('total_views').eq('id', 1).execute()
-            if res_views.data: total_views = int(res_views.data[0].get('total_views', 0))
+            res_views = supabase.table('site_stats').select('TotalViews').eq('id', 1).execute()
+            if res_views.data: total_views = int(res_views.data[0].get('TotalViews', 0))
         except: pass
 
         cat_counts = Counter(l['ประเภท'] for l in links if l.get('ประเภท'))
