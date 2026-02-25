@@ -9,3 +9,4 @@ gunicorn
 qrcode
 Pillow
 supabase
+python-dotenv

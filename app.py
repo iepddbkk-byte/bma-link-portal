@@ -18,8 +18,6 @@ from threading import Thread
 from PIL import Image
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-from dotenv import load_dotenv
-load_dotenv() # โหลดค่าจากไฟล์ .env (สำหรับรันในเครื่องตัวเอง)
 
 # [NEW] นำเข้า Supabase
 from supabase import create_client, Client
