@@ -14,7 +14,8 @@ import string
 import os
 import json
 import requests
-import uuid 
+import uuid
+import time 
 from collections import Counter
 from threading import Thread 
 from PIL import Image
@@ -24,7 +25,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignat
 # --- 1. ตั้งค่า Flask App ---
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'bma-smart-linkage-secret-key-fixed-2025')
 
 # --- 2. ตั้งค่า FLASK-MAIL ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -153,6 +154,19 @@ def records_to_dict(records_list, headers):
             records_dict.append(record)
     return records_dict
 
+# [NEW] ฟังก์ชันช่วยดึงข้อมูลแบบมี Retry ป้องกัน Google Sheets ดึงข้อมูลไม่ทัน
+def fetch_sheet_with_retry(sheet_obj, headers=None, is_dict=True, retries=3):
+    for attempt in range(retries):
+        try:
+            if is_dict:
+                return records_to_dict(sheet_obj.get_all_values(), headers)
+            else:
+                return sheet_obj.get_all_records()
+        except Exception as e:
+            print(f"⚠️ [API Retry {attempt+1}] GSpread Fetch Error: {e}")
+            time.sleep(1.5) # รอ 1.5 วินาทีแล้วลองดึงใหม่
+    raise Exception("Google Sheets API Timeout")
+
 def get_db_records(force_refresh=False):
     global _app_cache
     if db_sheet is None: return []
@@ -161,11 +175,12 @@ def get_db_records(force_refresh=False):
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
         if (now - cache['time']).total_seconds() < CACHE_TIMEOUT: return cache['data']
     try:
-        data = records_to_dict(db_sheet.get_all_values(), DB_HEADERS)
+        data = fetch_sheet_with_retry(db_sheet, DB_HEADERS, True)
         cache['data'] = data
-        cache['time'] = now
+        cache['time'] = datetime.datetime.now()
         return data
-    except: return []
+    except: 
+        return cache['data'] if cache['data'] is not None else []
 
 def get_staff_records(force_refresh=False):
     global _app_cache
@@ -175,11 +190,12 @@ def get_staff_records(force_refresh=False):
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
         if (now - cache['time']).total_seconds() < CACHE_TIMEOUT: return cache['data']
     try:
-        data = records_to_dict(staff_sheet.get_all_values(), STAFF_HEADERS)
+        data = fetch_sheet_with_retry(staff_sheet, STAFF_HEADERS, True)
         cache['data'] = data
-        cache['time'] = now
+        cache['time'] = datetime.datetime.now()
         return data
-    except: return []
+    except: 
+        return cache['data'] if cache['data'] is not None else []
         
 def get_invite_codes(force_refresh=False):
     global _app_cache
@@ -189,11 +205,12 @@ def get_invite_codes(force_refresh=False):
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
         if (now - cache['time']).total_seconds() < CACHE_TIMEOUT: return cache['data']
     try:
-        data = invite_sheet.get_all_records()
+        data = fetch_sheet_with_retry(invite_sheet, is_dict=False)
         cache['data'] = data
-        cache['time'] = now
+        cache['time'] = datetime.datetime.now()
         return data
-    except: return []
+    except: 
+        return cache['data'] if cache['data'] is not None else []
 
 def send_reset_email(username, recipient_email):
     try:
@@ -440,11 +457,20 @@ def login_page():
 
 @app.route('/login_action', methods=['POST'])
 def login_action():
-    if staff_sheet is None: return redirect(url_for('login_page'))
+    if staff_sheet is None: 
+        flash('ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error')
+        return redirect(url_for('login_page'))
     try:
         username = request.form.get('username')
         password = request.form.get('password')
+        
         staff_list = get_staff_records()
+        
+        # [NEW] เช็คกรณี Google Sheet ดึงข้อมูลมาไม่ได้เลย (กันระบบเข้าใจผิดว่ารหัสผิด)
+        if not staff_list:
+            flash('ระบบฐานข้อมูลตอบสนองช้า กรุณากดเข้าสู่ระบบใหม่อีกครั้ง', 'error')
+            return redirect(url_for('login_page'))
+            
         user_found = next((u for u in staff_list if u['Username'].lower() == username.lower()), None)
         
         if user_found and check_password_hash(user_found['PasswordHash'], password):
@@ -460,7 +486,10 @@ def login_action():
         else:
             flash('Username หรือ รหัสผ่าน ไม่ถูกต้อง', 'error')
             return redirect(url_for('login_page'))
-    except Exception as e: return redirect(url_for('login_page'))
+    except Exception as e: 
+        print(f"Login error: {e}")
+        flash('เกิดข้อผิดพลาดของระบบ กรุณาลองใหม่อีกครั้ง', 'error')
+        return redirect(url_for('login_page'))
 
 @app.route('/logout')
 def logout():
