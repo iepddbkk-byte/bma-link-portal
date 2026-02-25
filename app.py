@@ -18,6 +18,8 @@ from threading import Thread
 from PIL import Image
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
+from dotenv import load_dotenv
+load_dotenv() # โหลดค่าจากไฟล์ .env (สำหรับรันในเครื่องตัวเอง)
 
 # [NEW] นำเข้า Supabase
 from supabase import create_client, Client
@@ -40,8 +42,8 @@ s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 # --- 3. ตั้งค่าการเชื่อมต่อ SUPABASE ---
 # ⚠️ เปลี่ยน URL ตรงนี้ให้เป็น URL โปรเจกต์ของคุณ (ดูใน Supabase -> Project Settings -> API)
-SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://supabase.com/dashboard/project/gluompferkrtnhuwvoik")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_publishable_MEME0cW0Fz4X1ROyMS3-CA_RIAJ-GP4")
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
 try:
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
