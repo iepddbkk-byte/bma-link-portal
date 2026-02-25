@@ -162,13 +162,14 @@
         }
         .page-banner-text h1 {
             font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 4px;
+            position: relative; z-index: 1;
         }
-        .page-banner-text p { font-size: 0.88rem; color: rgba(255,255,255,0.75); }
+        .page-banner-text p { font-size: 0.88rem; color: rgba(255,255,255,0.75); position: relative; z-index: 1; }
         .page-banner-icon {
             width: 56px; height: 56px; background: rgba(255,255,255,0.15);
             border-radius: var(--radius-lg); display: flex; align-items: center;
             justify-content: center; font-size: 1.8rem; flex-shrink: 0;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px); position: relative; z-index: 1;
         }
 
         /* ==========================================
@@ -192,7 +193,8 @@
         ========================================== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            /* [UPDATED] เปลี่ยนเป็น 3 คอลัมน์ เพื่อรองรับ 6 การ์ดได้สวยๆ */
+            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -219,6 +221,9 @@
         .stat-card.green::after  { background: var(--bma-green); }
         .stat-card.emerald::after{ background: #10b981; }
         .stat-card.purple::after { background: #8b5cf6; }
+        /* [NEW] สีใหม่สำหรับการ์ดความพึงพอใจ */
+        .stat-card.amber::after  { background: #f59e0b; }
+        .stat-card.rose::after   { background: #f43f5e; }
 
         .stat-icon {
             width: 52px; height: 52px; border-radius: var(--radius-md);
@@ -229,16 +234,22 @@
         .stat-icon.green  { background: var(--bma-green-light); color: var(--bma-green); }
         .stat-icon.emerald{ background: #ecfdf5; color: #10b981; }
         .stat-icon.purple { background: #f5f3ff; color: #8b5cf6; }
+        .stat-icon.amber  { background: #fffbeb; color: #f59e0b; }
+        .stat-icon.rose   { background: #fff1f2; color: #f43f5e; }
 
         .stat-content { flex: 1; min-width: 0; }
         .stat-num {
             font-size: 1.9rem; font-weight: 700; line-height: 1.1;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.5px; display: flex; align-items: baseline; gap: 4px;
         }
         .stat-num.blue   { color: #3b82f6; }
         .stat-num.green  { color: var(--bma-green); }
         .stat-num.emerald{ color: #10b981; }
         .stat-num.purple { color: #8b5cf6; }
+        .stat-num.amber  { color: #f59e0b; }
+        .stat-num.rose   { color: #f43f5e; }
+        
+        .stat-num small { font-size: 1rem; font-weight: 500; opacity: 0.7; }
         .stat-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
 
         /* ==========================================
@@ -460,7 +471,7 @@
             .page-banner-text p  { font-size: 0.8rem; }
             .page-banner-icon { width: 44px; height: 44px; font-size: 1.4rem; }
 
-            /* Stats: 2 columns */
+            /* Stats: 2 columns on mobile */
             .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
             .stat-card { padding: 16px 14px; gap: 10px; }
             .stat-icon { width: 42px; height: 42px; font-size: 1.1rem; }
@@ -507,7 +518,6 @@
 </head>
 <body>
 
-<!-- ==================== HEADER ==================== -->
 <header class="main-header">
     <div class="header-left">
         <a href="{{ url_for('home') }}" class="logo-container">
@@ -554,10 +564,8 @@
     </nav>
 </header>
 
-<!-- ==================== MAIN CONTENT ==================== -->
 <div class="container">
 
-    <!-- Page Banner -->
     <div class="page-banner">
         <div class="page-banner-text">
             <h1>📊 Analytics Dashboard</h1>
@@ -566,8 +574,24 @@
         <div class="page-banner-icon">📈</div>
     </div>
 
-    <!-- ── STAT CARDS ── -->
     <div class="stats-grid">
+        
+        <div class="stat-card amber">
+            <div class="stat-icon amber"><i class="fas fa-star"></i></div>
+            <div class="stat-content">
+                <div class="stat-num amber">{{ chart_data.avg_sat }} <small>/ 5</small></div>
+                <div class="stat-label">ความพึงพอใจโดยรวม</div>
+            </div>
+        </div>
+
+        <div class="stat-card rose">
+            <div class="stat-icon rose"><i class="fas fa-heart"></i></div>
+            <div class="stat-content">
+                <div class="stat-num rose">{{ chart_data.avg_ease }} <small>/ 5</small></div>
+                <div class="stat-label">ความง่ายในการใช้งาน</div>
+            </div>
+        </div>
+
         <div class="stat-card blue">
             <div class="stat-icon blue"><i class="fas fa-eye"></i></div>
             <div class="stat-content">
@@ -575,6 +599,7 @@
                 <div class="stat-label">ยอดเข้าชมทั้งหมด</div>
             </div>
         </div>
+
         <div class="stat-card green">
             <div class="stat-icon green"><i class="fas fa-link"></i></div>
             <div class="stat-content">
@@ -582,6 +607,7 @@
                 <div class="stat-label">ลิงก์ทั้งหมด</div>
             </div>
         </div>
+
         <div class="stat-card emerald">
             <div class="stat-icon emerald"><i class="fas fa-check-circle"></i></div>
             <div class="stat-content">
@@ -589,18 +615,18 @@
                 <div class="stat-label">ลิงก์ที่ใช้งานอยู่</div>
             </div>
         </div>
+
         <div class="stat-card purple">
             <div class="stat-icon purple"><i class="fas fa-users"></i></div>
             <div class="stat-content">
                 <div class="stat-num purple">{{ chart_data.total_users }}</div>
-                <div class="stat-label">เจ้าหน้าที่</div>
+                <div class="stat-label">เจ้าหน้าที่ในระบบ</div>
             </div>
         </div>
+
     </div>
 
-    <!-- ── TOP CLICKS & EDITS ── -->
     <div class="rank-grid-2">
-        <!-- Top Clicks -->
         <div class="rank-card">
             <div class="section-title">
                 <div class="title-icon" style="background:#fef3c7; color:#b45309;">
@@ -645,7 +671,6 @@
             </div>
         </div>
 
-        <!-- Top Edits -->
         <div class="rank-card orange">
             <div class="section-title">
                 <div class="title-icon" style="background:#fff7ed; color:#c2410c;">
@@ -694,7 +719,6 @@
         </div>
     </div>
 
-    <!-- ── TOP CONTRIBUTORS ── -->
     <div class="section-card">
         <div class="section-title" style="border-color:#e9d5ff;">
             <div class="title-icon" style="background:#f5f3ff; color:#7c3aed;">
@@ -746,9 +770,7 @@
         </div>
     </div>
 
-    <!-- ── TOP BUREAUS & DIVISIONS ── -->
     <div class="rank-grid-2">
-        <!-- Top Bureaus -->
         <div class="rank-card emerald">
             <div class="section-title">
                 <div class="title-icon" style="background:#ecfdf5; color:#059669;">
@@ -788,7 +810,6 @@
             </div>
         </div>
 
-        <!-- Top Divisions -->
         <div class="rank-card blue">
             <div class="section-title">
                 <div class="title-icon" style="background:#eff6ff; color:#1d4ed8;">
@@ -829,7 +850,6 @@
         </div>
     </div>
 
-    <!-- ── CHARTS ── -->
     <div class="charts-grid">
         <div class="chart-card">
             <div class="chart-card-title">
@@ -851,7 +871,6 @@
         </div>
     </div>
 
-    <!-- ── FEEDBACK ── -->
     <div class="section-title" style="margin-bottom:16px; padding-bottom:14px; border-bottom:2px solid var(--border-color);">
         <div class="title-icon" style="background:#f0fdf4; color:#15803d;">
             <i class="fas fa-comments"></i>
@@ -902,17 +921,13 @@
         </div>
     </div>
 
-</div><!-- /.container -->
-
-<!-- ==================== FOOTER ==================== -->
-<footer class="main-footer">
+</div><footer class="main-footer">
     <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
     <p>สำนักยุทธศาสตร์และประเมินผล</p>
     <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
     <p style="margin-top:12px; font-size:0.82rem; opacity:0.7;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
 </footer>
 
-<!-- ==================== SCRIPTS ==================== -->
 <script>
     // Mobile Menu
     function toggleMenu() {
@@ -1051,7 +1066,6 @@
     });
 </script>
 
-<!-- Flash Messages -->
 <script>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -1062,7 +1076,6 @@
     {% endwith %}
 </script>
 
-<!-- Tawk.to -->
 <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
