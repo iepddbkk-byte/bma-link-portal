@@ -1,4 +1,3 @@
-import gspread
 import qrcode
 from datetime import timedelta
 from io import BytesIO
@@ -6,7 +5,6 @@ from flask import (
     Flask, jsonify, request, render_template, 
     session, redirect, url_for, flash, send_file
 )
-from oauth2client.service_account import ServiceAccountCredentials
 from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
 import random
@@ -14,13 +12,15 @@ import string
 import os
 import json
 import requests
-import uuid
-import time 
+import uuid 
 from collections import Counter
 from threading import Thread 
 from PIL import Image
 from flask_mail import Mail, Message
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
+from itsdangerous import URLSafeTimedSerializer
+
+# [NEW] นำเข้า Supabase
+from supabase import create_client, Client
 
 # --- 1. ตั้งค่า Flask App ---
 app = Flask(__name__)
@@ -38,47 +38,17 @@ app.config['MAIL_DEFAULT_SENDER'] = ('BMA Link Registry', app.config['MAIL_USERN
 mail = Mail(app)
 s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-# --- 3. ตั้งค่าการเชื่อมต่อ Google Sheets ---
-SCOPE = [
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive.file'
-]
-CREDS_FILE = 'my-project-12345.json' 
-SHEET_KEY = "1z3-cjGsP8EHoVa85rn_O_F9NAkKz0ZCW4L0ybCnmcZM" 
-
-db_sheet = None 
-staff_sheet = None 
-invite_sheet = None 
-feedback_sheet = None
-stats_sheet = None 
-favorites_sheet = None
+# --- 3. ตั้งค่าการเชื่อมต่อ SUPABASE ---
+# ⚠️ เปลี่ยน URL ตรงนี้ให้เป็น URL โปรเจกต์ของคุณ (ดูใน Supabase -> Project Settings -> API)
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://gluompferkrtnhuwvoik.supabase.com")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_publishable_MEME0cW0Fz4X1ROyMS3-CA_RIAJ-GP4")
 
 try:
-    json_creds = os.environ.get('GOOGLE_CREDENTIALS')
-    if json_creds:
-        creds_dict = json.loads(json_creds)
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPE)
-    else:
-        creds = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILE, SCOPE)
-
-    client = gspread.authorize(creds)
-    spreadsheet = client.open_by_key(SHEET_KEY)
-    
-    db_sheet = spreadsheet.worksheet("Database")
-    staff_sheet = spreadsheet.worksheet("StaffList")
-    invite_sheet = spreadsheet.worksheet("InviteCodes")
-    feedback_sheet = spreadsheet.worksheet("Feedback")
-    
-    try: stats_sheet = spreadsheet.worksheet("SiteStats")
-    except: print("⚠️ Warning: SiteStats sheet not found.")
-
-    try: favorites_sheet = spreadsheet.worksheet("UserFavorites")
-    except: print("⚠️ Warning: UserFavorites sheet not found.")
-
-    print("✅ เชื่อมต่อ Google Sheet ครบทุกแท็บสำเร็จ!")
-
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    print("✅ เชื่อมต่อ Supabase สำเร็จ!")
 except Exception as e:
-    print(f"❌ เกิดข้อผิดพลาดในการเชื่อมต่อ Sheet: {e}")
+    print(f"❌ เกิดข้อผิดพลาดในการเชื่อมต่อ Supabase: {e}")
+
 
 # --- 3.5. ข้อมูลคงที่ ---
 bureaus_list = [
@@ -99,18 +69,8 @@ districts_list = [
     "ฝ่ายบริหารงานทั่วไป (กยม.)", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านการศึกษา พัฒนาสังคม และสร้างสรรค์เมือง", "กลุ่มงานยุทธศาสตร์และประเมินผลด้านสาธารณสุข"
 ]
 
-DB_HEADERS = [
-    "ID", "ประเภท", "หน่วยงาน", "ส่วนราชการ", "อีเมลผู้รับผิดชอบ", "เบอร์โทรติดต่อ",
-    "ชื่อลิงก์", "URL", "สถานะ", "รายละเอียด", "วันที่อัปเดต", "CreatorUsername", "LinkStatus", "ความเป็นส่วนตัว", "Clicks", "EditCount", "ปักหมุด", "วันที่สิ้นสุด"
-]
-
-STAFF_HEADERS = [
-    "Username", "PasswordHash", "Level", "ชื่อ", "ตำแหน่ง", 
-    "หน่วยงาน", "ส่วนราชการ", "เบอร์โทร", "Email", "CreatedAt", "UpdatedAt"
-]
-
 # ==========================================
-# ส่วนระบบ Caching
+# ส่วนระบบ Caching (ปรับปรุงเพื่อลดการทำงานของ DB)
 # ==========================================
 CACHE_TIMEOUT = 15 
 _app_cache = {
@@ -143,73 +103,53 @@ def generate_invite_code():
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     return f"INVITE-{code}"
 
-def records_to_dict(records_list, headers):
-    records_dict = []
-    if not records_list or len(records_list) < 2: return []
-    for row in records_list[1:]:
-        if row and len(row) > 0 and row[0].strip(): 
-            record = {}
-            for i, header in enumerate(headers):
-                record[header] = row[i].strip() if i < len(row) and isinstance(row[i], str) else row[i] if i < len(row) else ""
-            records_dict.append(record)
-    return records_dict
-
-# [NEW] ฟังก์ชันช่วยดึงข้อมูลแบบมี Retry ป้องกัน Google Sheets ดึงข้อมูลไม่ทัน
-def fetch_sheet_with_retry(sheet_obj, headers=None, is_dict=True, retries=3):
-    for attempt in range(retries):
-        try:
-            if is_dict:
-                return records_to_dict(sheet_obj.get_all_values(), headers)
-            else:
-                return sheet_obj.get_all_records()
-        except Exception as e:
-            print(f"⚠️ [API Retry {attempt+1}] GSpread Fetch Error: {e}")
-            time.sleep(1.5) # รอ 1.5 วินาทีแล้วลองดึงใหม่
-    raise Exception("Google Sheets API Timeout")
-
+# [UPDATED] ฟังก์ชันดึงข้อมูลจาก Supabase
 def get_db_records(force_refresh=False):
     global _app_cache
-    if db_sheet is None: return []
     now = datetime.datetime.now()
     cache = _app_cache['db_records']
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
         if (now - cache['time']).total_seconds() < CACHE_TIMEOUT: return cache['data']
     try:
-        data = fetch_sheet_with_retry(db_sheet, DB_HEADERS, True)
+        response = supabase.table('Links').select('*').execute()
+        data = response.data
         cache['data'] = data
-        cache['time'] = datetime.datetime.now()
+        cache['time'] = now
         return data
-    except: 
+    except Exception as e:
+        print(f"Error fetching Links: {e}")
         return cache['data'] if cache['data'] is not None else []
 
 def get_staff_records(force_refresh=False):
     global _app_cache
-    if staff_sheet is None: return []
     now = datetime.datetime.now()
     cache = _app_cache['staff_records']
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
         if (now - cache['time']).total_seconds() < CACHE_TIMEOUT: return cache['data']
     try:
-        data = fetch_sheet_with_retry(staff_sheet, STAFF_HEADERS, True)
+        response = supabase.table('StaffList').select('*').execute()
+        data = response.data
         cache['data'] = data
-        cache['time'] = datetime.datetime.now()
+        cache['time'] = now
         return data
-    except: 
+    except Exception as e:
+        print(f"Error fetching StaffList: {e}")
         return cache['data'] if cache['data'] is not None else []
         
 def get_invite_codes(force_refresh=False):
     global _app_cache
-    if invite_sheet is None: return []
     now = datetime.datetime.now()
     cache = _app_cache['invite_codes']
     if not force_refresh and cache['data'] is not None and cache['time'] is not None:
         if (now - cache['time']).total_seconds() < CACHE_TIMEOUT: return cache['data']
     try:
-        data = fetch_sheet_with_retry(invite_sheet, is_dict=False)
+        response = supabase.table('InviteCodes').select('*').execute()
+        data = response.data
         cache['data'] = data
-        cache['time'] = datetime.datetime.now()
+        cache['time'] = now
         return data
-    except: 
+    except Exception as e:
+        print(f"Error fetching InviteCodes: {e}")
         return cache['data'] if cache['data'] is not None else []
 
 def send_reset_email(username, recipient_email):
@@ -223,14 +163,17 @@ def send_reset_email(username, recipient_email):
     except: return False
 
 def increment_site_views():
-    if stats_sheet:
-        try:
-            current_views = int(stats_sheet.cell(1, 2).value or 0)
-            stats_sheet.update_cell(1, 2, current_views + 1)
-        except: pass
+    try:
+        # สมมติว่ามีตาราง SiteStats และมี Row ที่ id = 1
+        res = supabase.table('SiteStats').select('total_views').eq('id', 1).execute()
+        if res.data:
+            current_views = int(res.data[0].get('total_views', 0))
+            supabase.table('SiteStats').update({'total_views': current_views + 1}).eq('id', 1).execute()
+    except Exception as e:
+        print(f"Stats Error: {e}")
 
 # =======================================================
-# [UPDATED] สิทธิ์การเข้าถึงลิงก์ (รองรับ 3 Role)
+# สิทธิ์การเข้าถึงลิงก์ (รองรับ 3 Role)
 # =======================================================
 def check_link_permission(link, user_session):
     privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ')
@@ -242,18 +185,15 @@ def check_link_permission(link, user_session):
     user_bureau = user_session.get('main_agency', '')
     user_division = user_session.get('division', '')
     
-    # 1. Super Admin เห็นทุกลิงก์ในระบบ
     if user_role == 'Super Admin': return True
         
     link_creator = link.get('CreatorUsername')
     link_bureau = link.get('ส่วนราชการ')
     link_division = link.get('หน่วยงาน')
 
-    # 2. Admin (กอง) เห็นทุกลิงก์ในกองของตัวเอง แม้คนสร้างจะตั้งค่าส่วนตัว
     if user_role == 'Admin' and link_bureau == user_bureau:
         return True
 
-    # 3. User ทั่วไป (และ Admin ที่ดูลิงก์กองอื่น) เช็คตาม Privacy
     if privacy == 'สยป.': return True
     if privacy == 'กอง/สำนักงาน': return link_bureau == user_bureau
     if privacy == 'กลุ่มงาน/ฝ่าย': return link_division == user_division and link_bureau == user_bureau
@@ -264,26 +204,26 @@ def check_link_permission(link, user_session):
 # --- 5. API ---
 @app.route('/check_username', methods=['POST'])
 def check_username():
-    if staff_sheet is None: return jsonify({'available': False})
     try:
         data = request.get_json()
         username = data.get('username')
         if not username: return jsonify({'available': False})
-        all_staff = get_staff_records() 
-        all_usernames = [u['Username'] for u in all_staff]
-        is_available = username.lower() not in [u.lower() for u in all_usernames]
+        
+        # ค้นหาใน DB ว่ามีคนใช้หรือยัง
+        res = supabase.table('StaffList').select('Username').ilike('Username', username).execute()
+        is_available = len(res.data) == 0
         return jsonify({'available': is_available})
     except: return jsonify({'available': False})
 
 @app.route('/check_invite_code', methods=['POST'])
 def check_invite_code():
-    if invite_sheet is None: return jsonify({'available': False})
     try:
         data = request.get_json()
         code = data.get('invite_code')
-        cell = invite_sheet.find(code)
-        if not cell: return jsonify({'available': False, 'message': 'รหัสไม่ถูกต้อง'})
-        status = invite_sheet.cell(cell.row, 2).value 
+        res = supabase.table('InviteCodes').select('*').eq('Code', code).execute()
+        
+        if not res.data: return jsonify({'available': False, 'message': 'รหัสไม่ถูกต้อง'})
+        status = res.data[0].get('Status')
         if status == 'Available': return jsonify({'available': True, 'message': 'รหัสถูกต้อง'})
         else: return jsonify({'available': False, 'message': 'ถูกใช้งานแล้ว'})
     except: return jsonify({'available': False})
@@ -293,14 +233,13 @@ def run_link_checker():
     key = request.args.get('key')
     secret_key = os.environ.get('CHECKER_SECRET', 'my_super_secret_checker_key')
     if key != secret_key: return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
-    if db_sheet is None: return jsonify({'status': 'error', 'message': 'Database not connected'}), 500
     try:
         records = get_db_records()
-        updates = []
         headers = {'User-Agent': 'Mozilla/5.0'}
-        for i, record in enumerate(records[:30]): 
-            row_index = i + 2 
+        count = 0
+        for record in records[:30]: 
             url = record.get('URL')
+            link_id = record.get('ID')
             status_msg = "Unknown"
             if url and url.startswith('http'):
                 try:
@@ -308,13 +247,13 @@ def run_link_checker():
                     status_msg = "OK" if 200 <= resp.status_code < 300 or resp.status_code == 403 else f"{resp.status_code} Error"
                 except:
                     status_msg = "Error/Timeout"
-            updates.append({'range': f'M{row_index}', 'values': [[status_msg]]})
-        if updates:
-            db_sheet.batch_update(updates, value_input_option='RAW')
-            clear_db_cache()
-            return jsonify({'status': 'success', 'message': f'Checked {len(updates)} links'})
+                    
+            supabase.table('Links').update({'LinkStatus': status_msg}).eq('ID', link_id).execute()
+            count += 1
+            
+        clear_db_cache()
+        return jsonify({'status': 'success', 'message': f'Checked {count} links'})
     except Exception as e: return jsonify({'status': 'error', 'message': str(e)}), 500
-    return jsonify({'status': 'success'})
 
 @app.route('/generate_qr')
 def generate_qr_code():
@@ -344,17 +283,19 @@ def generate_qr_code():
 @app.route('/go/<link_id>')
 def go_to_link(link_id):
     try:
-        cell = db_sheet.find(link_id)
-        if cell:
-            row_values = db_sheet.row_values(cell.row)
-            target_url = row_values[7] 
-            def update_click_count(row_num):
+        res = supabase.table('Links').select('URL', 'Clicks').eq('ID', link_id).execute()
+        if res.data:
+            target_url = res.data[0].get('URL')
+            
+            # ทำงานแบบ Background Thread เพื่อไม่ให้หน้าเว็บหน่วง
+            def update_click_count(l_id, current_clicks):
                 try:
-                    current_clicks = db_sheet.cell(row_num, 15).value
-                    if not current_clicks: current_clicks = 0
-                    db_sheet.update_cell(row_num, 15, int(current_clicks) + 1)
+                    c = int(current_clicks) if current_clicks else 0
+                    supabase.table('Links').update({'Clicks': c + 1}).eq('ID', l_id).execute()
                 except: pass
-            Thread(target=update_click_count, args=(cell.row,)).start()
+                
+            Thread(target=update_click_count, args=(link_id, res.data[0].get('Clicks'))).start()
+            
             if target_url: return redirect(target_url)
         return render_template('error.html', message="ไม่พบลิงก์ที่คุณค้นหา หรือลิงก์ถูกลบไปแล้ว") 
     except: return render_template('error.html', message="เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล") 
@@ -362,7 +303,6 @@ def go_to_link(link_id):
 # --- 6. Routes (General) ---
 @app.route('/')
 def home():
-    if db_sheet is None: return render_template('index.html', session=session, bureaus=bureaus_list, districts=districts_list, links=[], error="Sheet Error")
     try:
         if not session.get('visited_home'):
             Thread(target=increment_site_views).start()
@@ -370,9 +310,10 @@ def home():
         if not session.get('visitor_id'): session['visitor_id'] = str(uuid.uuid4())
 
         total_views = 0
-        if stats_sheet:
-            try: total_views = stats_sheet.cell(1, 2).value or 0
-            except: pass
+        try:
+            res = supabase.table('SiteStats').select('total_views').eq('id', 1).execute()
+            if res.data: total_views = res.data[0].get('total_views', 0)
+        except: pass
 
         all_records = get_db_records()
         visible_links = [link for link in all_records if link.get('สถานะ') == 'ใช้งาน' and check_link_permission(link, session)]
@@ -392,7 +333,6 @@ def home():
 
 @app.route('/links')
 def links_page():
-    if db_sheet is None: return render_template('links_page.html', links=[], error="Sheet Error", session=session)
     try:
         if not session.get('visitor_id'): session['visitor_id'] = str(uuid.uuid4())
 
@@ -434,7 +374,6 @@ def links_page():
 @app.route('/my_favorites')
 def my_favorites_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
-    if db_sheet is None: return render_template('favorites.html', links=[], session=session)
     try:
         all_links = get_db_records()
         my_fav_ids = get_user_favorite_ids(session.get('username'))
@@ -457,21 +396,17 @@ def login_page():
 
 @app.route('/login_action', methods=['POST'])
 def login_action():
-    if staff_sheet is None: 
-        flash('ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error')
-        return redirect(url_for('login_page'))
     try:
         username = request.form.get('username')
         password = request.form.get('password')
         
         staff_list = get_staff_records()
         
-        # [NEW] เช็คกรณี Google Sheet ดึงข้อมูลมาไม่ได้เลย (กันระบบเข้าใจผิดว่ารหัสผิด)
         if not staff_list:
             flash('ระบบฐานข้อมูลตอบสนองช้า กรุณากดเข้าสู่ระบบใหม่อีกครั้ง', 'error')
             return redirect(url_for('login_page'))
             
-        user_found = next((u for u in staff_list if u['Username'].lower() == username.lower()), None)
+        user_found = next((u for u in staff_list if u.get('Username', '').lower() == username.lower()), None)
         
         if user_found and check_password_hash(user_found['PasswordHash'], password):
             session['logged_in'] = True
@@ -504,7 +439,6 @@ def register_page():
 
 @app.route('/register_action', methods=['POST'])
 def register_action():
-    if staff_sheet is None: return redirect(url_for('register_page'))
     try:
         username = request.form.get('username')
         password = request.form.get('password')
@@ -517,28 +451,41 @@ def register_action():
         division = request.form.get('division') 
         main_agency = request.form.get('main_agency') 
 
-        all_staff = get_staff_records()
-        if username.lower() in [u['Username'].lower() for u in all_staff]:
+        # เช็คชื่อซ้ำ
+        res_user = supabase.table('StaffList').select('Username').ilike('Username', username).execute()
+        if len(res_user.data) > 0:
             flash('Username ซ้ำ', 'error'); return redirect(url_for('register_page'))
         
-        code_cell = invite_sheet.find(invite_code)
-        if not code_cell or invite_sheet.cell(code_cell.row, 2).value != 'Available':
-            flash('รหัสเชิญไม่ถูกต้อง', 'error'); return redirect(url_for('register_page'))
+        # เช็ครหัส Invite
+        res_code = supabase.table('InviteCodes').select('*').eq('Code', invite_code).execute()
+        if not res_code.data or res_code.data[0].get('Status') != 'Available':
+            flash('รหัสเชิญไม่ถูกต้องหรือถูกใช้งานไปแล้ว', 'error'); return redirect(url_for('register_page'))
 
         hashed_password = generate_password_hash(password)
         current_time = get_current_timestamp()
         
-        new_row = [username, hashed_password, 'Users', fullname, position, division, main_agency, phone, email, current_time, current_time]
-        staff_sheet.append_row(new_row, value_input_option='USER_ENTERED')
+        # บันทึก User
+        new_user = {
+            "Username": username, "PasswordHash": hashed_password, "Level": "Users",
+            "ชื่อ": fullname, "ตำแหน่ง": position, "หน่วยงาน": division, 
+            "ส่วนราชการ": main_agency, "เบอร์โทร": phone, "Email": email,
+            "CreatedAt": current_time, "UpdatedAt": current_time
+        }
+        supabase.table('StaffList').insert(new_user).execute()
         clear_staff_cache()
         
-        invite_sheet.update_cell(code_cell.row, 2, "Used")
-        invite_sheet.update_cell(code_cell.row, 3, username)
-        invite_sheet.update_cell(code_cell.row, 4, current_time)
+        # อัปเดตสถานะ Invite Code
+        supabase.table('InviteCodes').update({
+            "Status": "Used", "UsedByUsername": username, "UsedAt": current_time
+        }).eq('Code', invite_code).execute()
+        clear_invite_cache()
         
         flash('สมัครสมาชิกสำเร็จ!', 'success')
         return redirect(url_for('login_page')) 
-    except: flash('เกิดข้อผิดพลาด', 'error'); return redirect(url_for('register_page'))
+    except Exception as e:
+        print(e)
+        flash('เกิดข้อผิดพลาดในการสมัครสมาชิก', 'error')
+        return redirect(url_for('register_page'))
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -564,13 +511,10 @@ def reset_password_page(token):
         if password != confirm: flash('รหัสผ่านไม่ตรงกัน', 'error'); return render_template('reset_password.html', token=token)
         try:
             new_hash = generate_password_hash(password)
-            cell = staff_sheet.find(username)
-            if cell:
-                staff_sheet.update_cell(cell.row, 2, new_hash) 
-                staff_sheet.update_cell(cell.row, 11, get_current_timestamp())
-                clear_staff_cache()
-                flash('เปลี่ยนรหัสผ่านสำเร็จ', 'success')
-                return redirect(url_for('login_page'))
+            supabase.table('StaffList').update({"PasswordHash": new_hash, "UpdatedAt": get_current_timestamp()}).eq('Username', username).execute()
+            clear_staff_cache()
+            flash('เปลี่ยนรหัสผ่านสำเร็จ', 'success')
+            return redirect(url_for('login_page'))
         except: flash('Error updating password', 'error')
     return render_template('reset_password.html', token=token)
 
@@ -614,35 +558,27 @@ def edit_profile_action():
         division = request.form.get('division') 
         main_agency = request.form.get('main_agency') 
         
-        cell = staff_sheet.find(session.get('username'))
-        if cell:
-            staff_sheet.update_cell(cell.row, 4, fullname)    
-            staff_sheet.update_cell(cell.row, 5, position)    
-            staff_sheet.update_cell(cell.row, 6, division)    
-            staff_sheet.update_cell(cell.row, 7, main_agency) 
-            staff_sheet.update_cell(cell.row, 8, phone)       
-            staff_sheet.update_cell(cell.row, 9, email)       
-            staff_sheet.update_cell(cell.row, 11, get_current_timestamp()) 
+        update_data = {
+            "ชื่อ": fullname, "ตำแหน่ง": position, "หน่วยงาน": division,
+            "ส่วนราชการ": main_agency, "เบอร์โทร": phone, "Email": email,
+            "UpdatedAt": get_current_timestamp()
+        }
+        
+        supabase.table('StaffList').update(update_data).eq('Username', session.get('username')).execute()
+        clear_staff_cache()
             
-            clear_staff_cache()
-            
-            session['name'] = fullname
-            session['email'] = email
-            session['main_agency'] = main_agency
-            session['division'] = division
-            flash('บันทึกเรียบร้อย', 'success')
-            return redirect(url_for('profile_page'))
+        session['name'] = fullname
+        session['email'] = email
+        session['main_agency'] = main_agency
+        session['division'] = division
+        flash('บันทึกเรียบร้อย', 'success')
+        return redirect(url_for('profile_page'))
     except Exception as e: return redirect(url_for('edit_profile_page'))
 
 # --- 9. Routes (Dashboard & Links Management) ---
-
-# =======================================================
-# [UPDATED] การดึงข้อมูลใน Dashboard (รองรับ 3 Role)
-# =======================================================
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
-    if db_sheet is None: return render_template('dashboard.html', session=session, links=[])
     try: 
         if not session.get('visitor_id'): session['visitor_id'] = str(uuid.uuid4())
 
@@ -657,10 +593,8 @@ def dashboard():
         if user_role == 'Super Admin':
             user_links = all_links
         elif user_role == 'Admin':
-            # Admin เห็นและจัดการลิงก์ทุกอันใน 'ส่วนราชการ' (กอง/สำนัก) ของตนเอง
             user_links = [l for l in all_links if l.get('ส่วนราชการ') == user_bureau]
         else:
-            # User ทั่วไป เห็นเฉพาะที่ตัวเองสร้าง
             user_links = [l for l in all_links if l.get('CreatorUsername') == username]
         
         favorite_links_obj = [l for l in all_links if l.get('ID') in my_fav_ids and l.get('สถานะ') == 'ใช้งาน']
@@ -674,9 +608,10 @@ def dashboard():
         top_10 = sorted(user_links, key=lambda x: x['Clicks'], reverse=True)[:10]
         
         total_views = 0
-        if stats_sheet:
-            try: total_views = int(stats_sheet.cell(1, 2).value or 0)
-            except: pass
+        try:
+            res = supabase.table('SiteStats').select('total_views').eq('id', 1).execute()
+            if res.data: total_views = int(res.data[0].get('total_views', 0))
+        except: pass
             
         chart_data = {
             "total_views": total_views, "top_10_links": top_10, "total_links": len(user_links),
@@ -707,52 +642,50 @@ def add_link_action():
         is_pinned = 'ไม่ปักหมุด'
         end_date = ''
         
-        # [UPDATED] สิทธิ์การปักหมุดสำหรับ Super Admin และ Admin
         if session.get('level', '').strip() in ['Super Admin', 'Admin']:
             if request.form.get('is_pinned'): is_pinned = 'ปักหมุด'
             end_date = request.form.get('end_date', '')
             
-        new_row = [
-            generate_new_id(), data['ประเภท'], division, main_agency, 
-            data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
-            data['URL'], data['สถานะ'], data['รายละเอียด'], 
-            get_current_timestamp(), session.get('username'), '', 
-            data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 0, 0, is_pinned, end_date
-        ]
-        db_sheet.append_row(new_row, value_input_option='USER_ENTERED')
+        new_link = {
+            "ID": generate_new_id(), "ประเภท": data['ประเภท'], "หน่วยงาน": division, 
+            "ส่วนราชการ": main_agency, "อีเมลผู้รับผิดชอบ": data['อีเมลผู้รับผิดชอบ'], 
+            "เบอร์โทรติดต่อ": data['เบอร์โทรติดต่อ'], "ชื่อลิงก์": data['ชื่อลิงก์'], 
+            "URL": data['URL'], "สถานะ": data['สถานะ'], "รายละเอียด": data['รายละเอียด'], 
+            "วันที่อัปเดต": get_current_timestamp(), "CreatorUsername": session.get('username'), 
+            "LinkStatus": '', "ความเป็นส่วนตัว": data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 
+            "Clicks": 0, "EditCount": 0, "ปักหมุด": is_pinned, "วันที่สิ้นสุด": end_date
+        }
+        
+        supabase.table('Links').insert(new_link).execute()
         clear_db_cache()
         flash('เพิ่มลิงก์สำเร็จ', 'success')
         return redirect(url_for('links_page'))
-    except Exception as e: return redirect(url_for('add_link_page'))
+    except Exception as e: 
+        print(f"Add link error: {e}")
+        flash('เกิดข้อผิดพลาดในการเพิ่มลิงก์', 'error')
+        return redirect(url_for('add_link_page'))
 
-# =======================================================
-# [UPDATED] สิทธิ์การลบลิงก์ (รองรับ 3 Role)
-# =======================================================
 @app.route('/delete/<link_id>', methods=['POST'])
 def delete_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        cell = db_sheet.find(link_id)
-        if not cell: return redirect(url_for('dashboard'))
-        row_data = db_sheet.row_values(cell.row)
+        res = supabase.table('Links').select('CreatorUsername', 'ส่วนราชการ').eq('ID', link_id).execute()
+        if not res.data: return redirect(url_for('dashboard'))
         
-        creator = row_data[11].strip() 
-        link_bureau = row_data[3].strip() if len(row_data) > 3 else ''
+        creator = res.data[0].get('CreatorUsername', '').strip()
+        link_bureau = res.data[0].get('ส่วนราชการ', '').strip()
         
         user_role = session.get('level', '').strip()
         username = session.get('username', '').strip()
         user_bureau = session.get('main_agency', '').strip()
 
         can_delete = False
-        if user_role == 'Super Admin':
-            can_delete = True
-        elif user_role == 'Admin' and link_bureau == user_bureau:
-            can_delete = True
-        elif creator == username:
-            can_delete = True
+        if user_role == 'Super Admin': can_delete = True
+        elif user_role == 'Admin' and link_bureau == user_bureau: can_delete = True
+        elif creator == username: can_delete = True
 
         if can_delete:
-            db_sheet.delete_rows(cell.row)
+            supabase.table('Links').delete().eq('ID', link_id).execute()
             clear_db_cache()
             flash('ลบสำเร็จ', 'success')
         else:
@@ -761,9 +694,6 @@ def delete_link_action(link_id):
         return redirect(url_for('dashboard'))
     except: return redirect(url_for('dashboard'))
 
-# =======================================================
-# [UPDATED] สิทธิ์การหน้าแก้ไขลิงก์ (รองรับ 3 Role)
-# =======================================================
 @app.route('/edit/<link_id>')
 def edit_link_page(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
@@ -784,36 +714,29 @@ def edit_link_page(link_id):
         can_edit = False
         is_super_admin = (user_role == 'Super Admin')
 
-        if is_super_admin:
-            can_edit = True
-        elif user_role == 'Admin' and link_bureau == user_bureau:
-            can_edit = True
-        elif creator == username:
-            can_edit = True
+        if is_super_admin: can_edit = True
+        elif user_role == 'Admin' and link_bureau == user_bureau: can_edit = True
+        elif creator == username: can_edit = True
         
         if not can_edit:
             flash('คุณไม่มีสิทธิ์แก้ไขลิงก์นี้', 'error')
             return redirect(url_for('dashboard'))
             
-        # ทั้ง Super Admin และ Admin สามารถ ปักหมุด+แก้ไขเวลา ได้
         can_pin = (user_role in ['Super Admin', 'Admin'])
             
         return render_template('edit_link.html', session=session, link=link, locked_agency=link.get('ส่วนราชการ', 'N/A'), is_super_admin=is_super_admin, can_pin=can_pin)
     except Exception as e: return redirect(url_for('dashboard'))
 
-# =======================================================
-# [UPDATED] สิทธิ์การบันทึกแก้ไขลิงก์ (รองรับ 3 Role)
-# =======================================================
 @app.route('/update_action/<link_id>', methods=['POST'])
 def update_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        cell = db_sheet.find(link_id)
-        if not cell: return redirect(url_for('dashboard'))
-        row_vals = db_sheet.row_values(cell.row)
+        res = supabase.table('Links').select('CreatorUsername', 'ส่วนราชการ', 'EditCount', 'ปักหมุด', 'วันที่สิ้นสุด').eq('ID', link_id).execute()
+        if not res.data: return redirect(url_for('dashboard'))
+        row_vals = res.data[0]
         
-        creator = row_vals[11].strip()
-        link_bureau = row_vals[3].strip() if len(row_vals) > 3 else ''
+        creator = row_vals.get('CreatorUsername', '').strip()
+        link_bureau = row_vals.get('ส่วนราชการ', '').strip()
         
         user_role = session.get('level', '').strip()
         username = session.get('username', '').strip()
@@ -831,18 +754,15 @@ def update_link_action(link_id):
         data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด', 'ความเป็นส่วนตัว']}
         if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         
-        # เฉพาะ Super Admin เท่านั้นที่ย้ายลิงก์ข้ามกองได้
-        main_agency = request.form.get('ส่วนราชการ') if user_role == 'Super Admin' else row_vals[3]
+        main_agency = request.form.get('ส่วนราชการ') if user_role == 'Super Admin' else link_bureau
         
-        current_clicks = row_vals[14] if len(row_vals) > 14 else 0
-        try: current_edits = int(row_vals[15]) if len(row_vals) > 15 and row_vals[15] else 0
+        try: current_edits = int(row_vals.get('EditCount', 0))
         except: current_edits = 0
         new_edit_count = current_edits + 1
 
-        current_pinned = row_vals[16] if len(row_vals) > 16 else 'ไม่ปักหมุด'
-        current_end_date = row_vals[17] if len(row_vals) > 17 else ''
+        current_pinned = row_vals.get('ปักหมุด', 'ไม่ปักหมุด')
+        current_end_date = row_vals.get('วันที่สิ้นสุด', '')
         
-        # Super Admin และ Admin อัปเดตสถานะปักหมุดได้
         if user_role in ['Super Admin', 'Admin']:
             is_pinned = 'ปักหมุด' if request.form.get('is_pinned') else 'ไม่ปักหมุด'
             end_date = request.form.get('end_date', '')
@@ -850,16 +770,16 @@ def update_link_action(link_id):
             is_pinned = current_pinned
             end_date = current_end_date
 
-        new_vals = [
-            link_id, data['ประเภท'], data['หน่วยงาน'], main_agency, 
-            data['อีเมลผู้รับผิดชอบ'], data['เบอร์โทรติดต่อ'], data['ชื่อลิงก์'], 
-            data['URL'], data['สถานะ'], data['รายละเอียด'], 
-            get_current_timestamp(), creator, row_vals[12] if len(row_vals) > 12 else '',
-            data.get('ความเป็นส่วนตัว', 'สาธารณะ'), current_clicks, new_edit_count, is_pinned, end_date 
-        ]
+        update_data = {
+            "ประเภท": data['ประเภท'], "หน่วยงาน": data['หน่วยงาน'], "ส่วนราชการ": main_agency, 
+            "อีเมลผู้รับผิดชอบ": data['อีเมลผู้รับผิดชอบ'], "เบอร์โทรติดต่อ": data['เบอร์โทรติดต่อ'], 
+            "ชื่อลิงก์": data['ชื่อลิงก์'], "URL": data['URL'], "สถานะ": data['สถานะ'], 
+            "รายละเอียด": data['รายละเอียด'], "วันที่อัปเดต": get_current_timestamp(), 
+            "ความเป็นส่วนตัว": data.get('ความเป็นส่วนตัว', 'สาธารณะ'), 
+            "EditCount": new_edit_count, "ปักหมุด": is_pinned, "วันที่สิ้นสุด": end_date 
+        }
         
-        range_name = f"A{cell.row}:R{cell.row}" 
-        db_sheet.update(range_name, [new_vals])
+        supabase.table('Links').update(update_data).eq('ID', link_id).execute()
         clear_db_cache()
         flash(f'แก้ไขสำเร็จ (แก้ไขไปแล้ว {new_edit_count} ครั้ง)', 'success')
         return redirect(url_for('dashboard')) 
@@ -868,11 +788,15 @@ def update_link_action(link_id):
 @app.route('/analytics')
 def analytics_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
-    if db_sheet is None: return render_template('analytics.html', session=session, chart_data={})
     try:
         links = get_db_records()
         users = get_staff_records()
-        feedback = feedback_sheet.get_all_records()
+        
+        feedback = []
+        try:
+            res_fb = supabase.table('Feedback').select('*').execute()
+            feedback = res_fb.data
+        except: pass
         
         for l in links:
             try: l['Clicks'] = int(l.get('Clicks', 0))
@@ -923,9 +847,10 @@ def analytics_page():
         top_10_edits = sorted(links, key=lambda x: x['EditCount'], reverse=True)[:10]
 
         total_views = 0
-        if stats_sheet:
-            try: total_views = int(stats_sheet.cell(1, 2).value or 0)
-            except: pass
+        try:
+            res_views = supabase.table('SiteStats').select('total_views').eq('id', 1).execute()
+            if res_views.data: total_views = int(res_views.data[0].get('total_views', 0))
+        except: pass
 
         cat_counts = Counter(l['ประเภท'] for l in links if l.get('ประเภท'))
         dept_counts = Counter(l['ส่วนราชการ'] for l in links if l.get('ส่วนราชการ')).most_common(5)
@@ -964,9 +889,6 @@ def analytics_page():
         return render_template('analytics.html', session=session, chart_data=chart_data)
     except: return redirect(url_for('dashboard'))
 
-# =======================================================
-# [UPDATED] สิทธิ์เข้าเมนูผู้ดูแลระบบ (เฉพาะ Super Admin)
-# =======================================================
 @app.route('/admin')
 def admin_panel():
     if not session.get('logged_in') or session.get('level', '').strip() != 'Super Admin': 
@@ -981,11 +903,10 @@ def change_user_level():
     try:
         user, level = request.form.get('username'), request.form.get('level')
         if user == session.get('username'): flash('เปลี่ยนระดับตัวเองไม่ได้', 'error'); return redirect(url_for('admin_panel'))
-        cell = staff_sheet.find(user)
-        if cell: 
-            staff_sheet.update_cell(cell.row, 3, level)
-            clear_staff_cache()
-            flash('สำเร็จ', 'success')
+        
+        supabase.table('StaffList').update({"Level": level}).eq('Username', user).execute()
+        clear_staff_cache()
+        flash('สำเร็จ', 'success')
     except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
 
@@ -995,11 +916,10 @@ def delete_user():
     try:
         user = request.form.get('username')
         if user == session.get('username'): flash('ลบตัวเองไม่ได้', 'error'); return redirect(url_for('admin_panel'))
-        cell = staff_sheet.find(user)
-        if cell: 
-            staff_sheet.delete_rows(cell.row)
-            clear_staff_cache()
-            flash('สำเร็จ', 'success')
+        
+        supabase.table('StaffList').delete().eq('Username', user).execute()
+        clear_staff_cache()
+        flash('สำเร็จ', 'success')
     except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
 
@@ -1016,13 +936,11 @@ def generate_code():
 
         new_rows = []
         for _ in range(amount):
-            new_rows.append([generate_invite_code(), 'Available', '', ''])
+            new_rows.append({"Code": generate_invite_code(), "Status": "Available", "UsedByUsername": "", "UsedAt": ""})
 
-        if invite_sheet:
-            invite_sheet.append_rows(new_rows, value_input_option='USER_ENTERED')
-            clear_invite_cache()
-            flash(f'✅ สร้างรหัสเชิญใหม่จำนวน {amount} รหัส สำเร็จเรียบร้อย!', 'success')
-        else: flash('ไม่สามารถเชื่อมต่อฐานข้อมูลได้', 'error')
+        supabase.table('InviteCodes').insert(new_rows).execute()
+        clear_invite_cache()
+        flash(f'✅ สร้างรหัสเชิญใหม่จำนวน {amount} รหัส สำเร็จเรียบร้อย!', 'success')
     except Exception as e: flash(f'เกิดข้อผิดพลาด: {e}', 'error')
         
     return redirect(url_for('admin_panel'))
@@ -1031,11 +949,10 @@ def generate_code():
 def delete_code():
     if not session.get('logged_in') or session.get('level', '').strip() != 'Super Admin': return redirect(url_for('login_page'))
     try:
-        cell = invite_sheet.find(request.form.get('code'))
-        if cell: 
-            invite_sheet.delete_rows(cell.row)
-            clear_invite_cache()
-            flash('ลบสำเร็จ', 'success')
+        code = request.form.get('code')
+        supabase.table('InviteCodes').delete().eq('Code', code).execute()
+        clear_invite_cache()
+        flash('ลบสำเร็จ', 'success')
     except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
 
@@ -1048,8 +965,15 @@ def feedback_page():
 def feedback_action():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        row = [get_current_timestamp(), session.get('username'), request.form.get('satisfaction'), request.form.get('ease_of_use'), request.form.get('comments', ''), request.form.get('features', '')]
-        feedback_sheet.append_row(row, value_input_option='USER_ENTERED')
+        data = {
+            "Timestamp": get_current_timestamp(),
+            "Username": session.get('username'),
+            "SatisfactionScore": request.form.get('satisfaction'),
+            "EaseOfUseScore": request.form.get('ease_of_use'),
+            "Comments": request.form.get('comments', ''),
+            "FeatureRequest": request.form.get('features', '')
+        }
+        supabase.table('Feedback').insert(data).execute()
         flash('ขอบคุณสำหรับข้อเสนอแนะ', 'success'); return redirect(url_for('dashboard'))
     except: return redirect(url_for('feedback_page'))
 
@@ -1090,42 +1014,43 @@ def offline():
     return '', 204
     
 # ==========================================
-# [NEW] My Favorites System Logic
+# [NEW] My Favorites System Logic (Supabase)
 # ==========================================
 def get_user_favorite_ids(username):
-    if favorites_sheet is None: return []
     try:
-        all_favs = favorites_sheet.get_all_records()
-        return [row['LinkID'] for row in all_favs if row['Username'] == username]
+        res = supabase.table('UserFavorites').select('LinkID').eq('Username', username).execute()
+        return [row['LinkID'] for row in res.data]
     except: return []
 
 @app.route('/toggle_favorite', methods=['POST'])
 def toggle_favorite():
     if not session.get('logged_in'): return jsonify({'status': 'error', 'message': 'Please login first'}), 401
-    if favorites_sheet is None: return jsonify({'status': 'error', 'message': 'Database not connected'}), 500
     try:
         data = request.get_json()
         link_id = data.get('link_id')
         username = session.get('username')
         
-        all_records = favorites_sheet.get_all_values() 
-        found_row_index = -1
+        # ค้นหาว่ามี Fav นี้ในฐานข้อมูลหรือไม่
+        res = supabase.table('UserFavorites').select('*').eq('Username', username).eq('LinkID', link_id).execute()
         
-        for i, row in enumerate(all_records):
-            if i == 0: continue
-            if len(row) > 2 and row[1] == username and row[2] == link_id:
-                found_row_index = i + 1
-                break
-        
-        if found_row_index != -1:
-            favorites_sheet.delete_rows(found_row_index)
+        if len(res.data) > 0:
+            # เจอ -> ลบออก (Unfavorite)
+            supabase.table('UserFavorites').delete().eq('Username', username).eq('LinkID', link_id).execute()
             action = 'removed'
         else:
-            favorites_sheet.append_row([get_current_timestamp(), username, link_id], value_input_option='USER_ENTERED')
+            # ไม่เจอ -> เพิ่มใหม่ (Favorite)
+            new_fav = {
+                "Timestamp": get_current_timestamp(),
+                "Username": username,
+                "LinkID": link_id
+            }
+            supabase.table('UserFavorites').insert(new_fav).execute()
             action = 'added'
             
         return jsonify({'status': 'success', 'action': action})
-    except Exception as e: return jsonify({'status': 'error', 'message': str(e)}), 500
+    except Exception as e: 
+        print(f"Fav Error: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
         
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
