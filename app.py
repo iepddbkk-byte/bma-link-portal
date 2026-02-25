@@ -41,7 +41,7 @@ s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 # --- 3. ตั้งค่าการเชื่อมต่อ SUPABASE ---
 # ⚠️ เปลี่ยน URL ตรงนี้ให้เป็น URL โปรเจกต์ของคุณ (ดูใน Supabase -> Project Settings -> API)
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_PUBLISHABLE_KEY")
+SUPABASE_KEY = os.environ.get("SUPABASE_SECRET_KEY")
 
 try:
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
