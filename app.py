@@ -731,8 +731,14 @@ def edit_link_page(link_id):
 def update_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        res = supabase.table('Links').select('CreatorUsername', 'ส่วนราชการ', 'EditCount', 'ปักหมุด', 'วันที่สิ้นสุด').eq('ID', link_id).execute()
-        if not res.data: return redirect(url_for('dashboard'))
+        # 1. ตัดช่องว่างที่อาจติดมากับ ID เพื่อให้ค้นหาเจอแน่นอน
+        safe_link_id = link_id.strip()
+        
+        res = supabase.table('Links').select('CreatorUsername', 'ส่วนราชการ', 'EditCount', 'ปักหมุด', 'วันที่สิ้นสุด').eq('ID', safe_link_id).execute()
+        if not res.data: 
+            flash('ไม่พบข้อมูลลิงก์ที่ต้องการแก้ไขในระบบ', 'error')
+            return redirect(url_for('dashboard'))
+            
         row_vals = res.data[0]
         
         creator = row_vals.get('CreatorUsername', '').strip()
@@ -748,15 +754,17 @@ def update_link_action(link_id):
         elif creator == username: can_edit = True
 
         if not can_edit:
-             flash('ไม่มีสิทธิ์', 'error')
+             flash('คุณไม่มีสิทธิ์แก้ไขลิงก์นี้', 'error')
              return redirect(url_for('dashboard'))
 
-        data = {k: request.form.get(k) for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด', 'ความเป็นส่วนตัว']}
-        if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
+        data = {k: request.form.get(k, '') for k in ['ประเภท', 'หน่วยงาน', 'อีเมลผู้รับผิดชอบ', 'เบอร์โทรติดต่อ', 'ชื่อลิงก์', 'URL', 'สถานะ', 'รายละเอียด', 'ความเป็นส่วนตัว']}
+        
+        if data['เบอร์โทรติดต่อ'] and not data['เบอร์โทรติดต่อ'].startswith("'"): 
+            data['เบอร์โทรติดต่อ'] = "'" + data['เบอร์โทรติดต่อ']
         
         main_agency = request.form.get('ส่วนราชการ') if user_role == 'Super Admin' else link_bureau
         
-        try: current_edits = int(row_vals.get('EditCount', 0))
+        try: current_edits = int(row_vals.get('EditCount') or 0)
         except: current_edits = 0
         new_edit_count = current_edits + 1
 
@@ -770,6 +778,10 @@ def update_link_action(link_id):
             is_pinned = current_pinned
             end_date = current_end_date
 
+        # 🚨 [จุดแก้ไขสำคัญ] แปลงค่าว่างของวันที่ให้เป็น None (NULL) เพื่อป้องกัน Supabase Error
+        if not end_date or end_date.strip() == '':
+            end_date = None
+
         update_data = {
             "ประเภท": data['ประเภท'], "หน่วยงาน": data['หน่วยงาน'], "ส่วนราชการ": main_agency, 
             "อีเมลผู้รับผิดชอบ": data['อีเมลผู้รับผิดชอบ'], "เบอร์โทรติดต่อ": data['เบอร์โทรติดต่อ'], 
@@ -779,11 +791,17 @@ def update_link_action(link_id):
             "EditCount": new_edit_count, "ปักหมุด": is_pinned, "วันที่สิ้นสุด": end_date 
         }
         
-        supabase.table('Links').update(update_data).eq('ID', link_id).execute()
+        supabase.table('Links').update(update_data).eq('ID', safe_link_id).execute()
+        
         clear_db_cache()
-        flash(f'แก้ไขสำเร็จ (แก้ไขไปแล้ว {new_edit_count} ครั้ง)', 'success')
+        flash(f'แก้ไขสำเร็จ (อัปเดตข้อมูลไปแล้ว {new_edit_count} ครั้ง)', 'success')
         return redirect(url_for('dashboard')) 
-    except Exception as e: return redirect(url_for('dashboard'))
+        
+    except Exception as e: 
+        # 🚨 [จุดแก้ไขสำคัญ] ให้ระบบแสดง Error ออกมาทางหน้าจอ แทนที่จะแอบเด้งกลับไปเงียบๆ
+        print(f"Update Error: {e}")
+        flash(f'เกิดข้อผิดพลาดในการบันทึก: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
         
 @app.route('/analytics')
 def analytics_page():
