@@ -475,19 +475,21 @@ def register_action():
         main_agency = request.form.get('main_agency') 
 
         # เช็คชื่อซ้ำ
-        res_user = supabase.table('StaffList').select('Username').ilike('Username', username).execute()
+        res_user = supabase.table('StaffList').select('Username').eq('Username', username).execute()
         if len(res_user.data) > 0:
-            flash('Username ซ้ำ', 'error'); return redirect(url_for('register_page'))
+            flash('Username ซ้ำ', 'error')
+            return redirect(url_for('register_page'))
         
         # เช็ครหัส Invite
         res_code = supabase.table('InviteCodes').select('*').eq('Code', invite_code).execute()
         if not res_code.data or res_code.data[0].get('Status') != 'Available':
-            flash('รหัสเชิญไม่ถูกต้องหรือถูกใช้งานไปแล้ว', 'error'); return redirect(url_for('register_page'))
+            flash('รหัสเชิญไม่ถูกต้องหรือถูกใช้งานไปแล้ว', 'error')
+            return redirect(url_for('register_page'))
 
         hashed_password = generate_password_hash(password)
         current_time = get_current_timestamp()
         
-        # บันทึก User
+        # ข้อมูลที่จะบันทึก (มี CreatedAt และ UpdatedAt ตาม Database ของคุณ)
         new_user = {
             "Username": username, "PasswordHash": hashed_password, "Level": "Users",
             "ชื่อ": fullname, "ตำแหน่ง": position, "หน่วยงาน": division, 
@@ -506,8 +508,9 @@ def register_action():
         flash('สมัครสมาชิกสำเร็จ!', 'success')
         return redirect(url_for('login_page')) 
     except Exception as e:
-        print(e)
-        flash('เกิดข้อผิดพลาดในการสมัครสมาชิก', 'error')
+        print(f"Register Error: {e}")
+        # 🚨 ให้ระบบโชว์ Error จริงออกหน้าจอ
+        flash(f'เกิดข้อผิดพลาดจากฐานข้อมูล: {str(e)}', 'error')
         return redirect(url_for('register_page'))
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
@@ -596,7 +599,10 @@ def edit_profile_action():
         session['division'] = division
         flash('บันทึกเรียบร้อย', 'success')
         return redirect(url_for('profile_page'))
-    except Exception as e: return redirect(url_for('edit_profile_page'))
+    except Exception as e: 
+        print(f"Edit Profile Error: {e}")
+        flash(f'เกิดข้อผิดพลาด: {str(e)}', 'error')
+        return redirect(url_for('edit_profile_page'))
 
 # --- 9. Routes (Dashboard & Links Management) ---
 @app.route('/dashboard')
