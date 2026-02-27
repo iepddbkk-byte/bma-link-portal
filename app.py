@@ -669,11 +669,13 @@ def add_link_action():
 def delete_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        res = supabase.table('Links').select('CreatorUsername', 'ส่วนราชการ').eq('ID', link_id).execute()
+        # 🚨 [แก้ปัญหา Error] เปลี่ยนจากการระบุชื่อคอลัมน์ภาษาไทย เป็น '*'
+        res = supabase.table('Links').select('*').eq('ID', link_id).execute()
         if not res.data: return redirect(url_for('dashboard'))
         
-        creator = res.data[0].get('CreatorUsername', '').strip()
-        link_bureau = res.data[0].get('ส่วนราชการ', '').strip()
+        row_vals = res.data[0]
+        creator = row_vals.get('CreatorUsername', '').strip()
+        link_bureau = row_vals.get('ส่วนราชการ', '').strip()
         
         user_role = session.get('level', '').strip()
         username = session.get('username', '').strip()
@@ -692,7 +694,9 @@ def delete_link_action(link_id):
             flash('ไม่มีสิทธิ์', 'error')
             
         return redirect(url_for('dashboard'))
-    except: return redirect(url_for('dashboard'))
+    except Exception as e: 
+        print(f"Delete Error: {e}")
+        return redirect(url_for('dashboard'))
 
 @app.route('/edit/<link_id>')
 def edit_link_page(link_id):
@@ -727,14 +731,17 @@ def edit_link_page(link_id):
         return render_template('edit_link.html', session=session, link=link, locked_agency=link.get('ส่วนราชการ', 'N/A'), is_super_admin=is_super_admin, can_pin=can_pin)
     except Exception as e: return redirect(url_for('dashboard'))
 
+# =======================================================
+# สิทธิ์การบันทึกแก้ไขลิงก์ (รองรับ 3 Role)
+# =======================================================
 @app.route('/update_action/<link_id>', methods=['POST'])
 def update_link_action(link_id):
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     try:
-        # 1. ตัดช่องว่างที่อาจติดมากับ ID เพื่อให้ค้นหาเจอแน่นอน
         safe_link_id = link_id.strip()
         
-        res = supabase.table('Links').select('CreatorUsername', 'ส่วนราชการ', 'EditCount', 'ปักหมุด', 'วันที่สิ้นสุด').eq('ID', safe_link_id).execute()
+        # 🚨 [แก้ปัญหา Error] เปลี่ยนจากการระบุชื่อคอลัมน์ภาษาไทย เป็น '*'
+        res = supabase.table('Links').select('*').eq('ID', safe_link_id).execute()
         if not res.data: 
             flash('ไม่พบข้อมูลลิงก์ที่ต้องการแก้ไขในระบบ', 'error')
             return redirect(url_for('dashboard'))
@@ -778,7 +785,6 @@ def update_link_action(link_id):
             is_pinned = current_pinned
             end_date = current_end_date
 
-        # 🚨 [จุดแก้ไขสำคัญ] แปลงค่าว่างของวันที่ให้เป็น None (NULL) เพื่อป้องกัน Supabase Error
         if not end_date or end_date.strip() == '':
             end_date = None
 
@@ -798,7 +804,6 @@ def update_link_action(link_id):
         return redirect(url_for('dashboard')) 
         
     except Exception as e: 
-        # 🚨 [จุดแก้ไขสำคัญ] ให้ระบบแสดง Error ออกมาทางหน้าจอ แทนที่จะแอบเด้งกลับไปเงียบๆ
         print(f"Update Error: {e}")
         flash(f'เกิดข้อผิดพลาดในการบันทึก: {str(e)}', 'error')
         return redirect(url_for('dashboard'))
