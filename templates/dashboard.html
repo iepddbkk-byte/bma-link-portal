@@ -548,14 +548,22 @@
             }
 
             /* TD 5: Countdown — meta */
+
             tbody td:nth-child(5) {
                 display: flex !important; align-items: center; gap: 7px;
                 padding: 8px 16px !important; font-size: 0.82rem;
-                border-bottom: 1px solid #f1f5f9 !important; order: 4;
+                border-bottom: 1px solid #f8fafc !important; order: 4;
             }
             tbody td:nth-child(5)::before {
                 content: "\f017"; font-family: "Font Awesome 6 Free"; font-weight: 900;
                 color: #f59e0b; font-size: 0.75rem; flex-shrink: 0;
+            }
+			
+			/* TD 12: ผู้สร้างลิงก์ — meta */
+            tbody td:nth-child(12) {
+                display: flex !important; align-items: center; gap: 7px;
+                padding: 4px 16px 12px !important; font-size: 0.84rem;
+                border-bottom: 1px solid #f1f5f9 !important; order: 5;
             }
 
             /* Share desktop */
@@ -727,14 +735,27 @@
                                         <i class="fas fa-star"></i>
                                     </button>
                                 {% else %}
-                                    <span style="color:#e2e8f0;"><i class="fas fa-star"></i></span>
+                                    <span style="color:#e2e8f0; display:flex; align-items:center; justify-content:center; width:32px; height:32px; margin:0 auto;"><i class="fas fa-star"></i></span>
                                 {% endif %}
-                                <button type="button" class="btn-share-tbl btn-share-mobile"
-                                        style="display:none;"
-                                        onclick="showShareModal('{{ link['ชื่อลิงก์'] }}','{{ link['URL'] }}','{{ link['ID'] }}')"
-                                        title="แชร์">
-                                    <i class="fas fa-share-alt"></i>
-                                </button>
+                                
+                                <div class="mobile-action-group" style="display:none; gap:8px; align-items:center;">
+                                    {% if session.level == 'Super Admin' or (session.level == 'Admin' and link['ส่วนราชการ'] == session.main_agency) or (link['CreatorUsername'] == session.username) %}
+                                        <a href="{{ url_for('edit_link_page', link_id=link['ID']) }}" class="btn-icon btn-edit" style="width:30px; height:30px; font-size:0.8rem;" title="แก้ไข">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <form action="{{ url_for('delete_link_action', link_id=link['ID']) }}" method="POST" class="delete-form" style="margin:0;">
+                                            <button type="submit" class="btn-icon btn-delete" style="width:30px; height:30px; font-size:0.8rem;" title="ลบ">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    
+                                    <button type="button" class="btn-share-tbl btn-share-mobile"
+                                            onclick="showShareModal('{{ link['ชื่อลิงก์'] }}','{{ link['URL'] }}','{{ link['ID'] }}')"
+                                            title="แชร์">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                </div>
                             </td>
 
                             <td data-value="{{ link['ชื่อลิงก์'] }}">
@@ -908,6 +929,8 @@
         const isMobile = window.innerWidth <= 768;
         document.querySelectorAll('.btn-share-mobile').forEach(b => b.style.display = isMobile ? 'flex' : 'none');
         document.querySelectorAll('.btn-share-desktop').forEach(b => b.style.display = isMobile ? 'none' : 'flex');
+		document.querySelectorAll('.mobile-action-group').forEach(b => b.style.display = isMobile ? 'flex' : 'none');
+    }
     }
     window.addEventListener('resize', applyMobileLayout);
 
