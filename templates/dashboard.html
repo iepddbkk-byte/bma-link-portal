@@ -358,6 +358,7 @@
            ACTION BUTTONS
         ========================================== */
         .action-buttons { display: flex; gap: 6px; justify-content: center; align-items: center; }
+		.mobile-actions { display: none; } /* ซ่อนกลุ่มปุ่มมือถือในหน้าจอคอม */
 
         .btn-icon {
             width: 28px; height: 28px; border-radius: var(--radius-sm);
@@ -566,9 +567,25 @@
                 border-bottom: 1px solid #f1f5f9 !important; order: 5;
             }
 
-            /* Share desktop */
-            .btn-share-mobile { display: flex !important; margin: 0; }
+            /* ============================== */
+            /* จัดการปุ่ม Action และผู้สร้าง (Mobile) */
+            /* ============================== */
+            .btn-share-mobile { display: none !important; } 
             .btn-share-desktop { display: none !important; }
+            
+            .mobile-actions {
+                display: flex !important;
+                gap: 8px;
+                align-items: center;
+            }
+
+            /* TD 12: แสดงชื่อผู้สร้างลิงก์ */
+            tbody td:nth-child(12) {
+                display: flex !important; align-items: center; gap: 7px;
+                padding: 4px 16px 12px !important; font-size: 0.84rem;
+                border-bottom: 1px solid #f1f5f9 !important; order: 5;
+            }
+			
 
             #noDataRow {
                 display: flex !important;
@@ -738,7 +755,7 @@
                                     <span style="color:#e2e8f0; display:flex; align-items:center; justify-content:center; width:32px; height:32px; margin:0 auto;"><i class="fas fa-star"></i></span>
                                 {% endif %}
                                 
-                                <div class="mobile-action-group" style="display:none; gap:8px; align-items:center;">
+                                <div class="mobile-actions">
                                     {% if session.level == 'Super Admin' or (session.level == 'Admin' and link['ส่วนราชการ'] == session.main_agency) or (link['CreatorUsername'] == session.username) %}
                                         <a href="{{ url_for('edit_link_page', link_id=link['ID']) }}" class="btn-icon btn-edit" style="width:30px; height:30px; font-size:0.8rem;" title="แก้ไข">
                                             <i class="fas fa-pen"></i>
@@ -749,10 +766,9 @@
                                             </button>
                                         </form>
                                     {% endif %}
-                                    
-                                    <button type="button" class="btn-share-tbl btn-share-mobile"
+                                    <button type="button" class="btn-share-tbl"
                                             onclick="showShareModal('{{ link['ชื่อลิงก์'] }}','{{ link['URL'] }}','{{ link['ID'] }}')"
-                                            title="แชร์">
+                                            style="margin:0; width:30px; height:30px; font-size:0.8rem; background:#0891b2;" title="แชร์">
                                         <i class="fas fa-share-alt"></i>
                                     </button>
                                 </div>
