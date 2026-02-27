@@ -121,7 +121,7 @@
            PAGE CONTAINER
         ========================================== */
         .container {
-            max-width: 1600px; /* Adjusted to match links_page for wider table */
+            max-width: 1600px;
             margin: 28px auto;
             padding: 0 24px;
             animation: fadeInUp 0.4s ease;
@@ -242,7 +242,6 @@
             box-shadow: var(--shadow-sm);
         }
         .table-responsive {
-            /* Desktop: vertical scroll only, no horizontal scroll */
             overflow-x: hidden; 
             overflow-y: auto; 
             max-height: 62vh;
@@ -255,28 +254,25 @@
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            table-layout: fixed; /* Fixed layout implementation */
+            table-layout: fixed; 
             background: #fff; 
         }
 
-        /* ── Column width distribution (total = 100%) ─────────────────────
-           Dashboard has 15 columns (added 'Manage' column)
-        ──────────────────────────────────────────────────────────────────── */
-        thead th:nth-child(1)  { width: 36px; } /* Star */
-        thead th:nth-child(2)  { width: 12%; }  /* ชื่อลิงก์ */
-        thead th:nth-child(3)  { width: 10%; }  /* รายละเอียด */
-        thead th:nth-child(4)  { width: 6%; }   /* ระดับ */
-        thead th:nth-child(5)  { width: 8%; }   /* กำหนดส่ง */
-        thead th:nth-child(6)  { width: 6%; }   /* การตรวจ */
-        thead th:nth-child(7)  { width: 6%; }   /* สถานะ */
-        thead th:nth-child(8)  { width: 6%; }   /* ประเภท */
-        thead th:nth-child(9)  { width: 8%; }   /* หน่วยงาน */
-        thead th:nth-child(10) { width: 8%; }   /* ส่วนราชการ */
-        thead th:nth-child(11) { width: 7%; }   /* เบอร์ติดต่อ */
-        thead th:nth-child(12) { width: 7%; }   /* ผู้สร้าง */
-        thead th:nth-child(13) { width: 7%; }   /* วันที่อัปเดต */
-        thead th:nth-child(14) { width: 46px; } /* แชร์ */
-        thead th:nth-child(15) { width: 75px; } /* จัดการ */
+        thead th:nth-child(1)  { width: 36px; } 
+        thead th:nth-child(2)  { width: 12%; }  
+        thead th:nth-child(3)  { width: 10%; }  
+        thead th:nth-child(4)  { width: 6%; }   
+        thead th:nth-child(5)  { width: 8%; }   
+        thead th:nth-child(6)  { width: 6%; }   
+        thead th:nth-child(7)  { width: 6%; }   
+        thead th:nth-child(8)  { width: 6%; }   
+        thead th:nth-child(9)  { width: 8%; }   
+        thead th:nth-child(10) { width: 8%; }   
+        thead th:nth-child(11) { width: 7%; }   
+        thead th:nth-child(12) { width: 7%; }   
+        thead th:nth-child(13) { width: 7%; }   
+        thead th:nth-child(14) { width: 46px; } 
+        thead th:nth-child(15) { width: 75px; } 
 
         thead th {
             background: var(--bma-green); color: #fff;
@@ -297,9 +293,9 @@
         tbody td {
             padding: 10px 8px; 
             border-bottom: 1px solid #f1f5f9;
-            vertical-align: top; /* Changed to TOP alignment */
+            vertical-align: top;
             color: #475569; font-size: 0.84rem;
-            word-break: break-word; /* Wrap text neatly */
+            word-break: break-word; 
             overflow-wrap: break-word;
         }
         tbody tr:last-child td { border-bottom: none; }
@@ -321,7 +317,7 @@
             width: 32px; height: 32px;
             display: flex; align-items: center; justify-content: center;
             border-radius: 50%;
-            margin: 0 auto; /* Center alignment */
+            margin: 0 auto;
         }
         .btn-fav:hover { transform: scale(1.2); background: #fef9c3; }
         .btn-fav.active { color: #f59e0b; }
@@ -358,7 +354,7 @@
            ACTION BUTTONS
         ========================================== */
         .action-buttons { display: flex; gap: 6px; justify-content: center; align-items: center; }
-		.mobile-actions { display: none; } /* ซ่อนกลุ่มปุ่มมือถือในหน้าจอคอม */
+        .mobile-actions { display: none; } /* ซ่อนกลุ่มปุ่มมือถือในหน้าจอคอม */
 
         .btn-icon {
             width: 28px; height: 28px; border-radius: var(--radius-sm);
@@ -559,13 +555,6 @@
                 content: "\f017"; font-family: "Font Awesome 6 Free"; font-weight: 900;
                 color: #f59e0b; font-size: 0.75rem; flex-shrink: 0;
             }
-			
-			/* TD 12: ผู้สร้างลิงก์ — meta */
-            tbody td:nth-child(12) {
-                display: flex !important; align-items: center; gap: 7px;
-                padding: 4px 16px 12px !important; font-size: 0.84rem;
-                border-bottom: 1px solid #f1f5f9 !important; order: 5;
-            }
 
             /* ============================== */
             /* จัดการปุ่ม Action และผู้สร้าง (Mobile) */
@@ -586,7 +575,6 @@
                 border-bottom: 1px solid #f1f5f9 !important; order: 5;
             }
 			
-
             #noDataRow {
                 display: flex !important;
                 background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
@@ -604,21 +592,12 @@
            DESKTOP: Alignments 
         ========================================== */
         @media (min-width: 769px) {
-            /* Center-align specific columns for better look */
-            tbody td:nth-child(1),
-            tbody td:nth-child(4),
-            tbody td:nth-child(5),
-            tbody td:nth-child(6),
-            tbody td:nth-child(7),
-            tbody td:nth-child(14),
+            tbody td:nth-child(1), tbody td:nth-child(4), tbody td:nth-child(5),
+            tbody td:nth-child(6), tbody td:nth-child(7), tbody td:nth-child(14),
             tbody td:nth-child(15) { text-align: center; }
             
-            thead th:nth-child(1),
-            thead th:nth-child(4),
-            thead th:nth-child(5),
-            thead th:nth-child(6),
-            thead th:nth-child(7),
-            thead th:nth-child(14),
+            thead th:nth-child(1), thead th:nth-child(4), thead th:nth-child(5),
+            thead th:nth-child(6), thead th:nth-child(7), thead th:nth-child(14),
             thead th:nth-child(15) { text-align: center; }
         }
 
@@ -723,18 +702,18 @@
                     <thead>
                         <tr>
                             <th>⭐</th>
-							<th onclick="sortTable(1)">🔗 ชื่อลิงก์ <span id="sort-1" class="sort-icon">↕</span></th>
-							<th>📄 รายละเอียด</th>
-							<th>ระดับ</th>
-							<th>⏳ กำหนดส่ง</th>
-							<th onclick="sortTable(5)">🚦 การตรวจ <span id="sort-5" class="sort-icon">↕</span></th>
-							<th onclick="sortTable(6)">📊 สถานะ <span id="sort-6" class="sort-icon">↕</span></th>
-							<th onclick="sortTable(7)">📂 ประเภท <span id="sort-7" class="sort-icon">↕</span></th>
-							<th onclick="sortTable(8)">🏢 หน่วยงาน <span id="sort-8" class="sort-icon">↕</span></th>
-							<th onclick="sortTable(9)">🏛️ ส่วนราชการ <span id="sort-9" class="sort-icon">↕</span></th>
-							<th>📞 เบอร์ติดต่อ</th>
-							<th onclick="sortTable(11)">👤 ผู้สร้าง <span id="sort-11" class="sort-icon">↕</span></th>
-							<th onclick="sortTable(12, 'date')">🗓️ วันที่อัปเดต <span id="sort-12" class="sort-icon">↕</span></th>
+                            <th onclick="sortTable(1)">🔗 ชื่อลิงก์ <span id="sort-1" class="sort-icon">↕</span></th>
+                            <th>📄 รายละเอียด</th>
+                            <th>ระดับ</th>
+                            <th>⏳ กำหนดส่ง</th>
+                            <th onclick="sortTable(5)">🚦 การตรวจ <span id="sort-5" class="sort-icon">↕</span></th>
+                            <th onclick="sortTable(6)">📊 สถานะ <span id="sort-6" class="sort-icon">↕</span></th>
+                            <th onclick="sortTable(7)">📂 ประเภท <span id="sort-7" class="sort-icon">↕</span></th>
+                            <th onclick="sortTable(8)">🏢 หน่วยงาน <span id="sort-8" class="sort-icon">↕</span></th>
+                            <th onclick="sortTable(9)">🏛️ ส่วนราชการ <span id="sort-9" class="sort-icon">↕</span></th>
+                            <th>📞 เบอร์ติดต่อ</th>
+                            <th onclick="sortTable(11)">👤 ผู้สร้าง <span id="sort-11" class="sort-icon">↕</span></th>
+                            <th onclick="sortTable(12, 'date')">🗓️ วันที่อัปเดต <span id="sort-12" class="sort-icon">↕</span></th>
                             <th>แชร์</th>
                             <th>จัดการ</th>
                         </tr>
@@ -912,7 +891,10 @@
                 <button class="page-btn" id="btnLast">»</button>
             </div>
         </div>
-    </div></div><footer class="main-footer">
+    </div>
+</div>
+
+<footer class="main-footer">
     <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
     <p>สำนักยุทธศาสตร์และประเมินผล</p>
     <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
@@ -945,8 +927,6 @@
         const isMobile = window.innerWidth <= 768;
         document.querySelectorAll('.btn-share-mobile').forEach(b => b.style.display = isMobile ? 'flex' : 'none');
         document.querySelectorAll('.btn-share-desktop').forEach(b => b.style.display = isMobile ? 'none' : 'flex');
-		document.querySelectorAll('.mobile-action-group').forEach(b => b.style.display = isMobile ? 'flex' : 'none');
-    }
     }
     window.addEventListener('resize', applyMobileLayout);
 
@@ -998,7 +978,7 @@
     }
 
     // ──────────────────────────────────────────
-    //  Display Page — pinned rows always first
+    //  Display Page — Fixed Mobile Filter
     // ──────────────────────────────────────────
     function displayPage(page) {
         const textFilter = document.getElementById("searchInput").value.toLowerCase().trim();
@@ -1006,11 +986,18 @@
         const itemsPer   = parseInt(document.getElementById("itemsPerPage").value);
 
         const filteredRows = allTableRows.filter(row => {
-            const text   = row.innerText.toLowerCase();
-            // TD index 9 = ส่วนราชการ (0-indexed)
-            const bureau = (row.children[9]?.innerText || '').trim();
-            return (!textFilter || text.includes(textFilter)) &&
-                   (!selAgency || bureau === selAgency);
+            // ใช้ textContent แทน innerText เพื่อให้อ่านค่าที่ซ่อนอยู่ในมือถือได้
+            const text   = row.textContent.toLowerCase();
+            
+            // ใช้ textContent ดึงชื่อกองและสำนัก (Index 8 = กลุ่มงาน/ฝ่าย, 9 = ส่วนราชการ)
+            const division = (row.children[8]?.textContent || '').trim();
+            const bureau   = (row.children[9]?.textContent || '').trim();
+            
+            // กรองหาคำค้นหา (textFilter) และ กรองหน่วยงาน (matchAgency)
+            const matchText   = !textFilter || text.includes(textFilter);
+            const matchAgency = !selAgency || division === selAgency || bureau === selAgency;
+            
+            return matchText && matchAgency;
         });
 
         // Separate pinned vs normal, then concat so pinned is always first
@@ -1049,7 +1036,7 @@
     // ──────────────────────────────────────────
     //  Toggle Favorite
     // ──────────────────────────────────────────
-        function toggleFav(btn, linkId) {
+    function toggleFav(btn, linkId) {
         const isActive = btn.classList.contains('active');
         isActive ? btn.classList.remove('active') : btn.classList.add('active');
         if (!isActive) {
@@ -1200,7 +1187,6 @@
         mobileSort.addEventListener('change', function () {
             if (!this.value) return;
             const [col, dir] = this.value.split('_');
-            // Index 12 is updated date
             sortTable(parseInt(col), col === '12' ? 'date' : 'text', dir);
         });
 
@@ -1208,7 +1194,7 @@
         setInterval(updateCountdowns, 60000);
 
         applyMobileLayout();
-        displayPage(1); // pinned rows will float to top on initial load
+        displayPage(1); 
     });
 </script>
 
@@ -1226,7 +1212,7 @@
         .catch(() => { const el = document.getElementById('onlineCount'); if (el) el.textContent = '-'; });
     }
     updateOnlineCount();
-    setInterval(updateOnlineCount, 10000);
+    setInterval(updateOnlineCount, 60000); // 🚨 อัปเดตลดการกินโควต้า Vercel เป็น 1 นาที
     window.addEventListener('beforeunload', () => {
         const fd = new FormData();
         fd.append('csrf_token', "{{ csrf_token() if csrf_token is defined else '' }}");
