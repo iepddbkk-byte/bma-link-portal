@@ -139,7 +139,7 @@
            PAGE CONTAINER
         ========================================== */
         .container {
-            max-width: 1400px;
+            max-width: 1600px; /* Adjusted to fit the fixed table layout perfectly */
             margin: 28px auto;
             padding: 28px 32px;
             background: var(--bg-card);
@@ -224,7 +224,7 @@
         }
 
         /* ==========================================
-           TABLE (DESKTOP)
+           TABLE (DESKTOP) - FIXED LAYOUT
         ========================================== */
         .table-wrapper {
             border-radius: var(--radius-lg);
@@ -233,21 +233,49 @@
             box-shadow: var(--shadow-sm);
         }
         .table-responsive {
-            overflow-x: auto; overflow-y: auto; max-height: 62vh;
+            /* Desktop: vertical scroll only, no horizontal scroll */
+            overflow-x: hidden; 
+            overflow-y: auto; 
+            max-height: 62vh;
         }
         .table-responsive::-webkit-scrollbar { height: 6px; width: 6px; }
         .table-responsive::-webkit-scrollbar-track { background: #f1f5f9; }
         .table-responsive::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         .table-responsive::-webkit-scrollbar-thumb:hover { background: var(--fav-gold); }
 
-        table { width: 100%; border-collapse: collapse; min-width: 900px; background: #fff; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            table-layout: fixed; /* Fixed layout implementation */
+            background: #fff; 
+        }
+
+        /* ── Column width distribution (total = 100%) ─────────────────────
+           Total 12 columns
+        ──────────────────────────────────────────────────────────────────── */
+        thead th:nth-child(1)  { width: 36px; }  /* Star */
+        thead th:nth-child(2)  { width: 15%; }   /* ชื่อลิงก์ */
+        thead th:nth-child(3)  { width: 15%; }   /* รายละเอียด */
+        thead th:nth-child(4)  { width: 7%; }    /* ระดับ */
+        thead th:nth-child(5)  { width: 7%; }    /* สถานะ */
+        thead th:nth-child(6)  { width: 8%; }    /* ประเภท */
+        thead th:nth-child(7)  { width: 10%; }   /* หน่วยงาน */
+        thead th:nth-child(8)  { width: 10%; }   /* ส่วนราชการ */
+        thead th:nth-child(9)  { width: 9%; }    /* เบอร์ติดต่อ */
+        thead th:nth-child(10) { width: 9%; }    /* ผู้สร้าง */
+        thead th:nth-child(11) { width: 10%; }   /* วันที่อัปเดต */
+        thead th:nth-child(12) { width: 46px; }  /* แชร์ */
 
         thead th {
             background: var(--fav-gold);
             color: #1a1a1a;
-            padding: 13px 14px; font-weight: 600;
-            font-size: 0.88rem; text-align: left;
+            padding: 10px 8px; /* Adjusted padding to match density */
+            font-weight: 600;
+            font-size: 0.88rem; 
+            text-align: left;
             white-space: nowrap;
+            overflow: hidden; 
+            text-overflow: ellipsis;
             position: sticky; top: 0; z-index: 10;
             cursor: pointer; user-select: none;
             transition: background var(--transition);
@@ -260,10 +288,13 @@
         .sort-active { opacity: 1; color: #7c3aed; }
 
         tbody td {
-            padding: 13px 14px;
+            padding: 10px 8px; /* Adjusted padding to match density */
             border-bottom: 1px solid #f1f5f9;
-            vertical-align: middle;
-            color: #475569; font-size: 0.9rem;
+            vertical-align: top; /* Text aligned to top */
+            color: #475569; 
+            font-size: 0.84rem;
+            word-break: break-word; /* Wrap text neatly */
+            overflow-wrap: break-word;
         }
         tbody tr:last-child td { border-bottom: none; }
         tbody tr { transition: background var(--transition); }
@@ -276,9 +307,9 @@
            BADGES
         ========================================== */
         .badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 10px; border-radius: var(--radius-full);
-            font-size: 0.8rem; font-weight: 500; white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 8px; border-radius: var(--radius-full);
+            font-size: 0.75rem; font-weight: 500; white-space: nowrap;
         }
         .badge-ok { background: #dcfce7; color: #166534; }
         .badge-pending { background: #fef3c7; color: #92400e; }
@@ -293,10 +324,11 @@
            BUTTONS
         ========================================== */
         .btn-share {
-            width: 34px; height: 34px; border-radius: 50%;
+            width: 30px; height: 30px; border-radius: 50%;
             background: #0891b2; color: #fff; border: none;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all var(--transition); font-size: 0.85rem;
+            transition: all var(--transition); font-size: 0.8rem;
+            margin: 0 auto;
         }
         .btn-share:hover { background: #0e7490; transform: scale(1.1); box-shadow: 0 4px 12px rgba(8,145,178,0.3); }
 
@@ -307,6 +339,7 @@
             width: 32px; height: 32px;
             display: flex; align-items: center; justify-content: center;
             border-radius: 50%;
+            margin: 0 auto;
         }
         .btn-fav:hover { transform: scale(1.2); background: var(--fav-gold-light); }
         .btn-fav i { filter: drop-shadow(0 0 4px rgba(245,158,11,0.4)); }
@@ -429,8 +462,8 @@
                TABLE → CARD TRANSFORMATION (Favorites)
                ============================================= */
             .table-wrapper { border: none; box-shadow: none; background: transparent; }
-            .table-responsive { overflow: visible; max-height: none; }
-            table { display: block; min-width: unset; background: transparent; }
+            .table-responsive { overflow: visible; max-height: none; overflow-x: auto; overflow-y: auto; }
+            table { display: block; table-layout: auto; background: transparent; }
             thead { display: none; }
             tbody { display: flex; flex-direction: column; gap: 12px; }
 
@@ -447,7 +480,7 @@
             tbody tr:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); background: #fff; }
 
             /* Hide all cells by default */
-            tbody td { display: none !important; border: none; padding: 0; }
+            tbody td { display: none !important; border: none; padding: 0; text-align: left !important;}
 
             /* ── TD 2: Link name (card header) ── */
             tbody td:nth-child(2) {
@@ -539,7 +572,20 @@
             #noDataRow td { display: flex !important; width: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
         }
 
-        /* TABLET */
+        /* TABLET & DESKTOP ALIGNMENTS */
+        @media (min-width: 769px) {
+            .nav-link span { display: inline; }
+            /* Align center for icon/status columns */
+            tbody td:nth-child(1),
+            tbody td:nth-child(4),
+            tbody td:nth-child(5),
+            tbody td:nth-child(12) { text-align: center; }
+
+            thead th:nth-child(1),
+            thead th:nth-child(4),
+            thead th:nth-child(5),
+            thead th:nth-child(12) { text-align: center; }
+        }
         @media (max-width: 1024px) and (min-width: 769px) {
             .nav-link span { display: none; }
             .nav-link { padding: 9px; border-radius: 50%; width: 42px; height: 42px; justify-content: center; }
@@ -548,7 +594,6 @@
 </head>
 <body>
 
-<!-- ==================== HEADER ==================== -->
 <header class="main-header">
     <div class="header-left">
         <a href="{{ url_for('home') }}" class="logo-container">
@@ -562,7 +607,6 @@
         </div>
     </div>
 
-    <!-- Mobile Controls -->
     <div class="mobile-controls">
         {% if session.get('logged_in') %}
             <a href="{{ url_for('profile_page') }}" class="mobile-profile-btn">
@@ -574,7 +618,6 @@
         </div>
     </div>
 
-    <!-- Desktop Nav -->
     <nav class="nav-menu" id="navMenu">
         <a href="{{ url_for('home') }}" class="nav-link" title="หน้าหลัก">
             <i class="fas fa-home"></i> <span>หน้าหลัก</span>
@@ -615,7 +658,6 @@
     </nav>
 </header>
 
-<!-- ==================== MAIN CONTENT ==================== -->
 <div class="container">
 
     {% if error %}
@@ -624,7 +666,6 @@
     </div>
     {% endif %}
 
-    <!-- Page Title -->
     <div class="page-title">
         <div class="page-title-icon-wrap">
             <i class="fas fa-star"></i>
@@ -636,14 +677,12 @@
         </span>
     </div>
 
-    <!-- Search & Filter Bar -->
     <div class="search-filter-container">
         <div class="search-input-wrapper">
             <i class="fas fa-search search-icon-inner"></i>
             <input type="text" id="searchInput" placeholder="ค้นหาในรายการโปรด (ชื่อ, ประเภท, หน่วยงาน)...">
         </div>
 
-        <!-- Mobile Sort -->
         <div class="mobile-sort-wrapper">
             <select id="mobileSort" class="mobile-sort-select">
                 <option value="">↕️ เรียงลำดับ</option>
@@ -655,24 +694,23 @@
         </div>
     </div>
 
-    <!-- Table -->
     <div class="table-wrapper">
         <div class="table-responsive">
             <table id="linksTable">
                 <thead>
                     <tr>
-                        <th style="width:46px; text-align:center;">⭐</th>
+                        <th>⭐</th>
                         <th onclick="sortTable(1)">🔗 ชื่อลิงก์ <span id="sort-1" class="sort-icon">↕</span></th>
                         <th>📄 รายละเอียด</th>
-                        <th style="text-align:center; width:90px;">ระดับ</th>
-                        <th style="text-align:center;">🚦 สถานะ</th>
+                        <th>ระดับ</th>
+                        <th>🚦 สถานะ</th>
                         <th onclick="sortTable(5)">📂 ประเภท <span id="sort-5" class="sort-icon">↕</span></th>
                         <th onclick="sortTable(6)">🏢 หน่วยงาน <span id="sort-6" class="sort-icon">↕</span></th>
                         <th onclick="sortTable(7)">🏛️ ส่วนราชการ <span id="sort-7" class="sort-icon">↕</span></th>
                         <th>📞 เบอร์ติดต่อ</th>
                         <th onclick="sortTable(9)">👤 ผู้สร้าง <span id="sort-9" class="sort-icon">↕</span></th>
                         <th onclick="sortTable(10, 'date')">🗓️ วันที่อัปเดต <span id="sort-10" class="sort-icon">↕</span></th>
-                        <th style="text-align:center; width:60px;">📤 แชร์</th>
+                        <th>📤 แชร์</th>
                     </tr>
                 </thead>
                 <tbody id="favTableBody">
@@ -680,15 +718,12 @@
                     {% for link in links %}
                     <tr id="row-{{ link['ID'] }}">
 
-                        <!-- TD 1: Star / Actions (card footer on mobile) -->
-                        <td style="text-align:center;" class="td-star">
-                            <!-- Desktop: star unfav button -->
+                        <td class="td-star">
                             <button class="btn-fav"
                                     onclick="removeFav(this, '{{ link['ID'] }}')"
                                     title="ลบออกจากรายการโปรด">
                                 <i class="fas fa-star"></i>
                             </button>
-                            <!-- Mobile card footer actions (injected via JS) -->
                             <div class="mobile-card-actions" style="display:none;">
                                 <button type="button"
                                         class="btn-share"
@@ -704,22 +739,19 @@
                             </div>
                         </td>
 
-                        <!-- TD 2: Link Name -->
                         <td data-value="{{ link['ชื่อลิงก์'] }}">
                             <div style="display:flex; flex-direction:column; gap:5px; align-items:flex-start;">
                                 <a href="{{ link['URL'] }}" target="_blank" rel="noopener"
-                                   style="font-weight:600; color:var(--bma-green); display:flex; align-items:center; gap:6px;" class="card-link-name">
-                                    <i class="fas fa-external-link-alt" style="font-size:0.75em; flex-shrink:0;"></i>
-                                    {{ link['ชื่อลิงก์'] }}
+                                   style="font-weight:600; color:var(--bma-green); display:flex; align-items:flex-start; gap:6px; line-height:1.3;" class="card-link-name">
+                                    <i class="fas fa-external-link-alt" style="font-size:0.75em; flex-shrink:0; margin-top:3px;"></i>
+                                    <span>{{ link['ชื่อลิงก์'] }}</span>
                                 </a>
                             </div>
                         </td>
 
-                        <!-- TD 3: Description -->
-                        <td style="color:#64748b; font-size:0.88rem; max-width:200px;">{{ link['รายละเอียด'] }}</td>
+                        <td style="color:#64748b; line-height:1.4;">{{ link['รายละเอียด'] }}</td>
 
-                        <!-- TD 4: Privacy -->
-                        <td style="text-align:center;">
+                        <td>
                             {% set privacy = link.get('ความเป็นส่วนตัว', 'สาธารณะ') | trim %}
                             {% if privacy == 'ส่วนตัว' %}
                                 <span class="badge badge-private"><i class="fas fa-lock"></i> ส่วนตัว</span>
@@ -734,8 +766,7 @@
                             {% endif %}
                         </td>
 
-                        <!-- TD 5: Status -->
-                        <td style="text-align:center;">
+                        <td>
                             {% if link['สถานะ'] == 'ใช้งาน' %}
                                 <span class="badge badge-ok"><span style="font-size:0.7em;">●</span> ใช้งาน</span>
                             {% elif link['สถานะ'] == 'ปรับปรุง' %}
@@ -745,19 +776,14 @@
                             {% endif %}
                         </td>
 
-                        <!-- TD 6: Type -->
                         <td>{{ link['ประเภท'] }}</td>
 
-                        <!-- TD 7: Division -->
                         <td>{{ link['หน่วยงาน'] }}</td>
 
-                        <!-- TD 8: Bureau -->
                         <td>{{ link['ส่วนราชการ'] }}</td>
 
-                        <!-- TD 9: Phone -->
                         <td style="white-space:nowrap;">{{ link['เบอร์โทรติดต่อ'] | replace("'", "") }}</td>
 
-                        <!-- TD 10: Creator -->
                         <td>
                             {% if link['CreatorUsername'] %}
                                 <a href="{{ url_for('view_profile', username=link['CreatorUsername']) }}"
@@ -769,13 +795,11 @@
                             {% endif %}
                         </td>
 
-                        <!-- TD 11: Updated Date -->
-                        <td data-value="{{ link['วันที่อัปเดต_สั้น'] }}" style="white-space:nowrap; color:#64748b; font-size:0.87rem;">
+                        <td data-value="{{ link['วันที่อัปเดต_สั้น'] }}" style="color:#64748b;">
                             {{ link['วันที่อัปเดต_สั้น'] }}
                         </td>
 
-                        <!-- TD 12: Share -->
-                        <td style="text-align:center;">
+                        <td>
                             <button type="button"
                                     class="btn-share"
                                     onclick="showShareModal('{{ link['ชื่อลิงก์'] }}', '{{ link['URL'] }}', '{{ link['ID'] }}')"
@@ -801,7 +825,6 @@
         </div>
     </div>
 
-    <!-- Pagination -->
     <div class="pagination-controls">
         <div class="pagination-info">
             <span>แสดง:</span>
@@ -823,7 +846,6 @@
     </div>
 </div>
 
-<!-- ==================== FOOTER ==================== -->
 <footer class="main-footer">
     <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
     <p>สำนักยุทธศาสตร์และประเมินผล</p>
@@ -831,7 +853,6 @@
     <p style="margin-top:12px; font-size:0.82rem; opacity:0.7;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
 </footer>
 
-<!-- ==================== SCRIPTS ==================== -->
 <script>
     // ──────────────────────────────────────────
     //  Mobile Menu Toggle
@@ -1088,7 +1109,6 @@
     });
 </script>
 
-<!-- Flash Messages -->
 <script>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -1099,7 +1119,6 @@
     {% endwith %}
 </script>
 
-<!-- Tawk.to Live Chat -->
 <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
