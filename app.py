@@ -12,6 +12,7 @@ import string
 import os
 import json
 import requests
+import concurrent.futures
 import uuid 
 from collections import Counter
 from threading import Thread 
@@ -233,27 +234,49 @@ def run_link_checker():
     key = request.args.get('key')
     secret_key = os.environ.get('CHECKER_SECRET', 'my_super_secret_checker_key')
     if key != secret_key: return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
+    
     try:
         records = get_db_records()
         headers = {'User-Agent': 'Mozilla/5.0'}
-        count = 0
-        for record in records[:30]: 
+        
+        # ดึงมาเช็ครอบละ 20 ลิงก์ เพื่อความปลอดภัยไม่ให้ชนลิมิต Vercel
+        links_to_check = records[:20] 
+        
+        # ฟังก์ชันย่อยสำหรับเช็คลิงก์ 1 อัน
+        def check_single_link(record):
             url = record.get('URL')
             link_id = record.get('ID')
             status_msg = "Unknown"
+            
             if url and url.startswith('http'):
                 try:
                     resp = requests.get(url, headers=headers, timeout=3)
                     status_msg = "OK" if 200 <= resp.status_code < 300 or resp.status_code == 403 else f"{resp.status_code} Error"
                 except:
                     status_msg = "Error/Timeout"
-                    
-            supabase.table('Links').update({'LinkStatus': status_msg}).eq('ID', link_id).execute()
-            count += 1
             
+            return {'id': link_id, 'status': status_msg}
+
+        # 🚀 [อัปเกรด] ใช้ ThreadPool เช็คลิงก์ 20 อันพร้อมๆ กัน (เร็วขึ้น 10 เท่า)
+        results = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(check_single_link, rec) for rec in links_to_check]
+            for future in concurrent.futures.as_completed(futures):
+                results.append(future.result())
+
+        # บันทึกข้อมูลลง Supabase
+        count = 0
+        for res in results:
+            if res['id']:
+                supabase.table('Links').update({'LinkStatus': res['status']}).eq('ID', res['id']).execute()
+                count += 1
+                
         clear_db_cache()
-        return jsonify({'status': 'success', 'message': f'Checked {count} links'})
-    except Exception as e: return jsonify({'status': 'error', 'message': str(e)}), 500
+        return jsonify({'status': 'success', 'message': f'Checked {count} links in record time!'})
+        
+    except Exception as e: 
+        print(f"Cron Error: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/generate_qr')
 def generate_qr_code():
