@@ -1103,6 +1103,19 @@ def toggle_favorite():
     except Exception as e: 
         print(f"Fav Error: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# ==========================================
+# หน้ากระดานแจกรหัสเชิญ (Public Live Board)
+# ==========================================
+@app.route('/live_invites')
+def live_invites_page():
+    try:
+        # ดึงข้อมูลรหัสเชิญทั้งหมด และเรียงตัวอักษร ก-ฮ
+        all_codes = get_invite_codes(force_refresh=True)
+        sorted_codes = sorted(all_codes, key=lambda x: x.get('Code', ''))
+        return render_template('live_invites.html', invite_codes=sorted_codes)
+    except Exception as e:
+        return f"Error loading invites: {e}"
         
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
