@@ -1113,7 +1113,7 @@ def live_invites_page():
         all_codes = get_invite_codes(force_refresh=True)
         all_staff = get_staff_records(force_refresh=True)
 
-        # 1. สร้างดิกชันนารีแปลงชื่อเต็มเป็นชื่อย่อ
+        # 1. ดิกชันนารีแปลงชื่อเต็มเป็นชื่อย่อ
         agency_abbr_map = {
             "สำนักงานเลขานุการ": "สก.",
             "สำนักงานบริหารยุทธศาสตร์": "สบย.",
@@ -1123,34 +1123,55 @@ def live_invites_page():
             "กองยุทธศาสตร์คุณภาพชีวิตเมือง": "กยช."
         }
 
-        # 2. นำข้อมูลพนักงานมาจัดกลุ่มเพื่อให้ค้นหาไวขึ้น
+        # 2. นำข้อมูลผู้ใช้มาผูกกับชื่อย่อสังกัด
         staff_dict = {}
         for staff in all_staff:
-            bureau_full = staff.get('ส่วนราชการ', '')
-            abbr = agency_abbr_map.get(bureau_full, bureau_full) # ถ้าไม่ตรงเงื่อนไขให้ใช้ชื่อเดิม
+            bureau_full = staff.get('ส่วนราชการ', '').strip()
+            abbr = agency_abbr_map.get(bureau_full, bureau_full) 
             staff_dict[staff.get('Username')] = abbr
 
         admin_codes = []
         user_codes = []
+        
+        # ตัวแปรเก็บสถิติสำหรับ Dashboard
+        stats = {
+            'total': 0,
+            'available': 0,
+            'used': 0,
+            'agency_usage': {}
+        }
 
-        # 3. แยกหมวดหมู่และแนบข้อมูลชื่อย่อ
+        # 3. แยกหมวดหมู่และรวมสถิติ
         for code in all_codes:
             c_text = code.get('Code', '')
             used_by = code.get('UsedByUsername', '')
+            status = code.get('Status', '')
             
-            # แนบตัวย่อสังกัดเข้าไปในข้อมูล
-            code['agency_abbr'] = staff_dict.get(used_by, '') if used_by else ''
+            # แนบตัวย่อสังกัดเข้าไปในข้อมูลการ์ด
+            abbr = staff_dict.get(used_by, '') if used_by else ''
+            code['agency_abbr'] = abbr
 
             if c_text.startswith('ADMIN-'):
                 admin_codes.append(code)
             else:
                 user_codes.append(code)
+                
+            stats['total'] += 1
+            if status == 'Available':
+                stats['available'] += 1
+            else:
+                stats['used'] += 1
+                if abbr:
+                    stats['agency_usage'][abbr] = stats['agency_usage'].get(abbr, 0) + 1
 
         # เรียงตามตัวอักษร
         admin_codes.sort(key=lambda x: x.get('Code', ''))
         user_codes.sort(key=lambda x: x.get('Code', ''))
+        
+        # เรียงลำดับสถิติสังกัดที่ใช้เยอะสุดไปน้อยสุด
+        stats['agency_usage'] = dict(sorted(stats['agency_usage'].items(), key=lambda item: item[1], reverse=True))
 
-        return render_template('live_invites.html', admin_codes=admin_codes, user_codes=user_codes)
+        return render_template('live_invites.html', admin_codes=admin_codes, user_codes=user_codes, stats=stats)
     except Exception as e:
         return f"Error loading invites: {e}"
         
