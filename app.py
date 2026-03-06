@@ -1110,10 +1110,47 @@ def toggle_favorite():
 @app.route('/live_invites')
 def live_invites_page():
     try:
-        # ดึงข้อมูลรหัสเชิญทั้งหมด และเรียงตัวอักษร ก-ฮ
         all_codes = get_invite_codes(force_refresh=True)
-        sorted_codes = sorted(all_codes, key=lambda x: x.get('Code', ''))
-        return render_template('live_invites.html', invite_codes=sorted_codes)
+        all_staff = get_staff_records(force_refresh=True)
+
+        # 1. สร้างดิกชันนารีแปลงชื่อเต็มเป็นชื่อย่อ
+        agency_abbr_map = {
+            "สำนักงานเลขานุการ": "สก.",
+            "สำนักงานบริหารยุทธศาสตร์": "สบย.",
+            "กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง": "กยศ.",
+            "กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง": "กยส.",
+            "กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง": "กยพ.",
+            "กองยุทธศาสตร์คุณภาพชีวิตเมือง": "กยช."
+        }
+
+        # 2. นำข้อมูลพนักงานมาจัดกลุ่มเพื่อให้ค้นหาไวขึ้น
+        staff_dict = {}
+        for staff in all_staff:
+            bureau_full = staff.get('ส่วนราชการ', '')
+            abbr = agency_abbr_map.get(bureau_full, bureau_full) # ถ้าไม่ตรงเงื่อนไขให้ใช้ชื่อเดิม
+            staff_dict[staff.get('Username')] = abbr
+
+        admin_codes = []
+        user_codes = []
+
+        # 3. แยกหมวดหมู่และแนบข้อมูลชื่อย่อ
+        for code in all_codes:
+            c_text = code.get('Code', '')
+            used_by = code.get('UsedByUsername', '')
+            
+            # แนบตัวย่อสังกัดเข้าไปในข้อมูล
+            code['agency_abbr'] = staff_dict.get(used_by, '') if used_by else ''
+
+            if c_text.startswith('ADMIN-'):
+                admin_codes.append(code)
+            else:
+                user_codes.append(code)
+
+        # เรียงตามตัวอักษร
+        admin_codes.sort(key=lambda x: x.get('Code', ''))
+        user_codes.sort(key=lambda x: x.get('Code', ''))
+
+        return render_template('live_invites.html', admin_codes=admin_codes, user_codes=user_codes)
     except Exception as e:
         return f"Error loading invites: {e}"
         
