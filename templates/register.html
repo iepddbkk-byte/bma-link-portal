@@ -17,7 +17,7 @@
             --color-error: #dc3545; 
             --color-success: #28a745; 
         }
-/* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+        /* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
         body, button, input, select, textarea, optgroup {
             font-family: 'Kanit', sans-serif;
         }		
@@ -76,8 +76,8 @@
         }
         .message.error { color: var(--color-error); }
         .message.success { color: var(--color-success); }
-        input.invalid { border-color: var(--color-error); background-color: #fdd; }
-        input.valid { border-color: var(--color-success); background-color: #dfd; }
+        input.invalid, select.invalid { border-color: var(--color-error); background-color: #fdd; }
+        input.valid, select.valid { border-color: var(--color-success); background-color: #dfd; }
         button {
             font-family: 'Kanit', Arial, sans-serif;
             background-color: var(--bma-green); 
@@ -106,6 +106,7 @@
         </div>
 
         <form id="registerForm" action="{{ url_for('register_action') }}" method="POST">
+            
             <div>
                 <label for="account_type">ประเภทบัญชี (จำเป็น)</label>
                 <select id="account_type" name="account_type" required>
@@ -113,9 +114,10 @@
                     <option value="Admin">ผู้ดูแลระบบประจำส่วนราชการ (Admin)</option>
                 </select>
             </div>
+
             <div>
                 <label for="invite_code">รหัสเชิญ (Invitation Code) (จำเป็น)</label>
-                <input type="text" id="invite_code" name="invite_code" required>
+                <input type="text" id="invite_code" name="invite_code" placeholder="เช่น BMA-ADMIN-001 หรือ INVITE-XYZ" required>
                 <span id="invite-code-message" class="message"></span>
             </div>
             <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
@@ -213,6 +215,7 @@
         }
 
         // --- 1. เลือก Elements ---
+        const accountTypeInput = document.getElementById('account_type');
         const inviteCodeInput = document.getElementById('invite_code'); 
         const inviteCodeMessage = document.getElementById('invite-code-message'); 
         const usernameInput = document.getElementById('username');
@@ -241,6 +244,7 @@
         // --- 3. ฟังก์ชันตรวจสอบรหัสเชิญ (เรียก API) ---
         async function checkInviteCode() {
             const inviteCode = inviteCodeInput.value;
+            const accountType = accountTypeInput.value;
             
             if (inviteCode.length < 3) {
                 inviteCodeMessage.textContent = 'กรุณากรอกรหัสเชิญ';
@@ -256,7 +260,7 @@
                 const response = await fetch("{{ url_for('check_invite_code') }}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 'invite_code': inviteCode })
+                    body: JSON.stringify({ 'invite_code': inviteCode, 'account_type': accountType })
                 });
                 const data = await response.json();
 
@@ -375,6 +379,11 @@
         passwordInput.addEventListener('keyup', validatePassword);
         confirmPasswordInput.addEventListener('keyup', validatePassword);
         
+        // ถ้าผู้ใช้กดเปลี่ยน Dropdown ประเภทบัญชี ให้ตรวจรหัสซ้ำใหม่ทันที
+        accountTypeInput.addEventListener('change', function() {
+            if(inviteCodeInput.value.length >= 3) debouncedCheckInviteCode();
+        });
+        
         registerForm.addEventListener('submit', function(event) {
             if (!isInviteCodeValid || !isUsernameAvailable || !isPasswordConfirmed) {
                 event.preventDefault(); // หยุดการส่งฟอร์ม
@@ -399,22 +408,22 @@
                         icon: '{{ category }}',
                         title: '{{ message }}',
                         showConfirmButton: false,
-                        timer: 3000
+                        timer: 4000
                     });
                 {% endfor %}
             {% endif %}
         {% endwith %}
     </script>
-	  <script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
+    <script type="text/javascript">
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='https://embed.tawk.to/6921d74327ad1319611fb7d7/1jam31og6';
+        s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+        })();
+    </script>
 </body>
 </html>
