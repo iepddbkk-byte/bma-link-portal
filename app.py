@@ -265,12 +265,15 @@ def register_action():
             flash('รหัสนี้สงวนไว้สำหรับสมัครผู้ดูแลระบบเท่านั้น', 'error')
             return redirect(url_for('register_page'))
 
-        # 2. เช็คโควต้า Admin 1 คน ต่อ 1 ส่วนราชการ (ป้องกันมี Admin ซ้ำ)
+        # 2. 🚨 [จุดที่แก้ไข] เช็คโควต้า Admin 1 คน ต่อ 1 ส่วนราชการ (เลี่ยงการใช้คอลัมน์ภาษาไทยใน Supabase)
         if account_type == 'Admin':
-            res_admin = supabase.table('StaffList').select('Username').eq('ส่วนราชการ', main_agency).eq('Level', 'Admin').execute()
-            if len(res_admin.data) > 0:
-                flash(f'ส่วนราชการ "{main_agency}" มี Admin ประจำอยู่แล้ว ไม่สามารถสมัครซ้ำได้', 'error')
-                return redirect(url_for('register_page'))
+            # สั่งให้ค้นหาจากคอลัมน์ Level (ภาษาอังกฤษ) แทน
+            res_admin = supabase.table('StaffList').select('*').eq('Level', 'Admin').execute()
+            # แล้วใช้ Python วนลูปเช็คส่วนราชการ เพื่อไม่ให้เกิด Error ตัว "ส"
+            for admin in res_admin.data:
+                if admin.get('ส่วนราชการ') == main_agency:
+                    flash(f'ส่วนราชการ "{main_agency}" มี Admin ประจำอยู่แล้ว ไม่สามารถสมัครซ้ำได้', 'error')
+                    return redirect(url_for('register_page'))
 
         # เช็คชื่อซ้ำ
         res_user = supabase.table('StaffList').select('Username').eq('Username', username).execute()
