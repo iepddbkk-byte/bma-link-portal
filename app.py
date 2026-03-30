@@ -220,14 +220,96 @@ def check_username():
 def check_invite_code():
     try:
         data = request.get_json()
-        code = data.get('invite_code')
+        code = data.get('invite_code', '').strip()
+        account_type = data.get('account_type', 'Users')
+        
+        if not code: return jsonify({'available': False, 'message': 'กรุณากรอกรหัสเชิญ'})
+        
         res = supabase.table('InviteCodes').select('*').eq('Code', code).execute()
         
         if not res.data: return jsonify({'available': False, 'message': 'รหัสไม่ถูกต้อง'})
         status = res.data[0].get('Status')
-        if status == 'Available': return jsonify({'available': True, 'message': 'รหัสถูกต้อง'})
-        else: return jsonify({'available': False, 'message': 'ถูกใช้งานแล้ว'})
+        if status != 'Available': return jsonify({'available': False, 'message': 'รหัสนี้ถูกใช้งานแล้ว'})
+        
+        # 🚨 เช็คว่ารหัสตรงกับประเภทบัญชีที่เลือกหรือไม่
+        is_admin_code = code.startswith('ADMIN-')
+        if account_type == 'Admin' and not is_admin_code:
+            return jsonify({'available': False, 'message': 'ใช้รหัส ADMIN- สำหรับผู้ดูแลระบบเท่านั้น'})
+        if account_type == 'Users' and is_admin_code:
+            return jsonify({'available': False, 'message': 'รหัสนี้สงวนไว้สำหรับผู้ดูแลระบบ'})
+            
+        return jsonify({'available': True, 'message': 'รหัสถูกต้อง สามารถใช้งานได้'})
     except: return jsonify({'available': False})
+
+
+@app.route('/register_action', methods=['POST'])
+def register_action():
+    try:
+        username = request.form.get('username')
+        password = request.form.get('password')
+        fullname = request.form.get('fullname')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        if phone and not phone.startswith("'"): phone = "'" + phone
+        invite_code = request.form.get('invite_code', '').strip()
+        position = request.form.get('position') 
+        division = request.form.get('division') 
+        main_agency = request.form.get('main_agency') 
+        account_type = request.form.get('account_type', 'Users')
+
+        # 1. เช็คความถูกต้องของ รหัส กับ ประเภทบัญชี
+        is_admin_code = invite_code.startswith('ADMIN-')
+        if account_type == 'Admin' and not is_admin_code:
+            flash('รหัสไม่ถูกต้อง (ต้องใช้รหัส ADMIN- สำหรับผู้ดูแลระบบ)', 'error')
+            return redirect(url_for('register_page'))
+        if account_type == 'Users' and is_admin_code:
+            flash('รหัสนี้สงวนไว้สำหรับสมัครผู้ดูแลระบบเท่านั้น', 'error')
+            return redirect(url_for('register_page'))
+
+        # 2. เช็คโควต้า Admin 1 คน ต่อ 1 ส่วนราชการ (ป้องกันมี Admin ซ้ำ)
+        if account_type == 'Admin':
+            res_admin = supabase.table('StaffList').select('Username').eq('ส่วนราชการ', main_agency).eq('Level', 'Admin').execute()
+            if len(res_admin.data) > 0:
+                flash(f'ส่วนราชการ "{main_agency}" มี Admin ประจำอยู่แล้ว ไม่สามารถสมัครซ้ำได้', 'error')
+                return redirect(url_for('register_page'))
+
+        # เช็คชื่อซ้ำ
+        res_user = supabase.table('StaffList').select('Username').eq('Username', username).execute()
+        if len(res_user.data) > 0:
+            flash('Username ซ้ำ', 'error')
+            return redirect(url_for('register_page'))
+        
+        # เช็ครหัส Invite ว่ายังว่างอยู่ไหม
+        res_code = supabase.table('InviteCodes').select('*').eq('Code', invite_code).execute()
+        if not res_code.data or res_code.data[0].get('Status') != 'Available':
+            flash('รหัสเชิญไม่ถูกต้องหรือถูกใช้งานไปแล้ว', 'error')
+            return redirect(url_for('register_page'))
+
+        hashed_password = generate_password_hash(password)
+        current_time = get_current_timestamp()
+        
+        # ข้อมูลที่จะบันทึก (ระบุ Level ตามที่เลือก)
+        new_user = {
+            "Username": username, "PasswordHash": hashed_password, "Level": account_type,
+            "ชื่อ": fullname, "ตำแหน่ง": position, "หน่วยงาน": division, 
+            "ส่วนราชการ": main_agency, "เบอร์โทร": phone, "Email": email,
+            "CreatedAt": current_time, "UpdatedAt": current_time
+        }
+        supabase.table('StaffList').insert(new_user).execute()
+        clear_staff_cache()
+        
+        # อัปเดตสถานะ Invite Code
+        supabase.table('InviteCodes').update({
+            "Status": "Used", "UsedByUsername": username, "UsedAt": current_time
+        }).eq('Code', invite_code).execute()
+        clear_invite_cache()
+        
+        flash('สมัครสมาชิกสำเร็จ! เข้าสู่ระบบได้เลย', 'success')
+        return redirect(url_for('login_page')) 
+    except Exception as e:
+        print(f"Register Error: {e}")
+        flash(f'เกิดข้อผิดพลาดจากฐานข้อมูล: {str(e)}', 'error')
+        return redirect(url_for('register_page'))
 
 @app.route('/run_link_checker')
 def run_link_checker():
@@ -469,10 +551,27 @@ def register_action():
         email = request.form.get('email')
         phone = request.form.get('phone')
         if phone and not phone.startswith("'"): phone = "'" + phone
-        invite_code = request.form.get('invite_code')
+        invite_code = request.form.get('invite_code', '').strip()
         position = request.form.get('position') 
         division = request.form.get('division') 
         main_agency = request.form.get('main_agency') 
+        account_type = request.form.get('account_type', 'Users')
+
+        # 1. เช็คความถูกต้องของ รหัส กับ ประเภทบัญชี
+        is_admin_code = invite_code.startswith('ADMIN-')
+        if account_type == 'Admin' and not is_admin_code:
+            flash('รหัสไม่ถูกต้อง (ต้องใช้รหัส ADMIN- สำหรับผู้ดูแลระบบ)', 'error')
+            return redirect(url_for('register_page'))
+        if account_type == 'Users' and is_admin_code:
+            flash('รหัสนี้สงวนไว้สำหรับสมัครผู้ดูแลระบบเท่านั้น', 'error')
+            return redirect(url_for('register_page'))
+
+        # 2. เช็คโควต้า Admin 1 คน ต่อ 1 ส่วนราชการ (ป้องกันมี Admin ซ้ำ)
+        if account_type == 'Admin':
+            res_admin = supabase.table('StaffList').select('Username').eq('ส่วนราชการ', main_agency).eq('Level', 'Admin').execute()
+            if len(res_admin.data) > 0:
+                flash(f'ส่วนราชการ "{main_agency}" มี Admin ประจำอยู่แล้ว ไม่สามารถสมัครซ้ำได้', 'error')
+                return redirect(url_for('register_page'))
 
         # เช็คชื่อซ้ำ
         res_user = supabase.table('StaffList').select('Username').eq('Username', username).execute()
@@ -480,7 +579,7 @@ def register_action():
             flash('Username ซ้ำ', 'error')
             return redirect(url_for('register_page'))
         
-        # เช็ครหัส Invite
+        # เช็ครหัส Invite ว่ายังว่างอยู่ไหม
         res_code = supabase.table('InviteCodes').select('*').eq('Code', invite_code).execute()
         if not res_code.data or res_code.data[0].get('Status') != 'Available':
             flash('รหัสเชิญไม่ถูกต้องหรือถูกใช้งานไปแล้ว', 'error')
@@ -489,9 +588,9 @@ def register_action():
         hashed_password = generate_password_hash(password)
         current_time = get_current_timestamp()
         
-        # ข้อมูลที่จะบันทึก (มี CreatedAt และ UpdatedAt ตาม Database ของคุณ)
+        # ข้อมูลที่จะบันทึก (ระบุ Level ตามที่เลือก)
         new_user = {
-            "Username": username, "PasswordHash": hashed_password, "Level": "Users",
+            "Username": username, "PasswordHash": hashed_password, "Level": account_type,
             "ชื่อ": fullname, "ตำแหน่ง": position, "หน่วยงาน": division, 
             "ส่วนราชการ": main_agency, "เบอร์โทร": phone, "Email": email,
             "CreatedAt": current_time, "UpdatedAt": current_time
@@ -505,11 +604,10 @@ def register_action():
         }).eq('Code', invite_code).execute()
         clear_invite_cache()
         
-        flash('สมัครสมาชิกสำเร็จ!', 'success')
+        flash('สมัครสมาชิกสำเร็จ! เข้าสู่ระบบได้เลย', 'success')
         return redirect(url_for('login_page')) 
     except Exception as e:
         print(f"Register Error: {e}")
-        # 🚨 ให้ระบบโชว์ Error จริงออกหน้าจอ
         flash(f'เกิดข้อผิดพลาดจากฐานข้อมูล: {str(e)}', 'error')
         return redirect(url_for('register_page'))
 
@@ -1103,6 +1201,77 @@ def toggle_favorite():
     except Exception as e: 
         print(f"Fav Error: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# ==========================================
+# หน้ากระดานแจกรหัสเชิญ (Public Live Board)
+# ==========================================
+@app.route('/live_invites')
+def live_invites_page():
+    try:
+        all_codes = get_invite_codes(force_refresh=True)
+        all_staff = get_staff_records(force_refresh=True)
+
+        # 1. ดิกชันนารีแปลงชื่อเต็มเป็นชื่อย่อ
+        agency_abbr_map = {
+            "สำนักงานเลขานุการ": "สก.",
+            "สำนักงานบริหารยุทธศาสตร์": "สบย.",
+            "กองพัฒนายุทธศาสตร์เศรษฐกิจเมือง": "กยศ.",
+            "กองยุทธศาสตร์สภาพแวดล้อมและความปลอดภัยเมือง": "กยส.",
+            "กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง": "กยพ.",
+            "กองยุทธศาสตร์คุณภาพชีวิตเมือง": "กยช."
+        }
+
+        # 2. นำข้อมูลผู้ใช้มาผูกกับชื่อย่อสังกัด
+        staff_dict = {}
+        for staff in all_staff:
+            bureau_full = staff.get('ส่วนราชการ', '').strip()
+            abbr = agency_abbr_map.get(bureau_full, bureau_full) 
+            staff_dict[staff.get('Username')] = abbr
+
+        admin_codes = []
+        user_codes = []
+        
+        # ตัวแปรเก็บสถิติสำหรับ Dashboard
+        stats = {
+            'total': 0,
+            'available': 0,
+            'used': 0,
+            'agency_usage': {}
+        }
+
+        # 3. แยกหมวดหมู่และรวมสถิติ
+        for code in all_codes:
+            c_text = code.get('Code', '')
+            used_by = code.get('UsedByUsername', '')
+            status = code.get('Status', '')
+            
+            # แนบตัวย่อสังกัดเข้าไปในข้อมูลการ์ด
+            abbr = staff_dict.get(used_by, '') if used_by else ''
+            code['agency_abbr'] = abbr
+
+            if c_text.startswith('ADMIN-'):
+                admin_codes.append(code)
+            else:
+                user_codes.append(code)
+                
+            stats['total'] += 1
+            if status == 'Available':
+                stats['available'] += 1
+            else:
+                stats['used'] += 1
+                if abbr:
+                    stats['agency_usage'][abbr] = stats['agency_usage'].get(abbr, 0) + 1
+
+        # เรียงตามตัวอักษร
+        admin_codes.sort(key=lambda x: x.get('Code', ''))
+        user_codes.sort(key=lambda x: x.get('Code', ''))
+        
+        # เรียงลำดับสถิติสังกัดที่ใช้เยอะสุดไปน้อยสุด
+        stats['agency_usage'] = dict(sorted(stats['agency_usage'].items(), key=lambda item: item[1], reverse=True))
+
+        return render_template('live_invites.html', admin_codes=admin_codes, user_codes=user_codes, stats=stats)
+    except Exception as e:
+        return f"Error loading invites: {e}"
         
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

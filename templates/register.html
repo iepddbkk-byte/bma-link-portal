@@ -107,6 +107,13 @@
 
         <form id="registerForm" action="{{ url_for('register_action') }}" method="POST">
             <div>
+                <label for="account_type">ประเภทบัญชี (จำเป็น)</label>
+                <select id="account_type" name="account_type" required>
+                    <option value="Users" selected>เจ้าหน้าที่ทั่วไป (User)</option>
+                    <option value="Admin">ผู้ดูแลระบบประจำส่วนราชการ (Admin)</option>
+                </select>
+            </div>
+            <div>
                 <label for="invite_code">รหัสเชิญ (Invitation Code) (จำเป็น)</label>
                 <input type="text" id="invite_code" name="invite_code" required>
                 <span id="invite-code-message" class="message"></span>
