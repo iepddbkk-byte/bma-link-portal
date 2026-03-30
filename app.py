@@ -241,7 +241,6 @@ def check_invite_code():
         return jsonify({'available': True, 'message': 'รหัสถูกต้อง สามารถใช้งานได้'})
     except: return jsonify({'available': False})
 
-
 @app.route('/register_action', methods=['POST'])
 def register_action():
     try:
@@ -541,75 +540,6 @@ def logout():
 def register_page():
     if session.get('logged_in'): return redirect(url_for('dashboard'))
     return render_template('register.html') 
-
-@app.route('/register_action', methods=['POST'])
-def register_action():
-    try:
-        username = request.form.get('username')
-        password = request.form.get('password')
-        fullname = request.form.get('fullname')
-        email = request.form.get('email')
-        phone = request.form.get('phone')
-        if phone and not phone.startswith("'"): phone = "'" + phone
-        invite_code = request.form.get('invite_code', '').strip()
-        position = request.form.get('position') 
-        division = request.form.get('division') 
-        main_agency = request.form.get('main_agency') 
-        account_type = request.form.get('account_type', 'Users')
-
-        # 1. เช็คความถูกต้องของ รหัส กับ ประเภทบัญชี
-        is_admin_code = invite_code.startswith('ADMIN-')
-        if account_type == 'Admin' and not is_admin_code:
-            flash('รหัสไม่ถูกต้อง (ต้องใช้รหัส ADMIN- สำหรับผู้ดูแลระบบ)', 'error')
-            return redirect(url_for('register_page'))
-        if account_type == 'Users' and is_admin_code:
-            flash('รหัสนี้สงวนไว้สำหรับสมัครผู้ดูแลระบบเท่านั้น', 'error')
-            return redirect(url_for('register_page'))
-
-        # 2. เช็คโควต้า Admin 1 คน ต่อ 1 ส่วนราชการ (ป้องกันมี Admin ซ้ำ)
-        if account_type == 'Admin':
-            res_admin = supabase.table('StaffList').select('Username').eq('ส่วนราชการ', main_agency).eq('Level', 'Admin').execute()
-            if len(res_admin.data) > 0:
-                flash(f'ส่วนราชการ "{main_agency}" มี Admin ประจำอยู่แล้ว ไม่สามารถสมัครซ้ำได้', 'error')
-                return redirect(url_for('register_page'))
-
-        # เช็คชื่อซ้ำ
-        res_user = supabase.table('StaffList').select('Username').eq('Username', username).execute()
-        if len(res_user.data) > 0:
-            flash('Username ซ้ำ', 'error')
-            return redirect(url_for('register_page'))
-        
-        # เช็ครหัส Invite ว่ายังว่างอยู่ไหม
-        res_code = supabase.table('InviteCodes').select('*').eq('Code', invite_code).execute()
-        if not res_code.data or res_code.data[0].get('Status') != 'Available':
-            flash('รหัสเชิญไม่ถูกต้องหรือถูกใช้งานไปแล้ว', 'error')
-            return redirect(url_for('register_page'))
-
-        hashed_password = generate_password_hash(password)
-        current_time = get_current_timestamp()
-        
-        # ข้อมูลที่จะบันทึก (ระบุ Level ตามที่เลือก)
-        new_user = {
-            "Username": username, "PasswordHash": hashed_password, "Level": account_type,
-            "ชื่อ": fullname, "ตำแหน่ง": position, "หน่วยงาน": division, 
-            "ส่วนราชการ": main_agency, "เบอร์โทร": phone, "Email": email,
-            "CreatedAt": current_time, "UpdatedAt": current_time
-        }
-        supabase.table('StaffList').insert(new_user).execute()
-        clear_staff_cache()
-        
-        # อัปเดตสถานะ Invite Code
-        supabase.table('InviteCodes').update({
-            "Status": "Used", "UsedByUsername": username, "UsedAt": current_time
-        }).eq('Code', invite_code).execute()
-        clear_invite_cache()
-        
-        flash('สมัครสมาชิกสำเร็จ! เข้าสู่ระบบได้เลย', 'success')
-        return redirect(url_for('login_page')) 
-    except Exception as e:
-        print(f"Register Error: {e}")
-        flash(f'เกิดข้อผิดพลาดจากฐานข้อมูล: {str(e)}', 'error')
-        return redirect(url_for('register_page'))
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
