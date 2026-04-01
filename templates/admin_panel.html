@@ -580,11 +580,14 @@
             </div>
             <div class="card-body">
 
-                <div class="search-container">
-                    <div class="input-wrapper">
+                <div class="search-container" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: stretch;">
+                    <div class="input-wrapper" style="flex: 1; min-width: 250px;">
                         <i class="fas fa-search input-prefix-icon"></i>
-                        <input type="text" id="userSearchInput" class="form-input-search" placeholder="ค้นหาด้วยชื่อ หรือ Username...">
+                        <input type="text" id="userSearchInput" class="form-input-search" placeholder="ค้นหาด้วยชื่อ หรือ Username..." style="height: 100%;">
                     </div>
+                    <a href="{{ url_for('export_users') }}" class="btn" style="background: #10b981; color: white; display: inline-flex; align-items: center; gap: 8px; padding: 0 20px; border-radius: var(--radius-md); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+                        <i class="fas fa-file-excel" style="font-size: 1.1rem;"></i> Export Excel
+                    </a>
                 </div>
 
                 <div class="table-wrapper desktop-table">

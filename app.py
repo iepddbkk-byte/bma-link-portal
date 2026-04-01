@@ -19,6 +19,9 @@ from threading import Thread
 from PIL import Image
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
+import openpyxl
+from openpyxl.worksheet.table import Table, TableStyleInfo
+from openpyxl.utils import get_column_letter
 
 # [NEW] นำเข้า Supabase
 from supabase import create_client, Client
@@ -992,6 +995,83 @@ def change_user_level():
         flash('สำเร็จ', 'success')
     except: flash('Error', 'error')
     return redirect(url_for('admin_panel'))
+    
+@app.route('/admin/export_users')
+def export_users():
+    if not session.get('logged_in') or session.get('level', '').strip() != 'Super Admin': 
+        return redirect(url_for('login_page'))
+    try:
+        staff_list = get_staff_records()
+        
+        # 1. สร้างไฟล์ Excel เปล่า
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "รายชื่อเจ้าหน้าที่"
+
+        # 2. สร้างหัวตาราง
+        headers = ['Username', 'ชื่อ-นามสกุล', 'ระดับสิทธิ์', 'ตำแหน่ง', 'กลุ่มงาน/ฝ่าย', 'ส่วนราชการ (สำนัก)', 'อีเมล', 'เบอร์โทร', 'วันที่สมัคร']
+        ws.append(headers)
+
+        # 3. ใส่ข้อมูลพนักงานลงไปทีละบรรทัด
+        for user in staff_list:
+            date_joined = str(user.get('CreatedAt', '')).split('+')[0] if user.get('CreatedAt') else ''
+            phone_num = str(user.get('เบอร์โทร', '')).replace("'", "") # เอาเครื่องหมาย ' ออก
+            
+            ws.append([
+                user.get('Username', ''),
+                user.get('ชื่อ', ''),
+                user.get('Level', ''),
+                user.get('ตำแหน่ง', ''),
+                user.get('หน่วยงาน', ''),
+                user.get('ส่วนราชการ', ''),
+                user.get('Email', ''),
+                phone_num,
+                date_joined
+            ])
+
+        # 4. จัดรูปแบบเป็นตาราง (Table) และเปิด Auto Filter
+        max_row = len(staff_list) + 1
+        max_col = len(headers)
+        ref = f"A1:{get_column_letter(max_col)}{max_row}"
+        tab = Table(displayName="StaffTable", ref=ref)
+
+        # ใส่สีตารางแบบสีเขียว (TableStyleMedium4 มักจะเป็นโทนสีเขียว/ฟ้าสวยๆ)
+        style = TableStyleInfo(name="TableStyleMedium4", showFirstColumn=False,
+                               showLastColumn=False, showRowStripes=True, showColumnStripes=False)
+        tab.tableStyleInfo = style
+        ws.add_table(tab)
+
+        # 5. ปรับความกว้างคอลัมน์ให้พอดีกับข้อความอัตโนมัติ
+        for col in ws.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except: pass
+            adjusted_width = (max_length + 2) * 1.2
+            ws.column_dimensions[column].width = adjusted_width
+
+        # 6. แปลงไฟล์บันทึกลงในหน่วยความจำ (BytesIO) เพื่อส่งให้ผู้ใช้โหลด
+        excel_file = BytesIO()
+        wb.save(excel_file)
+        excel_file.seek(0)
+
+        # ตั้งชื่อไฟล์พร้อมวันที่
+        current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M")
+        filename = f"BMA_Staff_List_{current_time}.xlsx"
+
+        return send_file(
+            excel_file,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name=filename
+        )
+    except Exception as e:
+        print(f"Export Error: {e}")
+        flash(f'เกิดข้อผิดพลาดในการสร้างไฟล์ Excel: {e}', 'error')
+        return redirect(url_for('admin_panel'))    
 
 @app.route('/admin/delete_user', methods=['POST'])
 def delete_user():

@@ -10,3 +10,4 @@ qrcode
 Pillow
 supabase
 python-dotenv
+openpyxl==3.1.2
