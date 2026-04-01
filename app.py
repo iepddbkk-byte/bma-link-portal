@@ -1008,16 +1008,17 @@ def export_users():
         ws = wb.active
         ws.title = "รายชื่อเจ้าหน้าที่"
 
-        # 2. สร้างหัวตาราง
-        headers = ['Username', 'ชื่อ-นามสกุล', 'ระดับสิทธิ์', 'ตำแหน่ง', 'กลุ่มงาน/ฝ่าย', 'ส่วนราชการ (สำนัก)', 'อีเมล', 'เบอร์โทร', 'วันที่สมัคร']
+        # 2. สร้างหัวตาราง (เพิ่ม 'ลำดับ' ไว้หน้าสุด)
+        headers = ['ลำดับ', 'Username', 'ชื่อ-นามสกุล', 'ระดับสิทธิ์', 'ตำแหน่ง', 'กลุ่มงาน/ฝ่าย', 'ส่วนราชการ (สำนัก)', 'อีเมล', 'เบอร์โทร', 'วันที่สมัคร']
         ws.append(headers)
 
-        # 3. ใส่ข้อมูลพนักงานลงไปทีละบรรทัด
-        for user in staff_list:
+        # 3. ใส่ข้อมูลพนักงานลงไปทีละบรรทัด (ใช้ enumerate เพื่อสร้างเลขลำดับอัตโนมัติ เริ่มที่ 1)
+        for index, user in enumerate(staff_list, start=1):
             date_joined = str(user.get('CreatedAt', '')).split('+')[0] if user.get('CreatedAt') else ''
             phone_num = str(user.get('เบอร์โทร', '')).replace("'", "") # เอาเครื่องหมาย ' ออก
             
             ws.append([
+                index,  # 👈 ใส่เลขลำดับตรงนี้
                 user.get('Username', ''),
                 user.get('ชื่อ', ''),
                 user.get('Level', ''),
@@ -1050,7 +1051,9 @@ def export_users():
                     if len(str(cell.value)) > max_length:
                         max_length = len(str(cell.value))
                 except: pass
+            # ปรับความกว้าง (สำหรับคอลัมน์ลำดับ ไม่ต้องกว้างมาก)
             adjusted_width = (max_length + 2) * 1.2
+            if column == 'A': adjusted_width = 8  # ล็อกความกว้างคอลัมน์ A (ลำดับ) ไว้ที่ 8
             ws.column_dimensions[column].width = adjusted_width
 
         # 6. แปลงไฟล์บันทึกลงในหน่วยความจำ (BytesIO) เพื่อส่งให้ผู้ใช้โหลด
@@ -1071,7 +1074,7 @@ def export_users():
     except Exception as e:
         print(f"Export Error: {e}")
         flash(f'เกิดข้อผิดพลาดในการสร้างไฟล์ Excel: {e}', 'error')
-        return redirect(url_for('admin_panel'))    
+        return redirect(url_for('admin_panel'))   
 
 @app.route('/admin/delete_user', methods=['POST'])
 def delete_user():
