@@ -602,7 +602,7 @@
                                 </tr>
                             </thead>
                             <tbody id="userTableBody">
-                                {% for user in staff_list %}
+                                {% for user in staff_list | sort(attribute='ชื่อ') %}
                                 <tr class="user-row">
                                     <td style="font-weight:600; color:var(--text-color);">
                                         <div style="display:flex;align-items:center;gap:9px;">
@@ -651,7 +651,7 @@
                 </div>
 
                 <div class="mobile-user-cards" id="mobileUserContainer">
-                    {% for user in staff_list %}
+                    {% for user in staff_list | sort(attribute='ชื่อ') %}
                     <div class="user-card user-mobile-item">
                         <div class="user-card-header">
                             <div class="user-avatar">{{ user.ชื่อ[0] if user.ชื่อ else user.Username[0] }}</div>
@@ -823,7 +823,7 @@
         const searchInput = document.getElementById('userSearchInput');
         
         let currentPage = 1;
-        const itemsPerPage = 10;
+        const itemsPerPage = 50;
         let filteredIndices = []; // เก็บ index ของแถวที่ค้นหาเจอ
 
         function renderUsers() {
