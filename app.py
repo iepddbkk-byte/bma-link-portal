@@ -690,7 +690,15 @@ def add_link_page():
     if not session.get('logged_in'): return redirect(url_for('login_page'))
     user_main_agency = session.get('main_agency', 'N/A')
     user_division = session.get('division', 'N/A')
-    return render_template('add_link.html', session=session, locked_agency=user_main_agency, locked_division=user_division)
+    
+    # ดึงข้อมูลเบอร์โทรและอีเมลจากโปรไฟล์ของตัวเองมาเติมอัตโนมัติ
+    username = session.get('username')
+    all_staff = get_staff_records()
+    user_info = next((u for u in all_staff if u.get('Username') == username), {})
+    user_email = user_info.get('Email', '')
+    user_phone = str(user_info.get('เบอร์โทร', '')).replace("'", "")
+    
+    return render_template('add_link.html', session=session, locked_agency=user_main_agency, locked_division=user_division, user_email=user_email, user_phone=user_phone)
 
 @app.route('/add_action', methods=['POST'])
 def add_link_action():
@@ -727,6 +735,29 @@ def add_link_action():
         print(f"Add link error: {e}")
         flash('เกิดข้อผิดพลาดในการเพิ่มลิงก์', 'error')
         return redirect(url_for('add_link_page'))
+        
+@app.route('/check_url', methods=['POST'])
+def check_url():
+    try:
+        data = request.get_json()
+        url = data.get('url', '').strip()
+        link_id = data.get('link_id', '').strip() # สำหรับหน้า Edit
+
+        if not url: return jsonify({'duplicate': False})
+
+        # ค้นหาว่า URL นี้มีในระบบหรือไม่
+        res = supabase.table('Links').select('ID', 'URL').eq('URL', url).execute()
+
+        if len(res.data) > 0:
+            # ถ้าเป็นหน้าแก้ไข (Edit) และ URL ตรงกับ ID ของตัวเอง อนุญาตให้ผ่าน
+            if link_id and res.data[0].get('ID') == link_id:
+                return jsonify({'duplicate': False})
+            
+            return jsonify({'duplicate': True, 'message': 'URL นี้มีอยู่ในระบบแล้ว'})
+
+        return jsonify({'duplicate': False})
+    except:
+        return jsonify({'duplicate': False})
 
 @app.route('/delete/<link_id>', methods=['POST'])
 def delete_link_action(link_id):

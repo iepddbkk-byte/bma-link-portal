@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMA SMART LINKAGE - สมัครสมาชิก</title>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300&display=swap"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
@@ -17,7 +18,7 @@
             --color-error: #dc3545; 
             --color-success: #28a745; 
         }
-        /* --- FIX FONT ISSUE: บังคับใช้ Kanit กับทุก Element โดยเฉพาะปุ่มและ Form --- */
+        /* --- FIX FONT ISSUE --- */
         body, button, input, select, textarea, optgroup {
             font-family: 'Kanit', sans-serif;
         }		
@@ -68,6 +69,29 @@
             cursor: not-allowed;
             color: #888;
         }
+        
+        /* --- รูปแบบช่องรหัสผ่านที่มีไอคอน --- */
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-wrapper input {
+            padding-right: 40px !important; /* เว้นที่ให้ไอคอนตา */
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 1.1em;
+            transition: color 0.2s;
+            user-select: none;
+        }
+        .toggle-password:hover {
+            color: var(--bma-green);
+        }
+
         .message {
             display: block;
             font-size: 0.9em;
@@ -131,15 +155,24 @@
                 <input type="text" id="username" name="username" required>
                 <span id="username-message" class="message"></span> 
             </div>
+            
             <div>
                 <label for="password">Password (สำหรับ Login) (จำเป็น)</label>
-                <input type="password" id="password" name="password" required>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" required>
+                    <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('password', this)" title="แสดงรหัสผ่าน"></i>
+                </div>
             </div>
+            
             <div>
                 <label for="confirm_password">ยืนยันรหัสผ่าน (จำเป็น)</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
+                <div class="input-wrapper">
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                    <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('confirm_password', this)" title="แสดงรหัสผ่าน"></i>
+                </div>
                 <span id="password-message" class="message"></span>
             </div>
+
              <div>
                 <label for="position">ตำแหน่ง (จำเป็น)</label>
                 <input type="text" id="position" name="position" placeholder="เช่น นักวิเคราะห์นโยบายและแผนปฏิบัติการ" required>
@@ -184,6 +217,20 @@
     </div>
 
     <script>
+        // --- ฟังก์ชันสลับแสดง/ซ่อนรหัสผ่าน ---
+        function togglePasswordVisibility(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         // --- ส่วนควบคุม Dropdown สังกัด สยป. ---
         const agencyMapping = {
             "สำนักงานเลขานุการ": ["ฝ่ายบริหารงานทั่วไป (สก.)", "ฝ่ายการเจ้าหน้าที่", "ฝ่ายการคลัง"],
@@ -199,11 +246,9 @@
             const divisionSelect = document.getElementById("division");
             const selectedDept = departmentSelect.value;
 
-            // ปลดล็อคและล้างค่าเดิม
             divisionSelect.disabled = false;
             divisionSelect.innerHTML = '<option value="" disabled selected>--- กรุณาเลือก กลุ่มงาน / ฝ่าย ---</option>';
 
-            // เติมค่าใหม่ตามที่เลือก
             if (agencyMapping[selectedDept]) {
                 agencyMapping[selectedDept].forEach(function(div) {
                     const option = document.createElement("option");
@@ -227,12 +272,10 @@
         const registerForm = document.getElementById('registerForm');
         const phoneInput = document.getElementById('phone');
 
-        // สถานะการตรวจสอบ
         let isInviteCodeValid = false; 
         let isUsernameAvailable = false;
         let isPasswordConfirmed = false;
 
-        // --- 2. ฟังก์ชันตรวจสอบสถานะปุ่ม Submit ---
         function checkFormValidity() {
             if (isInviteCodeValid && isUsernameAvailable && isPasswordConfirmed) {
                 submitButton.disabled = false;
@@ -241,7 +284,6 @@
             }
         }
         
-        // --- 3. ฟังก์ชันตรวจสอบรหัสเชิญ (เรียก API) ---
         async function checkInviteCode() {
             const inviteCode = inviteCodeInput.value;
             const accountType = accountTypeInput.value;
@@ -286,7 +328,6 @@
             checkFormValidity();
         }
 
-        // --- 4. ฟังก์ชันตรวจสอบ Username ซ้ำ ---
         async function checkUsername() {
             const username = usernameInput.value;
             if (username.length < 3) {
@@ -326,7 +367,6 @@
             checkFormValidity();
         }
 
-        // --- 5. ฟังก์ชันตรวจสอบรหัสผ่านตรงกัน ---
         function validatePassword() {
             const pass = passwordInput.value;
             const confirmPass = confirmPasswordInput.value;
@@ -351,7 +391,6 @@
             checkFormValidity();
         }
 
-        // --- Clean Phone Number ---
         if(phoneInput) {
             function cleanRealTime(input) {
                 let val = input.value;
@@ -361,7 +400,6 @@
             phoneInput.addEventListener('paste', function(e) { setTimeout(() => { cleanRealTime(e.target); }, 10); });
         }
         
-        // --- 6. ฟังก์ชัน Debounce ---
         function debounce(func, delay) {
             let timeout;
             return function(...args) {
@@ -373,27 +411,24 @@
         const debouncedCheckUsername = debounce(checkUsername, 500);
         const debouncedCheckInviteCode = debounce(checkInviteCode, 500); 
 
-        // --- 7. ผูก Event Listeners ---
         inviteCodeInput.addEventListener('keyup', debouncedCheckInviteCode); 
         usernameInput.addEventListener('keyup', debouncedCheckUsername);
         passwordInput.addEventListener('keyup', validatePassword);
         confirmPasswordInput.addEventListener('keyup', validatePassword);
         
-        // ถ้าผู้ใช้กดเปลี่ยน Dropdown ประเภทบัญชี ให้ตรวจรหัสซ้ำใหม่ทันที
         accountTypeInput.addEventListener('change', function() {
             if(inviteCodeInput.value.length >= 3) debouncedCheckInviteCode();
         });
         
         registerForm.addEventListener('submit', function(event) {
             if (!isInviteCodeValid || !isUsernameAvailable || !isPasswordConfirmed) {
-                event.preventDefault(); // หยุดการส่งฟอร์ม
+                event.preventDefault(); 
                 Swal.fire({
                     icon: 'error',
                     title: 'ข้อมูลไม่ถูกต้อง',
                     text: 'กรุณาตรวจสอบรหัสเชิญ, Username, และ รหัสผ่านอีกครั้ง'
                 });
             } else {
-                // ก่อนส่งให้เคลียร์เครื่องหมาย ' เผื่อไว้
                 if(phoneInput) phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
             }
         });

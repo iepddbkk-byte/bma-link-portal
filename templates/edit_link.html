@@ -401,6 +401,13 @@
             background: linear-gradient(135deg, var(--bma-green), #00c851);
         }
         .btn-submit:active { transform: translateY(0); }
+        
+        .btn-submit:disabled {
+            background: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         /* Back link */
         .back-link {
@@ -553,6 +560,9 @@
                         <i class="fas fa-globe input-prefix-icon"></i>
                         <input type="url" id="URL" name="URL"
                                class="form-input" value="{{ link.URL }}" placeholder="https://..." required>
+                    </div>
+                    <div id="url-message" class="form-hint" style="color: #ef4444; font-weight: 600; margin-top: 6px; display: none;">
+                        <i class="fas fa-exclamation-circle" style="color: #ef4444; margin-top: 2px;"></i> URL นี้มีอยู่ในระบบแล้ว (ไม่สามารถใช้ซ้ำกับลิงก์อื่นได้)
                     </div>
 
                     <div class="shortener-box">
@@ -761,7 +771,10 @@
             <i class="fas fa-arrow-left" style="font-size:0.8rem;"></i>
             ยกเลิกและกลับไปหน้า Dashboard
         </a>
-    </div></div><script>
+    </div>
+</div>
+
+<script>
     // Mobile Menu
     function toggleMenu() {
         const nav  = document.getElementById('navMenu');
@@ -802,6 +815,59 @@
         {% endif %}
     });
 
+    // === ระบบตรวจ URL ซ้ำ ===
+    const urlInput = document.getElementById('URL');
+    const urlMessage = document.getElementById('url-message');
+    const submitBtn = document.querySelector('.btn-submit');
+    const currentLinkId = "{{ link.ID }}"; // ให้รู้ว่าตัวเองคือ ID ไหน จะได้ไม่ทับตัวเอง
+    let isUrlValid = true;
+
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    async function checkUrlDuplicate() {
+        const urlValue = urlInput.value.trim();
+        if (!urlValue) {
+            urlMessage.style.display = 'none';
+            urlInput.style.borderColor = '';
+            isUrlValid = true;
+            submitBtn.disabled = false;
+            return;
+        }
+
+        try {
+            const response = await fetch("{{ url_for('check_url') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: urlValue, link_id: currentLinkId })
+            });
+            const data = await response.json();
+
+            if (data.duplicate) {
+                urlMessage.style.display = 'flex';
+                urlInput.style.borderColor = '#ef4444';
+                urlInput.style.backgroundColor = '#fef2f2';
+                isUrlValid = false;
+                submitBtn.disabled = true;
+            } else {
+                urlMessage.style.display = 'none';
+                urlInput.style.borderColor = '#22c55e';
+                urlInput.style.backgroundColor = '#f0fdf4';
+                isUrlValid = true;
+                submitBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error("Error checking URL:", error);
+        }
+    }
+
+    urlInput.addEventListener('input', debounce(checkUrlDuplicate, 500));
+
     // Phone number cleaning
     const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
     if (phoneInput) {
@@ -810,8 +876,14 @@
         phoneInput.addEventListener('paste',  (e) => setTimeout(() => clean(e.target), 10));
     }
 
-    document.getElementById('editLinkForm').addEventListener('submit', function() {
-        if (phoneInput) phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
+    // ตรวจก่อนส่งฟอร์ม + คลีนเบอร์โทร
+    document.getElementById('editLinkForm').addEventListener('submit', function(e) {
+        if (!isUrlValid) {
+            e.preventDefault();
+            Swal.fire('ข้อผิดพลาด', 'URL นี้มีอยู่ในระบบแล้ว กรุณาใช้ URL อื่น', 'error');
+        } else {
+            if (phoneInput) phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
+        }
     });
 </script>
 

@@ -374,6 +374,13 @@
         }
         .btn-submit:active { transform: translateY(0); }
         .btn-submit i { font-size: 1rem; }
+        
+        .btn-submit:disabled {
+            background: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         /* Back link */
         .back-link {
@@ -557,6 +564,9 @@
                         <input type="url" id="URL" name="URL"
                                class="form-input" placeholder="https://example.com" required>
                     </div>
+                    <div id="url-message" class="form-hint" style="color: #ef4444; font-weight: 600; margin-top: 6px; display: none;">
+                        <i class="fas fa-exclamation-circle" style="color: #ef4444; margin-top: 2px;"></i> URL นี้มีอยู่ในระบบแล้ว (ไม่สามารถเพิ่มซ้ำได้)
+                    </div>
 
                     <div class="shortener-box">
                         <div class="shortener-header" onclick="toggleShortener()">
@@ -683,7 +693,7 @@
                         <div class="input-wrapper">
                             <i class="fas fa-envelope input-prefix-icon"></i>
                             <input type="email" id="อีเมลผู้รับผิดชอบ" name="อีเมลผู้รับผิดชอบ"
-                                   class="form-input" placeholder="example@bangkok.go.th" required>
+                                   class="form-input" value="{{ user_email }}" placeholder="example@bangkok.go.th" required>
                         </div>
                     </div>
 
@@ -695,7 +705,7 @@
                         <div class="input-wrapper">
                             <i class="fas fa-phone input-prefix-icon"></i>
                             <input type="tel" id="เบอร์โทรติดต่อ" name="เบอร์โทรติดต่อ"
-                                   class="form-input" placeholder="02-xxx-xxxx ต่อ xxxx" required>
+                                   class="form-input" value="{{ user_phone }}" placeholder="02-xxx-xxxx ต่อ xxxx" required>
                         </div>
                         <div class="form-hint">
                             <i class="fas fa-info-circle"></i>
@@ -735,7 +745,10 @@
             <i class="fas fa-arrow-left" style="font-size:0.8rem;"></i>
             กลับไปหน้า Dashboard
         </a>
-    </div></div><script>
+    </div>
+</div>
+
+<script>
     // Mobile Menu
     function toggleMenu() {
         const nav  = document.getElementById('navMenu');
@@ -760,6 +773,58 @@
         icon.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
     }
 
+    // === ระบบตรวจ URL ซ้ำ ===
+    const urlInput = document.getElementById('URL');
+    const urlMessage = document.getElementById('url-message');
+    const submitBtn = document.querySelector('.btn-submit');
+    let isUrlValid = true;
+
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    async function checkUrlDuplicate() {
+        const urlValue = urlInput.value.trim();
+        if (!urlValue) {
+            urlMessage.style.display = 'none';
+            urlInput.style.borderColor = '';
+            isUrlValid = true;
+            submitBtn.disabled = false;
+            return;
+        }
+
+        try {
+            const response = await fetch("{{ url_for('check_url') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: urlValue })
+            });
+            const data = await response.json();
+
+            if (data.duplicate) {
+                urlMessage.style.display = 'flex';
+                urlInput.style.borderColor = '#ef4444';
+                urlInput.style.backgroundColor = '#fef2f2';
+                isUrlValid = false;
+                submitBtn.disabled = true;
+            } else {
+                urlMessage.style.display = 'none';
+                urlInput.style.borderColor = '#22c55e';
+                urlInput.style.backgroundColor = '#f0fdf4';
+                isUrlValid = true;
+                submitBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error("Error checking URL:", error);
+        }
+    }
+
+    urlInput.addEventListener('input', debounce(checkUrlDuplicate, 500));
+
     // Phone number cleaning
     const phoneInput = document.getElementById('เบอร์โทรติดต่อ');
     if (phoneInput) {
@@ -768,8 +833,14 @@
         phoneInput.addEventListener('paste',  (e) => setTimeout(() => clean(e.target), 10));
     }
 
-    document.getElementById('addLinkForm').addEventListener('submit', function() {
-        if (phoneInput) phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
+    // ตรวจก่อนส่งฟอร์ม + คลีนเบอร์โทร
+    document.getElementById('addLinkForm').addEventListener('submit', function(e) {
+        if (!isUrlValid) {
+            e.preventDefault();
+            Swal.fire('ข้อผิดพลาด', 'URL นี้มีอยู่ในระบบแล้ว กรุณาใช้ URL อื่น', 'error');
+        } else {
+            if (phoneInput) phoneInput.value = phoneInput.value.replace(/'/g, '').trim();
+        }
     });
 </script>
 
