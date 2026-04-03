@@ -909,6 +909,9 @@ def analytics_page():
         links = get_db_records()
         users = get_staff_records()
         
+        # 🟢 [ส่วนที่เพิ่มใหม่] คัดกรองลิงก์ที่มีความเป็นส่วนตัวเป็น "ส่วนตัว" ออกจากการคำนวณสถิติทั้งหมด
+        links = [l for l in links if str(l.get('ความเป็นส่วนตัว', '')).strip() != 'ส่วนตัว']
+        
         feedback = []
         try:
             res_fb = supabase.table('Feedback').select('*').execute()
