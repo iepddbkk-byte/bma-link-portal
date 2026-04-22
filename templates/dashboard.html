@@ -674,12 +674,12 @@
             </div>
             <select id="agencyFilter" class="filter-select">
                 <option value="">🏢 ทุกส่วนราชการ</option>
-                <optgroup label="ระดับสำนัก">
+                <optgroup label="สำนักงาน/กอง">
                     {% for bureau in bureaus %}
                     <option value="{{ bureau }}">{{ bureau }}</option>
                     {% endfor %}
                 </optgroup>
-                <optgroup label="สำนักงานเขต">
+                <optgroup label="ฝ่าย/กลุ่มงาน">
                     {% for district in districts %}
                     <option value="{{ district }}">{{ district }}</option>
                     {% endfor %}
