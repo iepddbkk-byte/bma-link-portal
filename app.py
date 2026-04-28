@@ -909,13 +909,13 @@ def analytics_page():
         links = get_db_records()
         users = get_staff_records()
         
-        # 🟢 [ส่วนที่เพิ่มใหม่] คัดกรองลิงก์ที่มีความเป็นส่วนตัวเป็น "ส่วนตัว" ออกจากการคำนวณสถิติทั้งหมด
+        # คัดกรองลิงก์ 'ส่วนตัว' ออก ไม่นำมาคำนวณ
         links = [l for l in links if str(l.get('ความเป็นส่วนตัว', '')).strip() != 'ส่วนตัว']
         
         feedback = []
         try:
             res_fb = supabase.table('Feedback').select('*').execute()
-            feedback = res_fb.data
+            if res_fb.data: feedback = res_fb.data
         except: pass
         
         for l in links:
@@ -984,47 +984,58 @@ def analytics_page():
                 except: pass
         sorted_m = sorted(monthly.items())
         
+        # 🟢 [อัปเกรดล่าสุด] ระบบประมวลผล Feedback ข้าม Error ของข้อมูลในฐาน
         sat, ease, comments, features = [], [], [], []
+        sat_counts_dict = {"5": 0, "4": 0, "3": 0, "2": 0, "1": 0}
+        respondents = set()
+        commenters = set()
+        
         for f in feedback:
-            # 1. ดึงคะแนน (รองรับทั้งพิมพ์เล็กและพิมพ์ใหญ่)
+            # 1. เช็คผู้ตอบแบบสอบถาม (นับจาก Username ที่ไม่ซ้ำ)
+            uname = str(f.get('Username', '')).strip()
+            if uname and uname.upper() not in ['NULL', 'EMPTY', 'NONE', 'ไม่มี', '', 'N/A']:
+                respondents.add(uname)
+            else:
+                uname = 'ไม่ระบุตัวตน'
+                
+            # 2. ดึงคะแนน และแปลงเป็นตัวเลข
             s_score = f.get('SatisfactionScore') if f.get('SatisfactionScore') is not None else f.get('satisfactionscore')
             e_score = f.get('EaseOfUseScore') if f.get('EaseOfUseScore') is not None else f.get('easeofusescore')
             
-            try: 
-                if s_score is not None and str(s_score).strip() != '':
-                    sat.append(int(s_score))
-            except: pass
-            
-            try: 
-                if e_score is not None and str(e_score).strip() != '':
-                    ease.append(int(e_score))
-            except: pass
-            
-            # 2. ดึงคอมเมนต์ พร้อมกรองคำว่า NULL, EMPTY, ไม่มี ทิ้งไปเพื่อไม่ให้รกหน้าเว็บ
-            c_text = f.get('Comments') if f.get('Comments') is not None else f.get('comments')
-            f_text = f.get('FeatureRequest') if f.get('FeatureRequest') is not None else f.get('featurerequest')
-            user_name = f.get('Username') or f.get('username', 'ไม่ระบุตัวตน')
-            
-            ignore_words = ['NULL', 'EMPTY', 'ไม่มี', '-']
-            
-            if c_text and str(c_text).strip().upper() not in ignore_words:
-                comments.append({'user': user_name, 'text': c_text})
+            if s_score not in [None, '']:
+                try:
+                    s_int = int(s_score)
+                    sat.append(s_int)
+                    if str(s_int) in sat_counts_dict: sat_counts_dict[str(s_int)] += 1
+                except: pass
                 
-            if f_text and str(f_text).strip().upper() not in ignore_words:
-                features.append({'user': user_name, 'text': f_text})
-        
-        # นับจำนวนดาวแต่ละระดับ
-        sat_counts_dict = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
-        for score in sat:
-            if score in sat_counts_dict: sat_counts_dict[score] += 1
+            if e_score not in [None, '']:
+                try: ease.append(int(e_score))
+                except: pass
+                
+            # 3. ดึงคอมเมนต์
+            c_text = str(f.get('Comments') if f.get('Comments') is not None else f.get('comments', '')).strip()
+            f_text = str(f.get('FeatureRequest') if f.get('FeatureRequest') is not None else f.get('featurerequest', '')).strip()
+            
+            ignore_words = ['NULL', 'EMPTY', 'ไม่มี', 'NONE', '-', 'N/A', 'ไม่ระบุ']
+            
+            if c_text and c_text.upper() not in ignore_words:
+                comments.append({'user': uname, 'text': c_text})
+                commenters.add(uname)
+                
+            if f_text and f_text.upper() not in ignore_words:
+                features.append({'user': uname, 'text': f_text})
         
         chart_data = {
             "total_views": total_views, "top_10_clicks": top_10_clicks, "top_10_edits": top_10_edits,
             "top_10_users": top_10_users, "top_10_bureaus": top_10_bureaus, "top_10_divisions": top_10_divisions,
             "total_links": len(links), "total_users": len(users), 
             "active_links": sum(1 for l in links if l.get('สถานะ') == 'ใช้งาน'),
-            "total_responses": len(feedback),
-            "sat_counts": sat_counts_dict, # 🟢 ข้อมูลนี้จะส่งไปวาดหลอดเปอร์เซ็นต์
+            
+            "total_responses": len(respondents),  # เปลี่ยนเป็นนับจำนวน Username ผู้ตอบ
+            "total_commenters": len(commenters),  # นับจำนวนคนที่แสดงความเห็น
+            "sat_counts": sat_counts_dict,
+            
             "category_labels": list(cat_counts.keys()), "category_data": list(cat_counts.values()),
             "dept_labels": [d[0] for d in dept_counts], "dept_data": [d[1] for d in dept_counts],
             "month_labels": [m[0] for m in sorted_m], "month_data": [m[1] for m in sorted_m],
@@ -1033,6 +1044,9 @@ def analytics_page():
             "recent_comments": comments[-5:][::-1], "recent_features": features[-5:][::-1]
         }
         return render_template('analytics.html', session=session, chart_data=chart_data)
+    except Exception as e:
+        print(f"Analytics Error: {e}")
+        return redirect(url_for('dashboard'))
 
 @app.route('/admin')
 def admin_panel():

@@ -665,6 +665,10 @@
             <div class="sat-summary-num" id="satTotalRespondents">0</div>
             <div class="sat-summary-total">จากจำนวนผู้ใช้งาน <span id="satTotalUsers">0</span> คน</div>
             <div class="sat-summary-percent" id="satPercentText">คิดเป็น 0%</div>
+            
+            <div style="margin-top:15px; padding-top:15px; border-top:1px dashed #fcd34d;">
+                <div style="font-size:0.85rem; color:#b45309;"><i class="fas fa-comment-dots"></i> ผู้แสดงความคิดเห็น: <span id="satTotalCommenters" style="font-weight:700; font-size:1.1rem;">0</span> คน</div>
+            </div>
         </div>
         <div class="sat-bars-container" id="satBars">
             </div>
@@ -974,6 +978,8 @@
     <p style="margin-top:12px; font-size:0.82rem; opacity:0.7;">© 2025 Bangkok Metropolitan Administration. All rights reserved.</p>
 </footer>
 
+<div id="bmaChartData" style="display: none;">{{ chart_data | tojson | safe }}</div>
+
 <script>
     // ==========================================
     // 1. ระบบเมนูมือถือ
@@ -996,30 +1002,35 @@
     // ==========================================
     // 2. รับข้อมูลจาก Python
     // ==========================================
-    // ใช้ get_flashed_messages style object หรือ JSON ธรรมดาเพื่อความปลอดภัยสูงสุด
     let chartData = {};
     try {
-        chartData = {{ chart_data | tojson | safe }};
+        const dataDiv = document.getElementById('bmaChartData');
+        if (dataDiv) {
+            chartData = JSON.parse(dataDiv.textContent);
+        }
     } catch(e) {
-        console.error("Error parsing chart data:", e);
+        console.error("Error parsing data:", e);
     }
     
     // ==========================================
-    // 3. ระบบแสดงผลแถบความพึงพอใจ (Satisfaction Bars)
+    // 3. ระบบแสดงผลแถบความพึงพอใจ
     // ==========================================
     function renderSatisfactionBars() {
-        if (!chartData) return;
+        if (!chartData || !chartData.sat_counts) return;
 
         const totalResp = chartData.total_responses || 0;
         const totalUsers = chartData.total_users || 0;
-        const satCounts = chartData.sat_counts || {"5":0, "4":0, "3":0, "2":0, "1":0};
+        const totalCommenters = chartData.total_commenters || 0;
+        const satCounts = chartData.sat_counts;
         
         const elTotalResp = document.getElementById('satTotalRespondents');
         const elTotalUsers = document.getElementById('satTotalUsers');
         const elPercentText = document.getElementById('satPercentText');
+        const elTotalCommenters = document.getElementById('satTotalCommenters');
         
         if (elTotalResp) elTotalResp.textContent = totalResp;
         if (elTotalUsers) elTotalUsers.textContent = totalUsers;
+        if (elTotalCommenters) elTotalCommenters.textContent = totalCommenters;
         
         let percentAll = "0.0";
         if(totalUsers > 0) {
@@ -1041,8 +1052,7 @@
         let html = '';
         
         [5, 4, 3, 2, 1].forEach(level => {
-            // ดึงค่าโดยป้องกันเรื่อง Data Type (String vs Integer)
-            const count = satCounts[level.toString()] || satCounts[level] || 0;
+            const count = satCounts[level.toString()] || 0;
             const percent = totalResp > 0 ? ((count / totalResp) * 100).toFixed(1) : 0;
             const stars = '<i class="fas fa-star"></i>'.repeat(level);
             
@@ -1065,7 +1075,6 @@
         
         container.innerHTML = html;
 
-        // หน่วงเวลาให้เบราว์เซอร์วาด HTML เสร็จก่อนเริ่ม Animation 
         setTimeout(() => {
             document.querySelectorAll('.sat-bar-fill').forEach(bar => {
                 bar.style.width = bar.getAttribute('data-target-width');
@@ -1073,7 +1082,6 @@
         }, 150);
     }
     
-    // บังคับให้เริ่มทำงานเมื่อเว็บโหลดเสร็จสมบูรณ์
     document.addEventListener("DOMContentLoaded", function() {
         renderSatisfactionBars();
     });
