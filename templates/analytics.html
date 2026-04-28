@@ -975,7 +975,9 @@
 </footer>
 
 <script>
-    // Mobile Menu
+    // ==========================================
+    // 1. ระบบเมนูมือถือ
+    // ==========================================
     function toggleMenu() {
         const nav  = document.getElementById('navMenu');
         const icon = document.getElementById('menuIcon');
@@ -991,23 +993,21 @@
         }
     });
 
-    // Data from Python
-    const chartData = {{ chart_data | tojson }};
+    // ==========================================
+    // 2. รับข้อมูลจาก Python
+    // ==========================================
+    const chartData = {{ chart_data | tojson | safe }};
     
-// ==================================================
-    // SATISFACTION BARS SCRIPT (แก้ไขให้รองรับ JSON Format)
-    // ==================================================
+    // ==========================================
+    // 3. ระบบแสดงผลแถบความพึงพอใจ (Satisfaction Bars)
+    // ==========================================
     function renderSatisfactionBars() {
-        // ใช้ || {} เพื่อป้องกันกรณีไม่มีข้อมูลส่งมา
-        const chartDataObj = typeof chartData !== 'undefined' ? chartData : {};
+        if (!chartData) return;
+
+        const totalResp = chartData.total_responses || 0;
+        const totalUsers = chartData.total_users || 0;
+        const satCounts = chartData.sat_counts || {"5":0, "4":0, "3":0, "2":0, "1":0};
         
-        const totalResp = chartDataObj.total_responses || 0;
-        const totalUsers = chartDataObj.total_users || 0;
-        
-        // รับค่าจาก Python (JSON จะแปลง Key ตัวเลขเป็น String อัตโนมัติ เช่น "5")
-        const satCounts = chartDataObj.sat_counts || {"5":0, "4":0, "3":0, "2":0, "1":0};
-        
-        // อัปเดตตัวเลขรวมบนหน้าเว็บ
         const elTotalResp = document.getElementById('satTotalRespondents');
         const elTotalUsers = document.getElementById('satTotalUsers');
         const elPercentText = document.getElementById('satPercentText');
@@ -1030,12 +1030,11 @@
         };
 
         const container = document.getElementById('satBars');
-        if (!container) return; // หยุดทำงานถ้าหา Container ไม่เจอ
+        if (!container) return;
 
         let html = '';
         
         [5, 4, 3, 2, 1].forEach(level => {
-            // ค้นหา Key แบบ String ป้องกัน Error
             const count = satCounts[level.toString()] || satCounts[level] || 0;
             const percent = totalResp > 0 ? ((count / totalResp) * 100).toFixed(1) : 0;
             const stars = '<i class="fas fa-star"></i>'.repeat(level);
@@ -1059,7 +1058,6 @@
         
         container.innerHTML = html;
 
-        // Animate Bars (หน่วงเวลาเล็กน้อยให้หน้าเว็บวาด HTML เสร็จก่อน)
         setTimeout(() => {
             document.querySelectorAll('.sat-bar-fill').forEach(bar => {
                 bar.style.width = bar.getAttribute('data-target-width');
@@ -1067,15 +1065,13 @@
         }, 150);
     }
     
-    // เรียกใช้งานฟังก์ชันเมื่อโหลดหน้าเว็บ
-    document.addEventListener("DOMContentLoaded", function() {
-        renderSatisfactionBars();
-    });
+    // เรียกใช้ฟังก์ชันวาดแถบดาวทันที
+    renderSatisfactionBars();
 
 
-    // ==================================================
-    // CHART.JS
-    // ==================================================
+    // ==========================================
+    // 4. ระบบวาดกราฟ (Chart.js)
+    // ==========================================
     Chart.defaults.font.family = "'Kanit', sans-serif";
     Chart.defaults.font.size   = 13;
 
@@ -1090,8 +1086,7 @@
         return Array.from({ length: n }, (_, i) => palette[i % palette.length]);
     }
 
-    // Pie Chart
-    if (chartData.category_labels?.length) {
+    if (chartData.category_labels && chartData.category_labels.length > 0) {
         new Chart(document.getElementById('categoryPieChart'), {
             type: 'pie',
             data: {
@@ -1102,17 +1097,11 @@
                     borderWidth: 2, borderColor: '#fff'
                 }]
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom', labels: { padding: 14, font: { size: 12 } } }
-                }
-            }
+            options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { padding: 14, font: { size: 12 } } } } }
         });
     }
 
-    // Bar Chart
-    if (chartData.dept_labels?.length) {
+    if (chartData.dept_labels && chartData.dept_labels.length > 0) {
         new Chart(document.getElementById('departmentBarChart'), {
             type: 'bar',
             data: {
@@ -1125,19 +1114,13 @@
                 }]
             },
             options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                    x: { grid: { display: false },
-                         ticks: { maxRotation: 30, font: { size: 11 } } }
-                }
+                responsive: true, plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false }, ticks: { maxRotation: 30, font: { size: 11 } } } }
             }
         });
     }
 
-    // Line Chart
-    if (chartData.month_labels?.length) {
+    if (chartData.month_labels && chartData.month_labels.length > 0) {
         new Chart(document.getElementById('monthlyLineChart'), {
             type: 'line',
             data: {
@@ -1147,26 +1130,17 @@
                     data: chartData.month_data,
                     backgroundColor: 'rgba(0,150,60,0.08)',
                     borderColor: 'rgba(0,150,60,1)',
-                    borderWidth: 2.5,
-                    fill: true, tension: 0.4,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: 'rgba(0,150,60,1)',
-                    pointBorderWidth: 2, pointRadius: 5,
-                    pointHoverRadius: 7
+                    borderWidth: 2.5, fill: true, tension: 0.4,
+                    pointBackgroundColor: '#fff', pointBorderColor: 'rgba(0,150,60,1)', pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7
                 }]
             },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                    x: { grid: { display: false } }
-                }
-            }
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } }
         });
     }
 
-    // Online Count
+    // ==========================================
+    // 5. ระบบนับคนออนไลน์
+    // ==========================================
     function updateOnlineCount() {
         fetch("{{ url_for('heartbeat') }}", {
             method: "POST",
