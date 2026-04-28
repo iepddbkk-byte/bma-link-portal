@@ -193,7 +193,6 @@
         ========================================== */
         .stats-grid {
             display: grid;
-            /* [UPDATED] เปลี่ยนเป็น 3 คอลัมน์ เพื่อรองรับ 6 การ์ดได้สวยๆ */
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             margin-bottom: 24px;
@@ -221,7 +220,6 @@
         .stat-card.green::after  { background: var(--bma-green); }
         .stat-card.emerald::after{ background: #10b981; }
         .stat-card.purple::after { background: #8b5cf6; }
-        /* [NEW] สีใหม่สำหรับการ์ดความพึงพอใจ */
         .stat-card.amber::after  { background: #f59e0b; }
         .stat-card.rose::after   { background: #f43f5e; }
 
@@ -285,7 +283,6 @@
         .rank-card.emerald{ border-top-color: #10b981; }
         .rank-card.blue   { border-top-color: #3b82f6; }
 
-        /* Table Styles */
         .rank-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .rank-table-wrap::-webkit-scrollbar { height: 4px; }
         .rank-table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
@@ -369,6 +366,49 @@
         canvas { max-width: 100%; }
 
         /* ==========================================
+           SATISFACTION BREAKDOWN SECTION [NEW]
+        ========================================== */
+        .sat-overview-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 36px;
+            align-items: center;
+        }
+        .sat-summary-box {
+            text-align: center;
+            padding: 30px 20px;
+            background: #fffbeb;
+            border-radius: var(--radius-lg);
+            border: 1.5px solid #fde68a;
+        }
+        .sat-summary-title { color: #b45309; font-size: 1rem; font-weight: 700; margin-bottom: 15px; display:flex; align-items:center; justify-content:center; gap:8px;}
+        .sat-summary-num { font-size: 3rem; font-weight: 700; color: #f59e0b; line-height: 1; margin-bottom: 5px; }
+        .sat-summary-total { font-size: 1rem; color: #92400e; font-weight: 500; margin-bottom: 15px; }
+        .sat-summary-percent { font-size: 0.85rem; color: #b45309; background: #fef3c7; padding: 6px 12px; border-radius: var(--radius-full); font-weight:600; }
+
+        .sat-bars-container { display: flex; flex-direction: column; gap: 16px; }
+        .sat-row { display: flex; align-items: center; gap: 14px; }
+        .sat-label-wrap { width: 140px; display: flex; flex-direction: column; gap: 2px; }
+        .sat-level-name { font-size: 0.9rem; font-weight: 600; color: var(--text-color); }
+        .sat-stars { font-size: 0.75rem; color: #f59e0b; letter-spacing: 1px; }
+        
+        .sat-bar-bg { flex: 1; height: 12px; background: #f1f5f9; border-radius: var(--radius-full); overflow: hidden; }
+        .sat-bar-fill { height: 100%; border-radius: var(--radius-full); transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+        .sat-bar-fill.level-5 { background: linear-gradient(90deg, #10b981, #34d399); }
+        .sat-bar-fill.level-4 { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .sat-bar-fill.level-3 { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .sat-bar-fill.level-2 { background: linear-gradient(90deg, #f97316, #fb923c); }
+        .sat-bar-fill.level-1 { background: linear-gradient(90deg, #ef4444, #f87171); }
+        
+        .sat-value-wrap { width: 85px; text-align: right; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+        .sat-value-percent { font-size: 0.8rem; color: #94a3b8; font-weight: 500; margin-left: 4px; }
+
+        /* ==========================================
            FEEDBACK SECTION
         ========================================== */
         .feedback-grid {
@@ -419,18 +459,16 @@
         .main-footer strong { color: var(--text-color); }
 
         /* ==========================================
-           TABLET (769–1024)
+           TABLET & MOBILE
         ========================================== */
         @media (max-width: 1024px) and (min-width: 769px) {
             .nav-link span { display: none; }
             .nav-link { padding: 9px; border-radius: 50%; width: 42px; height: 42px; justify-content: center; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .rank-grid-2 { grid-template-columns: 1fr; }
+            .sat-overview-card { grid-template-columns: 1fr; gap: 24px; }
         }
 
-        /* ==========================================
-           MOBILE (≤768px)
-        ========================================== */
         @media (max-width: 768px) {
             :root { --header-height: 64px; }
 
@@ -440,7 +478,6 @@
             .header-online-count { display: none; }
             .mobile-controls { display: flex; }
 
-            /* Nav slide */
             .nav-menu {
                 display: none; position: fixed;
                 top: 64px; left: 0; right: 0;
@@ -454,65 +491,54 @@
                 from { opacity: 0; transform: translateY(-8px); }
                 to   { opacity: 1; transform: translateY(0); }
             }
-            .nav-link {
-                width: 100%; border-radius: var(--radius-md); padding: 12px 14px;
-                margin-bottom: 4px; justify-content: flex-start; color: var(--text-color); font-size: 0.95rem;
-            }
+            .nav-link { width: 100%; border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 4px; justify-content: flex-start; color: var(--text-color); font-size: 0.95rem; }
             .nav-link span { display: inline; }
             .nav-link i { margin-right: 10px; }
             .nav-link.profile-item { display: none; }
 
-            /* Container */
             .container { padding: 0 12px; margin: 12px auto; }
-
-            /* Banner */
             .page-banner { padding: 20px; flex-direction: row; }
             .page-banner-text h1 { font-size: 1.15rem; }
             .page-banner-text p  { font-size: 0.8rem; }
             .page-banner-icon { width: 44px; height: 44px; font-size: 1.4rem; }
 
-            /* Stats: 2 columns on mobile */
             .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
             .stat-card { padding: 16px 14px; gap: 10px; }
             .stat-icon { width: 42px; height: 42px; font-size: 1.1rem; }
             .stat-num  { font-size: 1.5rem; }
             .stat-label { font-size: 0.78rem; }
 
-            /* Section cards */
             .section-card { padding: 16px; }
-
-            /* Ranking grids: 1 column */
             .rank-grid-2 { grid-template-columns: 1fr; gap: 14px; }
             .rank-card { padding: 16px; }
-
-            /* Charts: 1 column */
             .charts-grid { grid-template-columns: 1fr; gap: 14px; }
             .chart-card { padding: 16px; }
             .chart-card.full { grid-column: 1; }
-
-            /* Feedback: 1 column */
             .feedback-grid { grid-template-columns: 1fr; gap: 14px; }
             .feedback-card { padding: 16px; }
 
-            /* Table: allow horizontal scroll per card */
             .rank-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
             table { min-width: 320px; font-size: 0.82rem; }
             thead th { padding: 8px 10px; font-size: 0.75rem; }
             tbody td { padding: 9px 10px; font-size: 0.82rem; }
-
-            /* Hide less important columns on mobile */
             .col-hide-mobile { display: none !important; }
-
             .link-name-cell { max-width: 120px; }
-
-            /* Section title */
             .section-title { font-size: 1rem; }
+
+            /* Mobile tweaks for Sat Card */
+            .sat-overview-card { grid-template-columns: 1fr; gap: 20px; padding: 20px 16px; }
+            .sat-label-wrap { width: 110px; }
+            .sat-level-name { font-size: 0.82rem; }
+            .sat-value-wrap { width: 70px; font-size: 0.82rem; }
+            .sat-summary-num { font-size: 2.5rem; }
         }
 
         @media (max-width: 380px) {
             .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
             .stat-card { padding: 12px 10px; gap: 8px; }
             .stat-num  { font-size: 1.3rem; }
+            .sat-label-wrap { width: 95px; }
+            .sat-value-percent { display: none; } /* Hide percent text on very small screen */
         }
     </style>
 </head>
@@ -569,7 +595,7 @@
     <div class="page-banner">
         <div class="page-banner-text">
             <h1>📊 Analytics Dashboard</h1>
-            <p>สรุปผลการใช้งานระบบสำหรับผู้บริหาร</p>
+            <p>สรุปผลการใช้งานระบบสำหรับผู้บริหาร (ไม่คำนวณรวมข้อมูลที่ตั้งค่าเป็นส่วนตัว)</p>
         </div>
         <div class="page-banner-icon">📈</div>
     </div>
@@ -624,6 +650,24 @@
             </div>
         </div>
 
+    </div>
+
+    <div class="section-title" style="margin-bottom:16px; padding-bottom:14px; border-bottom:2px solid var(--border-color);">
+        <div class="title-icon" style="background:#fffbeb; color:#f59e0b;">
+            <i class="fas fa-smile-beam"></i>
+        </div>
+        สรุปผลการประเมินความพึงพอใจของผู้ใช้งาน
+    </div>
+
+    <div class="sat-overview-card">
+        <div class="sat-summary-box">
+            <div class="sat-summary-title"><i class="fas fa-user-check"></i> ผู้ทำแบบประเมินทั้งหมด</div>
+            <div class="sat-summary-num" id="satTotalRespondents">0</div>
+            <div class="sat-summary-total">จากจำนวนผู้ใช้งาน <span id="satTotalUsers">0</span> คน</div>
+            <div class="sat-summary-percent" id="satPercentText">คิดเป็น 0%</div>
+        </div>
+        <div class="sat-bars-container" id="satBars">
+            </div>
     </div>
 
     <div class="rank-grid-2">
@@ -921,7 +965,9 @@
         </div>
     </div>
 
-</div><footer class="main-footer">
+</div>
+
+<footer class="main-footer">
     <p><strong>กองยุทธศาสตร์พัฒนาโครงสร้างพื้นฐานเมือง</strong></p>
     <p>สำนักยุทธศาสตร์และประเมินผล</p>
     <p>📞 โทร 0-2221-2141-69 ต่อ 1513</p>
@@ -945,8 +991,77 @@
         }
     });
 
-    // Chart.js
+    // Data from Python
     const chartData = {{ chart_data | tojson }};
+    
+    // ==================================================
+    // SATISFACTION BARS SCRIPT
+    // ==================================================
+    function renderSatisfactionBars() {
+        const totalResp = chartData.total_responses || 0;
+        const totalUsers = chartData.total_users || 0;
+        const satCounts = chartData.sat_counts || {5:0, 4:0, 3:0, 2:0, 1:0};
+        
+        // อัปเดตตัวเลขรวม
+        document.getElementById('satTotalRespondents').textContent = totalResp;
+        document.getElementById('satTotalUsers').textContent = totalUsers;
+        
+        let percentAll = "0%";
+        if(totalUsers > 0) {
+            percentAll = ((totalResp / totalUsers) * 100).toFixed(1) + "%";
+        }
+        document.getElementById('satPercentText').textContent = `คิดเป็น ${percentAll} ของเจ้าหน้าที่ในระบบ`;
+
+        const labels = {
+            5: "พึงพอใจมากที่สุด",
+            4: "พึงพอใจมาก",
+            3: "พึงพอใจ",
+            2: "ไม่พึงพอใจ",
+            1: "ไม่พึงพอใจมาก"
+        };
+
+        const container = document.getElementById('satBars');
+        let html = '';
+        
+        [5, 4, 3, 2, 1].forEach(level => {
+            const count = satCounts[level] || 0;
+            const percent = totalResp > 0 ? ((count / totalResp) * 100).toFixed(1) : 0;
+            const stars = '<i class="fas fa-star"></i>'.repeat(level);
+            
+            html += `
+                <div class="sat-row">
+                    <div class="sat-label-wrap">
+                        <div class="sat-level-name">${labels[level]}</div>
+                        <div class="sat-stars">${stars}</div>
+                    </div>
+                    <div class="sat-bar-bg">
+                        <div class="sat-bar-fill level-${level}" style="width: 0%" data-target-width="${percent}%"></div>
+                    </div>
+                    <div class="sat-value-wrap">
+                        <span style="color:var(--text-color);">${count} คน</span>
+                        <span class="sat-value-percent">(${percent}%)</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+
+        // Animate Bars
+        setTimeout(() => {
+            document.querySelectorAll('.sat-bar-fill').forEach(bar => {
+                bar.style.width = bar.getAttribute('data-target-width');
+            });
+        }, 100);
+    }
+    
+    // เรียกใช้งานเมื่อโหลดเสร็จ
+    renderSatisfactionBars();
+
+
+    // ==================================================
+    // CHART.JS
+    // ==================================================
     Chart.defaults.font.family = "'Kanit', sans-serif";
     Chart.defaults.font.size   = 13;
 

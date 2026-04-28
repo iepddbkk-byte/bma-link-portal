@@ -993,12 +993,17 @@ def analytics_page():
             if f.get('Comments'): comments.append({'user': f['Username'], 'text': f['Comments']})
             if f.get('FeatureRequest'): features.append({'user': f['Username'], 'text': f['FeatureRequest']})
         
+        sat_counts_dict = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+        for score in sat:
+            if score in sat_counts_dict: sat_counts_dict[score] += 1
+        
         chart_data = {
             "total_views": total_views, "top_10_clicks": top_10_clicks, "top_10_edits": top_10_edits,
             "top_10_users": top_10_users, "top_10_bureaus": top_10_bureaus, "top_10_divisions": top_10_divisions,
             "total_links": len(links), "total_users": len(users), 
             "active_links": sum(1 for l in links if l.get('สถานะ') == 'ใช้งาน'),
             "total_responses": len(feedback),
+            "sat_counts": sat_counts_dict, # 🟢 แทรกบรรทัดนี้ส่งข้อมูลไปหน้าเว็บ
             "category_labels": list(cat_counts.keys()), "category_data": list(cat_counts.values()),
             "dept_labels": [d[0] for d in dept_counts], "dept_data": [d[1] for d in dept_counts],
             "month_labels": [m[0] for m in sorted_m], "month_data": [m[1] for m in sorted_m],
@@ -1007,7 +1012,6 @@ def analytics_page():
             "recent_comments": comments[-5:][::-1], "recent_features": features[-5:][::-1]
         }
         return render_template('analytics.html', session=session, chart_data=chart_data)
-    except: return redirect(url_for('dashboard'))
 
 @app.route('/admin')
 def admin_panel():
