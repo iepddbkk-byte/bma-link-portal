@@ -986,13 +986,34 @@ def analytics_page():
         
         sat, ease, comments, features = [], [], [], []
         for f in feedback:
-            try: sat.append(int(f['SatisfactionScore']))
+            # 1. ดึงคะแนน (รองรับทั้งพิมพ์เล็กและพิมพ์ใหญ่)
+            s_score = f.get('SatisfactionScore') if f.get('SatisfactionScore') is not None else f.get('satisfactionscore')
+            e_score = f.get('EaseOfUseScore') if f.get('EaseOfUseScore') is not None else f.get('easeofusescore')
+            
+            try: 
+                if s_score is not None and str(s_score).strip() != '':
+                    sat.append(int(s_score))
             except: pass
-            try: ease.append(int(f['EaseOfUseScore']))
+            
+            try: 
+                if e_score is not None and str(e_score).strip() != '':
+                    ease.append(int(e_score))
             except: pass
-            if f.get('Comments'): comments.append({'user': f['Username'], 'text': f['Comments']})
-            if f.get('FeatureRequest'): features.append({'user': f['Username'], 'text': f['FeatureRequest']})
+            
+            # 2. ดึงคอมเมนต์ พร้อมกรองคำว่า NULL, EMPTY, ไม่มี ทิ้งไปเพื่อไม่ให้รกหน้าเว็บ
+            c_text = f.get('Comments') if f.get('Comments') is not None else f.get('comments')
+            f_text = f.get('FeatureRequest') if f.get('FeatureRequest') is not None else f.get('featurerequest')
+            user_name = f.get('Username') or f.get('username', 'ไม่ระบุตัวตน')
+            
+            ignore_words = ['NULL', 'EMPTY', 'ไม่มี', '-']
+            
+            if c_text and str(c_text).strip().upper() not in ignore_words:
+                comments.append({'user': user_name, 'text': c_text})
+                
+            if f_text and str(f_text).strip().upper() not in ignore_words:
+                features.append({'user': user_name, 'text': f_text})
         
+        # นับจำนวนดาวแต่ละระดับ
         sat_counts_dict = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
         for score in sat:
             if score in sat_counts_dict: sat_counts_dict[score] += 1
@@ -1003,7 +1024,7 @@ def analytics_page():
             "total_links": len(links), "total_users": len(users), 
             "active_links": sum(1 for l in links if l.get('สถานะ') == 'ใช้งาน'),
             "total_responses": len(feedback),
-            "sat_counts": sat_counts_dict, # 🟢 แทรกบรรทัดนี้ส่งข้อมูลไปหน้าเว็บ
+            "sat_counts": sat_counts_dict, # 🟢 ข้อมูลนี้จะส่งไปวาดหลอดเปอร์เซ็นต์
             "category_labels": list(cat_counts.keys()), "category_data": list(cat_counts.values()),
             "dept_labels": [d[0] for d in dept_counts], "dept_data": [d[1] for d in dept_counts],
             "month_labels": [m[0] for m in sorted_m], "month_data": [m[1] for m in sorted_m],

@@ -937,7 +937,7 @@
                 <li>
                     <div class="empty-state">
                         <i class="fas fa-inbox"></i>
-                        <p>ยังไม่มีข้อเสนอแนะ</p>
+                        <p>ไม่มีข้อเสนอแนะ</p>
                     </div>
                 </li>
                 {% endfor %}
@@ -957,7 +957,7 @@
                 <li>
                     <div class="empty-state">
                         <i class="fas fa-inbox"></i>
-                        <p>ยังไม่มีคำขอฟีเจอร์</p>
+                        <p>ไม่มีคำขอฟีเจอร์</p>
                     </div>
                 </li>
                 {% endfor %}
@@ -996,7 +996,13 @@
     // ==========================================
     // 2. รับข้อมูลจาก Python
     // ==========================================
-    const chartData = {{ chart_data | tojson | safe }};
+    // ใช้ get_flashed_messages style object หรือ JSON ธรรมดาเพื่อความปลอดภัยสูงสุด
+    let chartData = {};
+    try {
+        chartData = {{ chart_data | tojson | safe }};
+    } catch(e) {
+        console.error("Error parsing chart data:", e);
+    }
     
     // ==========================================
     // 3. ระบบแสดงผลแถบความพึงพอใจ (Satisfaction Bars)
@@ -1019,7 +1025,7 @@
         if(totalUsers > 0) {
             percentAll = ((totalResp / totalUsers) * 100).toFixed(1);
         }
-        if (elPercentText) elPercentText.textContent = `คิดเป็น ${percentAll}% ของเจ้าหน้าที่ในระบบ`;
+        if (elPercentText) elPercentText.textContent = `คิดเป็น ${percentAll}% ของผู้ใช้งานในระบบ`;
 
         const labels = {
             5: "พึงพอใจมากที่สุด",
@@ -1035,6 +1041,7 @@
         let html = '';
         
         [5, 4, 3, 2, 1].forEach(level => {
+            // ดึงค่าโดยป้องกันเรื่อง Data Type (String vs Integer)
             const count = satCounts[level.toString()] || satCounts[level] || 0;
             const percent = totalResp > 0 ? ((count / totalResp) * 100).toFixed(1) : 0;
             const stars = '<i class="fas fa-star"></i>'.repeat(level);
@@ -1058,6 +1065,7 @@
         
         container.innerHTML = html;
 
+        // หน่วงเวลาให้เบราว์เซอร์วาด HTML เสร็จก่อนเริ่ม Animation 
         setTimeout(() => {
             document.querySelectorAll('.sat-bar-fill').forEach(bar => {
                 bar.style.width = bar.getAttribute('data-target-width');
@@ -1065,9 +1073,10 @@
         }, 150);
     }
     
-    // เรียกใช้ฟังก์ชันวาดแถบดาวทันที
-    renderSatisfactionBars();
-
+    // บังคับให้เริ่มทำงานเมื่อเว็บโหลดเสร็จสมบูรณ์
+    document.addEventListener("DOMContentLoaded", function() {
+        renderSatisfactionBars();
+    });
 
     // ==========================================
     // 4. ระบบวาดกราฟ (Chart.js)
