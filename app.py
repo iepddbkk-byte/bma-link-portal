@@ -984,56 +984,73 @@ def analytics_page():
                 except: pass
         sorted_m = sorted(monthly.items())
         
-        # 🟢 [อัปเกรดล่าสุด] ระบบประมวลผล Feedback ข้าม Error ของข้อมูลในฐาน
+        # 🟢 [แก้ไขใหม่] ระบบประมวลผล Feedback ให้นับ Username ละ 1 ครั้ง (เอาครั้งล่าสุด)
+        def get_ts(f):
+            return str(f.get('Timestamp', '') or '')
+            
+        feedback_sorted = sorted(feedback, key=get_ts)
+        
+        latest_feedback = {}
+        for f in feedback_sorted:
+            uname = str(f.get('Username', '')).strip()
+            ignore_words = ['NULL', 'EMPTY', 'NONE', 'ไม่มี', '', 'N/A', 'ไม่ระบุ']
+            
+            if uname.upper() in ignore_words:
+                uname = f"anonymous_{id(f)}"  # สร้าง Key สมมติเพื่อไม่ให้ไปทับคนอื่น
+                
+            # เนื่องจากเรียงตาม Timestamp จากเก่าไปใหม่ ข้อมูลนี้จะไปทับข้อมูลเก่า ทำให้เหลือแค่ครั้งล่าสุด
+            latest_feedback[uname] = f
+
         sat, ease, comments, features = [], [], [], []
         sat_counts_dict = {"5": 0, "4": 0, "3": 0, "2": 0, "1": 0}
-        respondents = set()
         commenters = set()
         
-        for f in feedback:
-            # 1. เช็คผู้ตอบแบบสอบถาม (นับจาก Username ที่ไม่ซ้ำ)
-            uname = str(f.get('Username', '')).strip()
-            if uname and uname.upper() not in ['NULL', 'EMPTY', 'NONE', 'ไม่มี', '', 'N/A']:
-                respondents.add(uname)
-            else:
-                uname = 'ไม่ระบุตัวตน'
-                
-            # 2. ดึงคะแนน และแปลงเป็นตัวเลข
+        for uname, f in latest_feedback.items():
+            display_name = uname if not uname.startswith('anonymous_') else 'ไม่ระบุตัวตน'
+            
+            # ดึงคะแนน (รองรับการคืนค่าแบบพิมพ์เล็กและพิมพ์ใหญ่ของ Supabase)
             s_score = f.get('SatisfactionScore') if f.get('SatisfactionScore') is not None else f.get('satisfactionscore')
             e_score = f.get('EaseOfUseScore') if f.get('EaseOfUseScore') is not None else f.get('easeofusescore')
             
             if s_score not in [None, '']:
                 try:
                     s_int = int(s_score)
-                    sat.append(s_int)
-                    if str(s_int) in sat_counts_dict: sat_counts_dict[str(s_int)] += 1
+                    if 1 <= s_int <= 5:
+                        sat.append(s_int)
+                        sat_counts_dict[str(s_int)] += 1
                 except: pass
                 
             if e_score not in [None, '']:
-                try: ease.append(int(e_score))
+                try: 
+                    e_int = int(e_score)
+                    if 1 <= e_int <= 5:
+                        ease.append(e_int)
                 except: pass
                 
-            # 3. ดึงคอมเมนต์
+            # ดึงคอมเมนต์
             c_text = str(f.get('Comments') if f.get('Comments') is not None else f.get('comments', '')).strip()
             f_text = str(f.get('FeatureRequest') if f.get('FeatureRequest') is not None else f.get('featurerequest', '')).strip()
             
             ignore_words = ['NULL', 'EMPTY', 'ไม่มี', 'NONE', '-', 'N/A', 'ไม่ระบุ']
             
             if c_text and c_text.upper() not in ignore_words:
-                comments.append({'user': uname, 'text': c_text})
-                commenters.add(uname)
+                comments.append({'user': display_name, 'text': c_text})
+                if not uname.startswith('anonymous_'): commenters.add(uname)
                 
             if f_text and f_text.upper() not in ignore_words:
-                features.append({'user': uname, 'text': f_text})
-        
+                features.append({'user': display_name, 'text': f_text})
+
+        # นับเฉพาะ Username ผู้ใช้งานที่เข้าระบบจริงๆ (เพื่อไม่ให้เปอร์เซ็นต์เกินผู้ใช้ในระบบทั้งหมด)
+        valid_respondents = [k for k in latest_feedback.keys() if not k.startswith('anonymous_')]
+
         chart_data = {
             "total_views": total_views, "top_10_clicks": top_10_clicks, "top_10_edits": top_10_edits,
             "top_10_users": top_10_users, "top_10_bureaus": top_10_bureaus, "top_10_divisions": top_10_divisions,
             "total_links": len(links), "total_users": len(users), 
             "active_links": sum(1 for l in links if l.get('สถานะ') == 'ใช้งาน'),
             
-            "total_responses": len(respondents),  # เปลี่ยนเป็นนับจำนวน Username ผู้ตอบ
-            "total_commenters": len(commenters),  # นับจำนวนคนที่แสดงความเห็น
+            "total_responses": len(valid_respondents),
+            "total_commenters": len(commenters),
             "sat_counts": sat_counts_dict,
             
             "category_labels": list(cat_counts.keys()), "category_data": list(cat_counts.values()),
