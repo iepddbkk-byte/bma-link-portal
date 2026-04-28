@@ -994,23 +994,32 @@
     // Data from Python
     const chartData = {{ chart_data | tojson }};
     
-    // ==================================================
-    // SATISFACTION BARS SCRIPT
+// ==================================================
+    // SATISFACTION BARS SCRIPT (แก้ไขให้รองรับ JSON Format)
     // ==================================================
     function renderSatisfactionBars() {
-        const totalResp = chartData.total_responses || 0;
-        const totalUsers = chartData.total_users || 0;
-        const satCounts = chartData.sat_counts || {5:0, 4:0, 3:0, 2:0, 1:0};
+        // ใช้ || {} เพื่อป้องกันกรณีไม่มีข้อมูลส่งมา
+        const chartDataObj = typeof chartData !== 'undefined' ? chartData : {};
         
-        // อัปเดตตัวเลขรวม
-        document.getElementById('satTotalRespondents').textContent = totalResp;
-        document.getElementById('satTotalUsers').textContent = totalUsers;
+        const totalResp = chartDataObj.total_responses || 0;
+        const totalUsers = chartDataObj.total_users || 0;
         
-        let percentAll = "0%";
+        // รับค่าจาก Python (JSON จะแปลง Key ตัวเลขเป็น String อัตโนมัติ เช่น "5")
+        const satCounts = chartDataObj.sat_counts || {"5":0, "4":0, "3":0, "2":0, "1":0};
+        
+        // อัปเดตตัวเลขรวมบนหน้าเว็บ
+        const elTotalResp = document.getElementById('satTotalRespondents');
+        const elTotalUsers = document.getElementById('satTotalUsers');
+        const elPercentText = document.getElementById('satPercentText');
+        
+        if (elTotalResp) elTotalResp.textContent = totalResp;
+        if (elTotalUsers) elTotalUsers.textContent = totalUsers;
+        
+        let percentAll = "0.0";
         if(totalUsers > 0) {
-            percentAll = ((totalResp / totalUsers) * 100).toFixed(1) + "%";
+            percentAll = ((totalResp / totalUsers) * 100).toFixed(1);
         }
-        document.getElementById('satPercentText').textContent = `คิดเป็น ${percentAll} ของเจ้าหน้าที่ในระบบ`;
+        if (elPercentText) elPercentText.textContent = `คิดเป็น ${percentAll}% ของเจ้าหน้าที่ในระบบ`;
 
         const labels = {
             5: "พึงพอใจมากที่สุด",
@@ -1021,10 +1030,13 @@
         };
 
         const container = document.getElementById('satBars');
+        if (!container) return; // หยุดทำงานถ้าหา Container ไม่เจอ
+
         let html = '';
         
         [5, 4, 3, 2, 1].forEach(level => {
-            const count = satCounts[level] || 0;
+            // ค้นหา Key แบบ String ป้องกัน Error
+            const count = satCounts[level.toString()] || satCounts[level] || 0;
             const percent = totalResp > 0 ? ((count / totalResp) * 100).toFixed(1) : 0;
             const stars = '<i class="fas fa-star"></i>'.repeat(level);
             
@@ -1047,16 +1059,18 @@
         
         container.innerHTML = html;
 
-        // Animate Bars
+        // Animate Bars (หน่วงเวลาเล็กน้อยให้หน้าเว็บวาด HTML เสร็จก่อน)
         setTimeout(() => {
             document.querySelectorAll('.sat-bar-fill').forEach(bar => {
                 bar.style.width = bar.getAttribute('data-target-width');
             });
-        }, 100);
+        }, 150);
     }
     
-    // เรียกใช้งานเมื่อโหลดเสร็จ
-    renderSatisfactionBars();
+    // เรียกใช้งานฟังก์ชันเมื่อโหลดหน้าเว็บ
+    document.addEventListener("DOMContentLoaded", function() {
+        renderSatisfactionBars();
+    });
 
 
     // ==================================================
